@@ -1,8 +1,7 @@
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem } from 'jalali-js';
-import { createCalendar } from 'jalali-js';
+import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
 import { useMemo, useState } from 'react';
-import { buildCalendarGrid, nextMonth, previousMonth } from './calendar-grid.js';
 import type { LocaleCode } from './use-calendar.js';
 import { localePackFor } from './use-calendar.js';
 

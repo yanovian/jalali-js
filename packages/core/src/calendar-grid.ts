@@ -1,5 +1,8 @@
-import type { CalendarDate, CalendarSystem } from 'jalali-js';
-import { addDays, dayOfWeek, getCalendarEngine } from 'jalali-js';
+import type { CalendarDate } from './calendar-date.js';
+import type { CalendarSystem } from './convert.js';
+import { getCalendarEngine } from './convert.js';
+import { addDays } from './date-math.js';
+import { dayOfWeek } from './day-of-week.js';
 
 export interface CalendarGridDay {
   date: CalendarDate;
@@ -25,6 +28,10 @@ function isSameDate(a: CalendarDate, b: CalendarDate): boolean {
  * of the previous month and the leading days of the next month so every row is a complete
  * week. `today` and `selected` mark the matching cells via `isToday`/`isSelected`, for a
  * consumer to style.
+ *
+ * Framework-agnostic on purpose: the `react` and `vue` bindings both need this exact
+ * computation, and `core` is the one package both already depend on, so it lives here instead
+ * of being written twice and risking drift between them.
  */
 export function buildCalendarGrid(
   system: CalendarSystem,

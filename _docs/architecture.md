@@ -390,7 +390,12 @@ commit.
   imports to dodge this: it is consumed by both Vite (`playground-react`)
   and webpack (`playground-next`) today, and a third bundler with its own
   resolution quirks is more likely to show up later than a reason for
-  `packages/react` to run under plain Node ever is.
+  `packages/react` to run under plain Node ever is. `apps/playground-nuxt`
+  needed no such workaround: Nuxt builds on Vite, not Turbopack, and Vite
+  already resolves the `.js`-suffixed imports correctly on its own. Nuxt
+  does need `build.transpile` in `nuxt.config.ts` listing `jalali-js`,
+  `@jalali-js/i18n`, and `@jalali-js/vue`, so its build treats them as
+  source to compile rather than pre-built external packages.
 - **Build:** `tsup`, or Vite in library mode, per package. Each package
   builds ESM and CJS output, plus `.d.ts` files, and marks `sideEffects:
 false` where true, for tree-shaking.
@@ -399,13 +404,48 @@ false` where true, for tree-shaking.
   support ESLint 10 (a real crash on load, not just an unmet peer-range
   warning); `.tsx` files are linted with `eslint-plugin-react-hooks` and
   `eslint-plugin-jsx-a11y` instead, both confirmed to work under ESLint 10.
-  Revisit adding `eslint-plugin-react` back once it catches up.
+  Revisit adding `eslint-plugin-react` back once it catches up. `.vue` files
+  are linted with `eslint-plugin-vue`'s `essential` tier, not its
+  `recommended` tier: `recommended` layers in template formatting rules
+  (attribute wrapping, quote style, self-closing tags, and more) that
+  actively fight Prettier's own opinion on the same things, the same class
+  of problem `eslint-config-prettier` exists to solve for core ESLint.
+  `essential` is Vue's correctness-only tier; the handful of non-formatting
+  rules worth keeping from the higher tiers (`vue/no-v-html`,
+  `vue/require-explicit-emits`, `vue/no-template-shadow`) are added back
+  explicitly instead of pulling in the whole formatting layer to get them.
 - **Pre-commit hooks:** Husky and lint-staged, see "Pre-commit checks" above.
-- **Unit and property tests:** Vitest and fast-check.
+  `lint-staged`'s glob (`package.json`) must list `.vue` alongside
+  `.js`/`.jsx`/`.ts`/`.tsx` explicitly; adding `packages/vue` without
+  updating that glob left `.vue` files unlinted and unformatted by the hook
+  entirely, caught by deliberately staging a broken `.vue` file and
+  confirming the hook now catches it.
+- **Unit and property tests:** Vitest and fast-check. Vue component tests
+  use `@vue/test-utils` (Vue's own official testing library) rather than
+  `@testing-library/vue`: the latter's last release predates Vue 3.5 and
+  Vitest 4 by more than two years, a real compatibility risk, not just a
+  staleness preference.
 - **E2E and visual tests:** Playwright.
 - **Versioning and publishing:** Changesets.
 - **Bundle-size budget:** `size-limit`, checked in CI on `packages/core` at
   minimum.
+- **`defineModel()` and `exactOptionalPropertyTypes`.** Vue's `defineModel()`
+  macro (used in `@jalali-js/vue`'s `DatePicker` for its `v-model`) generates
+  a `modelValue` prop type that is not `exactOptionalPropertyTypes`-clean:
+  binding a genuinely-optional ref to it from a consuming app fails to
+  typecheck, even though the component itself (`packages/vue`, checked with
+  the flag on) is correct. `apps/playground-vue` and `apps/playground-nuxt`
+  set `exactOptionalPropertyTypes: false` in their own `tsconfig.json`
+  for this reason; this weakens nothing about the library's own guarantee,
+  since it is scoped to apps consuming the library, not the library itself.
+- **Framework-agnostic UI logic lives in `packages/core`, not in each
+  binding.** `buildCalendarGrid()`/`nextMonth()`/`previousMonth()` (the
+  month-grid computation both `Calendar` components need) touch no
+  framework API at all; writing them once in `packages/core` and importing
+  them from both `packages/react` and `packages/vue` was cheaper and safer
+  than keeping two copies in sync, and let Phase 6 add real property-based
+  tests for logic that Phase 5 had only exercised indirectly, through
+  React component tests.
 
 ## Makefile
 

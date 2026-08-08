@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "noEmit": true,
+    "composite": false,
+    // Vue's defineModel() macro (used in @jalali-js/vue's DatePicker) generates a modelValue
+    // prop type that is not exactOptionalPropertyTypes-clean: binding a genuinely-optional ref
+    // to v-model trips it, even though the component itself (packages/vue, checked with this
+    // flag on) is correct. This is an app consuming the library, not the library itself, so
+    // relaxing this here does not weaken any guarantee the library's own typecheck makes.
+    "exactOptionalPropertyTypes": false
+  },
+  "include": ["src", "vite.config.ts"]
+}

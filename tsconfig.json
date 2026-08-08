@@ -9,7 +9,10 @@
     { "path": "packages/i18n" },
     { "path": "packages/nlp" },
     { "path": "packages/react" },
+    { "path": "packages/vue" },
     { "path": "apps/playground-react" },
-    { "path": "apps/playground-next" }
+    { "path": "apps/playground-next" },
+    { "path": "apps/playground-vue" },
+    { "path": "apps/playground-nuxt" }
   ]
 }

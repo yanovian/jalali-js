@@ -235,20 +235,65 @@ for either calendar system with no extra per-system logic.
 
 ## Phase 6: Vue bindings (`packages/vue`)
 
-- [ ] Add the `useCalendar` composable.
-- [ ] Add headless component primitives: scoped slots for styling.
-- [ ] Add a default-styled `DatePicker` component built on the headless
+- [x] Add the `useCalendar` composable. `src/use-calendar.ts`. Returns a
+      `date` ref (not a `[date, setDate]` pair like React's hook): idiomatic
+      Vue reads and writes the ref directly.
+- [x] Add headless component primitives: scoped slots for styling.
+      `src/Calendar.vue`, built on `buildCalendarGrid()` (moved to
+      `packages/core` this phase; see below). A `day` scoped slot lets a
+      consumer replace the cell markup outright, alongside the same
+      `[data-jalali-calendar-*]` attributes React's binding uses, for a
+      consumer who only wants to restyle rather than replace.
+- [x] Add a default-styled `DatePicker` component built on the headless
       primitives, so a consumer gets a usable picker with no custom styling.
-- [ ] Wire the `DatePicker`'s `v-model` value to the Phase 2 storage-value
-      contract, and expose the `valueFormat` option.
-- [ ] Expose a `displayFormat` prop, using the Phase 3 format presets.
-- [ ] Scaffold `apps/playground-vue` (Vite and Vue) to exercise the
-      composable and components.
-- [ ] Scaffold `apps/playground-nuxt`, a real Nuxt app, and confirm the SSR
-      timezone handling from Phase 2.
-- [ ] Add component tests with Vitest and Testing Library, including a test
+      `src/DatePicker.vue` (grid variant, wraps `Calendar` in a popover) and
+      `src/DropdownDateFields.vue` (dropdown variant). `src/date-picker.css`
+      is the same stylesheet content as `@jalali-js/react`'s, since both
+      bindings share the same `[data-jalali-*]` attribute names.
+- [x] Wire the `DatePicker`'s `v-model` value to the Phase 2 storage-value
+      contract, and expose the `valueFormat` option. `v-model` carries the
+      _storage_ value (shaped by `valueFormat`), not the raw `CalendarDate`,
+      so it is an effective write channel: picking a date updates the bound
+      value, but the component does not read a value back in (inverting
+      every `valueFormat` back to a date is out of scope); a `defaultDate`
+      prop seeds the initial selection instead, the same split React's
+      `defaultDate`/`onChange` design already uses.
+- [x] Expose a `displayFormat` prop, using the Phase 3 format presets.
+- [x] Scaffold `apps/playground-vue` (Vite and Vue) to exercise the
+      composable and components. Builds cleanly (`vite build`); exercises
+      both `DatePicker` variants, both locales, both calendar systems, and
+      `useCalendar` directly.
+- [x] Scaffold `apps/playground-nuxt`, a real Nuxt app, and confirm the SSR
+      timezone handling from Phase 2. Verified against the actual built
+      output, not just a unit test: `nuxt build` produces a real Nitro
+      server, which was started and curled directly; the response HTML
+      reads `Resolved timezone (timeZone: 'auto'): UTC`, matching
+      architecture.md's SSR design. Unlike Next.js/Turbopack (Phase 5),
+      Nuxt's Vite-based build needed no extension-resolution workaround,
+      only `build.transpile` in `nuxt.config.ts` (see architecture.md's
+      Tooling section).
+- [x] Add component tests with Vitest and Testing Library, including a test
       that the emitted value stays Gregorian by default while the display
-      shows Jalali.
+      shows Jalali. `Calendar.test.ts`, `DatePicker.test.ts`,
+      `use-calendar.test.ts`, `use-resolved-timezone.test.ts`, using
+      `@vue/test-utils` rather than `@testing-library/vue` (see
+      architecture.md's Tooling section for why).
+
+This phase also moved `buildCalendarGrid()`/`nextMonth()`/`previousMonth()`
+from `packages/react` into `packages/core`: the computation touches no
+framework API, and `packages/vue` needed the identical logic, so writing it
+once and importing it from both bindings was safer than a second copy that
+could drift. This also gave the logic its own direct, property-based test
+suite (`packages/core/src/calendar-grid.test.ts`) for the first time; Phase
+5 had only exercised it indirectly, through React component tests.
+
+This phase also found and fixed a real gap in the pre-commit hook itself:
+`lint-staged`'s file glob (in the root `package.json`) did not include
+`.vue`, so adding `packages/vue` meant the hook silently skipped linting and
+formatting every `.vue` file. Fixed by adding `.vue` to the glob, then
+verified directly the same way Phase 0 verified the hook originally:
+staging a `.vue` file with an unfixable lint error and confirming the
+commit is blocked.
 
 ## Phase 7: Theming and configurability
 

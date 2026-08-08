@@ -1,0 +1,23 @@
+{
+  "name": "playground-vue",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@jalali-js/i18n": "workspace:*",
+    "@jalali-js/vue": "workspace:*",
+    "jalali-js": "workspace:*",
+    "vue": "^3.5.41"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "vite": "8.2.0",
+    "vue-tsc": "^3.3.9"
+  }
+}
