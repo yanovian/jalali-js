@@ -357,9 +357,9 @@ audit and maintenance workflows.
       budget is exceeded.
 - [ ] Add `license-audit.yml`, reusing the org's existing license-audit
       action.
-- [ ] Add `update-dependencies-non-breaking.yml` (weekly).
-- [ ] Add `update-dependencies-breaking.yml` (monthly, with a minimum
-      release-age buffer).
+- [ ] Add `update-dependencies-non-breaking.yml` (monthly).
+- [ ] Add `update-dependencies-breaking.yml` (once every 6 months as it is
+      breaking potentially change with 3o days ofset).
 - [ ] Add `prune-old-actions.yaml` (scheduled cleanup).
 
 ## Phase 10: Visual e2e tests and PR screenshot bot
