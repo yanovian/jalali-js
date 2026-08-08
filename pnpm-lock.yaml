@@ -57,6 +57,19 @@ importers:
         specifier: workspace:*
         version: link:../core
 
+  packages/nlp:
+    dependencies:
+      '@jalali-js/i18n':
+        specifier: workspace:*
+        version: link:../i18n
+      jalali-js:
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@types/node':
+        specifier: ^26.2.0
+        version: 26.2.0
+
 packages:
 
   '@eslint-community/eslint-utils@4.10.1':

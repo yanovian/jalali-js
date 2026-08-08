@@ -1,5 +1,5 @@
 {
-  "name": "@jalali-js/i18n",
+  "name": "@jalali-js/nlp",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@jalali-js/i18n": "workspace:*",
     "jalali-js": "workspace:*"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/node": "^26.2.0"
+  }
 }

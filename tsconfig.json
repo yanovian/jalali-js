@@ -4,5 +4,9 @@
   // exists. The "typecheck" script does not run this file directly; it delegates to each
   // package's own typecheck script instead, so it works with zero packages too.
   "files": [],
-  "references": [{ "path": "packages/core" }, { "path": "packages/i18n" }]
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/i18n" },
+    { "path": "packages/nlp" }
+  ]
 }

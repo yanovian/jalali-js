@@ -152,15 +152,36 @@ any calendar system with no extra per-system logic, and is verified against
 
 ## Phase 4: Natural language date parsing (`packages/nlp`)
 
-- [ ] Define a `parse(input: string, locale)` function that returns a
-      `CalendarDate`, or `null` when it cannot read the input.
-- [ ] Add an English word list: relative terms (`today`, `tomorrow`,
+- [x] Define a `parse(input: string, locale)` function that returns a
+      `CalendarDate`, or `null` when it cannot read the input. `src/parse.ts`.
+      `locale` is `'en' | 'fa' | 'fa-Latn'`, the BCP 47-style tag for
+      Finglish (Farsi, Latin script); an options bag adds `system`
+      (default `'jalali'`) without disturbing that two-argument shape for
+      the common case.
+- [x] Add an English word list: relative terms (`today`, `tomorrow`,
       `yesterday`, `next week`) and Jalali month names in English spelling
-      (`next Farvardin`).
-- [ ] Add a Farsi word list, in Persian script (`امروز`, `فردا`, `دیروز`).
-- [ ] Add a Finglish word list, Farsi words in Latin letters (`emrooz`,
+      (`next Farvardin`). `src/word-list.ts`, reusing `en.monthNames.jalali`
+      from `@jalali-js/i18n` rather than a second copy of the same names
+      (architecture.md: "next to the locale data it depends on").
+- [x] Add a Farsi word list, in Persian script (`امروز`, `فردا`, `دیروز`).
+      `src/word-list.ts`. Extended to match English's coverage rather than
+      stopping at the three listed words: `هفته آینده`/`هفته بعد` for
+      "next week", and `<month> آینده`/`<month> بعد` for "next Farvardin"'s
+      Farsi equivalent, in Farsi's own suffix word order (the month name
+      first, the "next" marker after).
+- [x] Add a Finglish word list, Farsi words in Latin letters (`emrooz`,
       `farda`, `dirooz`), with common spelling variants for each word.
-- [ ] Add unit tests for each input style, and for invalid or unclear input.
+      `src/word-list.ts`. Month names reuse the same English
+      transliterations as the English word list (`Farvardin`, and so on):
+      those already are Finglish spellings, not English words, so writing
+      them twice would only be able to drift out of sync.
+- [x] Add unit tests for each input style, and for invalid or unclear input.
+      `parse.test.ts`.
+
+This phase also added `addDays()` to `packages/core` (`src/date-math.ts`,
+needed for "tomorrow", "yesterday", and "next week"). It moves along a
+date's Julian Day Number, so it is correct across a month or year boundary
+for either calendar system with no extra per-system logic.
 
 ## Phase 5: React bindings (`packages/react`)
 
