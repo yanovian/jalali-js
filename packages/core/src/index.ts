@@ -19,6 +19,7 @@ export { createCalendar } from './calendar.js';
 export type { CalendarDateFields, CalendarEngine } from './calendar-engine.js';
 export type { CalendarSystem } from './convert.js';
 export { fromGregorian, getCalendarEngine, toGregorian } from './convert.js';
+export { dayOfWeek } from './day-of-week.js';
 export { gregorianEngine } from './gregorian.js';
 export { jalaliEngine } from './jalali.js';
 export type { NativeCalendarObject, StorageValue, ValueFormat } from './storage-value.js';

@@ -51,6 +51,12 @@ importers:
         specifier: ^4.9.0
         version: 4.9.0
 
+  packages/i18n:
+    dependencies:
+      jalali-js:
+        specifier: workspace:*
+        version: link:../core
+
 packages:
 
   '@eslint-community/eslint-utils@4.10.1':

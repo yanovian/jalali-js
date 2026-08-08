@@ -357,8 +357,20 @@ commit.
 ## Tooling
 
 - **Package manager and workspaces:** pnpm.
-- **Language:** TypeScript, with `strict: true`, no implicit `any`, and
-  project references between packages.
+- **Language:** TypeScript, with `strict: true`, no implicit `any`.
+  A package that depends on another workspace package (for example
+  `packages/i18n` on `packages/core`) does **not** declare a TypeScript
+  project reference to it in its own `tsconfig.json`. A declared reference
+  puts that pair under TypeScript's composite build-graph rules, which
+  require an actual `tsc --build` (with real `.d.ts` output on disk) before
+  a plain `tsc --noEmit` on the referencing package can see the other
+  package's types at all: the exact failure this repo hit once already.
+  Cross-package types resolve through the ordinary pnpm workspace
+  `node_modules` symlink instead, backed by each package's `main`/`types`
+  fields (pointing at `src/index.ts` until Phase 8 adds a real build). The
+  root `tsconfig.json` still lists every package under `references`, but
+  only as an editor convenience (cross-package go-to-definition and
+  the like); no script ever runs that file directly.
 - **Build:** `tsup`, or Vite in library mode, per package. Each package
   builds ESM and CJS output, plus `.d.ts` files, and marks `sideEffects:
 false` where true, for tree-shaking.

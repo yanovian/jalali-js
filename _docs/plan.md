@@ -118,16 +118,37 @@ as it lands.
 
 ## Phase 3: Internationalization (`packages/i18n`)
 
-- [ ] Add `en` locale data: month names, weekday names, and direction.
-- [ ] Add `fa` locale data: month names, weekday names, Persian numerals,
-      and right-to-left direction.
-- [ ] Add a `format()` function that reads locale data.
-- [ ] Add display-format presets: long against short, with or without
-      weekday, and Persian against Latin digits.
-- [ ] Design the locale-pack format so a third locale is a data file, with
-      no code change.
-- [ ] Add unit tests for formatted output per locale, per format preset, and
-      for numeral conversion.
+- [x] Add `en` locale data: month names, weekday names, and direction.
+      `src/en.ts`. Covers both calendar systems' month names, including
+      English transliterations of the Jalali months (Farvardin, Ordibehesht,
+      and so on), not only Gregorian ones.
+- [x] Add `fa` locale data: month names, weekday names, Persian numerals,
+      and right-to-left direction. `src/fa.ts`. Also covers both calendar
+      systems, including Persian transliterations of the Gregorian months
+      (ژانویه, فوریه, and so on). Persian has no widely standardized
+      abbreviated month form the way English does, so `short` reuses `long`
+      for month names in this locale; weekday names do have a well-known
+      one-letter short form, so those differ.
+- [x] Add a `format()` function that reads locale data. `src/format.ts`.
+      Depends on `jalali-js` (`packages/core`) for `AnyCalendarDate` and the
+      new `dayOfWeek()` helper (below); `packages/core` itself still has
+      zero runtime dependencies, so this stays a one-directional
+      `i18n -> core` dependency, not a cycle.
+- [x] Add display-format presets: long against short, with or without
+      weekday, and Persian against Latin digits. `FormatOptions` in
+      `src/format.ts`: `style`, `weekday`, `numerals`.
+- [x] Design the locale-pack format so a third locale is a data file, with
+      no code change. `LocalePack` in `src/locale.ts`; `en.ts` and `fa.ts`
+      are both plain data files against that one interface.
+- [x] Add unit tests for formatted output per locale, per format preset, and
+      for numeral conversion. `format.test.ts`, `numerals.test.ts`.
+
+This phase also added `dayOfWeek()` to `packages/core` (`src/day-of-week.ts`,
+not itemized in Phase 1 or 2, since the need for it only became clear once
+the `weekday` display preset required knowing which weekday a date falls
+on). It derives the weekday from a date's Julian Day Number, so it works for
+any calendar system with no extra per-system logic, and is verified against
+`Date.prototype.getUTCDay()` across a wide range of random dates.
 
 ## Phase 4: Natural language date parsing (`packages/nlp`)
 
