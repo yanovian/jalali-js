@@ -342,30 +342,64 @@ composing themes.
 
 ## Testing strategy
 
-| Layer          | Tool                       | What it covers                                                                                                 |
-| -------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Unit           | Vitest                     | Conversion correctness, leap-year rules, formatting, i18n data, NLP parsing                                    |
-| Property-based | fast-check                 | Round-trip checks across a large range of random dates                                                         |
-| Type-level     | `tsd` or `expect-type`     | The public API types work as documented, for example a precision tier rejects a field it does not have         |
-| Component      | Vitest and Testing Library | React and Vue binding behavior, tested alone                                                                   |
-| E2E and visual | Playwright                 | A real browser render of all four playground apps, across locale, direction, precision, and theme combinations |
+| Layer          | Tool                       | What it covers                                                                                                             |
+| -------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Unit           | Vitest                     | Conversion correctness, leap-year rules, formatting, i18n data, NLP parsing                                                |
+| Property-based | fast-check                 | Round-trip checks across a large range of random dates                                                                     |
+| Type-level     | `tsd` or `expect-type`     | The public API types work as documented, for example a precision tier rejects a field it does not have                     |
+| Component      | Vitest and Testing Library | React and Vue binding behavior, tested alone                                                                               |
+| E2E and visual | Playwright                 | A real browser render of all four playground apps, across locale, direction, precision, theme, and browser combinations    |
+| Compatibility  | GitHub Actions matrix      | Each playground app built, typechecked, and tested against every still-supported major version of its underlying framework |
+
+### Cross-browser coverage
+
+The Playwright suite (Phase 10) runs against Playwright's three engines,
+Chromium, Firefox, and WebKit, covering Chrome/Edge, Firefox, and Safari's
+rendering engine without needing a real per-OS browser install or a paid
+cross-browser cloud service. Browser is a matrix dimension, not a config
+option baked into one run: each `{app, browser}` pair is its own parallel
+CI job (see the CI/CD pipeline's matrix exception above), so adding a
+browser costs one more parallel job, not more wall-clock time.
+
+### Peer-dependency compatibility matrix
+
+A UI library breaks in ways `packages/react`'s and `packages/vue`'s own
+test suites cannot see: a peer dependency's own major-version upgrade
+changing a JSX transform, a hook's rules, a Vue reactivity edge case, or an
+SSR API. Phase 9 adds a compatibility job, separate from the main `ci.yml`
+checks, that installs each playground app against every major version of
+its framework still under active support/maintenance today (illustrative,
+not fixed, since the real list drifts: React's last two majors, Vue 2 and
+3, Next.js's last two or three majors, Nuxt's last two), and runs that
+app's own build, typecheck, and test steps against each. One GitHub
+Actions matrix job per `{app, framework version}` cell, in parallel. A
+`peerDependencies` range that is too narrow, or a real incompatibility a
+type-only check would miss, fails here instead of in a downstream
+consumer's install.
 
 ### Visual regression and PR screenshots
 
 Playwright takes screenshots of the calendar in a set matrix, for example
-`{en, fa}` by `{date, datetime, zoned-datetime}` by `{default theme}`, across
-all four playground apps: `playground-react`, `playground-vue`,
-`playground-next`, and `playground-nuxt`. On every pull request, a CI job:
+`{en, fa}` by `{date, datetime, zoned-datetime}` by `{default theme}` by
+`{chromium, firefox, webkit}`, across all four playground apps:
+`playground-react`, `playground-vue`, `playground-next`, and
+`playground-nuxt`. It also takes one smoke screenshot per `{app, framework
+version}` cell from the compatibility matrix above, so a maintainer sees
+whether a framework upgrade changed rendering, not only whether the build
+succeeded; that smoke shot skips the full locale/precision/theme/browser
+cross product; one representative configuration per cell is enough to
+catch a rendering regression, and the full cross product already runs on
+the current framework version. On every pull request, a CI job:
 
-1. Runs the Playwright visual suite and saves the PNG files as a build
-   artifact.
+1. Runs the Playwright visual suite (both matrices above, each a set of
+   parallel matrix jobs) and saves the PNG files as a build artifact.
 2. Publishes the images somewhere a PR comment can link to. The proposal is
    to commit them to an orphan `visual-snapshots` branch. A raw GitHub URL
    then embeds directly in Markdown, with no third-party service and no
    cost. `actions/github-script` posts or updates one PR comment with the
-   image grid. A paid visual-diff service, such as Chromatic or Percy, is a
-   reasonable upgrade later, if pixel-diff review becomes slow. It is not
-   required for v1.
+   image grid, covering both matrices. A paid visual-diff service, such as
+   Chromatic or Percy, is a reasonable upgrade later, if pixel-diff review
+   becomes slow. It is not required for v1.
 3. Fails the check when a screenshot differs from its baseline past a set
    threshold, and the PR does not update the baseline. This stops silent
    visual drift, while it still lets an intended visual change move through
@@ -376,6 +410,19 @@ all four playground apps: `playground-react`, `playground-vue`,
 The pipeline uses GitHub Actions. It follows the pattern already used across
 this org's repos: pnpm and Node setup, single-runner jobs with no matrix, and
 reusable internal actions for dependency updates and license audits.
+
+**Exception: the Phase 9 peer-dependency compatibility matrix and the Phase
+10 cross-browser visual suite both use a real GitHub Actions
+`strategy.matrix`, deliberately, not the single-runner style above.** A
+compatibility check across several supported major versions of React, Vue,
+Next.js, and Nuxt, and a visual suite across several browser engines, are
+exactly the case a matrix exists for: the work is the same job repeated
+over an axis of inputs, and running it serially would multiply CI
+wall-clock time by the size of that axis for no benefit. The rest of the
+pipeline (`ci.yml`'s install/typecheck/lint/format-check/test/build, and
+the scheduled maintenance workflows) stays single-runner, since none of
+that work is naturally shaped as "the same job, many inputs" the way these
+two checks are.
 
 - **`ci.yml`.** This workflow exists from Phase 0, not from a later phase.
   Its first version runs on push and pull request: install, typecheck,

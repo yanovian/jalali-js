@@ -400,16 +400,39 @@ audit and maintenance workflows.
 - [ ] Add `update-dependencies-breaking.yml` (once every 6 months as it is
       breaking potentially change with 3o days ofset).
 - [ ] Add `prune-old-actions.yaml` (scheduled cleanup).
+- [ ] Add a peer-dependency compatibility matrix job: build, typecheck, and
+      test each playground app against every major version of its
+      underlying framework that is still under active support/maintenance
+      (React, Vue, Next.js, Nuxt; the exact version list, e.g. React 18 and
+      19, Vue 2 and 3, Next's last two or three majors, Nuxt's last two, is
+      chosen at implementation time from each project's own support
+      policy, not fixed here, since it goes stale otherwise). One GitHub
+      Actions matrix job per `{app, framework version}` cell, all running
+      in parallel, so this stays fast despite the combinatorial version
+      count (see architecture.md's CI/CD pipeline for why this is a
+      deliberate, scoped exception to this pipeline's usual no-matrix
+      style).
 
 ## Phase 10: Visual e2e tests and PR screenshot bot
 
 - [ ] Add a Playwright config that targets all four playground apps,
       including `playground-next` and `playground-nuxt`.
-- [ ] Add the screenshot capture matrix: locale, precision, and theme.
+- [ ] Add cross-browser coverage: Chromium, Firefox, and WebKit (Playwright's
+      three engines, covering Chrome/Edge, Firefox, and Safari's rendering
+      engine without needing real per-OS browser installs). Runs as its own
+      matrix dimension, in parallel per browser, alongside the visual
+      matrix below.
+- [ ] Add the screenshot capture matrix: locale, precision, theme, and
+      browser (from the cross-browser job above).
+- [ ] Add one smoke screenshot per `{app, framework version}` cell from
+      Phase 9's peer-dependency compatibility matrix, so a maintainer can
+      see whether a framework upgrade broke rendering, not only whether the
+      build succeeded, feeding the same PR comment grid as the main visual
+      matrix.
 - [ ] Add a publish step that commits screenshots to an orphan
       `visual-snapshots` branch, for linkable raw URLs.
 - [ ] Add a PR comment bot, using `actions/github-script`, that posts or
-      updates one comment with the image grid.
+      updates one comment with the image grid, covering every matrix above.
 - [ ] Add a baseline diff check that fails the build on an unacknowledged
       visual change, and passes when the PR updates the baseline with the
       change.
