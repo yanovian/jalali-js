@@ -7,8 +7,9 @@ first-class bindings for React, Vue, Nuxt, and Next.js. It supports English
 and Farsi (Persian), including natural language date input in both languages.
 It has a configurable date, time, and timezone precision model.
 
-**Status: pre-implementation.** This repo holds the project plan only. No
-code has been written yet.
+**Status: early scaffolding.** Phase 0 (repo tooling: lint, typecheck, tests,
+CI, pre-commit hooks) is done. Calendar logic has not started yet. See
+[`_docs/plan.md`](_docs/plan.md) for the phase-by-phase status.
 
 ## Plan
 
@@ -22,5 +23,5 @@ code has been written yet.
 
 ## License
 
-TBD. See [open decisions](_docs/architecture.md#open-decisions) in
-architecture.md.
+[MIT](LICENSE), copyright Yanovian LLC. Open source and free to use, with no
+warranty.

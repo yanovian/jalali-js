@@ -4,8 +4,8 @@ See [alternatives.md](./alternatives.md) for the vision and the comparison
 with other libraries. See [architecture.md](./architecture.md) for the design
 behind these decisions. This file shows only the status of each phase.
 
-No phase is implemented yet. Every item below is `[ ]`. Change an item to
-`[x]` as it lands.
+Phase 0 is done. Every phase after it is still `[ ]`. Change an item to `[x]`
+as it lands.
 
 ## Phase 0: Repo scaffolding and tooling
 
@@ -20,8 +20,7 @@ No phase is implemented yet. Every item below is `[ ]`. Change an item to
       each package's own script, so it works with zero packages too.
 - [x] Add an ESLint flat config and Prettier, shared across packages.
 - [x] Set up Vitest at the workspace root, so it runs across all packages.
-- [x] Add a `LICENSE` file (MIT, pending confirmation; see architecture.md's
-      open decisions).
+- [x] Add a `LICENSE` file: MIT.
 - [x] Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`.
 - [x] Add `.github/ISSUE_TEMPLATE/` with `bug_report.yml`,
       `feature_request.yml`, and `config.yml`.

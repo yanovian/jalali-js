@@ -398,9 +398,8 @@ release              Publish through Changesets (CI-driven; the local target is 
 
 ## Governance and community files
 
-- `LICENSE`. **Open decision, proposed default: MIT.** This matches the
-  license used across the rest of this ecosystem, and across this org's
-  other public repos. Confirm this before Phase 0.
+- `LICENSE`: MIT. This matches the license used across the rest of this
+  ecosystem, and across this org's other public repos.
 - `CONTRIBUTING.md`: setup steps, branch and PR conventions, the changeset
   requirement, and commit style.
 - `CODE_OF_CONDUCT.md`: Contributor Covenant.
@@ -413,13 +412,15 @@ release              Publish through Changesets (CI-driven; the local target is 
 
 ## Open decisions
 
+The license is MIT (see "Governance and community files" above). The
+decisions below are still open.
+
 | #   | Decision                                                                                              | Proposed default                                                                                                                   |
 | --- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | License                                                                                               | MIT                                                                                                                                |
-| 2   | npm package names and scope: unscoped `jalali-js` core against a scoped `@jalali-js/core` monorepo    | `jalali-js` for the core package, to match the repo name. `@jalali-js/react` and `@jalali-js/vue` for the bindings                 |
-| 3   | Monorepo task runner                                                                                  | Plain pnpm workspace scripts. Add Turborepo or Nx only if CI time later justifies it                                               |
-| 4   | Docs site framework                                                                                   | VitePress: lightweight, Vue-based, and enough for API docs plus playground embeds                                                  |
-| 5   | Reuse the org's existing internal GitHub Actions (dependency updater, license auditor, action pruner) | Yes, reuse them as they are                                                                                                        |
-| 6   | Where to host PR screenshots for visual diffs                                                         | Commit to an orphan branch and link raw URLs, with no third-party cost. Revisit with Chromatic or Percy if the team needs it later |
-| 7   | The second calendar system for the abstraction-proof phase                                            | Hebrew calendar. The team confirms this at the start of that phase                                                                 |
-| 8   | The default `DatePicker` UI variant: calendar-grid popup against year/month/day dropdowns             | Calendar-grid popup for v1, with a `variant: 'dropdown'` option. Confirm before Phase 5 and Phase 6 start                          |
+| 1   | npm package names and scope: unscoped `jalali-js` core against a scoped `@jalali-js/core` monorepo    | `jalali-js` for the core package, to match the repo name. `@jalali-js/react` and `@jalali-js/vue` for the bindings                 |
+| 2   | Monorepo task runner                                                                                  | Plain pnpm workspace scripts. Add Turborepo or Nx only if CI time later justifies it                                               |
+| 3   | Docs site framework                                                                                   | VitePress: lightweight, Vue-based, and enough for API docs plus playground embeds                                                  |
+| 4   | Reuse the org's existing internal GitHub Actions (dependency updater, license auditor, action pruner) | Yes, reuse them as they are                                                                                                        |
+| 5   | Where to host PR screenshots for visual diffs                                                         | Commit to an orphan branch and link raw URLs, with no third-party cost. Revisit with Chromatic or Percy if the team needs it later |
+| 6   | The second calendar system for the abstraction-proof phase                                            | Hebrew calendar. The team confirms this at the start of that phase                                                                 |
+| 7   | The default `DatePicker` UI variant: calendar-grid popup against year/month/day dropdowns             | Calendar-grid popup for v1, with a `variant: 'dropdown'` option. Confirm before Phase 5 and Phase 6 start                          |
