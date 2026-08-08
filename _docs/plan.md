@@ -76,25 +76,45 @@ as it lands.
 
 ## Phase 2: Precision and timezone data model (`packages/core`)
 
-- [ ] Add the `CalendarDate` type: year, month, and day. This is the
-      default, with no time part.
-- [ ] Add the `CalendarDateTime` type: adds time, with no timezone.
-- [ ] Add the `ZonedCalendarDateTime` type: adds an IANA timezone.
-- [ ] Add the `createCalendar()` factory, with a `precision` option that
-      picks one of the tiers above.
-- [ ] Support `timeZone: 'auto'` through `Intl.DateTimeFormat`.
-- [ ] Handle timezone safely under SSR: `'auto'` resolves to UTC during
-      server render. Add a `useResolvedTimeZone()`-style hook that reads the
-      real client timezone after hydration (see architecture.md's SSR note).
-- [ ] Add unit tests for each precision tier and for timezone conversion.
-- [ ] Add the storage-value contract: each precision tier converts to a
+- [x] Add the `CalendarDate` type: year, month, and day. This is the
+      default, with no time part. `src/calendar-date.ts`.
+- [x] Add the `CalendarDateTime` type: adds time, with no timezone.
+      `src/calendar-date.ts`.
+- [x] Add the `ZonedCalendarDateTime` type: adds an IANA timezone.
+      `src/calendar-date.ts`.
+- [x] Add the `createCalendar()` factory, with a `precision` option that
+      picks one of the tiers above. `src/calendar.ts`, using function
+      overloads so each precision's `today()` returns the right type.
+- [x] Support `timeZone: 'auto'` through `Intl.DateTimeFormat`.
+      `resolveTimeZone()` in `src/timezone.ts`.
+- [x] Handle timezone safely under SSR: `'auto'` resolves to UTC during
+      server render (detected through `globalThis.window`, so this package
+      never needs the DOM lib to compile). The `useResolvedTimeZone()` hook
+      itself is a React/Vue binding, so it ships in Phase 5/6; this phase
+      ships the SSR-safe primitive (`resolveTimeZone()`) that hook wraps
+      (see architecture.md's SSR note).
+- [x] Add unit tests for each precision tier and for timezone conversion.
+      `calendar.test.ts`, `timezone.test.ts`. The timezone conversion
+      (`zonedWallClockToInstant()` / `instantToZonedFields()`) is verified
+      against known real-world offsets: a fixed-offset zone (Asia/Tehran,
+      UTC+03:30), and a DST-observing zone in both seasons (America/New_York).
+      A property test round-trips 1970-2100 across five zones. This work
+      also found and fixed a real bug: the offset lookup compared an
+      instant against a seconds-only reconstruction of itself, leaking up
+      to +/-999ms of truncation noise into the result as a spurious
+      fractional-minute offset.
+- [x] Add the storage-value contract: each precision tier converts to a
       Gregorian, calendar-agnostic value by default (see architecture.md's
-      "Display value against storage value").
-- [ ] Add the `valueFormat` option (`gregorian-iso`, `date`, `epoch`,
+      "Display value against storage value"). `toStorageValue()` in
+      `src/storage-value.ts`.
+- [x] Add the `valueFormat` option (`gregorian-iso`, `date`, `epoch`,
       `jalali-iso`, `jalali-object`), so an app can opt into a Jalali-native
-      stored value when it needs one.
-- [ ] Add unit tests that confirm the default stored value stays Gregorian
+      stored value when it needs one. `src/storage-value.ts`.
+- [x] Add unit tests that confirm the default stored value stays Gregorian
       even when the display locale and calendar are Jalali.
+      `storage-value.test.ts`'s "stays Gregorian and calendar-agnostic"
+      suite, including a test that the Jalali year (1403) never appears in
+      the default output at all.
 
 ## Phase 3: Internationalization (`packages/i18n`)
 
