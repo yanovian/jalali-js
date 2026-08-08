@@ -444,16 +444,17 @@ that work is naturally shaped as "the same job, many inputs" the way these
 two checks are.
 
 - **`ci.yml`.** This workflow exists from Phase 0, not from a later phase.
-  Its first version runs on push and pull request: install, typecheck,
-  lint, format-check, and unit tests. Every later phase adds a step to this
-  same workflow instead of standing up CI for the first time: a build step
-  and a bundle-size check (with `size-limit` or a similar tool, since "fast
-  and efficient" is a stated goal and CI should enforce it, not just state
-  it) once there is a build, a step that builds all four playground apps
-  including `playground-next` and `playground-nuxt` once they exist, and a
-  Playwright visual suite with screenshot upload or comment once the visual
-  tests exist. The result is that no phase after Phase 0 ships a change with
-  no CI check behind it.
+  Its first version ran install, typecheck, lint, format-check, and unit
+  tests on push and pull request. Phase 9 added the rest: a "Build
+  packages" step (`pnpm --filter "./packages/**" build`), a separate "Build
+  playground apps" step (`pnpm --filter "./apps/**" build`, so a break
+  specific to `playground-next` or `playground-nuxt` shows up as its own
+  named step, not folded into one opaque "build everything" line), and a
+  "Check bundle size" step (`pnpm size`, `packages/core`'s `size-limit`
+  budget from Phase 8) run after the packages build so `packages/core/dist`
+  already exists. A Playwright visual suite with screenshot upload or
+  comment is still Phase 10. No phase after Phase 0 ships a change with no
+  CI check behind it.
 - **`release.yml` (Phase 8).** Driven by Changesets, via `changesets/action`.
   Runs on every push to `master`. When unreleased changesets exist, the
   action opens or updates a "Version Packages" pull request (`pnpm
@@ -464,23 +465,80 @@ version-packages`, i.e. `changeset version`). Merging that pull request
   release with generated notes. The team picks this flow over a single
   tag-triggered release, since this repo has several packages, and `core`,
   `react`, and `vue` each need their own version.
-- **`license-audit.yml`.** Runs on pull requests, in the same shape as the
-  org's existing license-audit workflow. It gates on critical-severity
-  license issues in dependencies.
+- **`license-audit.yml` (Phase 9).** `yanovian/open-license-auditor@v1`, the
+  org's own license-scanning Action (used the same way in
+  `yanovian/chrome-ext-tabby` and the org's other repos), on every pull
+  request. `fail-on: critical` gates on strong-copyleft licenses (the GPL
+  and AGPL families); it posts one PR comment either way
+  (`severity-filter: both`) so a warning-level license is visible without
+  failing the check. No config file needed for this repo: the config file
+  is entirely optional, and every default bucket already fits a plain npm
+  workspace with no unusual license needs.
 - **`update-dependencies-non-breaking.yml`** and
-  **`update-dependencies-breaking.yml`.** Scheduled dependency update pull
-  requests, on the same cadence as other repos in the org: weekly for
-  non-breaking updates, monthly for breaking updates, with a minimum
-  release-age buffer.
-- **`prune-old-actions.yaml`.** A scheduled cleanup of old workflow runs.
+  **`update-dependencies-breaking.yml` (Phase 9).**
+  `yanovian/update-dependencies-action@v1`, scoped by `update-strategy` to
+  `non-breaking` and `breaking` respectively. **This repo's cadence is
+  slower than `yanovian/chrome-ext-tabby`'s own use of the same Action on
+  purpose, not copied verbatim:** monthly for non-breaking (the 1st of
+  every month, 03:00 UTC) and every 6 months for breaking (January 1st and
+  July 1st, 05:00 UTC, offset an hour from the non-breaking run so the two
+  never race on the months both fire), against tabby's weekly/monthly.
+  jalali-js releases by hand-reviewed Changesets, not continuously the way
+  a browser extension ships, so a breaking dependency bump benefits from a
+  slower, more deliberate cadence with more real migration review between
+  runs. `min-release-age-days: 30` on the breaking workflow gives a
+  compromised or broken release a month to get caught before this repo
+  picks it up. Both need a `PAT_TOKEN` repo secret (a real personal access
+  token), not the default `GITHUB_TOKEN`: GitHub does not let a
+  GITHUB_TOKEN-authored pull request trigger this repo's own `ci.yml`, so
+  nothing would check the update once it opened.
+- **`prune-old-actions.yaml` (Phase 9).** `yanovian/prune-old-actions@v1`,
+  daily, `days-ago: 30`, matching the org's other repos exactly (no reason
+  for this one's cadence to differ).
+- **`compat-matrix.yml` (Phase 9).** The peer-dependency compatibility
+  matrix from "Peer-dependency compatibility matrix" above. Runs on pull
+  requests that touch `packages/react`, `packages/vue`, `packages/ui-react`,
+  `packages/ui-vue`, or `apps/**`, on a weekly schedule (catches drift from
+  a newly released framework version with no PR open), and on
+  `workflow_dispatch`. `fail-fast: false`, so one incompatible version does
+  not hide the others in the same run. Each matrix cell:
+  1. Installs the workspace normally (`pnpm install --frozen-lockfile`).
+  2. Runs `scripts/compat-override.mjs <pkg@range>...`, which writes that
+     cell's framework version into the root `package.json`'s
+     `pnpm.overrides` (never committed, only ever mutated in a CI
+     checkout).
+  3. Reinstalls (`pnpm install --no-frozen-lockfile`), which pnpm resolves
+     workspace-wide, including packages that only declare the framework as
+     a `peerDependency` (`packages/react`, `packages/vue`), not only the
+     one playground app that names it as a real dependency.
+  4. Runs that app's own `typecheck` and `build` scripts, plus (for
+     React/Vue cells) `vitest run` scoped to the affected packages, so the
+     component test suites themselves run against the overridden version,
+     not only a build/typecheck smoke check.
+
+  Verified this mechanism for real, not only read: overrode `react`/
+  `react-dom`/`@types/react` to `^18` locally, reinstalled, and confirmed
+  `packages/react` and `packages/ui-react`'s full test suites (30 tests)
+  passed, along with `playground-react`'s own typecheck and build, all
+  against React 18, before restoring `package.json`/`pnpm-lock.yaml` to
+  their unmodified state.
+
+  Matrix cells today: React 18 and 19 (both still broadly deployed); Vue 3
+  only (Vue 2 reached end-of-life 2023-12-31 and is excluded, so this is a
+  matrix of one on purpose, not an oversight); Next.js 15 and 16; Nuxt 3
+  and 4. This list is not meant to stay fixed; update it as each
+  framework's own supported-majors set moves.
+
 - **`pages.yml`.** Deploys the docs and playground site to GitHub Pages when
   a file under `apps/docs/**` changes.
 
-**Open decision:** should the team reuse this org's existing internal
-GitHub Actions (dependency updater, license auditor, action pruner) as they
-are, or build new equivalents for this repo? The proposal is to reuse them.
-They are already trusted, and reuse keeps this repo consistent with the rest
-of the org.
+The dependency-update, license-audit, and action-pruning Actions above are
+the org's own (`yanovian/update-dependencies-action`,
+`yanovian/open-license-auditor`, `yanovian/prune-old-actions`), the same
+ones `yanovian/chrome-ext-tabby` and the org's other repos use, confirmed
+directly against that repo's own `.github/workflows/` rather than assumed.
+Reusing them was an open decision earlier in this document; it is settled
+now, as the "reuse them" bullets above show.
 
 ## Pre-commit checks
 
@@ -681,11 +739,36 @@ to memorize each package-manager command. It follows the same `help` target
 convention used across the org. Each check has its own target, so a
 contributor can run one check alone or every check together.
 
+**Every CI workflow calls `make <target>`, never a raw `pnpm` command,
+everywhere a Makefile target exists for what that step does (Phase 9).**
+This is deliberate, not incidental: it keeps exactly one definition of
+"what does typecheck/lint/build/etc. actually run" (the Makefile), so a
+contributor reproduces any CI failure locally with the same command CI
+used, and changing how a check runs means editing the Makefile once, not
+hunting through every workflow file that happens to invoke it. `ci.yml`,
+`release.yml`, and `compat-matrix.yml` all follow this. Two narrow,
+intentional exceptions:
+
+- `release.yml`'s `version:`/`publish:` inputs to `changesets/action` name
+  exact pnpm scripts (`pnpm version-packages`, `pnpm release`) for the
+  action to execute as its own steps, not a command a human runs directly;
+  Makefile's own `release` target is a deliberately different, dry-run-only
+  preview command (see its own entry below), so pointing these inputs at
+  `make release` would run the wrong thing.
+- `compat-matrix.yml`'s "Install with override" step uses `pnpm install
+--no-frozen-lockfile` directly: its entire point is letting the lockfile
+  move to match a version `scripts/compat-override.mjs` just wrote into
+  `package.json`, an inherently CI-only mechanic with no equivalent a
+  contributor would run by hand, unlike `install`/`install-frozen`.
+
 ```
 help                 Show available commands
 install              Install all workspace dependencies
+install-frozen       Install without updating the lockfile (CI)
 dev                  Run the playground apps in dev mode
-build                Build all packages
+build                Build all packages and apps
+build-packages       Build only packages/* (its own CI step, named separately from build-apps)
+build-apps           Build only apps/*, the four playground apps (ditto)
 typecheck            TypeScript project-wide check
 lint / lint-fix       ESLint, on its own or with autofix
 format / format-check Prettier, write mode or check mode (the CI gate)
@@ -695,10 +778,21 @@ probe-treeshake      Confirm packages/core's built output actually tree-shakes
 size                 Bundle-size budget check
 check                CI-equivalent: typecheck, lint, format-check, test, build, size
 changeset            Record a changeset for the current change
+app-typecheck        Typecheck one app/package by name: make app-typecheck APP=playground-react
+app-build            Build one app/package by name: make app-build APP=playground-react
+test-paths           Run Vitest scoped to specific paths: make test-paths PATHS="packages/react packages/ui-react"
 docs-dev / docs-build Documentation site
 clean                Remove build output
 release              Publish through Changesets (CI-driven; the local target is a dry run)
 ```
+
+`app-typecheck`, `app-build`, and `test-paths` exist for
+`compat-matrix.yml`'s dynamic matrix (see "Peer-dependency compatibility
+matrix" above), which needs to typecheck/build/test a specific app or path
+set chosen at matrix-expansion time, not one fixed at Makefile-authoring
+time; Make's own `VAR=value` argument passing covers this without
+inventing a parallel mechanism. They are equally usable by a contributor
+locally, for example to reproduce one matrix cell's typecheck step by hand.
 
 ## Governance and community files
 
@@ -722,11 +816,16 @@ naming is settled too: `jalali-js` for the core package, `@jalali-js/i18n`,
 package's own `package.json`. The default `DatePicker` UI variant is
 settled as well: a calendar-grid popup, with `variant: 'dropdown'` as the
 alternative (see "Configuration and theming" above); both ship in Phase 5.
-The decisions below are still open.
+Reusing the org's existing internal GitHub Actions (dependency updater,
+license auditor, action pruner) is settled too, as of Phase 9: yes, reuse
+them as they are (`yanovian/update-dependencies-action`,
+`yanovian/open-license-auditor`, `yanovian/prune-old-actions`; see the
+CI/CD pipeline section above), on this repo's own cadence rather than
+copying another repo's schedule verbatim. The decisions below are still
+open.
 
-| #   | Decision                                                                                              | Proposed default                                                                                                                   |
-| --- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Monorepo task runner                                                                                  | Plain pnpm workspace scripts. Add Turborepo or Nx only if CI time later justifies it                                               |
-| 2   | Docs site framework                                                                                   | VitePress: lightweight, Vue-based, and enough for API docs plus playground embeds                                                  |
-| 3   | Reuse the org's existing internal GitHub Actions (dependency updater, license auditor, action pruner) | Yes, reuse them as they are                                                                                                        |
-| 4   | Where to host PR screenshots for visual diffs                                                         | Commit to an orphan branch and link raw URLs, with no third-party cost. Revisit with Chromatic or Percy if the team needs it later |
+| #   | Decision                                      | Proposed default                                                                                                                   |
+| --- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Monorepo task runner                          | Plain pnpm workspace scripts. Add Turborepo or Nx only if CI time later justifies it                                               |
+| 2   | Docs site framework                           | VitePress: lightweight, Vue-based, and enough for API docs plus playground embeds                                                  |
+| 3   | Where to host PR screenshots for visual diffs | Commit to an orphan branch and link raw URLs, with no third-party cost. Revisit with Chromatic or Percy if the team needs it later |

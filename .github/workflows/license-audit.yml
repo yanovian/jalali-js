@@ -1,0 +1,23 @@
+name: License Audit
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: yanovian/open-license-auditor@v1
+        with:
+          config-path: .github/license-audit.yml
+          severity-filter: both
+          fail-on: critical
+          comment-on-pr: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}

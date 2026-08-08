@@ -390,19 +390,41 @@ since Phase 0. This phase adds the checks that only make sense once there is
 more to build: a full build, a bundle-size budget, and the surrounding
 audit and maintenance workflows.
 
-- [ ] Add a build step to `ci.yml` that builds every package.
-- [ ] Add a step that builds all four playground apps: `playground-react`,
+- [x] Add a build step to `ci.yml` that builds every package. "Build
+      packages" (`pnpm --filter "./packages/**" build`).
+- [x] Add a step that builds all four playground apps: `playground-react`,
       `playground-vue`, `playground-next`, and `playground-nuxt`. This
-      catches a break specific to Next.js or Nuxt.
-- [ ] Add a bundle-size check step that fails the build when `size-limit`'s
-      budget is exceeded.
-- [ ] Add `license-audit.yml`, reusing the org's existing license-audit
-      action.
-- [ ] Add `update-dependencies-non-breaking.yml` (monthly).
-- [ ] Add `update-dependencies-breaking.yml` (once every 6 months as it is
-      breaking potentially change with 3o days ofset).
-- [ ] Add `prune-old-actions.yaml` (scheduled cleanup).
-- [ ] Add a peer-dependency compatibility matrix job: build, typecheck, and
+      catches a break specific to Next.js or Nuxt. "Build playground apps"
+      (`pnpm --filter "./apps/**" build`), its own named step so a
+      Next.js/Nuxt-specific break is visible on its own, not folded into
+      one opaque "build everything" line.
+- [x] Add a bundle-size check step that fails the build when `size-limit`'s
+      budget is exceeded. "Check bundle size" (`pnpm size`), run after the
+      packages build so `packages/core/dist` already exists.
+- [x] Add `license-audit.yml`, reusing the org's existing license-audit
+      action. `yanovian/open-license-auditor@v1`, confirmed against
+      `yanovian/chrome-ext-tabby`'s own workflow (the real action name and
+      shape, not guessed): `fail-on: critical`, `severity-filter: both`, no
+      config file needed (every default license bucket already fits a
+      plain npm workspace).
+- [x] Add `update-dependencies-non-breaking.yml` (monthly).
+      `yanovian/update-dependencies-action@v1`,
+      `update-strategy: non-breaking`, 1st of every month at 03:00 UTC.
+      Needs a `PAT_TOKEN` repo secret (not the default `GITHUB_TOKEN`, which
+      cannot trigger this repo's own `ci.yml` on the pull request it opens).
+- [x] Add `update-dependencies-breaking.yml` (once every 6 months as it is
+      breaking potentially change with 30 days offset).
+      `yanovian/update-dependencies-action@v1`,
+      `update-strategy: breaking`, `min-release-age-days: 30`, January 1st
+      and July 1st at 05:00 UTC (this repo's own, slower cadence than
+      `yanovian/chrome-ext-tabby`'s monthly use of the same action, on
+      purpose: Changesets-driven, hand-reviewed releases warrant more time
+      between breaking bumps than a continuously-shipped browser
+      extension). Same `PAT_TOKEN` requirement as the non-breaking workflow.
+- [x] Add `prune-old-actions.yaml` (scheduled cleanup).
+      `yanovian/prune-old-actions@v1`, daily, `days-ago: 30`, matching the
+      org's other repos exactly.
+- [x] Add a peer-dependency compatibility matrix job: build, typecheck, and
       test each playground app against every major version of its
       underlying framework that is still under active support/maintenance
       (React, Vue, Next.js, Nuxt; the exact version list, e.g. React 18 and
@@ -413,7 +435,34 @@ audit and maintenance workflows.
       in parallel, so this stays fast despite the combinatorial version
       count (see architecture.md's CI/CD pipeline for why this is a
       deliberate, scoped exception to this pipeline's usual no-matrix
-      style).
+      style). `compat-matrix.yml` plus `scripts/compat-override.mjs`
+      (writes the matrix cell's version into `pnpm.overrides`, so pnpm
+      resolves it workspace-wide, including packages that only declare the
+      framework as a `peerDependency`). Matrix today: React 18 and 19; Vue
+      3 only (Vue 2 reached end-of-life 2023-12-31 and is excluded on
+      purpose); Next.js 15 and 16; Nuxt 3 and 4. Verified the override
+      mechanism for real: forced React down to 18 locally, confirmed
+      `packages/react`'s and `packages/ui-react`'s full test suites (30
+      tests) and `playground-react`'s typecheck/build all passed against
+      it, then restored `package.json`/`pnpm-lock.yaml` to their
+      unmodified state.
+- [x] Route every CI workflow step through `make <target>` instead of a raw
+      `pnpm` command, wherever a Makefile target exists for what that step
+      does, so a contributor can reproduce a CI failure locally with the
+      exact same command. Added `install-frozen`, `build-packages`,
+      `build-apps`, `app-typecheck`, `app-build`, and `test-paths`
+      (the last three parameterized, for `compat-matrix.yml`'s dynamic
+      matrix: `make app-typecheck APP=playground-react`, `make test-paths
+PATHS="packages/react packages/ui-react"`) to the Makefile to cover
+      every step that did not already have a target. Two narrow exceptions,
+      both documented directly in the workflow files and in architecture.md's
+      "Makefile" section: `release.yml`'s `changesets/action` inputs name
+      exact pnpm scripts for the action itself to run, not `make release`
+      (which is a deliberately different, dry-run-only local preview); and
+      `compat-matrix.yml`'s post-override install stays `pnpm install
+--no-frozen-lockfile` directly, since letting the lockfile move to
+      match a dynamically-written override has no equivalent a contributor
+      would run by hand.
 
 ## Phase 10: Visual e2e tests and PR screenshot bot
 

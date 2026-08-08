@@ -24,16 +24,25 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: make install-frozen
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: make typecheck
 
       - name: Lint
-        run: pnpm lint
+        run: make lint
 
       - name: Check formatting
-        run: pnpm format:check
+        run: make format-check
 
       - name: Run tests
-        run: pnpm test
+        run: make test
+
+      - name: Build packages
+        run: make build-packages
+
+      - name: Build playground apps
+        run: make build-apps
+
+      - name: Check bundle size
+        run: make size

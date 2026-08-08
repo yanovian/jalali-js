@@ -1,0 +1,32 @@
+name: Update Dependencies (non-breaking)
+
+# `PAT_TOKEN` (a real personal access token, not the default GITHUB_TOKEN) is required: a
+# GITHUB_TOKEN-authored pull request cannot trigger this repo's own ci.yml, so nothing would
+# check the update once opened. See yanovian/update-dependencies-action's README, "Permissions
+# and tokens".
+#
+# Monthly, not the weekly cadence yanovian/chrome-ext-tabby uses for this same action: this
+# repo's own release rhythm (Changesets, hand-reviewed) is slower than a browser extension's,
+# so a slower non-breaking cadence matches it better. See update-dependencies-breaking.yml for
+# the (much slower) breaking-update cadence.
+
+on:
+  schedule:
+    - cron: '0 3 1 * *' # the 1st of every month at 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: yanovian/update-dependencies-action@v1
+        with:
+          update-strategy: non-breaking
+          create-pull-request: true
+          github-token: ${{ secrets.PAT_TOKEN }}

@@ -1,4 +1,6 @@
-.PHONY: help install dev build typecheck lint lint-fix format format-check test test-watch check clean probe-treeshake size changeset release
+.PHONY: help install install-frozen dev build build-packages build-apps typecheck lint lint-fix \
+	format format-check test test-watch check clean probe-treeshake size changeset release \
+	app-typecheck app-build test-paths
 
 PNPM ?= pnpm
 
@@ -9,11 +11,20 @@ help: ## Show available commands
 install: ## Install workspace dependencies
 	$(PNPM) install
 
+install-frozen: ## Install workspace dependencies without updating the lockfile (CI)
+	$(PNPM) install --frozen-lockfile
+
 dev: ## Run the playground apps in dev mode
 	$(PNPM) dev
 
-build: ## Build all packages
+build: ## Build all packages and apps
 	$(PNPM) build
+
+build-packages: ## Build only packages/* (not apps/*), its own target so a break there is named on its own in CI
+	$(PNPM) --filter "./packages/**" build
+
+build-apps: ## Build only apps/* (the four playground apps), its own target for the same reason as build-packages
+	$(PNPM) --filter "./apps/**" build
 
 typecheck: ## TypeScript check, across every package
 	$(PNPM) typecheck
@@ -51,6 +62,15 @@ changeset: ## Record a changeset for the current change (interactive)
 
 release: ## Publish through Changesets (CI-driven; this local target only previews what would release)
 	$(PNPM) exec changeset status
+
+app-typecheck: ## Typecheck one app/package by name (compat-matrix.yml): make app-typecheck APP=playground-react
+	$(PNPM) --filter $(APP) typecheck
+
+app-build: ## Build one app/package by name (compat-matrix.yml): make app-build APP=playground-react
+	$(PNPM) --filter $(APP) build
+
+test-paths: ## Run Vitest scoped to specific paths (compat-matrix.yml): make test-paths PATHS="packages/react packages/ui-react"
+	$(PNPM) exec vitest run $(PATHS)
 
 clean: ## Remove build output
 	find packages apps -maxdepth 2 -type d -name dist -prune -exec rm -rf {} \; 2>/dev/null || true

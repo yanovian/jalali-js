@@ -32,12 +32,17 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: make install-frozen
 
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
         with:
+          # These name pnpm scripts directly, not `make` targets: changesets/action runs them
+          # as its own version/publish steps, and Makefile's own `release` target is a
+          # deliberately different, dry-run-only command for a human to preview locally (see
+          # its own comment). `pnpm release` here is the real one: `pnpm build && changeset
+          # publish`.
           version: pnpm version-packages
           publish: pnpm release
         env:

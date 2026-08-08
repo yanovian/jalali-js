@@ -1,0 +1,101 @@
+name: Compatibility matrix
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'packages/react/**'
+      - 'packages/vue/**'
+      - 'packages/ui-react/**'
+      - 'packages/ui-vue/**'
+      - 'apps/**'
+      - 'scripts/compat-override.mjs'
+      - '.github/workflows/compat-matrix.yml'
+  schedule:
+    # Weekly: catches drift from a newly released framework version even with no PR open.
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compat:
+    name: ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    strategy:
+      # One job per {app, framework version} cell, all in parallel: this is the deliberate,
+      # scoped exception to this repo's usual single-runner CI style (see architecture.md's
+      # CI/CD pipeline). fail-fast: false, so one incompatible version doesn't hide the others.
+      fail-fast: false
+      matrix:
+        include:
+          # React: the last two majors under active support/maintenance.
+          - app: playground-react
+            label: react@18
+            override: 'react@^18 react-dom@^18 @types/react@^18 @types/react-dom@^18'
+            test-paths: 'packages/react packages/ui-react'
+          - app: playground-react
+            label: react@19 (current)
+            override: 'react@^19 react-dom@^19 @types/react@^19 @types/react-dom@^19'
+            test-paths: 'packages/react packages/ui-react'
+          # Vue 2 reached end-of-life 2023-12-31 and is intentionally excluded; Vue 3 is the
+          # only currently maintained major, so this is a matrix of one on purpose, not an
+          # oversight.
+          - app: playground-vue
+            label: vue@3 (current)
+            override: 'vue@^3.4'
+            test-paths: 'packages/vue packages/ui-vue'
+          # Next.js: the last two majors.
+          - app: playground-next
+            label: next@15
+            override: 'next@^15'
+            test-paths: ''
+          - app: playground-next
+            label: next@16 (current)
+            override: 'next@^16'
+            test-paths: ''
+          # Nuxt: the last two majors.
+          - app: playground-nuxt
+            label: nuxt@3
+            override: 'nuxt@^3'
+            test-paths: ''
+          - app: playground-nuxt
+            label: nuxt@4 (current)
+            override: 'nuxt@^4'
+            test-paths: ''
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies (baseline)
+        run: make install-frozen
+
+      - name: Override to ${{ matrix.label }}
+        run: node scripts/compat-override.mjs ${{ matrix.override }}
+
+      - name: Install with override
+        # Not `make install-frozen`: this step's whole point is letting the lockfile move to
+        # match the override compat-override.mjs just wrote into package.json, so it must stay
+        # unfrozen. Only this one step needs that; nowhere else in this repo does.
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Typecheck ${{ matrix.app }}
+        run: make app-typecheck APP=${{ matrix.app }}
+
+      - name: Build ${{ matrix.app }}
+        run: make app-build APP=${{ matrix.app }}
+
+      - name: Test affected packages
+        if: matrix.test-paths != ''
+        run: make test-paths PATHS="${{ matrix.test-paths }}"
