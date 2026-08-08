@@ -1,4 +1,4 @@
-.PHONY: help install dev build typecheck lint lint-fix format format-check test test-watch check clean
+.PHONY: help install dev build typecheck lint lint-fix format format-check test test-watch check clean probe-treeshake size changeset release
 
 PNPM ?= pnpm
 
@@ -36,7 +36,21 @@ test: ## Unit and property tests (Vitest), once
 test-watch: ## Unit and property tests (Vitest), watch mode
 	$(PNPM) test:watch
 
-check: typecheck lint format-check test build ## CI-equivalent: typecheck, lint, format-check, test, build
+check: typecheck lint format-check test build size ## CI-equivalent: typecheck, lint, format-check, test, build, size
+
+probe-treeshake: ## Confirm packages/core's built output actually tree-shakes
+	$(PNPM) --filter jalali-js build
+	$(PNPM) probe:treeshake
+
+size: ## Check packages/core's bundle-size budget (size-limit)
+	$(PNPM) --filter jalali-js build
+	$(PNPM) size
+
+changeset: ## Record a changeset for the current change (interactive)
+	$(PNPM) exec changeset
+
+release: ## Publish through Changesets (CI-driven; this local target only previews what would release)
+	$(PNPM) exec changeset status
 
 clean: ## Remove build output
 	find packages apps -maxdepth 2 -type d -name dist -prune -exec rm -rf {} \; 2>/dev/null || true

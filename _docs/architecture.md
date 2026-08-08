@@ -388,9 +388,13 @@ reusable internal actions for dependency updates and license audits.
   Playwright visual suite with screenshot upload or comment once the visual
   tests exist. The result is that no phase after Phase 0 ships a change with
   no CI check behind it.
-- **`release.yml`.** Driven by Changesets. When unreleased changesets exist,
-  a bot opens or updates a "Version Packages" pull request. Merging that
-  pull request publishes the updated packages to npm and cuts a GitHub
+- **`release.yml` (Phase 8).** Driven by Changesets, via `changesets/action`.
+  Runs on every push to `master`. When unreleased changesets exist, the
+  action opens or updates a "Version Packages" pull request (`pnpm
+version-packages`, i.e. `changeset version`). Merging that pull request
+  re-triggers the workflow, finds no unreleased changesets left, and runs
+  `pnpm release` instead (`pnpm build && changeset publish`), which
+  publishes every changed package to npm (`NPM_TOKEN`) and tags a GitHub
   release with generated notes. The team picks this flow over a single
   tag-triggered release, since this repo has several packages, and `core`,
   `react`, and `vue` each need their own version.
@@ -467,9 +471,69 @@ commit.
   does need `build.transpile` in `nuxt.config.ts` listing `jalali-js`,
   `@jalali-js/i18n`, and `@jalali-js/vue`, so its build treats them as
   source to compile rather than pre-built external packages.
-- **Build:** `tsup`, or Vite in library mode, per package. Each package
-  builds ESM and CJS output, plus `.d.ts` files, and marks `sideEffects:
-false` where true, for tree-shaking.
+- **Build (Phase 8).** `tsup` for `core`, `i18n`, `nlp`, `react`, and
+  `ui-react`; Vite in library mode (`@vitejs/plugin-vue` plus
+  `vite-plugin-dts`) for `vue` and `ui-vue`, since tsup's esbuild core has
+  no `.vue` SFC support. Every package builds ESM (`dist/index.js`) and CJS
+  (`dist/index.cjs`) output, plus `.d.ts`. `tsup.config.base.ts` (repo
+  root) holds the one tsup config shared by all five tsup-built packages,
+  imported from each package's own `tsup.config.ts`, rather than five
+  near-identical copies. Two fixes were needed for the `.d.ts` build
+  specifically, both isolated to `dts.compilerOptions` so they change
+  nothing about the JS output: `composite`/`incremental` (set in
+  `tsconfig.base.json` for the root `tsconfig.json`'s own editor-only
+  project references, see above) get turned off, since tsup's dts worker
+  otherwise misreads them as a real composite build and rejects every
+  source file as "not listed in the file list of project ''"; and
+  `ignoreDeprecations: '6.0'` silences a `baseUrl`-deprecated error the dts
+  worker triggers internally under TypeScript 6.x, unrelated to anything
+  this repo's own tsconfig files set. The Vue packages skip the
+  single-file-rollup option (`vite-plugin-dts`'s `rollupTypes`) since it
+  needs `@microsoft/api-extractor`, an extra heavy dependency neither
+  package otherwise needs; they ship a `.d.ts` per source file instead, an
+  equally valid package shape, with `exclude: ['src/**/*.test.ts']` so test
+  files do not get their own declaration output.
+- **`main`/`types`/`exports` keep pointing at `src/index.ts` even after
+  Phase 8; only `publishConfig` points at `dist`.** Every buildable
+  package's top-level `main`/`types`/`exports` still resolve to
+  `src/index.ts`, exactly as before this phase (see the `tsconfig`
+  discussion above for why: no build should be required before `tsc
+--noEmit` or a playground app can see a sibling package's types).
+  `publishConfig` on each package.json carries the real `dist`-pointing
+  `main`/`module`/`types`/`exports`; npm and pnpm both merge
+  `publishConfig` over the top-level fields specifically at publish time,
+  so a consumer installing the published package gets compiled `dist`
+  output, while the workspace (typecheck, tests, and every playground app)
+  keeps resolving siblings straight from source, unaffected. Verified
+  directly: every `dist/` directory in the repo was deleted, and `pnpm
+typecheck` still passed across all 11 packages and apps.
+  CSS subpath exports (`./date-picker.css`, `./themes/*.css`) point at
+  `src/*.css` in both the default `exports` and `publishConfig.exports`:
+  plain CSS needs no compile step, so there is nothing for a build to
+  change; `files` lists `src/*.css` (or `src/themes/*.css`) alongside
+  `dist` so the published tarball still includes them.
+- **`sideEffects`.** `jalali-js`, `@jalali-js/i18n`, and `@jalali-js/nlp`
+  are `"sideEffects": false`: every export is a pure function or constant,
+  confirmed by reading each package's source for top-level code with an
+  external effect (there is none). `@jalali-js/react`, `@jalali-js/vue`,
+  `@jalali-js/ui-react`, and `@jalali-js/ui-vue` use the array form,
+  `"sideEffects": ["*.css"]`: their JS entry points are equally pure, but
+  each ships a CSS file meant to be imported for its side effect (injecting
+  style into the page), and a bare `false` would let a bundler's
+  tree-shaking drop that import as dead code.
+- **Tree-shaking probe (Phase 8).** `scripts/treeshake-probe.mjs` (`pnpm
+probe:treeshake`, or `make probe-treeshake` to build `packages/core`
+  first) bundles a probe entry that imports only `createCalendar` from the
+  real, built `jalali-js` output with esbuild, then asserts the result
+  drops several other real exports (`compareDates`, `addDays`,
+  `buildCalendarGrid`, `nextMonth`, `previousMonth`, `dayOfWeek`,
+  `toStorageValue`) that `calendar.ts` never imports, while a
+  jalali-specific constant `today()` genuinely does reach
+  (`LEAP_YEAR_RESIDUES`) must survive, so a broken or empty bundle cannot
+  make the check trivially pass. Confirmed both directions directly: the
+  real config drops all seven; the same probe with `treeShaking: false`
+  set leaks `compareDates` back in. Result today: a probe bundling only
+  `createCalendar` is 6.7 KB unminified.
 - **Lint and format:** ESLint with a flat config, plus Prettier, enforced in
   CI, not only on a local machine. `eslint-plugin-react` does not yet
   support ESLint 10 (a real crash on load, not just an unmet peer-range
@@ -497,9 +561,35 @@ false` where true, for tree-shaking.
   Vitest 4 by more than two years, a real compatibility risk, not just a
   staleness preference.
 - **E2E and visual tests:** Playwright.
-- **Versioning and publishing:** Changesets.
-- **Bundle-size budget:** `size-limit`, checked in CI on `packages/core` at
-  minimum.
+- **Versioning and publishing (Phase 8).** Changesets. `.changeset/config.json`:
+  `"access": "public"` (every library package publishes in the open, not
+  behind an npm org's private registry default), `"baseBranch": "master"`
+  (this repo's actual default branch; `ci.yml` already targets `master`,
+  not `main`), `changelog: ["@changesets/changelog-github", { repo:
+"yanovian/jalali-js" }]` for changelog entries linked back to the actual
+  PR/commit, and `"ignore": ["playground-react", "playground-vue",
+"playground-next", "playground-nuxt"]`, since the four playground apps
+  are `private` demo apps, never published. Root scripts: `changeset` (add
+  a changeset, interactive), `version-packages` (`changeset version`, bumps
+  versions and writes changelogs from unreleased changesets), and
+  `release` (`pnpm build && changeset publish`, builds every package for
+  real before publishing what changed). `updateInternalDependencies:
+"patch"` means a patch release of `jalali-js` bumps the packages that
+  depend on it by at least a patch too, keeping the workspace's own
+  `workspace:*` ranges meaningful after publish (Changesets rewrites
+  `workspace:*` to the real published version automatically).
+- **Bundle-size budget (Phase 8).** `size-limit` plus
+  `@size-limit/preset-small-lib`, checked on `packages/core`'s built
+  output (`packages/core/dist/index.js`) via a `"size-limit"` array in the
+  root `package.json` (`pnpm size`, or `make size` to build `packages/core`
+  first). Budget: 6 KB, minified and brotli-compressed, chosen against a
+  measured baseline of 2.05 KB for the same build, roughly 3x headroom for
+  a second calendar system and further core growth while still catching a
+  real regression (an accidentally-bundled dependency, or tree-shaking
+  breaking). Verified the gate itself fails shut, not just passes:
+  temporarily set to a limit `size-limit` cannot meet, confirmed the
+  command exits non-zero with the actual overage reported, then restored
+  the real 6 KB budget.
 - **`defineModel()` and `exactOptionalPropertyTypes`.** Vue's `defineModel()`
   macro (used in `@jalali-js/vue`'s `DatePicker` for its `v-model`) generates
   a `modelValue` prop type that is not `exactOptionalPropertyTypes`-clean:
@@ -535,6 +625,7 @@ lint / lint-fix       ESLint, on its own or with autofix
 format / format-check Prettier, write mode or check mode (the CI gate)
 test / test-watch     Unit and property tests (Vitest)
 test-e2e             Playwright visual e2e suite
+probe-treeshake      Confirm packages/core's built output actually tree-shakes
 size                 Bundle-size budget check
 check                CI-equivalent: typecheck, lint, format-check, test, build, size
 changeset            Record a changeset for the current change

@@ -1,14 +1,37 @@
 {
   "name": "@jalali-js/i18n",
   "version": "0.0.0",
-  "private": true,
   "type": "module",
   "license": "MIT",
   "author": "Yanovian LLC",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "types": "./src/index.ts",
   "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "types": "./dist/index.d.ts",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+      }
+    }
+  },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build": "tsup"
   },
   "dependencies": {
     "jalali-js": "workspace:*"

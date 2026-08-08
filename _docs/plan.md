@@ -332,15 +332,54 @@ commit is blocked.
 
 ## Phase 8: Build and release pipeline
 
-- [ ] Add a `tsup` (or Vite library mode) build config per package: ESM,
-      CJS, and `.d.ts` output.
-- [ ] Confirm tree-shaking with a real bundler probe, and mark `sideEffects:
-false` where true.
-- [ ] Add a `size-limit` bundle-size budget on `packages/core`.
-- [ ] Set up Changesets for versioning across the monorepo.
-- [ ] Add `release.yml`: the Changesets bot opens or updates a "Version
+- [x] Add a `tsup` (or Vite library mode) build config per package: ESM,
+      CJS, and `.d.ts` output. `tsup` for `core`, `i18n`, `nlp`, `react`,
+      `ui-react` (`tsup.config.base.ts` at the repo root, shared by all
+      five, rather than five near-identical copies); Vite library mode
+      (`@vitejs/plugin-vue` plus `vite-plugin-dts`) for `vue` and `ui-vue`,
+      since tsup's esbuild core has no `.vue` SFC support. Every package's
+      top-level `main`/`types`/`exports` still point at `src/index.ts`
+      after this phase, unchanged from before it; only `publishConfig`
+      points at `dist`, since npm and pnpm both merge `publishConfig` over
+      the top-level fields specifically at publish time. This keeps the
+      "no build needed before `tsc --noEmit`" property from Phase 0-7
+      intact after adding a real build, rather than trading it away:
+      verified directly by deleting every `dist/` directory in the repo
+      and confirming `pnpm typecheck` still passed across all 11 packages
+      and apps. See architecture.md's "Tooling" for the two tsup dts-worker
+      fixes this needed (`composite`/`incremental` off, and
+      `ignoreDeprecations: '6.0'`).
+- [x] Confirm tree-shaking with a real bundler probe, and mark `sideEffects:
+false` where true. `scripts/treeshake-probe.mjs` (`pnpm probe:treeshake`,
+      `make probe-treeshake`) bundles a probe entry importing only
+      `createCalendar` from the real built `jalali-js` output and asserts
+      7 other real, unreached exports get dropped, while one reached,
+      jalali-specific constant survives, so the check cannot pass on a
+      broken or empty bundle. Confirmed it fails when it should too: the
+      same probe with tree-shaking turned off leaks a marker back in.
+      `jalali-js`/`@jalali-js/i18n`/`@jalali-js/nlp` are `"sideEffects":
+false`; `@jalali-js/react`/`@jalali-js/vue`/`@jalali-js/ui-react`/
+      `@jalali-js/ui-vue` use `"sideEffects": ["*.css"]`, since each ships
+      a CSS file meant to be imported for its side effect.
+- [x] Add a `size-limit` bundle-size budget on `packages/core`. Root
+      `package.json`'s `"size-limit"` field, checked against
+      `packages/core/dist/index.js` (`pnpm size`, `make size`). Budget: 6
+      KB minified and brotli-compressed, against a measured baseline of
+      2.05 KB, roughly 3x headroom. Verified the gate fails shut: set to a
+      limit `size-limit` could not meet, confirmed a non-zero exit with the
+      real overage reported, then restored the real budget.
+- [x] Set up Changesets for versioning across the monorepo.
+      `.changeset/config.json`: `access: "public"`, `baseBranch: "master"`
+      (this repo's real default branch, matching `ci.yml`, not `main`),
+      `@changesets/changelog-github` pointed at `yanovian/jalali-js`, and
+      the four playground apps `ignore`d (private demo apps, never
+      published). Root scripts: `changeset`, `version-packages`
+      (`changeset version`), `release` (`pnpm build && changeset publish`).
+- [x] Add `release.yml`: the Changesets bot opens or updates a "Version
       Packages" pull request. Merging it publishes to npm and cuts a GitHub
-      release.
+      release. Uses `changesets/action@v1`, triggered on push to `master`;
+      `version` runs `pnpm version-packages`, `publish` runs `pnpm release`
+      so every package is actually rebuilt before anything ships.
 
 ## Phase 9: Expand continuous integration
 
