@@ -7,12 +7,27 @@ not track status.
 
 ## Calendar systems in scope
 
-| Phase            | Calendar                               | Notes                                                                                                                                                                               |
-| ---------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| v1               | Jalali (Persian, Shamsi) to Gregorian  | Core deliverable                                                                                                                                                                    |
-| v1               | Gregorian to Gregorian (identity)      | This lets app code treat "calendar system" as one setting, instead of a special case for Gregorian                                                                                  |
-| Last phase       | A second calendar (proposed: Hebrew)   | This phase proves the `CalendarEngine` design works for a calendar with different rules. The team picks this calendar after the Jalali and Gregorian core is stable and well tested |
-| Later, on demand | Other calendars, such as ISO week-date | The team adds a calendar here only when a real need appears. The plugin design should make this a contained addition, not a rewrite                                                 |
+`jalali-js` is named after, and scoped to, one calendar system: Jalali.
+Gregorian is the only other one in v1, and it is not a peer feature, it is
+a structural requirement: the "display Jalali, store Gregorian" contract
+(see "Display value against storage value" below) needs Gregorian as the
+storage-side interop partner. Nothing else is committed.
+
+| Phase            | Calendar                                            | Notes                                                                                                                                                                                     |
+| ---------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v1               | Jalali (Persian, Shamsi) to Gregorian               | Core deliverable                                                                                                                                                                          |
+| v1               | Gregorian to Gregorian (identity)                   | This lets app code treat "calendar system" as one setting, instead of a special case for Gregorian, and is the storage side of every display calendar's value, not an independent feature |
+| Later, on demand | Any other calendar, such as ISO week-date or Hebrew | The team adds a calendar here only if real user demand appears; see `CalendarEngine`'s generalizability note below for why this does not need to happen speculatively                     |
+
+Earlier drafts of this plan committed to a "prove `CalendarEngine`
+generalizes" phase that would add a full second calendar (Hebrew was the
+leading candidate) purely to stress-test the plugin interface. That phase
+was cut: it costs real i18n data, locale names, and test maintenance for a
+calendar with no evidenced demand in a library whose name and audience are
+specifically Jalali. `CalendarEngine`'s generalizability is validated far
+more cheaply with a minimal fake engine in `packages/core`'s own test
+suite (see below), not by shipping and maintaining a real second calendar
+system nobody asked for.
 
 ## Conversion algorithm
 
@@ -33,9 +48,13 @@ dependency, and its accuracy is well documented for the range a real
 application hits. The conversion engine sits behind a small internal
 interface, `CalendarEngine`. This interface lets the team add an
 astronomical engine later, as an opt-in for a use case that needs correctness
-across thousands of years, with no change to the public API. The same
-interface lets the team add a second calendar system (see above) as an
-addition, not a rewrite.
+across thousands of years, with no change to the public API. It also means
+`jalali-js`/`gregorian.ts` do not hard-code assumptions the interface itself
+should not depend on; that generalizability is checked cheaply, with a
+minimal fake `CalendarEngine` implementation in `packages/core`'s own test
+suite (a calendar with, say, a deliberately irregular month-length rule),
+not by committing to build and maintain a real second calendar system (see
+"Calendar systems in scope" above for why that was cut from the plan).
 
 The team checks correctness with:
 
@@ -631,9 +650,9 @@ probe:treeshake`, or `make probe-treeshake` to build `packages/core`
   root `package.json` (`pnpm size`, or `make size` to build `packages/core`
   first). Budget: 6 KB, minified and brotli-compressed, chosen against a
   measured baseline of 2.05 KB for the same build, roughly 3x headroom for
-  a second calendar system and further core growth while still catching a
-  real regression (an accidentally-bundled dependency, or tree-shaking
-  breaking). Verified the gate itself fails shut, not just passes:
+  further core growth while still catching a real regression (an
+  accidentally-bundled dependency, or tree-shaking breaking). Verified the
+  gate itself fails shut, not just passes:
   temporarily set to a limit `size-limit` cannot meet, confirmed the
   command exits non-zero with the actual overage reported, then restored
   the real 6 KB budget.
@@ -711,4 +730,3 @@ The decisions below are still open.
 | 2   | Docs site framework                                                                                   | VitePress: lightweight, Vue-based, and enough for API docs plus playground embeds                                                  |
 | 3   | Reuse the org's existing internal GitHub Actions (dependency updater, license auditor, action pruner) | Yes, reuse them as they are                                                                                                        |
 | 4   | Where to host PR screenshots for visual diffs                                                         | Commit to an orphan branch and link raw URLs, with no third-party cost. Revisit with Chromatic or Percy if the team needs it later |
-| 5   | The second calendar system for the abstraction-proof phase                                            | Hebrew calendar. The team confirms this at the start of that phase                                                                 |

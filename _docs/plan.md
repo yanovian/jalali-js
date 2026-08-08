@@ -46,8 +46,10 @@ as it lands.
 ## Phase 1: Core Jalali to Gregorian conversion engine (`packages/core`)
 
 - [x] Define the internal `CalendarEngine` interface. This is the seam that
-      later lets a second calendar system, and later an astronomical engine,
-      plug in with no change to the public API. `src/calendar-engine.ts`.
+      would let another calendar system plug in later, if real demand ever
+      appears (not currently planned; see architecture.md's "Calendar
+      systems in scope"), and later an astronomical engine, with no change
+      to the public API. `src/calendar-engine.ts`.
 - [x] Implement the Jalali leap-year rule (see architecture.md for the
       chosen algorithm). `src/jalali.ts`, a 33-year-cycle arithmetic rule.
       Verified against Node's own ICU (`Intl.DateTimeFormat` with the
@@ -445,26 +447,19 @@ audit and maintenance workflows.
 - [ ] Add `pages.yml`: deploy the docs and playground site to GitHub Pages.
 - [ ] Run the v1.0 release checklist and review the changelog.
 
-## Phase 12: Add a second calendar system
-
-This phase is last on purpose. The `CalendarEngine` design from Phase 1
-should prove itself against real use across every other phase first.
-
-- [ ] Confirm the second calendar to add (proposed: the Hebrew calendar; see
-      architecture.md's open decisions).
-- [ ] Turn `CalendarEngine` from an internal interface into a public plugin
-      contract.
-- [ ] Implement the chosen calendar's engine: its leap rule and month
-      lengths.
-- [ ] Add i18n data for the new calendar's month and era names.
-- [ ] Add tests that prove the design works with no change to the existing
-      public API.
-
 ## Later, not yet scheduled
 
-- ISO week-date calendar support. A cheap addition, and a useful check on
-  the design (see architecture.md).
+- A minimal fake `CalendarEngine` implementation, exercised only in
+  `packages/core`'s own test suite, to confirm the interface generalizes
+  beyond Jalali and Gregorian without shipping and maintaining a real
+  second calendar system (see architecture.md's "Calendar systems in
+  scope" for why a full second calendar, previously planned as its own
+  phase, was cut instead).
+- Any other calendar system (ISO week-date, Hebrew, or otherwise), added
+  only if real user demand appears. Not a committed phase: `jalali-js` is
+  named after, and scoped to, the Jalali calendar; Gregorian is in scope
+  only because the storage-value contract structurally needs it, not
+  because more calendars are a goal on their own.
 - More locales beyond `en` and `fa`.
 - An astronomical (vernal-equinox-based) conversion engine, as an opt-in
   next to the arithmetic default.
-- More calendar systems beyond the Phase 12 proof, based on real demand.
