@@ -1,0 +1,69 @@
+name: Bug report
+description: Something not working the way it should?
+title: '[Bug]: '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. A few details below help us fix it faster.
+
+  - type: checkboxes
+    id: existing
+    attributes:
+      label: Checked for duplicates
+      options:
+        - label: I searched open and closed issues and did not find this already reported
+          required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear, short description of the bug.
+      placeholder: fromGregorian returns the wrong day for a date in Esfand of a leap year.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include a minimal code sample if you can.
+      placeholder: |
+        1. Call `fromGregorian('2025-03-20', 'jalali')`
+        2. Read the returned `day` field
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      validations:
+        required: false
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package and version
+      placeholder: 'jalali-js@0.1.0'
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Runtime, framework, and OS, if relevant.
+      placeholder: 'Node 22, Next.js 15, macOS'
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Anything else?
+      description: Stack traces, screenshots, or anything else that might help.
+      validations:
+        required: false

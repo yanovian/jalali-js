@@ -9,33 +9,40 @@ No phase is implemented yet. Every item below is `[ ]`. Change an item to
 
 ## Phase 0: Repo scaffolding and tooling
 
-- [ ] Set up the pnpm workspace layout: `packages/`, `apps/`, `e2e/`,
-      `_docs/`.
-- [ ] Add a shared root `tsconfig.json` in strict mode, with project
-      references per package.
-- [ ] Add an ESLint flat config and Prettier, shared across packages.
-- [ ] Set up Vitest at the workspace root, so it runs across all packages.
-- [ ] Add a `LICENSE` file (MIT, pending confirmation; see architecture.md's
+- [x] Set up the pnpm workspace layout: `packages/`, `apps/`, `e2e/`,
+      `_docs/`. `pnpm-workspace.yaml` covers `packages/*` and `apps/*`.
+      `packages/` and `apps/` gain real content starting Phase 1; `e2e/`
+      starts Phase 10.
+- [x] Add a shared root `tsconfig.json` in strict mode, with project
+      references per package. `tsconfig.base.json` holds the shared strict
+      options; `tsconfig.json` is an editor-only solution file that packages
+      register with as they are added; the `typecheck` script delegates to
+      each package's own script, so it works with zero packages too.
+- [x] Add an ESLint flat config and Prettier, shared across packages.
+- [x] Set up Vitest at the workspace root, so it runs across all packages.
+- [x] Add a `LICENSE` file (MIT, pending confirmation; see architecture.md's
       open decisions).
-- [ ] Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`.
-- [ ] Add `.github/ISSUE_TEMPLATE/` with `bug_report.yml`,
+- [x] Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`.
+- [x] Add `.github/ISSUE_TEMPLATE/` with `bug_report.yml`,
       `feature_request.yml`, and `config.yml`.
-- [ ] Add `.github/PULL_REQUEST_TEMPLATE.md`.
-- [ ] Add a `Makefile` with separate `install`, `dev`, `build`, `typecheck`,
+- [x] Add `.github/PULL_REQUEST_TEMPLATE.md`.
+- [x] Add a `Makefile` with separate `install`, `dev`, `build`, `typecheck`,
       `lint`, `lint-fix`, `format`, `format-check`, `test`, and `test-watch`
       targets, plus one combined `check` target that runs typecheck, lint,
       format-check, and test together. Later phases add more targets, but
       every command a phase needs already has a place to go.
-- [ ] Add a minimal `ci.yml`: install, typecheck, lint, format-check, and
+- [x] Add a minimal `ci.yml`: install, typecheck, lint, format-check, and
       unit test, on every push and pull request. This is the only CI setup
       step in this phase. It exists before any calendar logic does, so every
       later phase lands its tests into a pipeline that already runs them,
       instead of waiting for Phase 9 to add checks retroactively.
-- [ ] Add a pre-commit hook (Husky and lint-staged, or an equivalent) that
+- [x] Add a pre-commit hook (Husky and lint-staged, or an equivalent) that
       runs ESLint `--fix` and Prettier `--write` on staged files, restages
       the fixed files, and blocks the commit when an error remains that
       `--fix` cannot resolve. Only formatted, lint-clean code reaches a
-      commit.
+      commit. Verified directly: a staged file with an unfixable lint error
+      blocks the commit, and a fixable formatting issue gets fixed and
+      restaged automatically.
 
 ## Phase 1: Core Jalali to Gregorian conversion engine (`packages/core`)
 
@@ -154,7 +161,7 @@ No phase is implemented yet. Every item below is `[ ]`. Change an item to
 - [ ] Add a `tsup` (or Vite library mode) build config per package: ESM,
       CJS, and `.d.ts` output.
 - [ ] Confirm tree-shaking with a real bundler probe, and mark `sideEffects:
-      false` where true.
+false` where true.
 - [ ] Add a `size-limit` bundle-size budget on `packages/core`.
 - [ ] Set up Changesets for versioning across the monorepo.
 - [ ] Add `release.yml`: the Changesets bot opens or updates a "Version

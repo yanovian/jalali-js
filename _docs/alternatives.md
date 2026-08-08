@@ -63,16 +63,16 @@ TypeScript-first conversion core, an explicit date and time precision model,
 bindings for more than one framework, built-in English and Farsi support, and
 a headless, themeable component layer with visual regression tests in CI.
 
-| Library | Primary use | TS-native | Multi-calendar design | Date, time, and timezone model | English and Farsi support | Framework bindings | Headless and themeable UI | Visual e2e in CI |
-|---|---|---|---|---|---|---|---|---|
-| [`jalaali-js`](https://www.npmjs.com/package/jalaali-js) | Jalali to Gregorian math | Yes | No, one calendar | No, plain numbers | No | No | No | Unknown |
-| [`moment-jalaali`](https://www.npmjs.com/package/moment-jalaali) | Jalali plugin for Moment | No | No | Through Moment, which its own team calls legacy | Partial | No | No | Unknown |
-| [`jalali-moment`](https://www.npmjs.com/package/jalali-moment) | Jalali fork of Moment | No | No | Through Moment, which its own team calls legacy | Partial | No | No | Unknown |
-| [`date-fns-jalali`](https://www.npmjs.com/package/date-fns-jalali) | Full date-fns API, Jalali flavor | Yes | No, one calendar | Through date-fns, no explicit precision types | No | No | No | Unknown |
-| `dayjs` with `jalaliday` plugin | Jalali plugin for Day.js | Partial | No | Through Day.js | No | No | No | Unknown |
-| [`persian-date`](https://www.npmjs.com/package/persian-date) | Persian date object | No | No | No | Partial | No | No | Unknown |
-| [`react-multi-date-picker`](https://github.com/shahabyazdi/react-multi-date-picker) | React date picker UI | Yes | Yes, several calendars | No explicit model | Yes | React only | Tied to the UI, not headless | Unknown |
-| [`vue-persian-datetime-picker`](https://github.com/talkhabi/vue-persian-datetime-picker) | Vue date picker UI | No | No | Through moment-jalaali | Partial | Vue only | Tied to the UI, not headless | Unknown |
+| Library                                                                                  | Primary use                      | TS-native | Multi-calendar design  | Date, time, and timezone model                  | English and Farsi support | Framework bindings | Headless and themeable UI    | Visual e2e in CI |
+| ---------------------------------------------------------------------------------------- | -------------------------------- | --------- | ---------------------- | ----------------------------------------------- | ------------------------- | ------------------ | ---------------------------- | ---------------- |
+| [`jalaali-js`](https://www.npmjs.com/package/jalaali-js)                                 | Jalali to Gregorian math         | Yes       | No, one calendar       | No, plain numbers                               | No                        | No                 | No                           | Unknown          |
+| [`moment-jalaali`](https://www.npmjs.com/package/moment-jalaali)                         | Jalali plugin for Moment         | No        | No                     | Through Moment, which its own team calls legacy | Partial                   | No                 | No                           | Unknown          |
+| [`jalali-moment`](https://www.npmjs.com/package/jalali-moment)                           | Jalali fork of Moment            | No        | No                     | Through Moment, which its own team calls legacy | Partial                   | No                 | No                           | Unknown          |
+| [`date-fns-jalali`](https://www.npmjs.com/package/date-fns-jalali)                       | Full date-fns API, Jalali flavor | Yes       | No, one calendar       | Through date-fns, no explicit precision types   | No                        | No                 | No                           | Unknown          |
+| `dayjs` with `jalaliday` plugin                                                          | Jalali plugin for Day.js         | Partial   | No                     | Through Day.js                                  | No                        | No                 | No                           | Unknown          |
+| [`persian-date`](https://www.npmjs.com/package/persian-date)                             | Persian date object              | No        | No                     | No                                              | Partial                   | No                 | No                           | Unknown          |
+| [`react-multi-date-picker`](https://github.com/shahabyazdi/react-multi-date-picker)      | React date picker UI             | Yes       | Yes, several calendars | No explicit model                               | Yes                       | React only         | Tied to the UI, not headless | Unknown          |
+| [`vue-persian-datetime-picker`](https://github.com/talkhabi/vue-persian-datetime-picker) | Vue date picker UI               | No        | No                     | Through moment-jalaali                          | Partial                   | Vue only           | Tied to the UI, not headless | Unknown          |
 
 Two patterns repeat across this list. First, several packages depend on
 Moment.js, and the Moment.js team itself calls the project legacy and

@@ -7,12 +7,12 @@ not track status.
 
 ## Calendar systems in scope
 
-| Phase | Calendar | Notes |
-|---|---|---|
-| v1 | Jalali (Persian, Shamsi) to Gregorian | Core deliverable |
-| v1 | Gregorian to Gregorian (identity) | This lets app code treat "calendar system" as one setting, instead of a special case for Gregorian |
-| Last phase | A second calendar (proposed: Hebrew) | This phase proves the `CalendarEngine` design works for a calendar with different rules. The team picks this calendar after the Jalali and Gregorian core is stable and well tested |
-| Later, on demand | Other calendars, such as ISO week-date | The team adds a calendar here only when a real need appears. The plugin design should make this a contained addition, not a rewrite |
+| Phase            | Calendar                               | Notes                                                                                                                                                                               |
+| ---------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v1               | Jalali (Persian, Shamsi) to Gregorian  | Core deliverable                                                                                                                                                                    |
+| v1               | Gregorian to Gregorian (identity)      | This lets app code treat "calendar system" as one setting, instead of a special case for Gregorian                                                                                  |
+| Last phase       | A second calendar (proposed: Hebrew)   | This phase proves the `CalendarEngine` design works for a calendar with different rules. The team picks this calendar after the Jalali and Gregorian core is stable and well tested |
+| Later, on demand | Other calendars, such as ISO week-date | The team adds a calendar here only when a real need appears. The plugin design should make this a contained addition, not a rewrite                                                 |
 
 ## Conversion algorithm
 
@@ -38,6 +38,7 @@ interface lets the team add a second calendar system (see above) as an
 addition, not a rewrite.
 
 The team checks correctness with:
+
 - Round-trip tests (Gregorian to Jalali and back to Gregorian) across a wide
   range of years, not just a few example dates.
 - A check of leap-year results against an independent, published reference
@@ -63,10 +64,10 @@ fields. This stops code that works on a `CalendarDate` from reading an hour
 field that was never set. A consumer picks the tier it needs up front:
 
 ```ts
-createCalendar({ system: 'jalali', precision: 'date' })            // default
-createCalendar({ system: 'jalali', precision: 'datetime' })
-createCalendar({ system: 'jalali', precision: 'zoned-datetime', timeZone: 'auto' })
-createCalendar({ system: 'jalali', precision: 'zoned-datetime', timeZone: 'Asia/Tehran' })
+createCalendar({ system: 'jalali', precision: 'date' }); // default
+createCalendar({ system: 'jalali', precision: 'datetime' });
+createCalendar({ system: 'jalali', precision: 'zoned-datetime', timeZone: 'auto' });
+createCalendar({ system: 'jalali', precision: 'zoned-datetime', timeZone: 'Asia/Tehran' });
 ```
 
 `timeZone: 'auto'` reads the value from
@@ -89,10 +90,10 @@ that has nothing calendar-specific in it.
 returns a Gregorian, calendar-agnostic value by default. The exact shape
 follows the active precision tier:
 
-| Precision tier | Default value shape |
-|---|---|
-| `CalendarDate` | Gregorian ISO date string, `YYYY-MM-DD` |
-| `CalendarDateTime` | Gregorian ISO datetime string, no offset |
+| Precision tier          | Default value shape                                              |
+| ----------------------- | ---------------------------------------------------------------- |
+| `CalendarDate`          | Gregorian ISO date string, `YYYY-MM-DD`                          |
+| `CalendarDateTime`      | Gregorian ISO datetime string, no offset                         |
 | `ZonedCalendarDateTime` | Gregorian ISO datetime string with offset, or epoch milliseconds |
 
 This matches how the native `<input type="date">` element behaves. No
@@ -114,11 +115,11 @@ value as-is, for example a government or legal record system in Iran that
 keeps dates in Jalali form. A `valueFormat` option covers this:
 
 ```ts
-useCalendar({ system: 'jalali', locale: 'fa', valueFormat: 'gregorian-iso' })  // default
-useCalendar({ system: 'jalali', locale: 'fa', valueFormat: 'date' })            // native JS Date
-useCalendar({ system: 'jalali', locale: 'fa', valueFormat: 'epoch' })
-useCalendar({ system: 'jalali', locale: 'fa', valueFormat: 'jalali-iso' })      // e.g. "1403-05-15"
-useCalendar({ system: 'jalali', locale: 'fa', valueFormat: 'jalali-object' })   // { year, month, day }
+useCalendar({ system: 'jalali', locale: 'fa', valueFormat: 'gregorian-iso' }); // default
+useCalendar({ system: 'jalali', locale: 'fa', valueFormat: 'date' }); // native JS Date
+useCalendar({ system: 'jalali', locale: 'fa', valueFormat: 'epoch' });
+useCalendar({ system: 'jalali', locale: 'fa', valueFormat: 'jalali-iso' }); // e.g. "1403-05-15"
+useCalendar({ system: 'jalali', locale: 'fa', valueFormat: 'jalali-object' }); // { year, month, day }
 ```
 
 This does not change the "no database schema" non-goal in
@@ -188,30 +189,30 @@ pipeline, not only a claim in the docs.
 This sketch may change during implementation.
 
 ```ts
-import { createCalendar } from 'jalali-js'
-import { toGregorian, fromGregorian } from 'jalali-js'
+import { createCalendar } from 'jalali-js';
+import { toGregorian, fromGregorian } from 'jalali-js';
 
-const cal = createCalendar({ system: 'jalali', locale: 'fa' })
-const today = cal.today()               // CalendarDate in the active system
-const g = toGregorian(today)             // plain Gregorian equivalent
-const back = fromGregorian(g, 'jalali')  // round-trips
+const cal = createCalendar({ system: 'jalali', locale: 'fa' });
+const today = cal.today(); // CalendarDate in the active system
+const g = toGregorian(today); // plain Gregorian equivalent
+const back = fromGregorian(g, 'jalali'); // round-trips
 
-cal.format(today, { style: 'long' })     // "۱۵ مرداد ۱۴۰۵"
-cal.isLeapYear(1403)                     // true
-cal.parse('farda')                       // Finglish for "tomorrow"
+cal.format(today, { style: 'long' }); // "۱۵ مرداد ۱۴۰۵"
+cal.isLeapYear(1403); // true
+cal.parse('farda'); // Finglish for "tomorrow"
 ```
 
 ### Framework bindings sketch
 
 ```tsx
 // React
-const { date, format, setDate } = useCalendar({ system: 'jalali', locale: 'fa' })
+const { date, format, setDate } = useCalendar({ system: 'jalali', locale: 'fa' });
 ```
 
 ```vue
 <!-- Vue and Nuxt -->
 <script setup>
-const { date, format } = useCalendar({ system: 'jalali', locale: 'fa' })
+const { date, format } = useCalendar({ system: 'jalali', locale: 'fa' });
 </script>
 ```
 
@@ -232,7 +233,7 @@ in `core`.
 - The parser reads a phrase and returns a `CalendarDate`, or `null` when it
   cannot read the phrase.
 - v1 supports three input styles: English words (`today`, `tomorrow`, `next
-  Farvardin`), Farsi words in Persian script (`امروز`, `فردا`), and Finglish,
+Farvardin`), Farsi words in Persian script (`امروز`, `فردا`), and Finglish,
   Farsi words written with Latin letters (`emrooz`, `farda`). Finglish
   support covers common spelling variants for each word.
 - The parser covers a fixed, testable set of relative terms and explicit
@@ -270,13 +271,13 @@ in `core`.
 
 ## Testing strategy
 
-| Layer | Tool | What it covers |
-|---|---|---|
-| Unit | Vitest | Conversion correctness, leap-year rules, formatting, i18n data, NLP parsing |
-| Property-based | fast-check | Round-trip checks across a large range of random dates |
-| Type-level | `tsd` or `expect-type` | The public API types work as documented, for example a precision tier rejects a field it does not have |
-| Component | Vitest and Testing Library | React and Vue binding behavior, tested alone |
-| E2E and visual | Playwright | A real browser render of all four playground apps, across locale, direction, precision, and theme combinations |
+| Layer          | Tool                       | What it covers                                                                                                 |
+| -------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Unit           | Vitest                     | Conversion correctness, leap-year rules, formatting, i18n data, NLP parsing                                    |
+| Property-based | fast-check                 | Round-trip checks across a large range of random dates                                                         |
+| Type-level     | `tsd` or `expect-type`     | The public API types work as documented, for example a precision tier rejects a field it does not have         |
+| Component      | Vitest and Testing Library | React and Vue binding behavior, tested alone                                                                   |
+| E2E and visual | Playwright                 | A real browser render of all four playground apps, across locale, direction, precision, and theme combinations |
 
 ### Visual regression and PR screenshots
 
@@ -360,7 +361,7 @@ commit.
   project references between packages.
 - **Build:** `tsup`, or Vite in library mode, per package. Each package
   builds ESM and CJS output, plus `.d.ts` files, and marks `sideEffects:
-  false` where true, for tree-shaking.
+false` where true, for tree-shaking.
 - **Lint and format:** ESLint with a flat config, plus Prettier, enforced in
   CI, not only on a local machine.
 - **Pre-commit hooks:** Husky and lint-staged, see "Pre-commit checks" above.
@@ -412,13 +413,13 @@ release              Publish through Changesets (CI-driven; the local target is 
 
 ## Open decisions
 
-| # | Decision | Proposed default |
-|---|---|---|
-| 1 | License | MIT |
-| 2 | npm package names and scope: unscoped `jalali-js` core against a scoped `@jalali-js/core` monorepo | `jalali-js` for the core package, to match the repo name. `@jalali-js/react` and `@jalali-js/vue` for the bindings |
-| 3 | Monorepo task runner | Plain pnpm workspace scripts. Add Turborepo or Nx only if CI time later justifies it |
-| 4 | Docs site framework | VitePress: lightweight, Vue-based, and enough for API docs plus playground embeds |
-| 5 | Reuse the org's existing internal GitHub Actions (dependency updater, license auditor, action pruner) | Yes, reuse them as they are |
-| 6 | Where to host PR screenshots for visual diffs | Commit to an orphan branch and link raw URLs, with no third-party cost. Revisit with Chromatic or Percy if the team needs it later |
-| 7 | The second calendar system for the abstraction-proof phase | Hebrew calendar. The team confirms this at the start of that phase |
-| 8 | The default `DatePicker` UI variant: calendar-grid popup against year/month/day dropdowns | Calendar-grid popup for v1, with a `variant: 'dropdown'` option. Confirm before Phase 5 and Phase 6 start |
+| #   | Decision                                                                                              | Proposed default                                                                                                                   |
+| --- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | License                                                                                               | MIT                                                                                                                                |
+| 2   | npm package names and scope: unscoped `jalali-js` core against a scoped `@jalali-js/core` monorepo    | `jalali-js` for the core package, to match the repo name. `@jalali-js/react` and `@jalali-js/vue` for the bindings                 |
+| 3   | Monorepo task runner                                                                                  | Plain pnpm workspace scripts. Add Turborepo or Nx only if CI time later justifies it                                               |
+| 4   | Docs site framework                                                                                   | VitePress: lightweight, Vue-based, and enough for API docs plus playground embeds                                                  |
+| 5   | Reuse the org's existing internal GitHub Actions (dependency updater, license auditor, action pruner) | Yes, reuse them as they are                                                                                                        |
+| 6   | Where to host PR screenshots for visual diffs                                                         | Commit to an orphan branch and link raw URLs, with no third-party cost. Revisit with Chromatic or Percy if the team needs it later |
+| 7   | The second calendar system for the abstraction-proof phase                                            | Hebrew calendar. The team confirms this at the start of that phase                                                                 |
+| 8   | The default `DatePicker` UI variant: calendar-grid popup against year/month/day dropdowns             | Calendar-grid popup for v1, with a `variant: 'dropdown'` option. Confirm before Phase 5 and Phase 6 start                          |

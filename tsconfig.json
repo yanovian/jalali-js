@@ -1,0 +1,8 @@
+{
+  // Editor-only solution file. Each package under packages/ and apps/ gets its own
+  // tsconfig.json (extending tsconfig.base.json) and is added here as a reference once it
+  // exists. The "typecheck" script does not run this file directly; it delegates to each
+  // package's own typecheck script instead, so it works with zero packages too.
+  "files": [],
+  "references": []
+}

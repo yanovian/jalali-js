@@ -1,0 +1,49 @@
+name: Feature request
+description: Suggest an idea for jalali-js
+title: '[Feature]: '
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Got an idea for jalali-js? Tell us about it below.
+
+  - type: checkboxes
+    id: existing
+    attributes:
+      label: Checked for duplicates
+      options:
+        - label: I searched open and closed issues and did not find this already suggested
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What is missing, awkward, or annoying right now?
+      placeholder: There is no way to format a Jalali date as a relative string, like "2 days ago".
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would you like to happen?
+      validations:
+        required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you have considered
+      description: Optional. Any workarounds or other approaches you have thought about.
+      validations:
+        required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Anything else?
+      description: Links, examples from other libraries, or anything else that helps.
+      validations:
+        required: false
