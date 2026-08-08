@@ -1,0 +1,140 @@
+/*
+ * Default styling for @jalali-js/react. Optional: every component works with no CSS at all,
+ * styled entirely through the [data-jalali-*] attributes below (see architecture.md's
+ * "Configuration and theming"). Import this file for a usable look with no extra work.
+ *
+ * Retheme by overriding these custom properties, not by fighting the rules below.
+ */
+[data-jalali-datepicker-root],
+[data-jalali-datepicker-dropdown],
+[data-jalali-calendar-root] {
+  --jalali-font: system-ui, sans-serif;
+  --jalali-bg: #ffffff;
+  --jalali-fg: #1a1a1a;
+  --jalali-muted-fg: #767676;
+  --jalali-border: #d9d9d9;
+  --jalali-radius: 8px;
+  --jalali-primary: #2563eb;
+  --jalali-primary-fg: #ffffff;
+  --jalali-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  font-family: var(--jalali-font);
+  color: var(--jalali-fg);
+  position: relative;
+  display: inline-block;
+}
+
+[data-jalali-datepicker-input] {
+  font: inherit;
+  color: inherit;
+  background: var(--jalali-bg);
+  border: 1px solid var(--jalali-border);
+  border-radius: var(--jalali-radius);
+  padding: 0.5em 0.75em;
+  min-width: 12em;
+  cursor: pointer;
+}
+
+[data-jalali-datepicker-input]:focus-visible {
+  outline: 2px solid var(--jalali-primary);
+  outline-offset: 1px;
+}
+
+[data-jalali-datepicker-popover] {
+  position: absolute;
+  z-index: 20;
+  margin-top: 0.25em;
+  background: var(--jalali-bg);
+  border: 1px solid var(--jalali-border);
+  border-radius: var(--jalali-radius);
+  box-shadow: var(--jalali-shadow);
+  padding: 0.75em;
+}
+
+[data-jalali-calendar-header] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+[data-jalali-calendar-nav] {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: var(--jalali-radius);
+  width: 2em;
+  height: 2em;
+  cursor: pointer;
+}
+
+[data-jalali-calendar-nav]:hover {
+  background: color-mix(in srgb, var(--jalali-fg) 8%, transparent);
+}
+
+[data-jalali-calendar-title] {
+  font-weight: 600;
+}
+
+[data-jalali-calendar-grid] {
+  display: grid;
+  gap: 2px;
+}
+
+[data-jalali-calendar-weekdays],
+[data-jalali-calendar-week] {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(2em, 1fr));
+  gap: 2px;
+}
+
+[data-jalali-calendar-weekday] {
+  text-align: center;
+  font-size: 0.8em;
+  color: var(--jalali-muted-fg);
+  padding-block: 0.25em;
+}
+
+[data-jalali-calendar-day] {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: var(--jalali-radius);
+  aspect-ratio: 1;
+  cursor: pointer;
+}
+
+[data-jalali-calendar-day]:hover {
+  background: color-mix(in srgb, var(--jalali-fg) 8%, transparent);
+}
+
+[data-jalali-calendar-day][data-outside-month] {
+  color: var(--jalali-muted-fg);
+}
+
+[data-jalali-calendar-day][data-today] {
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--jalali-primary);
+}
+
+[data-jalali-calendar-day][data-selected] {
+  background: var(--jalali-primary);
+  color: var(--jalali-primary-fg);
+}
+
+[data-jalali-datepicker-dropdown] {
+  display: flex;
+  gap: 0.5em;
+}
+
+[data-jalali-datepicker-field] {
+  font: inherit;
+  color: inherit;
+  background: var(--jalali-bg);
+  border: 1px solid var(--jalali-border);
+  border-radius: var(--jalali-radius);
+  padding: 0.5em;
+}

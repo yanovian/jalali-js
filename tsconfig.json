@@ -7,6 +7,9 @@
   "references": [
     { "path": "packages/core" },
     { "path": "packages/i18n" },
-    { "path": "packages/nlp" }
+    { "path": "packages/nlp" },
+    { "path": "packages/react" },
+    { "path": "apps/playground-react" },
+    { "path": "apps/playground-next" }
   ]
 }

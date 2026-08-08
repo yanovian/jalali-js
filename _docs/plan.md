@@ -185,24 +185,53 @@ for either calendar system with no extra per-system logic.
 
 ## Phase 5: React bindings (`packages/react`)
 
-- [ ] Confirm the default `DatePicker` UI variant (calendar-grid popup
+- [x] Confirm the default `DatePicker` UI variant (calendar-grid popup
       against dropdowns; see architecture.md's open decisions) before this
-      phase starts.
-- [ ] Add the `useCalendar` hook.
-- [ ] Add headless component primitives: data attributes and class hooks
-      for styling.
-- [ ] Add a default-styled `DatePicker` component built on the headless
+      phase starts. Calendar-grid popup is the default; `variant:
+'dropdown'` ships alongside it, both in this phase (see
+      architecture.md's "Configuration and theming").
+- [x] Add the `useCalendar` hook. `src/use-calendar.ts`.
+- [x] Add headless component primitives: data attributes and class hooks
+      for styling. `src/Calendar.tsx` (the month grid) and
+      `src/calendar-grid.ts` (the grid's pure data logic, tested on its
+      own). `[data-jalali-calendar-*]` attributes throughout, no required
+      CSS.
+- [x] Add a default-styled `DatePicker` component built on the headless
       primitives, so a consumer gets a usable picker with no custom styling.
-- [ ] Wire the `DatePicker`'s `onChange` value to the Phase 2 storage-value
-      contract, and expose the `valueFormat` option.
-- [ ] Expose a `displayFormat` prop, using the Phase 3 format presets.
-- [ ] Scaffold `apps/playground-react` (Vite and React) to exercise the
-      hook and components.
-- [ ] Scaffold `apps/playground-next`, a real Next.js app, and confirm the
-      SSR timezone handling from Phase 2.
-- [ ] Add component tests with Vitest and Testing Library, including a test
+      `src/DatePicker.tsx` (grid variant, wraps `Calendar` in a popover) and
+      `src/DropdownDateFields.tsx` (dropdown variant). `src/date-picker.css`
+      is the optional default stylesheet, themed through CSS custom
+      properties, imported separately (`@jalali-js/react/date-picker.css`)
+      so it stays opt-in.
+- [x] Wire the `DatePicker`'s `onChange` value to the Phase 2 storage-value
+      contract, and expose the `valueFormat` option. `onChange` fires with
+      both the shaped value and the raw `CalendarDate`. Both variants share
+      this wiring.
+- [x] Expose a `displayFormat` prop, using the Phase 3 format presets.
+- [x] Scaffold `apps/playground-react` (Vite and React) to exercise the
+      hook and components. Builds cleanly (`vite build`); exercises both
+      `DatePicker` variants, both locales, both calendar systems, and
+      `useCalendar` directly.
+- [x] Scaffold `apps/playground-next`, a real Next.js app, and confirm the
+      SSR timezone handling from Phase 2. Verified against the actual
+      production build output, not just a unit test: `next build`
+      statically prerenders the page, and the prerendered HTML reads
+      `Resolved timezone (timeZone: 'auto'): UTC`, matching architecture.md's
+      SSR design (no `window` during server render). Building this app
+      surfaced a real Turbopack limitation (Turbopack does not resolve a
+      `.js`-suffixed relative import to the `.ts` file that exists on disk,
+      for a package's internal files); see architecture.md's Tooling
+      section for the webpack-based fix. Also added `useResolvedTimeZone`,
+      the hook version of Phase 2's `resolveTimeZone()`, in
+      `src/use-resolved-timezone.ts`.
+- [x] Add component tests with Vitest and Testing Library, including a test
       that the emitted value stays Gregorian by default while the display
-      shows Jalali.
+      shows Jalali. `Calendar.test.tsx`, `DatePicker.test.tsx`,
+      `use-calendar.test.tsx`, `use-resolved-timezone.test.tsx`. Building
+      `DatePicker.test.tsx` surfaced two real bugs, both fixed: an
+      unanchored test regex matching more grid cells than intended, and
+      `vi.useFakeTimers()` (faking all timer APIs, not just `Date`) hanging
+      `userEvent`'s internal timing.
 
 ## Phase 6: Vue bindings (`packages/vue`)
 

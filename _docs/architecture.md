@@ -262,12 +262,12 @@ Farvardin`), Farsi words in Persian script (`امروز`, `فردا`), and Fingl
   [Display value against storage value](#display-value-against-storage-value)
   above; one controls what the user reads, the other controls what the app
   stores.
-- **Picker UI variant.** **Open decision:** should the default `DatePicker`
-  use a calendar-grid popup, or year/month/day dropdowns? A grid fits
-  "pick a date from a calendar" tasks. Dropdowns fit narrow, known-range
-  entry, such as a date of birth. The proposal is a calendar-grid popup as
-  the v1 default, with a `variant: 'dropdown'` option for the other case,
-  confirmed before Phase 5 and Phase 6 start.
+- **Picker UI variant.** `DatePicker`'s default is a calendar-grid popup: it
+  fits "pick a date from a calendar" tasks. A `variant: 'dropdown'` option
+  switches to three plain year/month/day `<select>` elements instead, for
+  narrow, known-range entry such as a date of birth. Both variants share the
+  same value-format and display-format wiring; only the input surface
+  differs.
 
 ## Testing strategy
 
@@ -371,11 +371,35 @@ commit.
   root `tsconfig.json` still lists every package under `references`, but
   only as an editor convenience (cross-package go-to-definition and
   the like); no script ever runs that file directly.
+- **Turbopack and `.js`-suffixed relative imports.** `packages/core`,
+  `packages/i18n`, and `packages/nlp` write their relative imports the
+  NodeNext way, with an explicit `.js` suffix even though the file on disk
+  is `.ts` (required, since those packages are also meant to run directly
+  under plain Node, with no bundler at all). Vite resolves that `.js`
+  suffix back to the real `.ts` file automatically, including for a
+  package's _internal_ files, not only its published entry point.
+  Turbopack, as of Next.js 16, does not: it resolves a workspace package's
+  own entry point fine, but not a `.js` specifier inside a relative import
+  two files deep, so a Next.js app built with Turbopack cannot consume
+  these packages from source at all. `apps/playground-next` builds with
+  webpack instead (`next build --webpack` / `next dev --webpack`), with
+  `resolve.extensionAlias: { '.js': ['.ts', '.tsx', '.js'] }` set in
+  `next.config.ts`, webpack's own standard fix for this exact NodeNext-plus-
+  bundler case. `packages/react` keeps the same `.js`-suffixed import style
+  as the other packages, on purpose, rather than switching to extensionless
+  imports to dodge this: it is consumed by both Vite (`playground-react`)
+  and webpack (`playground-next`) today, and a third bundler with its own
+  resolution quirks is more likely to show up later than a reason for
+  `packages/react` to run under plain Node ever is.
 - **Build:** `tsup`, or Vite in library mode, per package. Each package
   builds ESM and CJS output, plus `.d.ts` files, and marks `sideEffects:
 false` where true, for tree-shaking.
 - **Lint and format:** ESLint with a flat config, plus Prettier, enforced in
-  CI, not only on a local machine.
+  CI, not only on a local machine. `eslint-plugin-react` does not yet
+  support ESLint 10 (a real crash on load, not just an unmet peer-range
+  warning); `.tsx` files are linted with `eslint-plugin-react-hooks` and
+  `eslint-plugin-jsx-a11y` instead, both confirmed to work under ESLint 10.
+  Revisit adding `eslint-plugin-react` back once it catches up.
 - **Pre-commit hooks:** Husky and lint-staged, see "Pre-commit checks" above.
 - **Unit and property tests:** Vitest and fast-check.
 - **E2E and visual tests:** Playwright.
@@ -424,15 +448,18 @@ release              Publish through Changesets (CI-driven; the local target is 
 
 ## Open decisions
 
-The license is MIT (see "Governance and community files" above). The
-decisions below are still open.
+The license is MIT (see "Governance and community files" above). Package
+naming is settled too: `jalali-js` for the core package, `@jalali-js/i18n`,
+`@jalali-js/nlp`, and `@jalali-js/react` for the rest, matching each
+package's own `package.json`. The default `DatePicker` UI variant is
+settled as well: a calendar-grid popup, with `variant: 'dropdown'` as the
+alternative (see "Configuration and theming" above); both ship in Phase 5.
+The decisions below are still open.
 
 | #   | Decision                                                                                              | Proposed default                                                                                                                   |
 | --- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | npm package names and scope: unscoped `jalali-js` core against a scoped `@jalali-js/core` monorepo    | `jalali-js` for the core package, to match the repo name. `@jalali-js/react` and `@jalali-js/vue` for the bindings                 |
-| 2   | Monorepo task runner                                                                                  | Plain pnpm workspace scripts. Add Turborepo or Nx only if CI time later justifies it                                               |
-| 3   | Docs site framework                                                                                   | VitePress: lightweight, Vue-based, and enough for API docs plus playground embeds                                                  |
-| 4   | Reuse the org's existing internal GitHub Actions (dependency updater, license auditor, action pruner) | Yes, reuse them as they are                                                                                                        |
-| 5   | Where to host PR screenshots for visual diffs                                                         | Commit to an orphan branch and link raw URLs, with no third-party cost. Revisit with Chromatic or Percy if the team needs it later |
-| 6   | The second calendar system for the abstraction-proof phase                                            | Hebrew calendar. The team confirms this at the start of that phase                                                                 |
-| 7   | The default `DatePicker` UI variant: calendar-grid popup against year/month/day dropdowns             | Calendar-grid popup for v1, with a `variant: 'dropdown'` option. Confirm before Phase 5 and Phase 6 start                          |
+| 1   | Monorepo task runner                                                                                  | Plain pnpm workspace scripts. Add Turborepo or Nx only if CI time later justifies it                                               |
+| 2   | Docs site framework                                                                                   | VitePress: lightweight, Vue-based, and enough for API docs plus playground embeds                                                  |
+| 3   | Reuse the org's existing internal GitHub Actions (dependency updater, license auditor, action pruner) | Yes, reuse them as they are                                                                                                        |
+| 4   | Where to host PR screenshots for visual diffs                                                         | Commit to an orphan branch and link raw URLs, with no third-party cost. Revisit with Chromatic or Percy if the team needs it later |
+| 5   | The second calendar system for the abstraction-proof phase                                            | Hebrew calendar. The team confirms this at the start of that phase                                                                 |
