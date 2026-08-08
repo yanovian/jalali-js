@@ -297,14 +297,38 @@ commit is blocked.
 
 ## Phase 7: Theming and configurability
 
-- [ ] Define a CSS custom-property theming contract for the headless
-      components and the default `DatePicker` from Phases 5 and 6.
-- [ ] Add the optional `packages/ui`: a range picker, an inline calendar,
-      and extra themes, built on the same headless primitives.
-- [ ] Add the `variant: 'dropdown'` option to `DatePicker`, alongside the
-      v1 calendar-grid default.
-- [ ] Document the visual configuration matrix: locale, direction,
-      precision, display format, picker variant, and theme.
+- [x] Define a CSS custom-property theming contract for the headless
+      components and the default `DatePicker` from Phases 5 and 6. Both
+      `date-picker.css` files already expressed every rule through
+      `--jalali-*` variables (Phases 5/6); this phase extended the set with
+      spacing/sizing variables (`--jalali-gap`, `--jalali-input-padding`,
+      `--jalali-popover-padding`, `--jalali-day-min-size`) so a theme can
+      override layout, not only color, and wrote up the full variable table
+      in architecture.md's "Theming contract".
+- [x] Add the optional `packages/ui-react` and `packages/ui-vue`: a range
+      picker, an inline calendar, and extra themes, built on the same
+      headless primitives. Two packages, not one `packages/ui`: a UI
+      component is framework-specific by nature, the same reason `react`
+      and `vue` are separate packages (see architecture.md's "Package
+      layout"). `RangePicker` (`RangePicker.tsx`/`.vue`) renders its own
+      grid via `buildCalendarGrid()` rather than reusing `Calendar`, since
+      range state (start/end/in-between/hover-preview) does not fit
+      `Calendar`'s single-selection `data-selected`; it does reuse the new
+      `compareDates()` core utility (`packages/core/src/date-math.ts`) for
+      range comparisons. `InlineCalendar` is `Calendar` re-exported under a
+      more discoverable name, no separate implementation. `themes/dark.css`
+      and `themes/compact.css` ship in both packages, identical between
+      React and Vue by design (same `[data-jalali-*]` attributes).
+- [x] Add the `variant: 'dropdown'` option to `DatePicker`, alongside the
+      v1 calendar-grid default. Done in Phase 5/6, not this phase: both
+      `DatePicker.tsx` and `DatePicker.vue` already shipped the dropdown
+      variant when `DatePicker` itself was built.
+- [x] Document the visual configuration matrix: locale, direction,
+      precision, display format, picker variant, and theme. See
+      architecture.md's "Visual configuration matrix". `playground-react`
+      and `playground-vue` were updated to exercise `InlineCalendar` and
+      `RangePicker`, and to import `dark.css` + `compact.css` together to
+      demonstrate composing themes.
 
 ## Phase 8: Build and release pipeline
 

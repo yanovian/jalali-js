@@ -1,6 +1,7 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { addDays } from './date-math.js';
+import { addDays, compareDates } from './date-math.js';
+import { getCalendarEngine } from './convert.js';
 import { gregorianEngine } from './gregorian.js';
 import { jalaliEngine } from './jalali.js';
 
@@ -59,6 +60,48 @@ describe('addDays', () => {
           const engine = system === 'jalali' ? jalaliEngine : gregorianEngine;
           const date = { year, month, day: engine.daysInMonth(year, month) };
           expect(addDays(addDays(date, days, system), -days, system)).toEqual(date);
+        },
+      ),
+    );
+  });
+});
+
+describe('compareDates', () => {
+  it('gives 0 for the same date', () => {
+    expect(compareDates({ year: 1403, month: 5, day: 15 }, { year: 1403, month: 5, day: 15 })).toBe(
+      0,
+    );
+  });
+
+  it('orders by year, then month, then day', () => {
+    expect(
+      compareDates({ year: 1403, month: 5, day: 15 }, { year: 1404, month: 1, day: 1 }),
+    ).toBeLessThan(0);
+    expect(
+      compareDates({ year: 1403, month: 5, day: 15 }, { year: 1403, month: 6, day: 1 }),
+    ).toBeLessThan(0);
+    expect(
+      compareDates({ year: 1403, month: 5, day: 15 }, { year: 1403, month: 5, day: 16 }),
+    ).toBeLessThan(0);
+    expect(
+      compareDates({ year: 1404, month: 1, day: 1 }, { year: 1403, month: 5, day: 15 }),
+    ).toBeGreaterThan(0);
+  });
+
+  it('agrees with Julian Day Number ordering, for both calendar systems', () => {
+    fc.assert(
+      fc.property(
+        fc.constantFrom('jalali', 'gregorian'),
+        fc.integer({ min: -1000, max: 3000 }),
+        fc.integer({ min: 1, max: 12 }),
+        fc.integer({ min: -1000, max: 3000 }),
+        fc.integer({ min: 1, max: 12 }),
+        (system, yearA, monthA, yearB, monthB) => {
+          const engine = getCalendarEngine(system);
+          const a = { year: yearA, month: monthA, day: engine.daysInMonth(yearA, monthA) };
+          const b = { year: yearB, month: monthB, day: engine.daysInMonth(yearB, monthB) };
+          const jdnDiff = engine.toJulianDayNumber(a) - engine.toJulianDayNumber(b);
+          expect(Math.sign(compareDates(a, b))).toBe(Math.sign(jdnDiff));
         },
       ),
     );

@@ -159,7 +159,8 @@ packages/
   nlp/                 # Natural language date parsing: en, fa, Finglish.
   react/               # React hooks and headless components. Works in Next.js.
   vue/                 # Vue composables and headless components. Works in Nuxt.
-  ui/                  # Optional pre-styled, themeable components. Later phase.
+  ui-react/            # Optional extra React components: RangePicker, InlineCalendar, themes.
+  ui-vue/              # The same, for Vue.
 apps/
   docs/                # Documentation site and interactive playground.
   playground-react/    # Vite and React sandbox. An e2e screenshot target.
@@ -178,6 +179,14 @@ _docs/
 `react` and `vue` depend on `core` and `i18n` only. Neither depends on the
 other. This lets a Node backend, or a framework outside React and Vue, use
 `core` directly, with no framework weight added.
+
+`ui-react` and `ui-vue` (Phase 7), not a single `ui` package, despite the
+"optional `ui` package" phrasing this document used before that phase
+started: a range picker or an inline calendar is a real UI component, and a
+UI component is framework-specific by nature, the same reason `react` and
+`vue` are two packages rather than one. `ui-react` depends on `react` (for
+`Calendar`, the headless primitive it builds on) the same way `ui-vue`
+depends on `vue`; neither depends on the other.
 
 The `playground-next` and `playground-nuxt` apps are real Next.js and Nuxt
 apps, not Vite apps that only import the React or Vue package. CI builds and
@@ -249,11 +258,16 @@ Farvardin`), Farsi words in Persian script (`امروز`, `فردا`), and Fingl
   also ship a working, default-styled `DatePicker` component built on those
   same primitives, so a consumer gets a usable, good-looking picker with no
   styling work. Both live in the `react` and `vue` packages, not only in the
-  later, optional `ui` package.
-- An optional `ui` package, added in a later phase, adds more elaborate
-  variants on top of the same primitives: a range picker, an inline
-  calendar, and extra themes. It uses CSS custom properties for theming, so
-  a consumer can restyle it without a specificity fight.
+  optional `ui-react`/`ui-vue` packages (Phase 7; see
+  [Package layout](#package-layout) for why two packages, not one `ui`).
+- `ui-react` and `ui-vue` (Phase 7) add more elaborate variants on top of
+  the same primitives: `RangePicker` (a start/end picker, two-click
+  selection with a hover preview of the pending range) and `InlineCalendar`
+  (`Calendar` re-exported under a more discoverable name for an
+  always-visible grid with no popover), plus extra themes (`dark.css`,
+  `compact.css`). All of it uses CSS custom properties for theming (see
+  "Theming contract" below), so a consumer can restyle it without a
+  specificity fight.
 - Every visual variant (locale, text direction, precision, and theme) is a
   configuration option, not a fork or a separate component.
 - **Display format.** A `displayFormat` option picks a format preset:
@@ -267,7 +281,64 @@ Farvardin`), Farsi words in Persian script (`امروز`, `فردا`), and Fingl
   switches to three plain year/month/day `<select>` elements instead, for
   narrow, known-range entry such as a date of birth. Both variants share the
   same value-format and display-format wiring; only the input surface
-  differs.
+  differs. (Built in Phase 5/6, alongside the grid default.)
+
+### Theming contract
+
+`react`'s and `vue`'s `date-picker.css` each define the same set of
+`--jalali-*` custom properties on every component's root element
+(`[data-jalali-datepicker-root]`, `[data-jalali-datepicker-dropdown]`,
+`[data-jalali-calendar-root]`), and every rule in that stylesheet reads a
+variable rather than a literal value. A theme is a stylesheet that
+overrides some subset of these variables on the same selectors; it does not
+redefine any rule. This is why `dark.css` (colors) and `compact.css`
+(spacing and sizing) compose by importing both: they touch disjoint
+variables.
+
+| Variable                   | Controls                                                   |
+| -------------------------- | ---------------------------------------------------------- |
+| `--jalali-font`            | Font family                                                |
+| `--jalali-font-size`       | Base font size                                             |
+| `--jalali-bg`              | Background color (input, popover)                          |
+| `--jalali-fg`              | Text color                                                 |
+| `--jalali-muted-fg`        | Secondary text color (weekday headers, outside-month days) |
+| `--jalali-border`          | Border color                                               |
+| `--jalali-radius`          | Corner radius (input, popover, day cells, nav buttons)     |
+| `--jalali-primary`         | Accent color: today's ring, selected/range-endpoint fill   |
+| `--jalali-primary-fg`      | Text color on top of `--jalali-primary`                    |
+| `--jalali-shadow`          | Popover drop shadow                                        |
+| `--jalali-gap`             | Gap between grid cells                                     |
+| `--jalali-input-padding`   | Padding inside the text input                              |
+| `--jalali-popover-padding` | Padding inside the popover                                 |
+| `--jalali-day-min-size`    | Minimum width/height of a day cell                         |
+
+Because CSS custom properties inherit, a theme applies to every picker on
+the page once its stylesheet is imported: theming is a whole-app choice
+(import a theme, or don't), not a per-instance prop. A consumer who wants a
+single themed section scopes their own override under a parent selector,
+following the same pattern (override the variables, never fight the
+rules); the shipped theme files are page-wide by design.
+
+### Visual configuration matrix
+
+Every picker (`DatePicker`, `RangePicker`, `Calendar`/`InlineCalendar`)
+combines these independent axes; each is a plain prop or an imported
+stylesheet, never a fork or a separate component:
+
+| Axis                   | Values                                                                 | Set via                                                                                 |
+| ---------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Calendar system        | `jalali`, `gregorian`                                                  | `system` prop                                                                           |
+| Locale                 | `en`, `fa` (drives digits, month/weekday names, and RTL/LTR direction) | `locale` prop                                                                           |
+| Precision              | date, date+time, date+time+timezone                                    | Which `CalendarDate`/`CalendarDateTime`/`ZonedCalendarDateTime` value the app passes in |
+| Display format         | long/short, with/without weekday, Persian/Latin digits                 | `displayFormat` prop                                                                    |
+| Value format (storage) | Gregorian ISO, Jalali object, and others                               | `valueFormat` prop                                                                      |
+| Picker UI variant      | grid popup (default), dropdown fields                                  | `variant` prop (`DatePicker` only)                                                      |
+| Theme                  | default, `dark`, `compact`, or any combination                         | Which `date-picker.css`/theme stylesheets are imported                                  |
+
+`playground-react` and `playground-vue` exercise this matrix directly:
+each section demonstrates one axis (system, locale, variant), and the
+whole page runs under `dark` + `compact` imported together to demonstrate
+composing themes.
 
 ## Testing strategy
 

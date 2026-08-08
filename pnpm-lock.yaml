@@ -117,6 +117,9 @@ importers:
       '@jalali-js/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@jalali-js/ui-react':
+        specifier: workspace:*
+        version: link:../../packages/ui-react
       jalali-js:
         specifier: workspace:*
         version: link:../../packages/core
@@ -148,6 +151,9 @@ importers:
       '@jalali-js/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@jalali-js/ui-vue':
+        specifier: workspace:*
+        version: link:../../packages/ui-vue
       '@jalali-js/vue':
         specifier: workspace:*
         version: link:../../packages/vue
@@ -235,6 +241,80 @@ importers:
       react-dom:
         specifier: ^19.2.8
         version: 19.2.8(react@19.2.8)
+
+  packages/ui-react:
+    dependencies:
+      '@jalali-js/i18n':
+        specifier: workspace:*
+        version: link:../i18n
+      '@jalali-js/react':
+        specifier: workspace:*
+        version: link:../react
+      jalali-js:
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@testing-library/jest-dom':
+        specifier: ^7.0.0
+        version: 7.0.0(@testing-library/dom@10.4.1)
+      '@testing-library/react':
+        specifier: ^16.3.2
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@testing-library/user-event':
+        specifier: ^14.6.3
+        version: 14.6.3(@testing-library/dom@10.4.1)
+      '@types/node':
+        specifier: ^26.2.0
+        version: 26.2.0
+      '@types/react':
+        specifier: ^19.2.18
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: ^19.2.4
+        version: 19.2.4(@types/react@19.2.18)
+      jsdom:
+        specifier: ^30.0.1
+        version: 30.0.1
+      react:
+        specifier: ^19.2.8
+        version: 19.2.8
+      react-dom:
+        specifier: ^19.2.8
+        version: 19.2.8(react@19.2.8)
+
+  packages/ui-vue:
+    dependencies:
+      '@jalali-js/i18n':
+        specifier: workspace:*
+        version: link:../i18n
+      '@jalali-js/vue':
+        specifier: workspace:*
+        version: link:../vue
+      jalali-js:
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@testing-library/jest-dom':
+        specifier: ^7.0.0
+        version: 7.0.0(@testing-library/dom@10.4.1)
+      '@types/node':
+        specifier: ^26.2.0
+        version: 26.2.0
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.8
+        version: 6.0.8(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.2)(yaml@2.9.0))(vue@3.5.41(typescript@6.0.3))
+      '@vue/test-utils':
+        specifier: ^2.4.11
+        version: 2.4.11(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@6.0.3))
+      jsdom:
+        specifier: ^30.0.1
+        version: 30.0.1
+      vue:
+        specifier: ^3.5.41
+        version: 3.5.41(typescript@6.0.3)
+      vue-tsc:
+        specifier: ^3.3.9
+        version: 3.3.9(typescript@6.0.3)
 
   packages/vue:
     dependencies:

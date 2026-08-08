@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@jalali-js/i18n": "workspace:*",
+    "@jalali-js/ui-vue": "workspace:*",
     "@jalali-js/vue": "workspace:*",
     "jalali-js": "workspace:*",
     "vue": "^3.5.41"

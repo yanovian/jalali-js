@@ -3,12 +3,14 @@
  * styled entirely through the [data-jalali-*] attributes below (see architecture.md's
  * "Configuration and theming"). Import this file for a usable look with no extra work.
  *
- * Retheme by overriding these custom properties, not by fighting the rules below.
+ * Retheme by overriding these custom properties, not by fighting the rules below. See
+ * architecture.md's "Theming contract" for what each one controls.
  */
 [data-jalali-datepicker-root],
 [data-jalali-datepicker-dropdown],
 [data-jalali-calendar-root] {
   --jalali-font: system-ui, sans-serif;
+  --jalali-font-size: 1rem;
   --jalali-bg: #ffffff;
   --jalali-fg: #1a1a1a;
   --jalali-muted-fg: #767676;
@@ -17,8 +19,13 @@
   --jalali-primary: #2563eb;
   --jalali-primary-fg: #ffffff;
   --jalali-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --jalali-gap: 2px;
+  --jalali-input-padding: 0.5em 0.75em;
+  --jalali-popover-padding: 0.75em;
+  --jalali-day-min-size: 2em;
 
   font-family: var(--jalali-font);
+  font-size: var(--jalali-font-size);
   color: var(--jalali-fg);
   position: relative;
   display: inline-block;
@@ -30,7 +37,7 @@
   background: var(--jalali-bg);
   border: 1px solid var(--jalali-border);
   border-radius: var(--jalali-radius);
-  padding: 0.5em 0.75em;
+  padding: var(--jalali-input-padding);
   min-width: 12em;
   cursor: pointer;
 }
@@ -48,7 +55,7 @@
   border: 1px solid var(--jalali-border);
   border-radius: var(--jalali-radius);
   box-shadow: var(--jalali-shadow);
-  padding: 0.75em;
+  padding: var(--jalali-popover-padding);
 }
 
 [data-jalali-calendar-header] {
@@ -80,14 +87,14 @@
 
 [data-jalali-calendar-grid] {
   display: grid;
-  gap: 2px;
+  gap: var(--jalali-gap);
 }
 
 [data-jalali-calendar-weekdays],
 [data-jalali-calendar-week] {
   display: grid;
-  grid-template-columns: repeat(7, minmax(2em, 1fr));
-  gap: 2px;
+  grid-template-columns: repeat(7, minmax(var(--jalali-day-min-size), 1fr));
+  gap: var(--jalali-gap);
 }
 
 [data-jalali-calendar-weekday] {
@@ -123,6 +130,21 @@
 [data-jalali-calendar-day][data-selected] {
   background: var(--jalali-primary);
   color: var(--jalali-primary-fg);
+}
+
+/* Range selection (@jalali-js/ui-react and @jalali-js/ui-vue's RangePicker): the two endpoints
+   get the same solid fill a single-date selection uses; the days strictly between them get a
+   flatter fill in the same hue, with square inner edges so the highlight reads as one
+   continuous band across the row. */
+[data-jalali-calendar-day][data-range-start],
+[data-jalali-calendar-day][data-range-end] {
+  background: var(--jalali-primary);
+  color: var(--jalali-primary-fg);
+}
+
+[data-jalali-calendar-day][data-in-range] {
+  background: color-mix(in srgb, var(--jalali-primary) 16%, transparent);
+  border-radius: 0;
 }
 
 [data-jalali-datepicker-dropdown] {

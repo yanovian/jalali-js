@@ -1,6 +1,10 @@
 import '@jalali-js/react/date-picker.css';
+import '@jalali-js/ui-react/themes/dark.css';
+import '@jalali-js/ui-react/themes/compact.css';
 import { DatePicker, useCalendar } from '@jalali-js/react';
-import type { StorageValue } from 'jalali-js';
+import { InlineCalendar, RangePicker } from '@jalali-js/ui-react';
+import type { RangeStorageValue } from '@jalali-js/ui-react';
+import type { CalendarDate, StorageValue } from 'jalali-js';
 import { useState } from 'react';
 
 function CalendarSummary() {
@@ -10,10 +14,19 @@ function CalendarSummary() {
 
 export default function App() {
   const [stored, setStored] = useState<StorageValue | null>(null);
+  const [storedRange, setStoredRange] = useState<RangeStorageValue | null>(null);
+  const [inlineSelected, setInlineSelected] = useState<CalendarDate | null>(null);
 
   return (
     <main style={{ fontFamily: 'system-ui, sans-serif', padding: '2rem', maxWidth: 640 }}>
       <h1>jalali-js playground</h1>
+      <p>
+        This page has the dark + compact themes from <code>@jalali-js/ui-react/themes</code> applied
+        throughout, to demonstrate composing multiple theme files (see the two CSS imports at the
+        top of this file). Every component below shares one page-wide theme, since the theming
+        contract is CSS custom properties on each picker's root element, the same design a whole-app
+        theme switch relies on.
+      </p>
       <CalendarSummary />
 
       <section>
@@ -35,6 +48,23 @@ export default function App() {
       <section>
         <h2>Gregorian system</h2>
         <DatePicker system="gregorian" locale="en" />
+      </section>
+
+      <section>
+        <h2>Inline calendar (@jalali-js/ui-react)</h2>
+        <InlineCalendar
+          system="jalali"
+          locale="en"
+          value={inlineSelected}
+          onSelect={setInlineSelected}
+        />
+        <p>Selected: {inlineSelected ? JSON.stringify(inlineSelected) : 'none'}</p>
+      </section>
+
+      <section>
+        <h2>Range picker (@jalali-js/ui-react)</h2>
+        <RangePicker system="jalali" locale="en" onChange={(value) => setStoredRange(value)} />
+        <p>Stored range (Gregorian by default): {JSON.stringify(storedRange)}</p>
       </section>
     </main>
   );

@@ -10,6 +10,8 @@
     { "path": "packages/nlp" },
     { "path": "packages/react" },
     { "path": "packages/vue" },
+    { "path": "packages/ui-react" },
+    { "path": "packages/ui-vue" },
     { "path": "apps/playground-react" },
     { "path": "apps/playground-next" },
     { "path": "apps/playground-vue" },

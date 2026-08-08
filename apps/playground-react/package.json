@@ -11,6 +11,7 @@
   "dependencies": {
     "@jalali-js/i18n": "workspace:*",
     "@jalali-js/react": "workspace:*",
+    "@jalali-js/ui-react": "workspace:*",
     "jalali-js": "workspace:*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"

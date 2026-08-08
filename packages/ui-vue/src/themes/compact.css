@@ -1,0 +1,20 @@
+/*
+ * A denser layout for @jalali-js/vue's DatePicker/Calendar/RangePicker: smaller text, tighter
+ * padding, and a smaller minimum cell size. Import this *after* @jalali-js/vue/date-picker.css:
+ * like dark.css, it only overrides the same --jalali-* custom properties that stylesheet
+ * defines (see architecture.md's "Theming contract"), it does not redefine any selector or rule
+ * of its own. Combine with dark.css by importing both, in either order: they override disjoint
+ * sets of variables.
+ *
+ * Identical to @jalali-js/ui-react's theme of the same name, on purpose: both bindings use the
+ * same [data-jalali-*] attribute names, so a team can reuse one theme across both.
+ */
+[data-jalali-datepicker-root],
+[data-jalali-datepicker-dropdown],
+[data-jalali-calendar-root] {
+  --jalali-font-size: 0.875rem;
+  --jalali-gap: 1px;
+  --jalali-input-padding: 0.35em 0.5em;
+  --jalali-popover-padding: 0.5em;
+  --jalali-day-min-size: 1.5em;
+}
