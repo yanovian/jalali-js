@@ -439,7 +439,7 @@ audit and maintenance workflows.
 
 ## Phase 11: Docs site and v1.0 release
 
-- [ ] Scaffold `apps/docs` (VitePress, pending confirmation).
+- [ ] Scaffold `apps/docs` (VitePress).
 - [ ] Generate the API reference from the `core`, `i18n`, `nlp`, `react`,
       and `vue` package types.
 - [ ] Add `pages.yml`: deploy the docs and playground site to GitHub Pages.
