@@ -45,19 +45,34 @@ as it lands.
 
 ## Phase 1: Core Jalali to Gregorian conversion engine (`packages/core`)
 
-- [ ] Define the internal `CalendarEngine` interface. This is the seam that
+- [x] Define the internal `CalendarEngine` interface. This is the seam that
       later lets a second calendar system, and later an astronomical engine,
-      plug in with no change to the public API.
-- [ ] Implement the Jalali leap-year rule (see architecture.md for the
-      chosen algorithm).
-- [ ] Implement Gregorian leap-year handling, including the century rule.
-- [ ] Implement `toGregorian()` and `fromGregorian()`.
-- [ ] Add month-length tables for both calendars.
-- [ ] Add round-trip property tests (fast-check) across a wide range of
-      years.
-- [ ] Add boundary tests: year 1, Esfand length in a leap and a non-leap
+      plug in with no change to the public API. `src/calendar-engine.ts`.
+- [x] Implement the Jalali leap-year rule (see architecture.md for the
+      chosen algorithm). `src/jalali.ts`, a 33-year-cycle arithmetic rule.
+      Verified against Node's own ICU (`Intl.DateTimeFormat` with the
+      Persian calendar) with zero mismatches across Jalali years -50 to
+      3100, both for leap-year classification and for full date
+      conversion (see the derivation notes in the module and the test
+      fixtures below).
+- [x] Implement Gregorian leap-year handling, including the century rule.
+      `src/gregorian.ts`.
+- [x] Implement `toGregorian()` and `fromGregorian()`. `src/convert.ts`,
+      built on each calendar's `CalendarEngine`, converting through a
+      shared Julian Day Number.
+- [x] Add month-length tables for both calendars. `daysInMonth()` on each
+      engine.
+- [x] Add round-trip property tests (fast-check) across a wide range of
+      years. `gregorian.test.ts`, `jalali.test.ts`, and `convert.test.ts`,
+      years -2000 to 3000 (Gregorian) and -1000 to 3000 (Jalali).
+- [x] Add boundary tests: year 1, Esfand length in a leap and a non-leap
       year, and Gregorian century-leap edge cases (1900, 2000, 2100).
-- [ ] Check leap years against an independent, published reference table.
+      `gregorian.test.ts`'s century-boundary cases and `jalali.test.ts`'s
+      boundary-case suite.
+- [x] Check leap years against an independent, published reference table.
+      `jalali.test.ts` embeds a 121-year table (Jalali years 1300-1420)
+      sourced directly from ICU's Persian calendar, independent of this
+      package's own leap-year formula.
 
 ## Phase 2: Precision and timezone data model (`packages/core`)
 

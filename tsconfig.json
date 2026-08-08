@@ -4,5 +4,5 @@
   // exists. The "typecheck" script does not run this file directly; it delegates to each
   // package's own typecheck script instead, so it works with zero packages too.
   "files": [],
-  "references": []
+  "references": [{ "path": "packages/core" }]
 }

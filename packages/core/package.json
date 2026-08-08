@@ -1,0 +1,14 @@
+{
+  "name": "jalali-js",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Yanovian LLC",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "fast-check": "^4.9.0"
+  }
+}
