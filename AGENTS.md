@@ -2,6 +2,10 @@
 
 Guidance for AI agents working in this repo.
 
+## Coding style
+
+Make sure the code is DRY and KISS. Avoid duplocated code and complex function.
+
 ## Writing style
 
 Use ASD-STE100 Simplified Technical English (STE) for all plans,
