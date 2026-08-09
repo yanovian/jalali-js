@@ -9,8 +9,7 @@ The checklist Phase 11 asks for. Each item below is either verified directly, wi
 flagged as something only a human with the right access can do (an npm or GitHub secret, a repo
 setting). This document does not publish anything by itself. Publishing happens through
 `release.yml` (see architecture.md's "CI/CD pipeline"). A maintainer triggers it by running
-`make release-patch MESSAGE="..." TAG=v0.0.1` (see "Publishing" below), a separate, deliberate
-action to take when ready.
+`make release-patch` (see "Publishing" below), a separate, deliberate action to take when ready.
 
 ## Engineering readiness
 
@@ -43,16 +42,16 @@ action to take when ready.
       `access: "public"`), `files`, `sideEffects` (`false` for the 3 framework-agnostic
       packages, `["*.css"]` for the 4 that ship a stylesheet), and `peerDependencies`
       (`react`/`react-dom` `>=18`, `vue >=3.4`) all match Phase 8's design. Cross-package
-      dependencies use `workspace:*`. Both `pnpm publish` and `changeset publish` rewrite that
-      to the real version at publish time. That is expected, not a bug.
+      dependencies use `workspace:*`, which `pnpm publish` rewrites to the real version at
+      publish time. That is expected, not a bug.
 - [x] **Every publishable package has its own `README.md`.** Confirmed a `README.md` exists in
       all 7 package directories directly.
 - [x] **Initial version numbers are a deliberate choice, not a default.** Confirmed all 7 are
       still `0.0.0` and never published (`npm view jalali-js` and `npm view @jalali-js/i18n`
-      both return 404, so the names are free). The first release targets `v0.0.1`. All 7
-      packages are in one `fixed` Changesets group (`.changeset/config.json`), so they always
-      version together: a single `patch` bump moves every one of them from `0.0.0` to `0.0.1`
-      at once. See "Publishing" below.
+      both return 404, so the names are free). The first release targets `v0.0.1`. Every
+      package under `packages/*` starts at the same version and always gets bumped by the same
+      `make release-patch/-minor/-major` call, so they stay in sync automatically; a `patch`
+      bump moves every one of them from `0.0.0` to `0.0.1` at once. See "Publishing" below.
 
 ## Documentation readiness
 
@@ -78,37 +77,25 @@ action to take when ready.
 
 ## Publishing (do this last, deliberately, not as part of "running the checklist")
 
-One deliberate local command, matching the org's tag-triggered release convention
-(`yanovian/chrome-ext-tabby`'s own `release-patch`, `release-minor`, and `release-major`).
-Nothing publishes until a maintainer runs it.
+One deliberate local command, matching `yanovian/chrome-ext-tabby`'s own tag-triggered release
+convention exactly: `release-patch`, `release-minor`, and `release-major` both bump the version
+via `pnpm version` and trigger the same way. Nothing publishes until a maintainer runs it, and
+no GitHub token or any other credential is needed on your machine for this step: `pnpm version`
+only touches local `package.json` files and git, no network calls.
 
-1. Run **one** of `make release-patch`, `make release-minor`, or `make release-major`,
-   whichever bump this release needs, with a `MESSAGE` describing what ships and the `TAG` you
-   are cutting: for example `make release-patch MESSAGE="First public release" TAG=v0.0.1`.
-   Since every package is in one `fixed` Changesets group, this one command versions, tags, and
-   releases all 7 together. There is no separate step to add a changeset by hand first.
-2. That command writes a changeset for the whole fixed group, commits it, then runs `make
-check`, `changeset version` (bumps every package to the same new version, writes each
-   `CHANGELOG.md` entry, and consumes the changeset), commits again, tags, and pushes with
-   `--follow-tags`, all in one run. Confirm the working tree is clean before you start; the
-   command refuses to run otherwise.
-3. Pushing the tag triggers `release.yml`. It re-runs the checks, then `changesets/action@v1`
-   publishes (`pnpm release`: `pnpm build && changeset publish`, which publishes only a package
-   whose current version is not already on npm) and creates one GitHub release per published
-   package. Each release body comes from that package's own `CHANGELOG.md` entry.
-
-`@changesets/changelog-github` (the changelog format `changeset version` uses) links each entry
-back to its PR or commit, and needs a `GITHUB_TOKEN` in the environment to do it. This is a hard
-requirement, not an optional nicety: without it, `changeset version` fails outright (confirmed
-directly, not assumed, when a real release attempt hit exactly this). Create one at
-`https://github.com/settings/tokens/new?scopes=read:user,repo:status` (a classic token, those
-two scopes are enough) and `export GITHUB_TOKEN=...` in your shell before running
-`make release-patch`/`-minor`/`-major` or `make tag-release`.
-
-If a release attempt fails at this step, the changeset it already wrote and committed is still
-there; do not re-run `make release-<patch|minor|major>`, since that writes and commits a second
-changeset on top of the first one. Set `GITHUB_TOKEN` and run `make tag-release` directly
-instead, which picks up the changeset that already exists.
+1. Run **one** of `make release-patch`, `make release-minor`, or `make release-major`, whichever
+   bump this release needs. No arguments needed.
+2. That command runs `make check` first, then bumps every package under `packages/*` to the
+   same new version in one call (`pnpm --filter "./packages/**" exec -- pnpm version <bump>
+--no-git-tag-version`, since they all start in sync and always get the same bump, they stay in
+   sync with no extra bookkeeping), commits as "Release vX.Y.Z", tags, and pushes with
+   `--follow-tags`. It refuses to run on a dirty working tree, and no-ops cleanly if `HEAD` is
+   already tagged with nothing new since (safe to run again by mistake).
+3. Pushing the tag triggers `release.yml`. It re-runs the checks, builds, publishes each
+   package to npm (skipping any that are already published at that version, so a partial
+   failure is safe to retry), and creates one GitHub release with auto-generated notes
+   (`softprops/action-gh-release`, `generate_release_notes: true`), the same mechanism
+   `yanovian/chrome-ext-tabby` uses.
 
 This repo has not run any of the steps above. Publishing packages under the
 `jalali-js`/`@jalali-js/*` names to the public npm registry is a real, irreversible, public
@@ -121,21 +108,20 @@ Everything checkable from this environment passes. Two things are not yet confir
 worth resolving first:
 
 1. **No visual-baseline branch exists yet.** `visual-baselines` and `visual-snapshots` are both
-   absent from `origin`. `update-visual-baselines.yml` now runs automatically on every push to
-   `master` (fixed in this pass: it used to be a manual `workflow_dispatch` step that nobody had
-   ever run), so the next merge to `master` creates the branch on its own. To get a baseline in
+   absent from `origin`. `update-visual-baselines.yml` runs automatically on every push to
+   `master`, so the next merge to `master` creates the branch on its own. To get a baseline in
    place sooner, without waiting for a merge, run `update-visual-baselines.yml` once by hand
    (`workflow_dispatch` still works) so `e2e.yml` has something to diff against right away.
 2. **Four operational items are unverified.** They are not confirmed wrong, only unchecked: this
    environment's `gh` and `npm` credentials are both invalid. Confirm the `NPM_TOKEN` and
    `PAT_TOKEN` secrets, GitHub Pages being enabled, and `@jalali-js` npm org access, from a
    machine with working credentials, before you push the release tag. If `NPM_TOKEN` turns out
-   to be missing, `release.yml` fails partway through, after it has already pushed a commit and
-   a tag.
+   to be missing, `release.yml` fails at the publish step, after it has already re-run the
+   checks and built.
 
 ## When you're done with this document
 
 This checklist is a one-time gate for the first release, not a living document. Later releases
-are just "add changesets, run `make tag-release`." **Once you have published `v0.0.1`, confirmed
-it landed on npm, and confirmed it got a GitHub release, delete this file.** Keeping it around
-past that point only invites it to go stale and mislead the next release.
+are just "run `make release-patch` (or `-minor`/`-major`)." **Once you have published `v0.0.1`,
+confirmed it landed on npm, and confirmed it got a GitHub release, delete this file.** Keeping
+it around past that point only invites it to go stale and mislead the next release.
