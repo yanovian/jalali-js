@@ -1,27 +1,82 @@
-# jalali-js
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/logo-dark.svg">
+    <img src=".github/assets/logo-light.svg" alt="jalali-js" height="72">
+  </picture>
+</p>
 
-A TypeScript-native calendar toolkit for JavaScript, for the Jalali (Persian, Shamsi) calendar.
-Converts between Jalali and Gregorian, with first-class bindings for React and Vue (and
-first-class support for Next.js and Nuxt through them). English and Farsi (Persian) ship out of
-the box, including natural language date input in both languages ("today", "next Farvardin",
-"فردا", "emrooz"). A configurable date/time/timezone precision model, matching TC39 `Temporal`'s
-own tiers. Every component displays Jalali but stores a calendar-agnostic Gregorian value by
-default, the same contract a native `<input type="date">` follows.
+<p align="center">
+  <a href="https://github.com/yanovian/jalali-js/actions/workflows/ci.yml"><img src="https://github.com/yanovian/jalali-js/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <a href="https://www.npmjs.com/package/jalali-js"><img src="https://img.shields.io/npm/v/jalali-js.svg" alt="npm version"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/yanovian/jalali-js.svg" alt="License"></a>
+  <a href="https://yanovian.github.io/jalali-js/"><img src="https://img.shields.io/badge/docs-yanovian.github.io-1e1b4b.svg" alt="Documentation"></a>
+</p>
+
+<p align="center">
+  <b>A TypeScript-native Jalali (Persian, Shamsi) calendar toolkit, with first-class React and
+  Vue bindings.</b>
+</p>
+
+## Why this exists
+
+Most Jalali packages for JavaScript force a trade-off. A package is either a thin, math-only
+conversion function with no framework support, or a full date picker UI tied to one framework,
+often built on a legacy library like Moment. No single package covers TypeScript-native
+conversion, a real date, time, and timezone model, React and Vue bindings, and a headless
+component layer together. See [`_docs/alternatives.md`](_docs/alternatives.md) for the
+package-by-package comparison.
+
+jalali-js splits this into layers instead. One small, dependency-free core does the conversion.
+Thin framework bindings sit on top of it. A headless, themeable component layer sits on top of
+that. Use only the layer you need.
+
+## Install
 
 ```sh
-npm install jalali-js          # core: conversion, no framework, no runtime dependency
+npm install jalali-js          # core: conversion, zero runtime dependencies
 npm install @jalali-js/react   # React bindings
 npm install @jalali-js/vue     # Vue bindings
 ```
 
+## Quick look
+
 ```ts
 import { createCalendar } from 'jalali-js';
 
-createCalendar({ system: 'jalali' }).today(); // { year: 1403, month: 5, day: 15 }
+const calendar = createCalendar({ system: 'jalali' });
+calendar.today(); // { year: 1403, month: 5, day: 15 }
 ```
 
-See the [documentation site](https://yanovian.github.io/jalali-js/) for the full guide and API
-reference, and each package's own README (`packages/*/README.md`) for that package specifically.
+```tsx
+import { DatePicker } from '@jalali-js/react';
+
+<DatePicker locale="fa" onChange={(value) => console.log(value)} />;
+// Displays Jalali. Emits a plain Gregorian value by default. Your database never
+// has to store a Jalali-shaped value.
+```
+
+Full guide and API reference: **[yanovian.github.io/jalali-js](https://yanovian.github.io/jalali-js/)**
+
+## What you get
+
+- **TypeScript-native, not retrofitted.** Each precision tier (`date`, `date + time`,
+  `date + time + timezone`) is its own type. Function overloads resolve the right type, so you
+  get no `any` and no runtime-only guard standing in for one.
+- **Small and tree-shakeable.** The core stays under a 6 kB budget (minified, brotli), enforced
+  in CI. Import only what you use, and the bundler drops the rest.
+- **Zero runtime dependencies in the core.** `jalali-js` depends on nothing. `i18n` and `nlp`
+  depend only on `jalali-js`.
+- **Display and storage stay separate, on purpose.** A component shows Jalali by default and
+  emits a calendar-agnostic Gregorian value, the same contract a native `<input type="date">`
+  follows. A Jalali UI never forces a Jalali-shaped value into your database.
+- **React and Vue, both first-class,** including Next.js and Nuxt SSR with safe timezone
+  resolution during server render.
+- **English and Farsi out of the box,** including natural language date input in both, and
+  Finglish (`"emrooz"`, `"farda"`).
+- **Headless by default.** Data attributes and scoped slots give you full styling control. An
+  optional pre-styled `DatePicker` sits on top for teams that want one ready to use.
+- **Visual regressions get caught before merge.** Every pull request gets automated screenshots
+  across locale, calendar system, and picker variant.
 
 ## Packages
 
