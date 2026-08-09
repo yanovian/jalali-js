@@ -1,18 +1,24 @@
 name: Update visual baselines
 
-# Runs automatically on every push to master, so baselines never need a human to keep them
-# current. A pull request already gets full review, including its screenshot diff in the
-# e2e.yml PR comment, before it can merge. Once it merges, master's new render is by definition
-# the accepted one, so this job regenerates every screenshot from scratch across all three
-# browsers and force-replaces the orphan `visual-baselines` branch with the result. Baselines
-# keep no history of their own on purpose (only the current one is ever meaningful for
-# diffing), unlike `visual-snapshots`, which accumulates per-PR so old PR comments keep
-# working. `workflow_dispatch` stays available too, for the one-time bootstrap on a repo with
-# no `visual-baselines` branch yet, or to force a re-baseline with no code change (for example,
-# after a Playwright or browser engine upgrade shifts font rendering).
+# Runs after `ci.yml` finishes on master, not independently on every push: chained via
+# `workflow_run` rather than its own `push` trigger, so a commit that fails typecheck, lint, or
+# test never gets baselined. (An earlier version triggered on `push: branches: [master]`
+# directly, which ran in parallel with ci.yml on the same commit; a real problem, not just
+# wasted CI minutes, since it meant an untested or broken render could still become the
+# accepted baseline.) A pull request already gets full review, including its screenshot diff in
+# the e2e.yml PR comment, before it can merge, so by the time ci.yml has also passed on master,
+# that render is accepted twice over. This job then regenerates every screenshot from scratch
+# across all three browsers and force-replaces the orphan `visual-baselines` branch with the
+# result. Baselines keep no history of their own on purpose (only the current one is ever
+# meaningful for diffing), unlike `visual-snapshots`, which accumulates per-PR so old PR
+# comments keep working. `workflow_dispatch` stays available too, for the one-time bootstrap on
+# a repo with no `visual-baselines` branch yet, or to force a re-baseline with no code change
+# (for example, after a Playwright or browser engine upgrade shifts font rendering).
 
 on:
-  push:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
     branches: [master]
   workflow_dispatch:
 
@@ -21,10 +27,18 @@ permissions:
 
 jobs:
   update:
+    # workflow_dispatch has no conclusion to check; workflow_run only proceeds past a real,
+    # successful CI run, never a failed or cancelled one.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Pin to the exact commit ci.yml just validated: workflow_run's default checkout ref
+          # is the branch tip at trigger time, which could differ if another push landed on
+          # master in between, even though that is unlikely for this repo's release cadence.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -47,6 +61,7 @@ jobs:
       - name: Publish new baselines
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: |
           WORK=$(mktemp -d)
           git clone --quiet --depth=1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$WORK"
@@ -59,5 +74,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit --quiet -m "Update visual baselines from $GITHUB_REF_NAME ($GITHUB_SHA)"
+          git commit --quiet -m "Update visual baselines from master ($SOURCE_SHA)"
           git push --quiet --force origin HEAD:visual-baselines
