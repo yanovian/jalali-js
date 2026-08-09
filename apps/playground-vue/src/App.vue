@@ -1,28 +1,58 @@
 <script setup lang="ts">
 import '@jalali-js/vue/date-picker.css';
-import '@jalali-js/ui-vue/themes/dark.css';
 import '@jalali-js/ui-vue/themes/compact.css';
+// Loaded as a string, not a global side-effect import, so the dark theme can be toggled: it
+// only overrides --jalali-* custom properties on [data-jalali-*] elements (see dark.css's own
+// comment), so injecting/removing it as a <style> tag turns the picker theme on and off cleanly.
+import darkThemeCss from '@jalali-js/ui-vue/themes/dark.css?inline';
 import { DatePicker, useCalendar } from '@jalali-js/vue';
 import { InlineCalendar, RangePicker } from '@jalali-js/ui-vue';
 import type { RangeStorageValue } from '@jalali-js/ui-vue';
 import type { CalendarDate, StorageValue } from 'jalali-js';
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 
 const stored = ref<StorageValue>();
 const storedRange = ref<RangeStorageValue>();
 const inlineSelected = ref<CalendarDate | null>(null);
 const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
+const isDark = ref(true);
+
+// A <style> tag written directly in <template> does not work: Vue's SFC compiler treats
+// <style> as one of its own top-level file blocks, even when it appears nested inside
+// <template>, so it never reaches the DOM as a real element (confirmed directly: the compiled
+// output had zero <style> elements at runtime despite v-if being true). Toggling the theme
+// imperatively, on a single reused element, sidesteps that entirely.
+const darkStyleEl = document.createElement('style');
+darkStyleEl.textContent = darkThemeCss;
+watchEffect(() => {
+  if (isDark.value) {
+    document.head.appendChild(darkStyleEl);
+  } else {
+    darkStyleEl.remove();
+  }
+});
 </script>
 
 <template>
-  <main style="font-family: system-ui, sans-serif; padding: 2rem; max-width: 640px">
+  <main
+    style="font-family: system-ui, sans-serif; padding: 2rem; max-width: 640px; min-height: 100vh"
+    :style="{
+      background: isDark ? '#141414' : '#ffffff',
+      color: isDark ? '#ededed' : '#1a1a1a',
+    }"
+  >
     <h1>jalali-js playground (Vue)</h1>
+    <p style="margin: -0.5rem 0 1rem">Vue playground · <a href="../react/">React playground</a></p>
+    <p style="margin: 0 0 1rem">
+      <label><input type="checkbox" v-model="isDark" /> Dark mode</label>
+    </p>
     <p>
-      This page has the dark + compact themes from <code>@jalali-js/ui-vue/themes</code> applied
-      throughout, to demonstrate composing multiple theme files (see the two CSS imports at the top
-      of this file). Every component below shares one page-wide theme, since the theming contract is
-      CSS custom properties on each picker's root element, the same design a whole-app theme switch
-      relies on.
+      The <code>compact</code> theme from <code>@jalali-js/ui-vue/themes</code> is always on below,
+      for spacing. The <code>dark</code> theme (colors) is what the toggle above controls, applied
+      to both the pickers and this page's own background: composing multiple theme files works by
+      importing more than one (see the CSS imports at the top of this file). Every component below
+      shares one page-wide theme, since the theming contract is CSS custom properties on each
+      picker's root element, the same design a whole-app theme switch relies on.
     </p>
     <p>امروز: {{ jalali.format(jalali.today(), { style: 'long', weekday: true }) }}</p>
 

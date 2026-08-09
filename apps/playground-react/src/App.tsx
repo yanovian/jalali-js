@@ -1,6 +1,9 @@
 import '@jalali-js/react/date-picker.css';
-import '@jalali-js/ui-react/themes/dark.css';
 import '@jalali-js/ui-react/themes/compact.css';
+// Loaded as a string, not a global side-effect import, so the dark theme can be toggled: it
+// only overrides --jalali-* custom properties on [data-jalali-*] elements (see dark.css's own
+// comment), so injecting/removing it as a <style> tag turns the picker theme on and off cleanly.
+import darkThemeCss from '@jalali-js/ui-react/themes/dark.css?inline';
 import { DatePicker, useCalendar } from '@jalali-js/react';
 import { InlineCalendar, RangePicker } from '@jalali-js/ui-react';
 import type { RangeStorageValue } from '@jalali-js/ui-react';
@@ -16,16 +19,38 @@ export default function App() {
   const [stored, setStored] = useState<StorageValue | null>(null);
   const [storedRange, setStoredRange] = useState<RangeStorageValue | null>(null);
   const [inlineSelected, setInlineSelected] = useState<CalendarDate | null>(null);
+  const [isDark, setIsDark] = useState(true);
 
   return (
-    <main style={{ fontFamily: 'system-ui, sans-serif', padding: '2rem', maxWidth: 640 }}>
+    <main
+      style={{
+        fontFamily: 'system-ui, sans-serif',
+        padding: '2rem',
+        maxWidth: 640,
+        background: isDark ? '#141414' : '#ffffff',
+        color: isDark ? '#ededed' : '#1a1a1a',
+        minHeight: '100vh',
+      }}
+    >
+      {isDark && <style>{darkThemeCss}</style>}
       <h1>jalali-js playground</h1>
+      <p style={{ margin: '-0.5rem 0 1rem' }}>
+        React playground · <a href="../vue/">Vue playground</a>
+      </p>
+      <p style={{ margin: '0 0 1rem' }}>
+        <label>
+          <input type="checkbox" checked={isDark} onChange={(e) => setIsDark(e.target.checked)} />{' '}
+          Dark mode
+        </label>
+      </p>
       <p>
-        This page has the dark + compact themes from <code>@jalali-js/ui-react/themes</code> applied
-        throughout, to demonstrate composing multiple theme files (see the two CSS imports at the
-        top of this file). Every component below shares one page-wide theme, since the theming
-        contract is CSS custom properties on each picker's root element, the same design a whole-app
-        theme switch relies on.
+        The <code>compact</code> theme from <code>@jalali-js/ui-react/themes</code> is always on
+        below, for spacing. The <code>dark</code> theme (colors) is what the toggle above controls,
+        applied to both the pickers and this page&rsquo;s own background: composing multiple theme
+        files works by importing more than one (see the CSS imports at the top of this file). Every
+        component below shares one page-wide theme, since the theming contract is CSS custom
+        properties on each picker&rsquo;s root element, the same design a whole-app theme switch
+        relies on.
       </p>
       <CalendarSummary />
 

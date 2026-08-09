@@ -980,7 +980,9 @@ check                CI-equivalent: typecheck, lint, format-check, test, build, 
 app-typecheck        Typecheck one app/package by name: make app-typecheck APP=playground-react
 app-build            Build one app/package by name: make app-build APP=playground-react
 test-paths           Run Vitest scoped to specific paths: make test-paths PATHS="packages/react packages/ui-react"
-docs-dev / docs-build Documentation site
+docs-dev / docs-build Documentation site (playground URLs don't resolve under docs-dev, see docs-preview)
+docs-preview          Build and preview the docs site, with a working embedded playground
+embed-playgrounds     Build both playgrounds and embed them under apps/docs/public/
 clean                Remove build output
 release-patch/-minor/-major  Bump every package's version, commit, tag, and push: make release-patch
 publish-packages     Publish every package to npm, skipping any already published (release.yml)

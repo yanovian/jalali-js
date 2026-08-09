@@ -2,7 +2,7 @@
 	lint lint-fix format format-check test test-watch test-e2e test-e2e-project \
 	install-playwright check clean probe-treeshake size tag-release release-patch \
 	release-minor release-major publish-packages app-typecheck app-build app-build-at-base \
-	test-paths docs-dev docs-build docs-preview
+	test-paths docs-dev docs-build docs-preview embed-playgrounds
 
 PNPM ?= pnpm
 
@@ -31,13 +31,23 @@ build-apps: ## Build only the four playground apps (not docs), its own target fo
 build-docs: ## Build the docs site (API reference generation runs first automatically)
 	$(PNPM) --filter docs build
 
-docs-dev: ## Run the docs site in dev mode (API reference generation runs first automatically)
+# VitePress's dev server intercepts /playground/react/-style URLs for its own routing before
+# checking public/, so the playground 404-likes under docs-dev specifically; use docs-preview to
+# actually click around it. Both still embed it, via apps/docs/public/.
+docs-dev: embed-playgrounds ## Run the docs site in dev mode (fast reload; playground URLs don't resolve here, see docs-preview)
 	$(PNPM) --filter docs dev
 
 docs-build: build-docs ## Alias for build-docs, matching architecture.md's documented Makefile listing
 
-docs-preview: ## Preview the built docs site locally
+docs-preview: embed-playgrounds build-docs ## Build and preview the docs site locally, with a fully working embedded playground, matching the real deployed site exactly
 	$(PNPM) --filter docs preview
+
+embed-playgrounds: ## Build playground-react/playground-vue at their embedded subpaths and copy them into apps/docs/public/ (pages.yml; docs-dev/docs-preview already depend on this)
+	$(MAKE) app-build-at-base APP=playground-react BASE=/jalali-js/playground/react/
+	$(MAKE) app-build-at-base APP=playground-vue BASE=/jalali-js/playground/vue/
+	mkdir -p apps/docs/public/playground/react apps/docs/public/playground/vue
+	cp -r apps/playground-react/dist/. apps/docs/public/playground/react/
+	cp -r apps/playground-vue/dist/. apps/docs/public/playground/vue/
 
 typecheck: ## TypeScript check, across every package
 	$(PNPM) typecheck

@@ -3,3 +3,8 @@
 api/
 .vitepress/dist/
 .vitepress/cache/
+
+# Built by `make embed-playgrounds` (a dependency of docs-dev/docs-preview), never committed:
+# playground-react's and playground-vue's own dist/ output, copied here so VitePress serves them
+# under /playground/react/ and /playground/vue/ in both dev and build.
+public/playground/

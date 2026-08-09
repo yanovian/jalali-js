@@ -40,7 +40,13 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API', link: '/api/jalali-js/' },
-      { text: 'Playground', link: '/playground/react/', target: '_blank' },
+      {
+        text: 'Playground',
+        items: [
+          { text: 'React', link: '/playground/react/', target: '_blank' },
+          { text: 'Vue', link: '/playground/vue/', target: '_blank' },
+        ],
+      },
     ],
     sidebar: {
       '/guide/': [

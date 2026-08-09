@@ -85,6 +85,7 @@ export default tseslint.config(
       '**/.next/**',
       '**/.nuxt/**',
       '**/.output/**',
+      'apps/docs/public/playground/**',
     ],
   },
 );

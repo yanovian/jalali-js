@@ -6,3 +6,4 @@ _docs/visual-snapshots
 apps/docs/api
 apps/docs/.vitepress/dist
 apps/docs/.vitepress/cache
+apps/docs/public/playground

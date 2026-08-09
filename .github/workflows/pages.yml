@@ -39,23 +39,17 @@ jobs:
       - name: Install dependencies
         run: make install-frozen
 
-      - name: Build docs (API reference generation runs first automatically)
-        run: make build-docs
-
-      - name: Build playground-react at its embedded subpath
-        run: make app-build-at-base APP=playground-react BASE=/jalali-js/playground/react/
-
-      - name: Build playground-vue at its embedded subpath
-        run: make app-build-at-base APP=playground-vue BASE=/jalali-js/playground/vue/
-
-      - name: Merge playgrounds into the docs site
-        # playground-next and playground-nuxt are SSR apps; GitHub Pages is static-only, so
+      - name: Build and embed the playgrounds
+        # Must run before "Build docs" below: this places both playground apps under
+        # apps/docs/public/, and VitePress's own build copies public/ into dist/ automatically,
+        # the same mechanism that makes them work under `make docs-dev`/`docs-preview` locally
+        # too. playground-next and playground-nuxt are SSR apps; GitHub Pages is static-only, so
         # they stay CI-only verification apps (ci.yml, compat-matrix.yml, e2e.yml already cover
         # them) rather than customer-facing demos here.
-        run: |
-          mkdir -p apps/docs/.vitepress/dist/playground/react apps/docs/.vitepress/dist/playground/vue
-          cp -r apps/playground-react/dist/. apps/docs/.vitepress/dist/playground/react/
-          cp -r apps/playground-vue/dist/. apps/docs/.vitepress/dist/playground/vue/
+        run: make embed-playgrounds
+
+      - name: Build docs (API reference generation runs first automatically)
+        run: make build-docs
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
