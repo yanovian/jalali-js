@@ -379,11 +379,28 @@ false`; `@jalali-js/react`/`@jalali-js/vue`/`@jalali-js/ui-react`/
       the four playground apps `ignore`d (private demo apps, never
       published). Root scripts: `changeset`, `version-packages`
       (`changeset version`), `release` (`pnpm build && changeset publish`).
-- [x] Add `release.yml`: the Changesets bot opens or updates a "Version
-      Packages" pull request. Merging it publishes to npm and cuts a GitHub
-      release. Uses `changesets/action@v1`, triggered on push to `master`;
-      `version` runs `pnpm version-packages`, `publish` runs `pnpm release`
-      so every package is actually rebuilt before anything ships.
+- [x] Add `release.yml`, triggered by a pushed tag matching `v*.*.*`,
+      matching the org's own tag-triggered release convention
+      (`yanovian/chrome-ext-tabby`'s `release-patch`/`-minor`/`-major` +
+      `release.yml`): `make check`'s component steps
+      (typecheck/lint/format-check/test), then `pnpm release` (`pnpm build
+&& changeset publish`), then a GitHub release with generated notes
+      (`softprops/action-gh-release`, the same action tabby's own
+      `release.yml` uses). An earlier draft used Changesets' own two-phase
+      flow instead (a bot-opened "Version Packages" pull request on every
+      push to `master`, publishing the moment it was merged); revised to
+      one tag-triggered workflow, since the PR-review step was extra
+      ceremony beyond what tag-triggering already replaces (the same
+      maintainer reviewing that PR is the one pushing the release tag).
+      `jalali-js` still keeps Changesets for versioning specifically,
+      unlike tabby's single `pnpm version <bump>`: several
+      independently-versioned packages don't share one semver number, so
+      `make tag-release TAG=v1.0.0` (the local command a maintainer runs,
+      matching tabby's `release-patch`/etc.) runs `make check`, then
+      `changeset version` (bumps each changed package by whatever its own
+      changesets call for, writes changelogs), commits, tags, and pushes
+      with `--follow-tags` in one deliberate action; only the publish
+      trigger is a plain pushed tag, the same as tabby.
 
 ## Phase 9: Expand continuous integration
 

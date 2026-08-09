@@ -575,16 +575,32 @@ two checks are.
   already exists. A Playwright visual suite with screenshot upload or
   comment is still Phase 10. No phase after Phase 0 ships a change with no
   CI check behind it.
-- **`release.yml` (Phase 8).** Driven by Changesets, via `changesets/action`.
-  Runs on every push to `master`. When unreleased changesets exist, the
-  action opens or updates a "Version Packages" pull request (`pnpm
-version-packages`, i.e. `changeset version`). Merging that pull request
-  re-triggers the workflow, finds no unreleased changesets left, and runs
-  `pnpm release` instead (`pnpm build && changeset publish`), which
-  publishes every changed package to npm (`NPM_TOKEN`) and tags a GitHub
-  release with generated notes. The team picks this flow over a single
-  tag-triggered release, since this repo has several packages, and `core`,
-  `react`, and `vue` each need their own version.
+- **`release.yml` (Phase 8, revised to match the org's tag-triggered
+  convention).** One workflow, triggered by a pushed tag matching
+  `v*.*.*`, the same shape as `yanovian/chrome-ext-tabby`'s own
+  `release.yml`: `make check`'s component steps
+  (typecheck/lint/format-check/test), `pnpm release` (`pnpm build &&
+changeset publish`, which publishes every package whose current
+  `package.json` version isn't already on npm), then a GitHub release with
+  generated notes (`softprops/action-gh-release`, the same action tabby's
+  own `release.yml` uses). The earlier draft of this workflow used
+  Changesets' own two-phase flow: a bot-opened "Version Packages" pull
+  request on every push to `master`, publishing automatically the moment
+  that PR was merged. Revised to a single tag-triggered workflow instead,
+  since that PR-review step added a separate wait-for-a-bot-then-merge
+  step beyond what tag-triggering was already meant to replace, and the
+  same maintainer who would review that PR is the one pushing the release
+  tag anyway. Versioning still goes through Changesets, unlike tabby's
+  plain `pnpm version <bump>`: `make tag-release TAG=v1.0.0` (the local
+  command a maintainer runs, matching tabby's `release-patch`/`-minor`/
+  `-major`) runs `make check`, then `changeset version` (bumps every
+  changed package by whatever its own accumulated changesets call for,
+  writes changelogs), commits, tags, and pushes with `--follow-tags` in
+  one deliberate action. A single top-level version was never the right
+  fit here: this repo has several independently-versioned packages, and
+  `core`, `react`, and `vue` each need their own version, so Changesets
+  still does that part; only the _publish_ trigger is a plain pushed tag,
+  the same as tabby.
 - **`license-audit.yml` (Phase 9).** `yanovian/open-license-auditor@v1`, the
   org's own license-scanning Action (used the same way in
   `yanovian/chrome-ext-tabby` and the org's other repos), on every pull
@@ -881,12 +897,11 @@ hunting through every workflow file that happens to invoke it. `ci.yml`,
 `release.yml`, and `compat-matrix.yml` all follow this. Two narrow,
 intentional exceptions:
 
-- `release.yml`'s `version:`/`publish:` inputs to `changesets/action` name
-  exact pnpm scripts (`pnpm version-packages`, `pnpm release`) for the
-  action to execute as its own steps, not a command a human runs directly;
-  Makefile's own `release` target is a deliberately different, dry-run-only
-  preview command (see its own entry below), so pointing these inputs at
-  `make release` would run the wrong thing.
+- `release.yml`'s final `run: pnpm release` step names an exact pnpm
+  script rather than a `make` target: Makefile's own `release` target is a
+  deliberately different, dry-run-only preview command (see its own entry
+  below), so pointing this step at `make release` would run the wrong
+  thing.
 - `compat-matrix.yml`'s "Install with override" step uses `pnpm install
 --no-frozen-lockfile` directly: its entire point is letting the lockfile
   move to match a version `scripts/compat-override.mjs` just wrote into
@@ -916,6 +931,7 @@ test-paths           Run Vitest scoped to specific paths: make test-paths PATHS=
 docs-dev / docs-build Documentation site
 clean                Remove build output
 release              Publish through Changesets (CI-driven; the local target is a dry run)
+tag-release          Bump versions via Changesets, commit, tag, and push (triggers release.yml): make tag-release TAG=v1.0.0
 ```
 
 `app-typecheck`, `app-build`, and `test-paths` exist for

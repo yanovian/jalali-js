@@ -1,7 +1,7 @@
 .PHONY: help install install-frozen dev build build-packages build-apps build-docs typecheck \
 	lint lint-fix format format-check test test-watch test-e2e test-e2e-project \
-	install-playwright check clean probe-treeshake size changeset release app-typecheck \
-	app-build app-build-at-base test-paths docs-dev docs-build docs-preview
+	install-playwright check clean probe-treeshake size changeset release tag-release \
+	app-typecheck app-build app-build-at-base test-paths docs-dev docs-build docs-preview
 
 PNPM ?= pnpm
 
@@ -83,6 +83,15 @@ changeset: ## Record a changeset for the current change (interactive)
 
 release: ## Publish through Changesets (CI-driven; this local target only previews what would release)
 	$(PNPM) exec changeset status
+
+tag-release: check ## Bump versions, commit, tag, and push (triggers release.yml, which publishes): make tag-release TAG=v1.0.0
+	@test -n "$(TAG)" || (echo "Usage: make tag-release TAG=v1.0.0" && exit 1)
+	@git diff --quiet && git diff --cached --quiet || (echo "Working tree is not clean; commit or stash first." && exit 1)
+	$(PNPM) exec changeset version
+	git add -A
+	git commit -m "Version Packages"
+	git tag -a $(TAG) -m "Release $(TAG)"
+	git push origin HEAD --follow-tags
 
 app-typecheck: ## Typecheck one app/package by name (compat-matrix.yml): make app-typecheck APP=playground-react
 	$(PNPM) --filter $(APP) typecheck

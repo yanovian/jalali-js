@@ -79,16 +79,28 @@ when they're ready.
 
 ## Publishing (do this last, deliberately, not as part of "running the checklist")
 
+One deliberate local command, matching the org's tag-triggered release convention
+(`yanovian/chrome-ext-tabby`'s `release-patch`/`-minor`/`-major`): nothing publishes until a
+maintainer runs it.
+
 1. Add a changeset per package that should reach `v1.0.0` (`major` bump type), describing what
    ships in this first release.
-2. Push to `master`. `release.yml` opens (or updates) a "Version Packages" pull request:
-   version bumps and generated `CHANGELOG.md` entries, one per package, for review.
-3. Review that pull request like any other: read the version bumps, read the generated
-   changelog text, confirm nothing unexpected is included.
-4. Merge it. `release.yml` runs again, finds no unreleased changesets left, and publishes
-   (`pnpm release`: `pnpm build && changeset publish`) plus tags a GitHub release.
+2. Review the pending changesets (`pnpm changeset status`, or `make release` for the same
+   preview), and confirm the working tree is otherwise clean.
+3. Run `make tag-release TAG=v1.0.0`. This runs `make check`, then `changeset version` (bumps
+   each package's version, writes `CHANGELOG.md` entries, consumes the changesets), commits,
+   tags, and pushes with `--follow-tags`.
+4. Pushing the tag triggers `release.yml`: re-runs the checks, then publishes (`pnpm release`:
+   `pnpm build && changeset publish`, which publishes only a package whose current version isn't
+   already on npm) and creates a GitHub release with generated notes.
 
-This repo has not done any of the four steps above as part of this phase: they're a real,
+`@changesets/changelog-github` (the changelog format `changeset version` uses) links each entry
+back to its PR/commit; that needs a GitHub token to avoid API rate limits when run locally
+(`GITHUB_TOKEN` in the environment, or an authenticated `gh` CLI) — harmless to skip for an
+occasional release, since it only affects link-richness in the generated changelog text, not
+whether the release succeeds.
+
+This repo has not done any of the five steps above as part of this phase: they're a real,
 irreversible, public action (publishing packages under the `jalali-js`/`@jalali-js/*` names to
 the public npm registry), and belong to whoever owns that decision, made deliberately, not as a
 side effect of "completing Phase 11."
