@@ -1,6 +1,6 @@
 {
   "name": "@jalali-js/vue",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Vue bindings for jalali-js: useCalendar composable, headless Calendar grid, a default-styled DatePicker, SSR-safe timezone resolution.",
   "keywords": [
     "jalali",
