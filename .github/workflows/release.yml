@@ -1,16 +1,11 @@
 name: Release
 
-# Triggered by a maintainer pushing a tag (make tag-release TAG=v0.0.1), matching the org's own
-# tag-triggered release convention. That local command already bumps every changed package's
-# version via Changesets, commits, tags, and pushes, so by the time this workflow runs, the
-# versions to publish are already committed; this just checks, then publishes.
-#
-# `changesets/action` with only a `publish:` input (no `version:`), not a plain `pnpm release`
-# shell step: it publishes the same way, but also creates one GitHub Release per published
-# package (e.g. `jalali-js@0.0.1`, `@jalali-js/react@0.0.1`), each with that package's own real
-# changelog entry as its body, not a generic auto-generated PR list. `changeset publish` only
-# publishes a package whose current version isn't already on npm, so it's safe to run
-# unconditionally here.
+# Triggered by a maintainer pushing a tag (make release-patch, -minor, or -major), matching
+# yanovian/chrome-ext-tabby's own tag-triggered release convention exactly. That local command
+# already bumps every package under packages/* to the same new version (`pnpm version`,
+# extended across packages via `pnpm --filter`), commits, tags, and pushes, so by the time this
+# workflow runs, the versions to publish are already committed; this just checks, publishes,
+# and creates the GitHub release.
 
 on:
   push:
@@ -19,7 +14,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   release:
@@ -27,8 +21,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -38,6 +30,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: make install-frozen
@@ -54,10 +47,29 @@ jobs:
       - name: Run tests
         run: make test
 
-      - name: Publish
-        uses: changesets/action@v1
+      - name: Build
+        run: make build-packages
+
+      - name: Publish to npm
+        # A plain `pnpm publish` errors on a version that's already on npm, so this checks
+        # first: safe to re-run (say, after a previous run partly failed) without erroring on
+        # whatever already published successfully.
+        run: |
+          for pkg in packages/*/; do
+            name=$(node -p "require('./${pkg}package.json').name")
+            version=$(node -p "require('./${pkg}package.json').version")
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "$name@$version is already on npm, skipping"
+            else
+              (cd "$pkg" && pnpm publish --no-git-checks)
+            fi
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          publish: pnpm release
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
