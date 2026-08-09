@@ -42,8 +42,7 @@ reference, and each package's own README (`packages/*/README.md`) for that packa
   package layout, testing strategy, CI/CD design, and tooling.
 - [`_docs/alternatives.md`](_docs/alternatives.md): the vision, the goals, and a comparison with
   existing Jalali and Persian calendar libraries.
-- [`_docs/release-checklist.md`](_docs/release-checklist.md): the v1.0 release readiness
-  checklist.
+- [`_docs/release-checklist.md`](_docs/release-checklist.md): the release readiness checklist.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): setup, the branch and PR workflow, and the checks a
   change must pass.
 

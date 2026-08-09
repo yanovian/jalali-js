@@ -84,8 +84,8 @@ changeset: ## Record a changeset for the current change (interactive)
 release: ## Publish through Changesets (CI-driven; this local target only previews what would release)
 	$(PNPM) exec changeset status
 
-tag-release: check ## Bump versions, commit, tag, and push (triggers release.yml, which publishes): make tag-release TAG=v1.0.0
-	@test -n "$(TAG)" || (echo "Usage: make tag-release TAG=v1.0.0" && exit 1)
+tag-release: check ## Bump versions, commit, tag, and push (triggers release.yml, which publishes): make tag-release TAG=v0.0.1
+	@test -n "$(TAG)" || (echo "Usage: make tag-release TAG=v0.0.1" && exit 1)
 	@git diff --quiet && git diff --cached --quiet || (echo "Working tree is not clean; commit or stash first." && exit 1)
 	$(PNPM) exec changeset version
 	git add -A

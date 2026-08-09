@@ -383,24 +383,32 @@ false`; `@jalali-js/react`/`@jalali-js/vue`/`@jalali-js/ui-react`/
       matching the org's own tag-triggered release convention
       (`yanovian/chrome-ext-tabby`'s `release-patch`/`-minor`/`-major` +
       `release.yml`): `make check`'s component steps
-      (typecheck/lint/format-check/test), then `pnpm release` (`pnpm build
-&& changeset publish`), then a GitHub release with generated notes
-      (`softprops/action-gh-release`, the same action tabby's own
-      `release.yml` uses). An earlier draft used Changesets' own two-phase
-      flow instead (a bot-opened "Version Packages" pull request on every
-      push to `master`, publishing the moment it was merged); revised to
-      one tag-triggered workflow, since the PR-review step was extra
-      ceremony beyond what tag-triggering already replaces (the same
-      maintainer reviewing that PR is the one pushing the release tag).
-      `jalali-js` still keeps Changesets for versioning specifically,
-      unlike tabby's single `pnpm version <bump>`: several
-      independently-versioned packages don't share one semver number, so
-      `make tag-release TAG=v1.0.0` (the local command a maintainer runs,
-      matching tabby's `release-patch`/etc.) runs `make check`, then
-      `changeset version` (bumps each changed package by whatever its own
-      changesets call for, writes changelogs), commits, tags, and pushes
-      with `--follow-tags` in one deliberate action; only the publish
-      trigger is a plain pushed tag, the same as tabby.
+      (typecheck/lint/format-check/test), then `changesets/action@v1` in
+      publish-only mode (`publish: pnpm release`, no `version:` input,
+      since the tag already carries committed, bumped versions). This also
+      creates the GitHub release: `changesets/action`'s
+      `createGithubReleases` (on by default) opens one release per
+      published package, each with that package's own `CHANGELOG.md` entry
+      as its body, more specific than a generic PR-list release note for a
+      multi-package monorepo. An earlier draft used Changesets' own
+      two-phase flow instead (a bot-opened "Version Packages" pull request
+      on every push to `master`, publishing the moment it was merged);
+      revised to one tag-triggered workflow, since the PR-review step was
+      extra ceremony beyond what tag-triggering already replaces (the same
+      maintainer reviewing that PR is the one pushing the release tag). A
+      second draft published via a plain `pnpm release` step plus
+      `softprops/action-gh-release` (the action tabby's own `release.yml`
+      uses); revised again to `changesets/action`'s own publish mode, since
+      it produces real per-package release notes instead of an
+      auto-generated PR list. `jalali-js` still keeps Changesets for
+      versioning specifically, unlike tabby's single `pnpm version <bump>`:
+      several independently-versioned packages don't share one semver
+      number, so `make tag-release TAG=v0.0.1` (the local command a
+      maintainer runs, matching tabby's `release-patch`/etc.) runs `make
+check`, then `changeset version` (bumps each changed package by whatever
+      its own changesets call for, writes changelogs), commits, tags, and
+      pushes with `--follow-tags` in one deliberate action; only the
+      publish trigger is a plain pushed tag, the same as tabby.
 
 ## Phase 9: Expand continuous integration
 
@@ -566,7 +574,7 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
       (`page.getByRole('dialog')`) instead of its ancestor section, in
       both `playground-react.spec.ts` and `playground-vue.spec.ts`.
 
-## Phase 11: Docs site and v1.0 release
+## Phase 11: Docs site and initial release
 
 - [x] Scaffold `apps/docs` (VitePress). Real guide content, not stubs: getting
       started, core concepts, display value vs. storage value, configuration
@@ -605,7 +613,7 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
       (`/jalali-js/...`), confirmed every route and asset resolves, and
       screenshotted the embedded playground to confirm it actually renders,
       correctly themed, not only that the files exist.
-- [x] Run the v1.0 release checklist and review the changelog.
+- [x] Run the release checklist and review the changelog.
       `_docs/release-checklist.md`: engineering readiness, package
       readiness, documentation readiness, and the operational prerequisites
       (`NPM_TOKEN`, `PAT_TOKEN`, GitHub Pages enabled) nothing in this repo
@@ -614,11 +622,11 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
       logic not started," badly stale against the repo's actual state; and
       none of the 7 publishable packages had their own `README.md` (npm's
       registry page reads a package's own README, not the repo root's) —
-      all 7 now have one. Publishing itself (adding a `major`-bump
-      changeset per package, merging the resulting "Version Packages" pull
-      request) is deliberately not done as part of this phase: a real,
-      irreversible, public action belongs to whoever owns that decision,
-      made on purpose, not as a side effect of finishing a checklist.
+      all 7 now have one. Publishing itself (adding a `patch`-bump
+      changeset per package, then `make tag-release TAG=v0.0.1`) is
+      deliberately not done as part of this phase: a real, irreversible,
+      public action belongs to whoever owns that decision, made on
+      purpose, not as a side effect of finishing a checklist.
 
 ## Phase 12: Additional locales (`packages/i18n`, `packages/nlp`)
 

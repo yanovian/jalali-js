@@ -577,30 +577,40 @@ two checks are.
   CI check behind it.
 - **`release.yml` (Phase 8, revised to match the org's tag-triggered
   convention).** One workflow, triggered by a pushed tag matching
-  `v*.*.*`, the same shape as `yanovian/chrome-ext-tabby`'s own
+  `v*.*.*`, the same trigger shape as `yanovian/chrome-ext-tabby`'s own
   `release.yml`: `make check`'s component steps
-  (typecheck/lint/format-check/test), `pnpm release` (`pnpm build &&
-changeset publish`, which publishes every package whose current
-  `package.json` version isn't already on npm), then a GitHub release with
-  generated notes (`softprops/action-gh-release`, the same action tabby's
-  own `release.yml` uses). The earlier draft of this workflow used
-  Changesets' own two-phase flow: a bot-opened "Version Packages" pull
-  request on every push to `master`, publishing automatically the moment
-  that PR was merged. Revised to a single tag-triggered workflow instead,
-  since that PR-review step added a separate wait-for-a-bot-then-merge
-  step beyond what tag-triggering was already meant to replace, and the
-  same maintainer who would review that PR is the one pushing the release
-  tag anyway. Versioning still goes through Changesets, unlike tabby's
-  plain `pnpm version <bump>`: `make tag-release TAG=v1.0.0` (the local
-  command a maintainer runs, matching tabby's `release-patch`/`-minor`/
-  `-major`) runs `make check`, then `changeset version` (bumps every
-  changed package by whatever its own accumulated changesets call for,
-  writes changelogs), commits, tags, and pushes with `--follow-tags` in
-  one deliberate action. A single top-level version was never the right
-  fit here: this repo has several independently-versioned packages, and
-  `core`, `react`, and `vue` each need their own version, so Changesets
-  still does that part; only the _publish_ trigger is a plain pushed tag,
-  the same as tabby.
+  (typecheck/lint/format-check/test), then `changesets/action@v1` in
+  publish-only mode (`publish: pnpm release`, no `version:` input — the tag
+  already carries committed, bumped versions, so there is nothing left to
+  "version," only to publish). `pnpm release` is `pnpm build && changeset
+publish`, which publishes every package whose current `package.json`
+  version isn't already on npm. `changesets/action`'s `createGithubReleases`
+  option (on by default) then creates the GitHub release: one release
+  **per published package**, each with that package's own `CHANGELOG.md`
+  entry for the version just published as its body — confirmed directly
+  from the action's own source (`src/run.ts`, `maintenance/v1` branch:
+  `body: changelogEntry.content`, read from `pkg.dir`'s changelog). This
+  replaced two earlier drafts: the first used Changesets' own two-phase
+  flow (a bot-opened "Version Packages" pull request on every push to
+  `master`, publishing automatically the moment that PR was merged),
+  revised away because that PR-review step added a separate
+  wait-for-a-bot-then-merge step beyond what tag-triggering was already
+  meant to replace, and the same maintainer who would review that PR is
+  the one pushing the release tag anyway. The second draft published via a
+  plain `pnpm release` shell step plus `softprops/action-gh-release`
+  (tabby's own release-notes action), which only produces a generic,
+  auto-generated PR-list note; revised to `changesets/action`'s own publish
+  mode for real per-package release notes instead. Versioning still goes
+  through Changesets, unlike tabby's plain `pnpm version <bump>`: `make
+tag-release TAG=v0.0.1` (the local command a maintainer runs, matching
+  tabby's `release-patch`/`-minor`/`-major`) runs `make check`, then
+  `changeset version` (bumps every changed package by whatever its own
+  accumulated changesets call for, writes changelogs), commits, tags, and
+  pushes with `--follow-tags` in one deliberate action. A single top-level
+  version was never the right fit here: this repo has several
+  independently-versioned packages, and `core`, `react`, and `vue` each
+  need their own version, so Changesets still does that part; only the
+  _publish_ trigger is a plain pushed tag, the same as tabby.
 - **`license-audit.yml` (Phase 9).** `yanovian/open-license-auditor@v1`, the
   org's own license-scanning Action (used the same way in
   `yanovian/chrome-ext-tabby` and the org's other repos), on every pull
@@ -897,11 +907,11 @@ hunting through every workflow file that happens to invoke it. `ci.yml`,
 `release.yml`, and `compat-matrix.yml` all follow this. Two narrow,
 intentional exceptions:
 
-- `release.yml`'s final `run: pnpm release` step names an exact pnpm
-  script rather than a `make` target: Makefile's own `release` target is a
-  deliberately different, dry-run-only preview command (see its own entry
-  below), so pointing this step at `make release` would run the wrong
-  thing.
+- `release.yml`'s final step's `publish: pnpm release` input names an
+  exact pnpm script rather than a `make` target: Makefile's own `release`
+  target is a deliberately different, dry-run-only preview command (see
+  its own entry below), so pointing this at `make release` would run the
+  wrong thing.
 - `compat-matrix.yml`'s "Install with override" step uses `pnpm install
 --no-frozen-lockfile` directly: its entire point is letting the lockfile
   move to match a version `scripts/compat-override.mjs` just wrote into
@@ -931,7 +941,7 @@ test-paths           Run Vitest scoped to specific paths: make test-paths PATHS=
 docs-dev / docs-build Documentation site
 clean                Remove build output
 release              Publish through Changesets (CI-driven; the local target is a dry run)
-tag-release          Bump versions via Changesets, commit, tag, and push (triggers release.yml): make tag-release TAG=v1.0.0
+tag-release          Bump versions via Changesets, commit, tag, and push (triggers release.yml): make tag-release TAG=v0.0.1
 ```
 
 `app-typecheck`, `app-build`, and `test-paths` exist for

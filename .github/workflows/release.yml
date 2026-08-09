@@ -1,11 +1,16 @@
 name: Release
 
-# Triggered by a maintainer pushing a tag (make tag-release TAG=v1.0.0), matching the org's own
+# Triggered by a maintainer pushing a tag (make tag-release TAG=v0.0.1), matching the org's own
 # tag-triggered release convention. That local command already bumps every changed package's
 # version via Changesets, commits, tags, and pushes, so by the time this workflow runs, the
-# versions to publish are already committed; this just checks, builds, publishes, and cuts a
-# GitHub release. `changeset publish` only publishes a package whose current package.json
-# version isn't already on npm, so it's safe to run unconditionally here.
+# versions to publish are already committed; this just checks, then publishes.
+#
+# `changesets/action` with only a `publish:` input (no `version:`), not a plain `pnpm release`
+# shell step: it publishes the same way, but also creates one GitHub Release per published
+# package (e.g. `jalali-js@0.0.1`, `@jalali-js/react@0.0.1`), each with that package's own real
+# changelog entry as its body, not a generic auto-generated PR list. `changeset publish` only
+# publishes a package whose current version isn't already on npm, so it's safe to run
+# unconditionally here.
 
 on:
   push:
@@ -14,6 +19,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   release:
@@ -32,7 +38,6 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: make install-frozen
@@ -50,14 +55,9 @@ jobs:
         run: make test
 
       - name: Publish
-        run: pnpm release
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: changesets/action@v1
         with:
-          generate_release_notes: true
+          publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

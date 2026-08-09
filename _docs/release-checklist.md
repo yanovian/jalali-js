@@ -1,19 +1,18 @@
-# v1.0 release checklist
+# Release checklist
 
 The checklist Phase 11 asks for. Each item below is either verified directly (with how), or
 flagged as something only a human with the right access can do (an npm/GitHub secret, a repo
 setting). This document does not itself publish anything: publishing happens through
-`release.yml` (see architecture.md's "CI/CD pipeline"), triggered by merging the "Version
-Packages" pull request Changesets opens, a separate, deliberate action for a maintainer to take
-when they're ready.
+`release.yml` (see architecture.md's "CI/CD pipeline"), triggered by a maintainer pushing a
+release tag (`make tag-release TAG=v0.0.1`), a separate, deliberate action to take when they're
+ready.
 
 ## Engineering readiness
 
 - [ ] **All planned phases are done, or explicitly deferred.** Phases 0-11 (this one) are done;
-      see plan.md. "Later, not yet scheduled" lists what's deliberately out of scope for v1.0
-      (a fake-`CalendarEngine` generalizability test, more locales, an astronomical engine, and
-      any second calendar system, added only on real demand). Confirm this still matches intent
-      before release: no half-finished phase, nothing silently dropped.
+      see plan.md. "Later, not yet scheduled" lists what's deliberately out of scope for this
+      first release (any second calendar system, added only on real demand). Confirm this still
+      matches intent before release: no half-finished phase, nothing silently dropped.
 - [ ] **`make check` passes on a clean checkout.** Typecheck, lint, format, unit/property tests,
       every package and app builds, `packages/core`'s bundle-size budget. Verified as part of
       this phase's own work.
@@ -43,10 +42,9 @@ when they're ready.
 - [ ] **Initial version numbers are a deliberate choice, not a default.** Every package is
       currently `0.0.0` and has never been published. Changesets computes a version bump
       mechanically from whatever bump type (`patch`/`minor`/`major`) a changeset declares; it
-      has no "this is the first release, jump to 1.0.0" behavior of its own. Publishing as
-      `v1.0.0` means adding a changeset with a `major` bump for every package intended to reach
-      `1.0.0` (`pnpm changeset`, or `make changeset`), not assuming `changeset version` will
-      pick that number on its own.
+      has no default first-release number of its own. The first release targets `v0.0.1`: a
+      `patch` bump for every package intended to publish (`pnpm changeset`, or `make changeset`),
+      not assuming `changeset version` will pick that number on its own.
 
 ## Documentation readiness
 
@@ -83,16 +81,17 @@ One deliberate local command, matching the org's tag-triggered release conventio
 (`yanovian/chrome-ext-tabby`'s `release-patch`/`-minor`/`-major`): nothing publishes until a
 maintainer runs it.
 
-1. Add a changeset per package that should reach `v1.0.0` (`major` bump type), describing what
-   ships in this first release.
+1. Add a changeset per package that should reach `v0.0.1` (`patch` bump type, since every
+   package starts at `0.0.0`), describing what ships in this first release.
 2. Review the pending changesets (`pnpm changeset status`, or `make release` for the same
    preview), and confirm the working tree is otherwise clean.
-3. Run `make tag-release TAG=v1.0.0`. This runs `make check`, then `changeset version` (bumps
+3. Run `make tag-release TAG=v0.0.1`. This runs `make check`, then `changeset version` (bumps
    each package's version, writes `CHANGELOG.md` entries, consumes the changesets), commits,
    tags, and pushes with `--follow-tags`.
-4. Pushing the tag triggers `release.yml`: re-runs the checks, then publishes (`pnpm release`:
-   `pnpm build && changeset publish`, which publishes only a package whose current version isn't
-   already on npm) and creates a GitHub release with generated notes.
+4. Pushing the tag triggers `release.yml`: re-runs the checks, then `changesets/action@v1`
+   publishes (`pnpm release`: `pnpm build && changeset publish`, which publishes only a package
+   whose current version isn't already on npm) and creates one GitHub release per published
+   package, each sourced from that package's own `CHANGELOG.md` entry.
 
 `@changesets/changelog-github` (the changelog format `changeset version` uses) links each entry
 back to its PR/commit; that needs a GitHub token to avoid API rate limits when run locally
