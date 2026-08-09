@@ -571,6 +571,19 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
       review, not to chase a green check first. `workflow_dispatch` still
       stays available too, for the one-time bootstrap on a repo with no
       `visual-baselines` branch yet.
+
+      Revised again after that: triggering directly on `push: branches:
+
+[master]`ran this workflow in parallel with`ci.yml`on the same
+      commit, a real problem, not just wasted CI minutes, since a commit
+      that failed typecheck, lint, or test could still become the
+      accepted baseline. Fixed by chaining it to`ci.yml` instead
+      (`workflow_run`, `types: [completed]`, gated on
+      `github.event.workflow_run.conclusion == 'success'`), checked out
+      at the exact commit `ci.yml` validated
+      (`github.event.workflow_run.head_sha`), so only a commit that
+actually passed CI ever gets baselined.
+
 - [x] Found and fixed a real bug while building this: an opened calendar
       popover is `position: absolute` and pokes outside its parent
       section's own box, so screenshotting the section clipped the

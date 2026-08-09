@@ -530,13 +530,21 @@ e2e/`); a repo with no `visual-baselines` branch yet fails every
   addition, not built here.
 
 **Accepting a visual change.** `update-visual-baselines.yml` runs
-automatically on every push to `master`, so no maintainer ever has to run
-it by hand. It regenerates every screenshot from scratch
-(`playwright test --update-snapshots`, all three browsers) and
-force-replaces `visual-baselines` with the result. A `workflow_dispatch`
-trigger stays available too, for the one-time bootstrap on a repo with no
-`visual-baselines` branch yet, or to force a re-baseline with no code
-change.
+automatically once `ci.yml` succeeds on `master`, so no maintainer ever
+has to run it by hand. It is chained via `workflow_run`, not its own
+independent `push` trigger: an earlier version triggered on
+`push: branches: [master]` directly, which ran in parallel with `ci.yml`
+on the same commit, a real problem (not just wasted CI minutes), since a
+commit that failed typecheck, lint, or test could still become the
+accepted baseline. `workflow_run` only proceeds past a real, successful
+`ci.yml` run, checked out at the exact commit `ci.yml` validated
+(`github.event.workflow_run.head_sha`), not just whatever `master`'s tip
+happens to be by the time this job starts. It regenerates every
+screenshot from scratch (`playwright test --update-snapshots`, all three
+browsers) and force-replaces `visual-baselines` with the result. A
+`workflow_dispatch` trigger stays available too, for the one-time
+bootstrap on a repo with no `visual-baselines` branch yet, or to force a
+re-baseline with no code change.
 
 This means a PR that intentionally changes rendering keeps showing
 "changed" screenshots in its `e2e.yml` comment for as long as it stays
