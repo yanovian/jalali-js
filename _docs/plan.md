@@ -579,6 +579,24 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
       Fixed by screenshotting the popover element itself
       (`page.getByRole('dialog')`) instead of its ancestor section, in
       both `playground-react.spec.ts` and `playground-vue.spec.ts`.
+- [x] Added after Phase 11, on request: a `custom-theme` playground
+      section and matching functional test in both spec files, so a
+      consumer-style CSS override (not one of the shipped theme files)
+      gets checked too, not just the default look. A screenshot alone
+      only proves the render changed, not that a specific configured
+      value took effect, so each spec file also asserts on the real
+      computed styles (`toHaveCSS`). Building this found a real bug in
+      the first draft: the override was set as an inline style on a
+      wrapping element, and it silently lost to `dark.css`, since CSS
+      custom properties give a direct match on the element itself
+      priority over any inherited value, regardless of specificity or
+      import order. Fixed by scoping the override under a parent class
+      instead (`.custom-theme-scope [data-jalali-datepicker-root]`), the
+      pattern architecture.md's "Theming contract" already documented.
+      Verified directly: read the computed `--jalali-primary` value in
+      chromium, firefox, and webkit before and after the fix, confirmed
+      all three failed the same way on the inline-style draft and passed
+      once scoped correctly.
 
 ## Phase 11: Docs site and initial release
 

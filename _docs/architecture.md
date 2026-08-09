@@ -349,6 +349,19 @@ single themed section scopes their own override under a parent selector,
 following the same pattern (override the variables, never fight the
 rules); the shipped theme files are page-wide by design.
 
+This scoping matters in one specific way: it must target the root element
+directly, not an ancestor. Inheritance is the lowest-priority origin in
+CSS. A rule that matches the root element itself always wins over an
+inherited value, no matter how it was set. Playground apps found this the
+hard way while building the `custom-theme` test section below (see
+"Visual regression and PR screenshots"): an ancestor's inline `style`
+attribute lost to `dark.css`'s own rule, because `dark.css` matches
+`[data-jalali-datepicker-root]` directly and the inline style was set one
+level up, not on that element. The fix was a real CSS rule with a
+descendant selector, `.custom-theme-scope [data-jalali-datepicker-root]`,
+which matches the root element itself and beats `dark.css`'s plain
+attribute selector on specificity, regardless of import order.
+
 ### Visual configuration matrix
 
 Every picker (`DatePicker`, `RangePicker`, `Calendar`/`InlineCalendar`)
@@ -468,12 +481,28 @@ and starts all four playground apps (ports 4001-4004) before any test
 runs. `e2e/playground-react.spec.ts` and `e2e/playground-vue.spec.ts`
 screenshot each `data-testid`-marked section of the playground page
 (`grid-en-jalali`, `grid-fa-jalali`, `dropdown`, `gregorian`,
-`inline-calendar`, `range-picker`), plus one extra screenshot of an opened
-calendar-grid popover (the actual month grid, not just the closed input);
-`e2e/playground-next.spec.ts` and `e2e/playground-nuxt.spec.ts` each take
-one full-page screenshot, since those two apps exist to exercise SSR and
-hydration (see their own page components), not to demonstrate the
-locale/system/variant matrix the React/Vue playgrounds already cover.
+`inline-calendar`, `range-picker`, `custom-theme`), plus one extra
+screenshot of an opened calendar-grid popover (the actual month grid, not
+just the closed input); `e2e/playground-next.spec.ts` and
+`e2e/playground-nuxt.spec.ts` each take one full-page screenshot, since
+those two apps exist to exercise SSR and hydration (see their own page
+components), not to demonstrate the locale/system/variant matrix the
+React/Vue playgrounds already cover.
+
+**A screenshot alone only proves the render changed, not that a specific
+configured value took effect.** The `custom-theme` section exists to test
+that: it applies a real consumer-style CSS override (see the "Theming
+contract" note above on why it must scope to the root element, not an
+ancestor), and each spec file has a matching, non-screenshot test that
+reads the actual computed styles (`toHaveCSS('--jalali-primary', ...)`
+and a check that a rule consuming that variable, `border-radius`, really
+resolved to the overridden value) and fails with a plain "expected X, got
+Y" if an override stops applying. That failure mode is a real regression
+this design could hit silently: a specificity or ordering change in a
+future edit to `date-picker.css` or a theme file could make the shipped
+default win over a consumer's override again, and a screenshot diff alone
+would only catch it if the pixels happened to look different enough to
+register, not the exact mechanism that broke.
 
 **No screenshot PNG, of any kind, lives on `master`.** `.gitignore` excludes
 `test-results/`, `playwright-report/`, and `e2e/**/*-snapshots/` (the
