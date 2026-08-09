@@ -53,7 +53,7 @@ jobs:
             git archive origin/visual-baselines | tar -x -C e2e/
             echo "Restored baselines from origin/visual-baselines."
           else
-            echo "::warning::No visual-baselines branch found; every screenshot test will fail until a maintainer runs update-visual-baselines.yml."
+            echo "::warning::No visual-baselines branch found; every screenshot test will fail until the next push to master, or a manual run of update-visual-baselines.yml."
           fi
 
       - name: Run Playwright
@@ -157,7 +157,7 @@ jobs:
 
             if (manifest.changed.length > 0) {
               body += '\n### Changed screenshots\n\n';
-              body += 'Each row is one screenshot test. **Baseline** is the currently accepted image; **new** is what this PR renders; **diff** highlights the pixels that changed. If this change is intentional, run `update-visual-baselines.yml` from this branch to accept it.\n\n';
+              body += 'Each row is one screenshot test. **Baseline** is the currently accepted image; **new** is what this PR renders; **diff** highlights the pixels that changed. If this change is intentional, merging this PR is enough: the baseline updates on its own on the next push to master.\n\n';
               for (const shot of manifest.changed) {
                 // Explicit app/section/browser caption per image, not a bare filename. A
                 // reviewer scanning the comment should never have to guess what they are
