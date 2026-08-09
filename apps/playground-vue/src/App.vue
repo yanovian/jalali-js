@@ -5,6 +5,7 @@ import '@jalali-js/ui-vue/themes/compact.css';
 // only overrides --jalali-* custom properties on [data-jalali-*] elements (see dark.css's own
 // comment), so injecting/removing it as a <style> tag turns the picker theme on and off cleanly.
 import darkThemeCss from '@jalali-js/ui-vue/themes/dark.css?inline';
+import type { LocaleCode } from '@jalali-js/vue';
 import { DatePicker, useCalendar } from '@jalali-js/vue';
 import { InlineCalendar, RangePicker } from '@jalali-js/ui-vue';
 import type { RangeStorageValue } from '@jalali-js/ui-vue';
@@ -16,6 +17,7 @@ const storedRange = ref<RangeStorageValue>();
 const inlineSelected = ref<CalendarDate | null>(null);
 const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
 const isDark = ref(true);
+const locale = ref<LocaleCode>('fa');
 
 // A <style> tag written directly in <template> does not work: Vue's SFC compiler treats
 // <style> as one of its own top-level file blocks, even when it appears nested inside
@@ -45,14 +47,25 @@ watchEffect(() => {
     <p style="margin: -0.5rem 0 1rem">Vue playground · <a href="../react/">React playground</a></p>
     <p style="margin: 0 0 1rem">
       <label><input type="checkbox" v-model="isDark" /> Dark mode</label>
+      &nbsp;&nbsp;
+      <label>
+        <input
+          :checked="locale === 'en'"
+          type="checkbox"
+          @change="locale = locale === 'en' ? 'fa' : 'en'"
+        />
+        English (unchecked: Farsi)
+      </label>
     </p>
     <p>
       The <code>compact</code> theme from <code>@jalali-js/ui-vue/themes</code> is always on below,
-      for spacing. The <code>dark</code> theme (colors) is what the toggle above controls, applied
-      to both the pickers and this page's own background: composing multiple theme files works by
-      importing more than one (see the CSS imports at the top of this file). Every component below
-      shares one page-wide theme, since the theming contract is CSS custom properties on each
-      picker's root element, the same design a whole-app theme switch relies on.
+      for spacing. The <code>dark</code> theme (colors) is what the dark mode toggle controls,
+      applied to both the pickers and this page's own background: composing multiple theme files
+      works by importing more than one (see the CSS imports at the top of this file). Every
+      component below shares one page-wide theme, since the theming contract is CSS custom
+      properties on each picker's root element, the same design a whole-app theme switch relies on.
+      The language toggle controls every component below except the two explicit English/Farsi
+      comparison sections, which always show both at once.
     </p>
     <p>امروز: {{ jalali.format(jalali.today(), { style: 'long', weekday: true }) }}</p>
 
@@ -67,21 +80,39 @@ watchEffect(() => {
       <DatePicker system="jalali" locale="fa" />
     </section>
 
+    <section data-testid="quick-nav">
+      <h2>Quick year/month navigation (default on)</h2>
+      <p>Click the month or year in the header to jump straight to a month grid or year grid.</p>
+      <DatePicker system="jalali" :locale="locale" />
+    </section>
+
+    <section data-testid="quick-nav-off">
+      <h2>Quick navigation turned off (quickNav: false)</h2>
+      <p>The month and year in the header are plain text; only the prev/next arrows page.</p>
+      <DatePicker system="jalali" :locale="locale" :quick-nav="false" />
+    </section>
+
+    <section data-testid="no-initial-selection">
+      <h2>No initial selection (defaultDate: null)</h2>
+      <p>Opens with nothing picked, showing the placeholder until a person picks a date.</p>
+      <DatePicker system="jalali" :locale="locale" :default-date="null" />
+    </section>
+
     <section data-testid="dropdown">
       <h2>Dropdown variant (date-of-birth style entry)</h2>
-      <DatePicker system="jalali" locale="en" variant="dropdown" />
+      <DatePicker system="jalali" :locale="locale" variant="dropdown" />
     </section>
 
     <section data-testid="gregorian">
       <h2>Gregorian system</h2>
-      <DatePicker system="gregorian" locale="en" />
+      <DatePicker system="gregorian" :locale="locale" />
     </section>
 
     <section data-testid="inline-calendar">
       <h2>Inline calendar (@jalali-js/ui-vue)</h2>
       <InlineCalendar
         system="jalali"
-        locale="en"
+        :locale="locale"
         :value="inlineSelected"
         @select="(date: CalendarDate) => (inlineSelected = date)"
       />
@@ -90,7 +121,7 @@ watchEffect(() => {
 
     <section data-testid="range-picker">
       <h2>Range picker (@jalali-js/ui-vue)</h2>
-      <RangePicker v-model="storedRange" system="jalali" locale="en" />
+      <RangePicker v-model="storedRange" system="jalali" :locale="locale" />
       <p>Stored range (Gregorian by default): {{ JSON.stringify(storedRange) }}</p>
     </section>
 
@@ -105,7 +136,7 @@ watchEffect(() => {
         scoped selector under a parent class (see the "Theming contract" section there).
       </p>
       <div class="custom-theme-scope">
-        <DatePicker system="jalali" locale="en" />
+        <DatePicker system="jalali" :locale="locale" />
       </div>
     </section>
   </main>

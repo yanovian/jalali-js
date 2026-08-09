@@ -13,8 +13,16 @@ export interface DatePickerProps {
   system?: CalendarSystem;
   /** Which language the picker's text reads in. Default: 'en'. */
   locale?: LocaleCode;
-  /** The initial selection. Default: today, in `system`. */
-  defaultDate?: CalendarDate;
+  /**
+   * The initial selection. Default: today, in `system`. Pass `null` for no initial selection,
+   * so the picker opens empty and shows `placeholder` until a person picks a date.
+   */
+  defaultDate?: CalendarDate | null;
+  /**
+   * Let a person click the month or year in the grid popover's header to jump straight to a
+   * month grid or a year grid. Default: true. Has no effect on the dropdown variant.
+   */
+  quickNav?: boolean;
   /**
    * Called with the selection, in both forms: `value`, shaped by `valueFormat` (what an app
    * should store), and `date`, the raw `CalendarDate` (what an app should keep displaying).
@@ -50,6 +58,7 @@ export function DatePicker({
   system = 'jalali',
   locale = 'en',
   defaultDate,
+  quickNav,
   onChange,
   valueFormat = 'gregorian-iso',
   displayFormat,
@@ -58,8 +67,9 @@ export function DatePicker({
   className,
 }: DatePickerProps) {
   const localePack = useMemo(() => localePackFor(locale), [locale]);
-  const [date, setDate] = useState<CalendarDate>(
-    () => defaultDate ?? createCalendar({ system }).today(),
+  const today = useMemo(() => createCalendar({ system }).today(), [system]);
+  const [date, setDate] = useState<CalendarDate | null>(() =>
+    defaultDate === null ? null : (defaultDate ?? today),
   );
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -91,7 +101,7 @@ export function DatePicker({
       <DropdownDateFields
         system={system}
         locale={locale}
-        date={date}
+        date={date ?? today}
         onChange={selectDate}
         className={className}
       />
@@ -106,7 +116,7 @@ export function DatePicker({
         role="combobox"
         data-jalali-datepicker-input
         placeholder={placeholder ?? localePack.datePickerPlaceholder}
-        value={formatDate(date, localePack, displayFormat)}
+        value={date ? formatDate(date, localePack, displayFormat) : ''}
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -118,6 +128,7 @@ export function DatePicker({
             system={system}
             locale={locale}
             value={date}
+            quickNav={quickNav}
             onSelect={(next) => {
               selectDate(next);
               setOpen(false);

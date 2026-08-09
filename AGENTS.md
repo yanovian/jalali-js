@@ -29,3 +29,10 @@ comments.
 
 When you update a doc under `_docs/`, check it against these rules before you
 finish.
+
+## End of a task
+
+After you finish a task that changes code, suggest a branch name, a PR
+title, and a PR description. Keep each one short and to the point. Do not
+use em dashes. Follow the writing style rules above. These are suggestions
+only. The user creates the branch and the PR by hand.

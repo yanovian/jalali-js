@@ -16,7 +16,7 @@ import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, StorageValue, ValueFormat } from 'jalali-js';
 import { createCalendar, toStorageValue } from 'jalali-js';
-import { onBeforeUnmount, onMounted, ref, useId, watch, computed } from 'vue';
+import { onBeforeUnmount, onMounted, ref, useId, watch, computed, type Ref } from 'vue';
 import Calendar from './Calendar.vue';
 import DropdownDateFields from './DropdownDateFields.vue';
 import { localePackFor, type LocaleCode } from './use-calendar.js';
@@ -25,7 +25,13 @@ const props = withDefaults(
   defineProps<{
     system?: CalendarSystem;
     locale?: LocaleCode;
-    defaultDate?: CalendarDate;
+    /** The initial selection. Default: today, in `system`. Pass `null` for no initial
+     * selection, so the picker opens empty and shows `placeholder` until a person picks a
+     * date. */
+    defaultDate?: CalendarDate | null;
+    /** Let a person click the month or year in the grid popover's header to jump straight to
+     * a month grid or a year grid. Default: true. Has no effect on the dropdown variant. */
+    quickNav?: boolean;
     valueFormat?: ValueFormat;
     displayFormat?: FormatOptions;
     variant?: 'grid' | 'dropdown';
@@ -45,9 +51,10 @@ const localePack = computed(() => localePackFor(props.locale));
 const resolvedPlaceholder = computed(
   () => props.placeholder ?? localePack.value.datePickerPlaceholder,
 );
-const date = ref<CalendarDate>(
-  props.defaultDate ?? createCalendar({ system: props.system }).today(),
-);
+const today = computed(() => createCalendar({ system: props.system }).today());
+const date = ref<CalendarDate | null>(
+  props.defaultDate === null ? null : (props.defaultDate ?? today.value),
+) as Ref<CalendarDate | null>;
 const open = ref(false);
 const rootRef = ref<HTMLElement | null>(null);
 const popoverId = useId();
@@ -88,7 +95,7 @@ onBeforeUnmount(() => {
     v-if="variant === 'dropdown'"
     :system="system"
     :locale="locale"
-    :date="date"
+    :date="date ?? today"
     @change="selectDate"
   />
   <div v-else ref="rootRef" :dir="localePack.direction" data-jalali-datepicker-root>
@@ -98,7 +105,7 @@ onBeforeUnmount(() => {
       role="combobox"
       data-jalali-datepicker-input
       :placeholder="resolvedPlaceholder"
-      :value="formatDate(date, localePack, displayFormat)"
+      :value="date ? formatDate(date, localePack, displayFormat) : ''"
       aria-haspopup="dialog"
       :aria-expanded="open"
       :aria-controls="open ? popoverId : undefined"
@@ -115,6 +122,7 @@ onBeforeUnmount(() => {
         :system="system"
         :locale="locale"
         :value="date"
+        :quick-nav="quickNav"
         @select="
           (next) => {
             selectDate(next);

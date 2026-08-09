@@ -87,6 +87,26 @@ describe('DatePicker (grid variant, the default)', () => {
   });
 });
 
+describe('DatePicker (defaultDate)', () => {
+  it('defaults to today when defaultDate is omitted', () => {
+    const wrapper = mount(DatePicker, { props: { locale: 'en' } });
+    expect((wrapper.get('[role="combobox"]').element as HTMLInputElement).value).not.toBe('');
+  });
+
+  it('shows the placeholder with an empty value when defaultDate is null', () => {
+    const wrapper = mount(DatePicker, { props: { locale: 'en', defaultDate: null } });
+    const input = wrapper.get('[role="combobox"]').element as HTMLInputElement;
+    expect(input.value).toBe('');
+    expect(input.placeholder).toBe('Select a date');
+  });
+
+  it('opens on today’s month when defaultDate is null, with nothing selected', async () => {
+    const wrapper = mount(DatePicker, { props: { locale: 'en', defaultDate: null } });
+    await wrapper.get('[role="combobox"]').trigger('click');
+    expect(wrapper.find('[data-selected]').exists()).toBe(false);
+  });
+});
+
 describe('DatePicker (dropdown variant)', () => {
   it('renders three selects reflecting the initial date', () => {
     const wrapper = mount(DatePicker, {
