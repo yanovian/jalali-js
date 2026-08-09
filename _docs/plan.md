@@ -372,43 +372,46 @@ false`; `@jalali-js/react`/`@jalali-js/vue`/`@jalali-js/ui-react`/
       2.05 KB, roughly 3x headroom. Verified the gate fails shut: set to a
       limit `size-limit` could not meet, confirmed a non-zero exit with the
       real overage reported, then restored the real budget.
-- [x] Set up Changesets for versioning across the monorepo.
-      `.changeset/config.json`: `access: "public"`, `baseBranch: "master"`
-      (this repo's real default branch, matching `ci.yml`, not `main`),
-      `@changesets/changelog-github` pointed at `yanovian/jalali-js`, and
-      the four playground apps `ignore`d (private demo apps, never
-      published). Root scripts: `changeset`, `version-packages`
-      (`changeset version`), `release` (`pnpm build && changeset publish`).
-- [x] Add `release.yml`, triggered by a pushed tag matching `v*.*.*`,
-      matching the org's own tag-triggered release convention
-      (`yanovian/chrome-ext-tabby`'s `release-patch`/`-minor`/`-major` +
-      `release.yml`): `make check`'s component steps
-      (typecheck/lint/format-check/test), then `changesets/action@v1` in
-      publish-only mode (`publish: pnpm release`, no `version:` input,
-      since the tag already carries committed, bumped versions). This also
-      creates the GitHub release: `changesets/action`'s
-      `createGithubReleases` (on by default) opens one release per
-      published package, each with that package's own `CHANGELOG.md` entry
-      as its body, more specific than a generic PR-list release note for a
-      multi-package monorepo. An earlier draft used Changesets' own
-      two-phase flow instead (a bot-opened "Version Packages" pull request
-      on every push to `master`, publishing the moment it was merged);
-      revised to one tag-triggered workflow, since the PR-review step was
-      extra ceremony beyond what tag-triggering already replaces (the same
-      maintainer reviewing that PR is the one pushing the release tag). A
-      second draft published via a plain `pnpm release` step plus
-      `softprops/action-gh-release` (the action tabby's own `release.yml`
-      uses); revised again to `changesets/action`'s own publish mode, since
-      it produces real per-package release notes instead of an
-      auto-generated PR list. `jalali-js` still keeps Changesets for
-      versioning specifically, unlike tabby's single `pnpm version <bump>`:
-      several independently-versioned packages don't share one semver
-      number, so `make tag-release TAG=v0.0.1` (the local command a
-      maintainer runs, matching tabby's `release-patch`/etc.) runs `make
-check`, then `changeset version` (bumps each changed package by whatever
-      its own changesets call for, writes changelogs), commits, tags, and
-      pushes with `--follow-tags` in one deliberate action; only the
-      publish trigger is a plain pushed tag, the same as tabby.
+- [x] Set up versioning across the monorepo, and `release.yml`, triggered
+      by a pushed tag matching `v*.*.*`, matching
+      `yanovian/chrome-ext-tabby`'s own tag-triggered release convention
+      exactly: `pnpm version <bump>` (the same command tabby's
+      `release-patch`/`-minor`/`-major` use), extended across every
+      package under `packages/*` via `pnpm --filter "./packages/**" exec`,
+      since plain `pnpm version` only bumps one `package.json` at a time.
+      Every package starts at the same version and always gets the same
+      bump, so they stay in sync with no extra bookkeeping. `make
+release-patch`/`-minor`/`-major` run `make check`, bump, commit, tag, and
+      push with `--follow-tags`, all locally, all in one command, matching
+      tabby's ergonomics: no manual version number or tag, ever.
+      `release.yml` re-runs the checks, builds, publishes each package to
+      npm (skipping any already published at that version, so a partial
+      failure is safe to retry), and creates one GitHub release with
+      `softprops/action-gh-release`'s auto-generated notes, the same
+      mechanism tabby's own `release.yml` uses. Both `tag-release` and the
+      publish step refuse to redo work that already happened: `HEAD`
+      already tagged means nothing to release, and a package already on
+      npm at that version gets skipped, not re-published.
+
+      This went through two earlier designs before landing here, both
+          worth recording since they were real, considered trade-offs, not
+          just discarded drafts. The first used Changesets, since this repo
+          has 7 independently-nameable packages, and Changesets is the
+          standard tool for that; `changesets/action@v1` handled npm
+          publishing and, in one revision, per-package GitHub releases
+          sourced from each package's own `CHANGELOG.md`. That broke down for
+          a reason worth stating plainly: `@changesets/changelog-github`
+          (later swapped for the git-only `@changesets/cli/changelog`) needed
+          a `GITHUB_TOKEN` to generate changelogs locally, and a maintainer
+          release run failed on exactly that, with no way to create one
+          without a personal access token they were not able to use. Once
+          forced to remove that dependency, the actual value Changesets added
+          over tabby's plain `pnpm version` shrank to "independent per-package
+          version numbers," a feature this repo does not use: every package
+          here already always ships together, at the same number, so nothing
+          was actually lost moving to the simpler mechanism, and one more
+          dependency, the `.changeset/` directory, and a hand-written
+          changeset-generation script all went away with it.
 
 ## Phase 9: Expand continuous integration
 
@@ -445,7 +448,7 @@ audit and maintenance workflows.
       `update-strategy: breaking`, `min-release-age-days: 30`, January 1st
       and July 1st at 05:00 UTC (this repo's own, slower cadence than
       `yanovian/chrome-ext-tabby`'s monthly use of the same action, on
-      purpose: Changesets-driven, hand-reviewed releases warrant more time
+      purpose: a deliberately, hand-released library warrants more time
       between breaking bumps than a continuously-shipped browser
       extension). Same `PAT_TOKEN` requirement as the non-breaking workflow.
 - [x] Add `prune-old-actions.yaml` (scheduled cleanup).
