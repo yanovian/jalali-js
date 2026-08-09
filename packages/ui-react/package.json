@@ -1,6 +1,6 @@
 {
   "name": "@jalali-js/ui-react",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "RangePicker, InlineCalendar, and extra themes for @jalali-js/react, built on the same headless primitives.",
   "keywords": [
     "jalali",

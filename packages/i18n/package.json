@@ -1,6 +1,6 @@
 {
   "name": "@jalali-js/i18n",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Locale data and display formatting for jalali-js: English and Farsi, month/weekday names, numerals, and RTL.",
   "keywords": [
     "jalali",
