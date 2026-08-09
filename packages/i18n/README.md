@@ -23,10 +23,14 @@ format(date, fa); // '۱۵ مرداد ۱۴۰۳'
 
 Two locales ship today, `en` and `fa`, each covering both calendar systems' month names
 (English transliterations of the Jalali months, Persian transliterations of the Gregorian ones),
-weekday names, digit style, and text direction. `@jalali-js/react` and `@jalali-js/vue` already
-depend on this package and wire it up through a `locale` prop; reach for it directly only when
-formatting a date outside a component.
+weekday names, digit style, and text direction.
+[`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) and
+[`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) already depend on this package
+and wire it up through a `locale` prop; reach for it directly only when formatting a date
+outside a component.
 
-Full guide and API reference: [yanovian.github.io/jalali-js](https://yanovian.github.io/jalali-js/).
+[Guide and API reference](https://yanovian.github.io/jalali-js/) ·
+[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
+[Playground](https://yanovian.github.io/jalali-js/playground/react/)
 
 MIT licensed.

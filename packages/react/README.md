@@ -27,8 +27,11 @@ calendar-grid popup for three plain `<select>`s, for narrow, known-range entry s
 birth. `useResolvedTimeZone()` pairs with a `'zoned-datetime'` calendar under Next.js SSR with no
 hydration mismatch.
 
-`@jalali-js/ui-react` adds a `RangePicker`, an `InlineCalendar`, and extra themes on the same
-primitives. Full guide and API reference:
-[yanovian.github.io/jalali-js](https://yanovian.github.io/jalali-js/).
+[`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react) adds a `RangePicker`,
+an `InlineCalendar`, and extra themes on the same primitives.
+
+[Guide and API reference](https://yanovian.github.io/jalali-js/) ·
+[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
+[Playground](https://yanovian.github.io/jalali-js/playground/react/)
 
 MIT licensed.

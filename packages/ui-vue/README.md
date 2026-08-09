@@ -33,6 +33,8 @@ hovering after a start is picked previews the range a completed selection would 
 grid with no popover. `themes/dark.css` and `themes/compact.css` each override a disjoint set of
 the shared `--jalali-*` custom properties, so they compose by importing both.
 
-Full guide: [yanovian.github.io/jalali-js](https://yanovian.github.io/jalali-js/).
+[Guide and API reference](https://yanovian.github.io/jalali-js/) ·
+[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
+[Playground](https://yanovian.github.io/jalali-js/playground/vue/)
 
 MIT licensed.

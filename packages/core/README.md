@@ -18,12 +18,21 @@ toGregorian({ year: 1403, month: 5, day: 15 }, 'jalali'); // { year: 2024, month
 
 Three precision tiers (`CalendarDate`, `CalendarDateTime`, `ZonedCalendarDateTime`, matching TC39
 `Temporal`'s own tiers), and a `valueFormat` option for opting a stored value into the Jalali
-calendar instead of the Gregorian default. Full guide and API reference:
-[yanovian.github.io/jalali-js](https://yanovian.github.io/jalali-js/).
+calendar instead of the Gregorian default.
 
-Part of the [jalali-js](https://github.com/yanovian/jalali-js) toolkit. `@jalali-js/react` and
-`@jalali-js/vue` build framework bindings on top of this package; `@jalali-js/i18n` and
-`@jalali-js/nlp` are separate, optional packages for display formatting and natural language
-parsing.
+[Guide and API reference](https://yanovian.github.io/jalali-js/) ·
+[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
+[Playground](https://yanovian.github.io/jalali-js/playground/react/)
+
+Part of the [jalali-js](https://github.com/yanovian/jalali-js) toolkit:
+[`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) and
+[`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) build framework bindings on top
+of this package; [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n) and
+[`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp) are separate, optional packages
+for display formatting and natural language parsing.
+
+## Used by
+
+- [kissed.app](https://kissed.app)
 
 MIT licensed.
