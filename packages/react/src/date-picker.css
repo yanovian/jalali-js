@@ -82,7 +82,69 @@
 }
 
 [data-jalali-calendar-title] {
+  display: flex;
+  gap: 0.35em;
   font-weight: 600;
+}
+
+[data-jalali-calendar-title-month],
+[data-jalali-calendar-title-year] {
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Only a real <button> (quickNav on) gets pointer affordance; the plain <span> (quickNav off)
+   stays inert text. */
+button[data-jalali-calendar-title-month],
+button[data-jalali-calendar-title-year] {
+  cursor: pointer;
+  border-radius: var(--jalali-radius);
+  padding: 0.1em 0.35em;
+  margin: -0.1em -0.35em;
+}
+
+button[data-jalali-calendar-title-month]:hover,
+button[data-jalali-calendar-title-year]:hover {
+  background: color-mix(in srgb, var(--jalali-fg) 8%, transparent);
+}
+
+[data-jalali-calendar-months],
+[data-jalali-calendar-years] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--jalali-gap);
+}
+
+[data-jalali-calendar-month],
+[data-jalali-calendar-year] {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: var(--jalali-radius);
+  padding: 0.75em 0.5em;
+  cursor: pointer;
+}
+
+[data-jalali-calendar-month]:hover,
+[data-jalali-calendar-year]:hover {
+  background: color-mix(in srgb, var(--jalali-fg) 8%, transparent);
+}
+
+[data-jalali-calendar-month][data-today],
+[data-jalali-calendar-year][data-today] {
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--jalali-primary);
+}
+
+[data-jalali-calendar-month][data-selected],
+[data-jalali-calendar-year][data-selected] {
+  background: var(--jalali-primary);
+  color: var(--jalali-primary-fg);
 }
 
 [data-jalali-calendar-grid] {

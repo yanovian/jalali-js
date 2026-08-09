@@ -60,6 +60,12 @@ for narrow, known-range entry such as a date of birth:
 <DatePicker system="jalali" locale="en" variant="dropdown" />
 ```
 
+In the grid popup (and in `Calendar` directly), a person can click the month or year in the
+header to jump straight to a month grid or a year grid, instead of paging one month at a time.
+This is on by default; pass `quickNav={false}` to turn it off. Pass `defaultDate={null}` for no
+initial selection, so the picker opens empty and shows its placeholder until someone picks a
+date.
+
 Full prop list: [`DatePickerProps`](/api/@jalali-js/react/interfaces/DatePickerProps).
 
 ## `useResolvedTimeZone()`

@@ -35,7 +35,8 @@ describe('Calendar', () => {
         value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
       />,
     );
-    expect(screen.getByText('Mordad 1403')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Choose month' })).toHaveTextContent('Mordad');
+    expect(screen.getByRole('button', { name: 'Choose year' })).toHaveTextContent('1403');
   });
 
   it('marks the selected day and the current day with their data attributes', () => {
@@ -81,11 +82,12 @@ describe('Calendar', () => {
         value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
       />,
     );
+    const monthTitle = () => screen.getByRole('button', { name: 'Choose month' });
     await user.click(screen.getByRole('button', { name: 'Next month' }));
-    expect(screen.getByText('Shahrivar 1403')).toBeInTheDocument();
+    expect(monthTitle()).toHaveTextContent('Shahrivar');
     await user.click(screen.getByRole('button', { name: 'Previous month' }));
     await user.click(screen.getByRole('button', { name: 'Previous month' }));
-    expect(screen.getByText('Tir 1403')).toBeInTheDocument();
+    expect(monthTitle()).toHaveTextContent('Tir');
   });
 
   it('renders Persian month names and digits in the fa locale', () => {
@@ -96,6 +98,53 @@ describe('Calendar', () => {
         value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
       />,
     );
-    expect(screen.getByText('مرداد ۱۴۰۳')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Choose month' })).toHaveTextContent('مرداد');
+    expect(screen.getByRole('button', { name: 'Choose year' })).toHaveTextContent('۱۴۰۳');
+  });
+
+  describe('quickNav (default on)', () => {
+    it('opens the month grid when the month title is clicked, and picking a month returns to the day grid', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(
+        <Calendar
+          system="jalali"
+          locale="en"
+          value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
+        />,
+      );
+      await user.click(screen.getByRole('button', { name: 'Choose month' }));
+      expect(screen.getByRole('listbox', { name: 'Month' })).toBeInTheDocument();
+      await user.click(screen.getByRole('option', { name: 'Aban' }));
+      expect(screen.queryByRole('listbox', { name: 'Month' })).not.toBeInTheDocument();
+      expect(screen.getByRole('gridcell', { name: '15 Aban 1403' })).toBeInTheDocument();
+    });
+
+    it('opens the year grid when the year title is clicked, and picking a year moves to the month grid', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(
+        <Calendar
+          system="jalali"
+          locale="en"
+          value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
+        />,
+      );
+      await user.click(screen.getByRole('button', { name: 'Choose year' }));
+      expect(screen.getByRole('listbox', { name: 'Year' })).toBeInTheDocument();
+      await user.click(screen.getByRole('option', { name: '1400' }));
+      expect(screen.getByRole('listbox', { name: 'Month' })).toBeInTheDocument();
+    });
+
+    it('does not render clickable title buttons when quickNav is false', () => {
+      render(
+        <Calendar
+          system="jalali"
+          locale="en"
+          quickNav={false}
+          value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
+        />,
+      );
+      expect(screen.queryByRole('button', { name: 'Choose month' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Choose year' })).not.toBeInTheDocument();
+    });
   });
 });

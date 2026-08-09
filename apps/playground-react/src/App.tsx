@@ -4,6 +4,7 @@ import '@jalali-js/ui-react/themes/compact.css';
 // only overrides --jalali-* custom properties on [data-jalali-*] elements (see dark.css's own
 // comment), so injecting/removing it as a <style> tag turns the picker theme on and off cleanly.
 import darkThemeCss from '@jalali-js/ui-react/themes/dark.css?inline';
+import type { LocaleCode } from '@jalali-js/react';
 import { DatePicker, useCalendar } from '@jalali-js/react';
 import { InlineCalendar, RangePicker } from '@jalali-js/ui-react';
 import type { RangeStorageValue } from '@jalali-js/ui-react';
@@ -20,6 +21,7 @@ export default function App() {
   const [storedRange, setStoredRange] = useState<RangeStorageValue | null>(null);
   const [inlineSelected, setInlineSelected] = useState<CalendarDate | null>(null);
   const [isDark, setIsDark] = useState(true);
+  const [locale, setLocale] = useState<LocaleCode>('fa');
 
   return (
     <main
@@ -42,15 +44,25 @@ export default function App() {
           <input type="checkbox" checked={isDark} onChange={(e) => setIsDark(e.target.checked)} />{' '}
           Dark mode
         </label>
+        {'  '}
+        <label>
+          <input
+            type="checkbox"
+            checked={locale === 'en'}
+            onChange={(e) => setLocale(e.target.checked ? 'en' : 'fa')}
+          />{' '}
+          English (unchecked: Farsi)
+        </label>
       </p>
       <p>
         The <code>compact</code> theme from <code>@jalali-js/ui-react/themes</code> is always on
-        below, for spacing. The <code>dark</code> theme (colors) is what the toggle above controls,
-        applied to both the pickers and this page&rsquo;s own background: composing multiple theme
-        files works by importing more than one (see the CSS imports at the top of this file). Every
-        component below shares one page-wide theme, since the theming contract is CSS custom
-        properties on each picker&rsquo;s root element, the same design a whole-app theme switch
-        relies on.
+        below, for spacing. The <code>dark</code> theme (colors) is what the dark mode toggle
+        controls, applied to both the pickers and this page&rsquo;s own background: composing
+        multiple theme files works by importing more than one (see the CSS imports at the top of
+        this file). Every component below shares one page-wide theme, since the theming contract is
+        CSS custom properties on each picker&rsquo;s root element, the same design a whole-app theme
+        switch relies on. The language toggle controls every component below except the two explicit
+        English/Farsi comparison sections, which always show both at once.
       </p>
       <CalendarSummary />
 
@@ -65,21 +77,39 @@ export default function App() {
         <DatePicker system="jalali" locale="fa" />
       </section>
 
+      <section data-testid="quick-nav">
+        <h2>Quick year/month navigation (default on)</h2>
+        <p>Click the month or year in the header to jump straight to a month grid or year grid.</p>
+        <DatePicker system="jalali" locale={locale} />
+      </section>
+
+      <section data-testid="quick-nav-off">
+        <h2>Quick navigation turned off (quickNav: false)</h2>
+        <p>The month and year in the header are plain text; only the prev/next arrows page.</p>
+        <DatePicker system="jalali" locale={locale} quickNav={false} />
+      </section>
+
+      <section data-testid="no-initial-selection">
+        <h2>No initial selection (defaultDate: null)</h2>
+        <p>Opens with nothing picked, showing the placeholder until a person picks a date.</p>
+        <DatePicker system="jalali" locale={locale} defaultDate={null} />
+      </section>
+
       <section data-testid="dropdown">
         <h2>Dropdown variant (date-of-birth style entry)</h2>
-        <DatePicker system="jalali" locale="en" variant="dropdown" />
+        <DatePicker system="jalali" locale={locale} variant="dropdown" />
       </section>
 
       <section data-testid="gregorian">
         <h2>Gregorian system</h2>
-        <DatePicker system="gregorian" locale="en" />
+        <DatePicker system="gregorian" locale={locale} />
       </section>
 
       <section data-testid="inline-calendar">
         <h2>Inline calendar (@jalali-js/ui-react)</h2>
         <InlineCalendar
           system="jalali"
-          locale="en"
+          locale={locale}
           value={inlineSelected}
           onSelect={setInlineSelected}
         />
@@ -88,7 +118,7 @@ export default function App() {
 
       <section data-testid="range-picker">
         <h2>Range picker (@jalali-js/ui-react)</h2>
-        <RangePicker system="jalali" locale="en" onChange={(value) => setStoredRange(value)} />
+        <RangePicker system="jalali" locale={locale} onChange={(value) => setStoredRange(value)} />
         <p>Stored range (Gregorian by default): {JSON.stringify(storedRange)}</p>
       </section>
 
@@ -113,7 +143,7 @@ export default function App() {
           }
         `}</style>
         <div className="custom-theme-scope">
-          <DatePicker system="jalali" locale="en" />
+          <DatePicker system="jalali" locale={locale} />
         </div>
       </section>
     </main>
