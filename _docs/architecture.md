@@ -359,6 +359,59 @@ each section demonstrates one axis (system, locale, variant), and the
 whole page runs under `dark` + `compact` imported together to demonstrate
 composing themes.
 
+## Documentation site (Phase 11)
+
+`apps/docs`, VitePress (the "Docs site framework" open decision, settled: lightweight,
+Vue-based, and enough for API docs plus playground embeds — see "Open decisions" below). Guide
+pages (`guide/*.md`) are hand-written and checked against real source before being written, not
+from memory: `createCalendar()`'s actual overloads, `DatePicker`'s actual props, `parse()`'s
+actual supported phrases, and so on. The API reference (`/api/`) is generated, not hand-written,
+so it can never drift from the real public API the way a hand-maintained reference page would.
+
+**API reference generation.** `apps/docs/scripts/build-api.mjs` (`pnpm run docs:api`, run
+automatically before both `docs-dev` and `docs-build`) runs TypeDoc twice, not once:
+`jalali-js`, `@jalali-js/i18n`, `@jalali-js/nlp`, `@jalali-js/react`, and `@jalali-js/ui-react`
+are plain TypeScript/TSX and convert together in one run, using TypeDoc's `packages` entry-point
+strategy (each package's own `package.json` `types` field is enough; no per-package
+`typedoc.json` needed). `@jalali-js/vue` cannot join that run: its main entry point re-exports
+`.vue` SFCs, and TypeDoc's TypeScript-compiler-based parser has no `.vue` support at all,
+confirmed directly by trying the packages run with `vue` included and reading the resulting
+`TS2307: Cannot find module './Calendar.vue'` errors, not assumed. `@jalali-js/vue`'s
+plain-TypeScript composables (`useCalendar`, `useResolvedTimeZone`) still convert fine on their
+own, in a second TypeDoc run scoped via `tsconfig.vue-api.json`'s `files` list (not `include`),
+so the whole package's `src/` — which still contains the unparseable `.vue` re-exports in
+`index.ts` — never enters the TypeScript program at all. The `.vue` component APIs themselves
+(`Calendar`, `DatePicker`, `DropdownDateFields`, `RangePicker`, `InlineCalendar`) are
+hand-documented on `guide/vue.md` instead, the same way the wider Vue ecosystem documents SFC
+component APIs (VueUse, Vuetify): there is no robust, general TypeDoc-for-SFCs tool to reach
+for. Output is markdown (`typedoc-plugin-markdown`) plus VitePress-specific link/anchor fixups
+(`typedoc-vitepress-theme`); neither the generated `api/` directory nor VitePress's own
+`.vitepress/dist/`/`.vitepress/cache/` are committed (`apps/docs/.gitignore`), the same
+"generated output doesn't belong in git" rule `packages/*/dist/` already follows.
+
+**A real bug this surfaced.** A JSDoc comment on `WordList.nextMonthMarkers` originally read
+`used to build a "next <month>" phrase`. TypeDoc carried that literal `<month>` straight
+into the generated markdown, and VitePress (which compiles every markdown file as a potential
+Vue template, not simple prose) parsed it as an unclosed HTML/Vue tag and failed the build with
+`Element is missing end tag`. Fixed at the source (`packages/nlp/src/word-list.ts`): rephrased
+to `next Farvardin"-style phrase` instead of using angle-bracket placeholder notation.
+`typedoc-vitepress-theme` was also added at the same time for its own link-fixup value, but the
+actual fix is the source comment; a plugin was never going to make raw `<placeholder>` notation
+safe in prose that flows through a Vue-template-aware renderer.
+
+**Playground embeds.** `pages.yml` builds `playground-react` and `playground-vue` with an
+explicit `--base` (`make app-build-at-base`), so their own emitted asset URLs resolve correctly
+once copied into the docs site's own build output at `/playground/react/` and `/playground/vue/`
+(verified directly: served the merged output locally at the real deployment path,
+`/jalali-js/...`, confirmed every route and asset 200s, and screenshotted the embedded
+playground to confirm it actually renders, themed correctly, not just that the files exist).
+`playground-next` and `playground-nuxt` are SSR apps; GitHub Pages is static-only, so they stay
+CI-only verification apps (already covered by `ci.yml`, `compat-matrix.yml`, and `e2e.yml`)
+rather than customer-facing demos here. VitePress's own `base` config is `/jalali-js/`, matching
+where GitHub Pages actually serves a project site (not a custom domain, not a
+`<org>.github.io` user page) by default; this would need to become `/` if a custom domain (a
+`CNAME` file) is ever added.
+
 ## Testing strategy
 
 | Layer          | Tool                       | What it covers                                                                                                              |
@@ -585,8 +638,20 @@ version-packages`, i.e. `changeset version`). Merging that pull request
   and 4. This list is not meant to stay fixed; update it as each
   framework's own supported-majors set moves.
 
-- **`pages.yml`.** Deploys the docs and playground site to GitHub Pages when
-  a file under `apps/docs/**` changes.
+- **`pages.yml` (Phase 11).** Deploys the docs and playground site to GitHub
+  Pages on push to `master`, when a file under `apps/docs/**`,
+  `apps/playground-react/**`, `apps/playground-vue/**`, or `packages/**`
+  changes (`packages/**`, since the API reference is generated from those
+  packages' own types). Builds the docs site (`make build-docs`, which runs
+  API reference generation first), builds `playground-react` and
+  `playground-vue` at their embedded subpaths (`make app-build-at-base`),
+  copies both into the docs build output under `/playground/react/` and
+  `/playground/vue/`, then deploys the merged result with the official
+  `actions/configure-pages` / `actions/upload-pages-artifact` /
+  `actions/deploy-pages` flow. Needs GitHub Pages enabled with "GitHub
+  Actions" as the source in this repo's own Settings, an operational
+  prerequisite this workflow cannot turn on itself (see
+  `_docs/release-checklist.md`).
 
 The dependency-update, license-audit, and action-pruning Actions above are
 the org's own (`yanovian/update-dependencies-action`,
@@ -877,11 +942,14 @@ license auditor, action pruner) is settled too, as of Phase 9: yes, reuse
 them as they are (`yanovian/update-dependencies-action`,
 `yanovian/open-license-auditor`, `yanovian/prune-old-actions`; see the
 CI/CD pipeline section above), on this repo's own cadence rather than
-copying another repo's schedule verbatim. The decisions below are still
+copying another repo's schedule verbatim. Two more are settled as of Phase
+10 and Phase 11 respectively: where to host PR screenshots (an orphan
+branch, `visual-snapshots`, plus a second orphan branch,
+`visual-baselines`, for the diff baselines themselves — see "Visual
+regression and PR screenshots" above) and the docs site framework
+(VitePress — see "Documentation site" above). The decision below is still
 open.
 
-| #   | Decision                                      | Proposed default                                                                                                                   |
-| --- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Monorepo task runner                          | Plain pnpm workspace scripts. Add Turborepo or Nx only if CI time later justifies it                                               |
-| 2   | Docs site framework                           | VitePress: lightweight, Vue-based, and enough for API docs plus playground embeds                                                  |
-| 3   | Where to host PR screenshots for visual diffs | Commit to an orphan branch and link raw URLs, with no third-party cost. Revisit with Chromatic or Percy if the team needs it later |
+| #   | Decision             | Proposed default                                                                     |
+| --- | -------------------- | ------------------------------------------------------------------------------------ |
+| 1   | Monorepo task runner | Plain pnpm workspace scripts. Add Turborepo or Nx only if CI time later justifies it |

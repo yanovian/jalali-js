@@ -1,0 +1,5 @@
+# Regenerated on every docs build (see scripts/build-api.mjs), never committed: it can never
+# drift from the real public API this way, the same reasoning packages/*/dist/ already follows.
+api/
+.vitepress/dist/
+.vitepress/cache/

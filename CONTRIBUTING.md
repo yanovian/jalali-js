@@ -4,7 +4,8 @@ Thank you for your interest in jalali-js. This guide covers setup, the branch
 and PR workflow, and the checks a change must pass.
 
 See [`_docs/plan.md`](_docs/plan.md) for the current phase status,
-[`_docs/architecture.md`](_docs/architecture.md) for the technical design, and
+[`_docs/architecture.md`](_docs/architecture.md) for the technical design,
+[`_docs/release-checklist.md`](_docs/release-checklist.md) for what "ready for v1.0" means, and
 [`AGENTS.md`](AGENTS.md) for the writing style used in this repo's docs and
 comments.
 
@@ -28,7 +29,9 @@ make format-check   # Prettier, check mode (the CI gate)
 make typecheck      # TypeScript, across every package
 make test           # Unit and property tests (Vitest)
 make test-watch     # Same, in watch mode
-make check          # Everything above, together. Run this before you open a PR.
+make test-e2e       # Playwright visual e2e suite (every browser)
+make docs-dev       # Run the docs site locally
+make check          # Everything above (except test-e2e/docs-dev), together. Run this before you open a PR.
 ```
 
 ## Before you commit
@@ -40,7 +43,7 @@ so first means fewer surprises at commit time.
 
 ## Branch and PR workflow
 
-- Branch off `main`.
+- Branch off `master`.
 - Keep a PR focused on one change. A small PR is faster to review.
 - Add or update tests for any new or changed behavior.
 - Run `make check` before you open a PR. CI runs the same checks and blocks
@@ -48,7 +51,7 @@ so first means fewer surprises at commit time.
 - If your change affects a published package, add a changeset:
 
   ```sh
-  pnpm changeset
+  make changeset
   ```
 
   Describe the change in plain language. The changeset becomes the package's

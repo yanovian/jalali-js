@@ -12,7 +12,7 @@ export interface WordList {
   tomorrow: readonly string[];
   yesterday: readonly string[];
   nextWeek: readonly string[];
-  /** The word(s) meaning "next", used to build a "next <month>" phrase. */
+  /** The word(s) meaning "next", used to build a "next Farvardin"-style phrase. */
   nextMonthMarkers: readonly string[];
   /** Whether the marker comes before the month name ('prefix', "next Farvardin") or after it
    * ('suffix', "فروردین آینده"). */

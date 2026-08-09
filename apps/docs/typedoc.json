@@ -1,0 +1,14 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPointStrategy": "packages",
+  "entryPoints": [
+    "../../packages/core",
+    "../../packages/i18n",
+    "../../packages/nlp",
+    "../../packages/react",
+    "../../packages/ui-react"
+  ],
+  "out": "api",
+  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
+  "readme": "none"
+}

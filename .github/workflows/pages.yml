@@ -1,0 +1,77 @@
+name: Deploy docs and playground to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'apps/docs/**'
+      - 'apps/playground-react/**'
+      - 'apps/playground-vue/**'
+      - 'packages/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: make install-frozen
+
+      - name: Build docs (API reference generation runs first automatically)
+        run: make build-docs
+
+      - name: Build playground-react at its embedded subpath
+        run: make app-build-at-base APP=playground-react BASE=/jalali-js/playground/react/
+
+      - name: Build playground-vue at its embedded subpath
+        run: make app-build-at-base APP=playground-vue BASE=/jalali-js/playground/vue/
+
+      - name: Merge playgrounds into the docs site
+        # playground-next and playground-nuxt are SSR apps; GitHub Pages is static-only, so
+        # they stay CI-only verification apps (ci.yml, compat-matrix.yml, e2e.yml already cover
+        # them) rather than customer-facing demos here.
+        run: |
+          mkdir -p apps/docs/.vitepress/dist/playground/react apps/docs/.vitepress/dist/playground/vue
+          cp -r apps/playground-react/dist/. apps/docs/.vitepress/dist/playground/react/
+          cp -r apps/playground-vue/dist/. apps/docs/.vitepress/dist/playground/vue/
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/docs/.vitepress/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

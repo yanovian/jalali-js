@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "files": [
+    "../../packages/vue/src/use-calendar.ts",
+    "../../packages/vue/src/use-resolved-timezone.ts"
+  ]
+}

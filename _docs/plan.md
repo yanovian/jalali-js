@@ -4,8 +4,9 @@ See [alternatives.md](./alternatives.md) for the vision and the comparison
 with other libraries. See [architecture.md](./architecture.md) for the design
 behind these decisions. This file shows only the status of each phase.
 
-Phase 0 is done. Every phase after it is still `[ ]`. Change an item to `[x]`
-as it lands.
+Phases 0-11 are done. What's left is listed under "Later, not yet scheduled"
+below, plus the publishing step `_docs/release-checklist.md` deliberately
+leaves undone. Change an item to `[x]` as it lands.
 
 ## Phase 0: Repo scaffolding and tooling
 
@@ -549,11 +550,57 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
 
 ## Phase 11: Docs site and v1.0 release
 
-- [ ] Scaffold `apps/docs` (VitePress).
-- [ ] Generate the API reference from the `core`, `i18n`, `nlp`, `react`,
-      and `vue` package types.
-- [ ] Add `pages.yml`: deploy the docs and playground site to GitHub Pages.
-- [ ] Run the v1.0 release checklist and review the changelog.
+- [x] Scaffold `apps/docs` (VitePress). Real guide content, not stubs: getting
+      started, core concepts, display value vs. storage value, configuration
+      and theming, React, Vue, i18n, NLP, and a comparison with alternatives
+      (adapted from `_docs/alternatives.md`'s own table). Every code example
+      checked against real source before being written, not from memory.
+- [x] Generate the API reference from the `core`, `i18n`, `nlp`, `react`,
+      and `vue` package types. `apps/docs/scripts/build-api.mjs`
+      (`typedoc` + `typedoc-plugin-markdown` + `typedoc-vitepress-theme`),
+      run automatically before `docs-dev`/`docs-build`, never committed
+      (regenerated from the real types every build, like `packages/*/dist/`).
+      Also covers `ui-react`, beyond the original list. `vue` needed a
+      second, separately scoped TypeDoc run for its plain-TypeScript
+      composables only: TypeDoc's TypeScript-compiler-based parser cannot
+      parse `.vue` SFCs at all (confirmed directly, not assumed, by trying
+      the full run with `vue` included and reading the resulting
+      `TS2307: Cannot find module './Calendar.vue'` errors), so the `.vue`
+      component APIs (`Calendar`, `DatePicker`, `DropdownDateFields`,
+      `RangePicker`, `InlineCalendar`) are hand-documented on `guide/vue.md`
+      instead, the same way the wider Vue ecosystem documents SFC component
+      APIs. Found and fixed a real bug this way: a JSDoc comment's literal
+      `"next <month>"` placeholder text broke the VitePress build (parsed
+      as an unclosed HTML/Vue tag); fixed at the source
+      (`packages/nlp/src/word-list.ts`), not papered over in the docs
+      tooling.
+- [x] Add `pages.yml`: deploy the docs and playground site to GitHub Pages.
+      Builds the docs site, builds `playground-react` and `playground-vue`
+      at their embedded subpaths (`/playground/react/`, `/playground/vue/`,
+      via a new `make app-build-at-base` target), merges both into the docs
+      build output, deploys with the official
+      `configure-pages`/`upload-pages-artifact`/`deploy-pages` actions.
+      `playground-next`/`playground-nuxt` stay CI-only (GitHub Pages is
+      static-only; they're SSR apps, already covered by `ci.yml`,
+      `compat-matrix.yml`, and `e2e.yml`). Verified directly, not just
+      built: served the merged output locally at the real deployment path
+      (`/jalali-js/...`), confirmed every route and asset resolves, and
+      screenshotted the embedded playground to confirm it actually renders,
+      correctly themed, not only that the files exist.
+- [x] Run the v1.0 release checklist and review the changelog.
+      `_docs/release-checklist.md`: engineering readiness, package
+      readiness, documentation readiness, and the operational prerequisites
+      (`NPM_TOKEN`, `PAT_TOKEN`, GitHub Pages enabled) nothing in this repo
+      can verify or set up by itself. Two real gaps found and fixed while
+      writing it: the root `README.md` still said "Phase 0 done, calendar
+      logic not started," badly stale against the repo's actual state; and
+      none of the 7 publishable packages had their own `README.md` (npm's
+      registry page reads a package's own README, not the repo root's) —
+      all 7 now have one. Publishing itself (adding a `major`-bump
+      changeset per package, merging the resulting "Version Packages" pull
+      request) is deliberately not done as part of this phase: a real,
+      irreversible, public action belongs to whoever owns that decision,
+      made on purpose, not as a side effect of finishing a checklist.
 
 ## Later, not yet scheduled
 

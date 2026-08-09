@@ -1,6 +1,7 @@
-.PHONY: help install install-frozen dev build build-packages build-apps typecheck lint lint-fix \
-	format format-check test test-watch test-e2e test-e2e-project install-playwright check clean \
-	probe-treeshake size changeset release app-typecheck app-build test-paths
+.PHONY: help install install-frozen dev build build-packages build-apps build-docs typecheck \
+	lint lint-fix format format-check test test-watch test-e2e test-e2e-project \
+	install-playwright check clean probe-treeshake size changeset release app-typecheck \
+	app-build app-build-at-base test-paths docs-dev docs-build docs-preview
 
 PNPM ?= pnpm
 
@@ -23,8 +24,19 @@ build: ## Build all packages and apps
 build-packages: ## Build only packages/* (not apps/*), its own target so a break there is named on its own in CI
 	$(PNPM) --filter "./packages/**" build
 
-build-apps: ## Build only apps/* (the four playground apps), its own target for the same reason as build-packages
-	$(PNPM) --filter "./apps/**" build
+build-apps: ## Build only the four playground apps (not docs), its own target for the same reason as build-packages
+	$(PNPM) --filter "./apps/**" --filter "!docs" build
+
+build-docs: ## Build the docs site (API reference generation runs first automatically)
+	$(PNPM) --filter docs build
+
+docs-dev: ## Run the docs site in dev mode (API reference generation runs first automatically)
+	$(PNPM) --filter docs dev
+
+docs-build: build-docs ## Alias for build-docs, matching architecture.md's documented Makefile listing
+
+docs-preview: ## Preview the built docs site locally
+	$(PNPM) --filter docs preview
 
 typecheck: ## TypeScript check, across every package
 	$(PNPM) typecheck
@@ -74,6 +86,9 @@ release: ## Publish through Changesets (CI-driven; this local target only previe
 
 app-typecheck: ## Typecheck one app/package by name (compat-matrix.yml): make app-typecheck APP=playground-react
 	$(PNPM) --filter $(APP) typecheck
+
+app-build-at-base: ## Build one Vite app under a URL subpath (pages.yml, embedding a playground into the docs site): make app-build-at-base APP=playground-react BASE=/jalali-js/playground/react/
+	$(PNPM) --filter $(APP) exec vite build --base $(BASE)
 
 app-build: ## Build one app/package by name (compat-matrix.yml): make app-build APP=playground-react
 	$(PNPM) --filter $(APP) build
