@@ -81,11 +81,10 @@ size: ## Check packages/core's bundle-size budget (size-limit)
 
 # Bumps every package under packages/* to the same new version in one call (they always start
 # in sync and always get the same bump type, so they stay in sync with no extra bookkeeping),
-# commits, tags, and pushes. Matches yanovian/chrome-ext-tabby's own release-patch/-minor/-major
-# (`pnpm version <bump>`), extended across multiple packages via `pnpm --filter ... exec`, since
-# plain `pnpm version` only ever bumps one package.json. Safe to run again by mistake: it refuses
-# to start if the tree is dirty, and no-ops cleanly if HEAD is already tagged with nothing new
-# since, rather than cutting an unwanted second release.
+# commits, tags, and pushes: `pnpm version <bump>`, extended across multiple packages via `pnpm
+# --filter ... exec`, since plain `pnpm version` only ever bumps one package.json. Safe to run
+# again by mistake: it refuses to start if the tree is dirty, and no-ops cleanly if HEAD is
+# already tagged with nothing new since, rather than cutting an unwanted second release.
 tag-release: check
 	@test -n "$(BUMP)" || (echo "Usage: make tag-release BUMP=patch|minor|major (or use make release-patch/-minor/-major)" && exit 1)
 	@git diff --quiet && git diff --cached --quiet || (echo "Working tree is not clean; commit or stash first." && exit 1)

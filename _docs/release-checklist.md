@@ -77,11 +77,11 @@ setting). This document does not publish anything by itself. Publishing happens 
 
 ## Publishing (do this last, deliberately, not as part of "running the checklist")
 
-One deliberate local command, matching `yanovian/chrome-ext-tabby`'s own tag-triggered release
-convention exactly: `release-patch`, `release-minor`, and `release-major` both bump the version
-via `pnpm version` and trigger the same way. Nothing publishes until a maintainer runs it, and
-no GitHub token or any other credential is needed on your machine for this step: `pnpm version`
-only touches local `package.json` files and git, no network calls.
+One deliberate local command, matching the org's own tag-triggered release convention:
+`release-patch`, `release-minor`, and `release-major` bump the version via `pnpm version` and
+trigger the same way. Nothing publishes until a maintainer runs it, and no GitHub token or any
+other credential is needed on your machine for this step: `pnpm version` only touches local
+`package.json` files and git, no network calls.
 
 1. Run **one** of `make release-patch`, `make release-minor`, or `make release-major`, whichever
    bump this release needs. No arguments needed.
@@ -94,8 +94,7 @@ only touches local `package.json` files and git, no network calls.
 3. Pushing the tag triggers `release.yml`. It re-runs the checks, builds, publishes each
    package to npm (skipping any that are already published at that version, so a partial
    failure is safe to retry), and creates one GitHub release with auto-generated notes
-   (`softprops/action-gh-release`, `generate_release_notes: true`), the same mechanism
-   `yanovian/chrome-ext-tabby` uses.
+   (`softprops/action-gh-release`, `generate_release_notes: true`).
 
 This repo has not run any of the steps above. Publishing packages under the
 `jalali-js`/`@jalali-js/*` names to the public npm registry is a real, irreversible, public

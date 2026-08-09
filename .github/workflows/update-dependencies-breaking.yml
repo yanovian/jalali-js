@@ -6,9 +6,9 @@ name: Update Dependencies (breaking)
 # and tokens". `min-release-age-days: 30` gives a compromised or broken release a month to get
 # caught before this repo ever picks it up.
 #
-# Every 6 months, not the monthly cadence yanovian/chrome-ext-tabby uses for this same action:
-# a breaking update needs real, hand-done migration review here, so this repo picks a slower,
-# more deliberate cadence than a browser extension does. Offset an hour from
+# Every 6 months, a slower cadence than a monthly one: a breaking update needs real, hand-done
+# migration review here, so this repo picks a slower, more deliberate cadence than a
+# continuously-shipped product would use for the same action. Offset an hour from
 # update-dependencies-non-breaking.yml's own 1st-of-the-month run so the two never race on the
 # two months (January, July) where both fire.
 

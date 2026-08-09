@@ -373,25 +373,23 @@ false`; `@jalali-js/react`/`@jalali-js/vue`/`@jalali-js/ui-react`/
       limit `size-limit` could not meet, confirmed a non-zero exit with the
       real overage reported, then restored the real budget.
 - [x] Set up versioning across the monorepo, and `release.yml`, triggered
-      by a pushed tag matching `v*.*.*`, matching
-      `yanovian/chrome-ext-tabby`'s own tag-triggered release convention
-      exactly: `pnpm version <bump>` (the same command tabby's
-      `release-patch`/`-minor`/`-major` use), extended across every
-      package under `packages/*` via `pnpm --filter "./packages/**" exec`,
-      since plain `pnpm version` only bumps one `package.json` at a time.
-      Every package starts at the same version and always gets the same
-      bump, so they stay in sync with no extra bookkeeping. `make
-release-patch`/`-minor`/`-major` run `make check`, bump, commit, tag, and
-      push with `--follow-tags`, all locally, all in one command, matching
-      tabby's ergonomics: no manual version number or tag, ever.
+      by a pushed tag matching `v*.*.*`, matching the org's own
+      tag-triggered release convention: `pnpm version <bump>`, extended
+      across every package under `packages/*` via `pnpm --filter
+"./packages/**" exec`, since plain `pnpm version` only bumps one
+      `package.json` at a time. Every package starts at the same version
+      and always gets the same bump, so they stay in sync with no extra
+      bookkeeping. `make release-patch`/`-minor`/`-major` run `make
+check`, bump, commit, tag, and push with `--follow-tags`, all locally,
+      all in one command: no manual version number or tag, ever.
       `release.yml` re-runs the checks, builds, publishes each package to
       npm (skipping any already published at that version, so a partial
       failure is safe to retry), and creates one GitHub release with
-      `softprops/action-gh-release`'s auto-generated notes, the same
-      mechanism tabby's own `release.yml` uses. Both `tag-release` and the
-      publish step refuse to redo work that already happened: `HEAD`
-      already tagged means nothing to release, and a package already on
-      npm at that version gets skipped, not re-published.
+      `softprops/action-gh-release`'s auto-generated notes. Both
+      `tag-release` and the publish step refuse to redo work that already
+      happened: `HEAD` already tagged means nothing to release, and a
+      package already on npm at that version gets skipped, not
+      re-published.
 
       This went through two earlier designs before landing here, both
           worth recording since they were real, considered trade-offs, not
@@ -406,7 +404,7 @@ release-patch`/`-minor`/`-major` run `make check`, bump, commit, tag, and
           release run failed on exactly that, with no way to create one
           without a personal access token they were not able to use. Once
           forced to remove that dependency, the actual value Changesets added
-          over tabby's plain `pnpm version` shrank to "independent per-package
+          over plain `pnpm version` shrank to "independent per-package
           version numbers," a feature this repo does not use: every package
           here already always ships together, at the same number, so nothing
           was actually lost moving to the simpler mechanism, and one more
@@ -432,9 +430,9 @@ audit and maintenance workflows.
       budget is exceeded. "Check bundle size" (`pnpm size`), run after the
       packages build so `packages/core/dist` already exists.
 - [x] Add `license-audit.yml`, reusing the org's existing license-audit
-      action. `yanovian/open-license-auditor@v1`, confirmed against
-      `yanovian/chrome-ext-tabby`'s own workflow (the real action name and
-      shape, not guessed): `fail-on: critical`, `severity-filter: both`, no
+      action. `yanovian/open-license-auditor@v1`, confirmed against a real
+      usage of it elsewhere in the org (the real action name and shape,
+      not guessed): `fail-on: critical`, `severity-filter: both`, no
       config file needed (every default license bucket already fits a
       plain npm workspace).
 - [x] Add `update-dependencies-non-breaking.yml` (monthly).
@@ -446,8 +444,8 @@ audit and maintenance workflows.
       breaking potentially change with 30 days offset).
       `yanovian/update-dependencies-action@v1`,
       `update-strategy: breaking`, `min-release-age-days: 30`, January 1st
-      and July 1st at 05:00 UTC (this repo's own, slower cadence than
-      `yanovian/chrome-ext-tabby`'s monthly use of the same action, on
+      and July 1st at 05:00 UTC (this repo's own, slower cadence than the
+      org's more common monthly use of the same action, on
       purpose: a deliberately, hand-released library warrants more time
       between breaking bumps than a continuously-shipped browser
       extension). Same `PAT_TOKEN` requirement as the non-breaking workflow.
@@ -484,15 +482,14 @@ audit and maintenance workflows.
       (the last three parameterized, for `compat-matrix.yml`'s dynamic
       matrix: `make app-typecheck APP=playground-react`, `make test-paths
 PATHS="packages/react packages/ui-react"`) to the Makefile to cover
-      every step that did not already have a target. Two narrow exceptions,
-      both documented directly in the workflow files and in architecture.md's
-      "Makefile" section: `release.yml`'s `changesets/action` inputs name
-      exact pnpm scripts for the action itself to run, not `make release`
-      (which is a deliberately different, dry-run-only local preview); and
-      `compat-matrix.yml`'s post-override install stays `pnpm install
---no-frozen-lockfile` directly, since letting the lockfile move to
-      match a dynamically-written override has no equivalent a contributor
-      would run by hand.
+      every step that did not already have a target. One narrow exception,
+      documented directly in the workflow file and in architecture.md's
+      "Makefile" section: `compat-matrix.yml`'s post-override install
+      stays `pnpm install --no-frozen-lockfile` directly, since letting
+      the lockfile move to match a dynamically-written override has no
+      equivalent a contributor would run by hand. `release.yml` (Phase 8)
+      later added `publish-packages`, so every one of its own steps also
+      routes through `make`, with no exception of its own.
 
 ## Phase 10: Visual e2e tests and PR screenshot bot
 
@@ -640,20 +637,19 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
       (`/jalali-js/...`), confirmed every route and asset resolves, and
       screenshotted the embedded playground to confirm it actually renders,
       correctly themed, not only that the files exist.
-- [x] Run the release checklist and review the changelog.
-      `_docs/release-checklist.md`: engineering readiness, package
-      readiness, documentation readiness, and the operational prerequisites
-      (`NPM_TOKEN`, `PAT_TOKEN`, GitHub Pages enabled) nothing in this repo
-      can verify or set up by itself. Two real gaps found and fixed while
-      writing it: the root `README.md` still said "Phase 0 done, calendar
-      logic not started," badly stale against the repo's actual state; and
-      none of the 7 publishable packages had their own `README.md` (npm's
-      registry page reads a package's own README, not the repo root's).
-      All 7 now have one. Publishing itself (adding a `patch`-bump
-      changeset per package, then `make tag-release TAG=v0.0.1`) is
-      deliberately not done as part of this phase: a real, irreversible,
-      public action belongs to whoever owns that decision, made on
-      purpose, not as a side effect of finishing a checklist.
+- [x] Run the release checklist. `_docs/release-checklist.md`: engineering
+      readiness, package readiness, documentation readiness, and the
+      operational prerequisites (`NPM_TOKEN`, `PAT_TOKEN`, GitHub Pages
+      enabled) nothing in this repo can verify or set up by itself. Two
+      real gaps found and fixed while writing it: the root `README.md`
+      still said "Phase 0 done, calendar logic not started," badly stale
+      against the repo's actual state; and none of the 7 publishable
+      packages had their own `README.md` (npm's registry page reads a
+      package's own README, not the repo root's). All 7 now have one.
+      Publishing itself (`make release-patch`) is deliberately not done
+      as part of this phase: a real, irreversible, public action belongs
+      to whoever owns that decision, made on purpose, not as a side
+      effect of finishing a checklist.
 
 ## Phase 12: Additional locales (`packages/i18n`, `packages/nlp`)
 

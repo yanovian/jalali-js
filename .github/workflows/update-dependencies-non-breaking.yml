@@ -5,10 +5,10 @@ name: Update Dependencies (non-breaking)
 # check the update once opened. See yanovian/update-dependencies-action's README, "Permissions
 # and tokens".
 #
-# Monthly, not the weekly cadence yanovian/chrome-ext-tabby uses for this same action: this
-# repo ships a library, released deliberately and by hand (make release-patch/-minor/-major),
-# not continuously like a browser extension, so a slower non-breaking cadence matches it better.
-# See update-dependencies-breaking.yml for the (much slower) breaking-update cadence.
+# Monthly, not a weekly cadence: this repo ships a library, released deliberately and by hand
+# (make release-patch/-minor/-major), not continuously like a browser extension, so a slower
+# non-breaking cadence matches it better. See update-dependencies-breaking.yml for the (much
+# slower) breaking-update cadence.
 
 on:
   schedule:

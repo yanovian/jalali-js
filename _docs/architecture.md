@@ -616,46 +616,43 @@ two checks are.
   already exists. A Playwright visual suite with screenshot upload or
   comment is still Phase 10. No phase after Phase 0 ships a change with no
   CI check behind it.
-- **`release.yml` (Phase 8, revised to match the org's tag-triggered
-  convention).** One workflow, triggered by a pushed tag matching
-  `v*.*.*`, the same trigger shape as `yanovian/chrome-ext-tabby`'s own
-  `release.yml`: `make check`'s component steps
-  (typecheck/lint/format-check/test), then `changesets/action@v1` in
-  publish-only mode (`publish: pnpm release`, no `version:` input, since the tag
-  already carries committed, bumped versions, so there is nothing left to
-  "version," only to publish). `pnpm release` is `pnpm build && changeset
-publish`, which publishes every package whose current `package.json`
-  version isn't already on npm. `changesets/action`'s `createGithubReleases`
-  option (on by default) then creates the GitHub release: one release
-  **per published package**, each with that package's own `CHANGELOG.md`
-  entry for the version just published as its body. Confirmed directly
-  from the action's own source (`src/run.ts`, `maintenance/v1` branch:
-  `body: changelogEntry.content`, read from `pkg.dir`'s changelog). This
-  replaced two earlier drafts: the first used Changesets' own two-phase
-  flow (a bot-opened "Version Packages" pull request on every push to
-  `master`, publishing automatically the moment that PR was merged),
-  revised away because that PR-review step added a separate
-  wait-for-a-bot-then-merge step beyond what tag-triggering was already
-  meant to replace, and the same maintainer who would review that PR is
-  the one pushing the release tag anyway. The second draft published via a
-  plain `pnpm release` shell step plus `softprops/action-gh-release`
-  (tabby's own release-notes action), which only produces a generic,
-  auto-generated PR-list note; revised to `changesets/action`'s own publish
-  mode for real per-package release notes instead. Versioning still goes
-  through Changesets, unlike tabby's plain `pnpm version <bump>`: `make
-tag-release TAG=v0.0.1` (the local command a maintainer runs, matching
-  tabby's `release-patch`/`-minor`/`-major`) runs `make check`, then
-  `changeset version` (bumps every changed package by whatever its own
-  accumulated changesets call for, writes changelogs), commits, tags, and
-  pushes with `--follow-tags` in one deliberate action. A single top-level
-  version was never the right fit here: this repo has several
-  independently-versioned packages, and `core`, `react`, and `vue` each
-  need their own version, so Changesets still does that part; only the
-  _publish_ trigger is a plain pushed tag, the same as tabby.
+- **`release.yml` (Phase 8, matches the org's own tag-triggered release
+  convention, trigger and mechanism both).** One workflow, triggered by a
+  pushed tag matching `v*.*.*`. `make release-patch` (`-minor`/`-major`)
+  is the local command a maintainer runs: it runs `make check`, then
+  bumps every package under `packages/*` to the same new version in one
+  call (`pnpm --filter "./packages/**" exec -- pnpm version <bump>
+--no-git-tag-version`, since plain `pnpm version` only bumps one
+  `package.json` at a time), commits, tags, and pushes with
+  `--follow-tags`, all locally, all in one command. `release.yml` then
+  re-runs the checks, builds, publishes each package to npm via `make
+publish-packages` (skipping any already published at that version, so a
+  partial failure is safe to retry), and creates the GitHub release with
+  `softprops/action-gh-release`'s `generate_release_notes: true`.
+
+  This replaced a Changesets-based design that went through two
+  revisions before being dropped entirely. Changesets, and specifically
+  `changesets/action@v1` in publish-only mode, briefly created one
+  GitHub release **per published package**, each sourced from that
+  package's own `CHANGELOG.md` entry (`@changesets/changelog-github`,
+  confirmed directly from the action's own source,
+  `src/run.ts`: `body: changelogEntry.content`, read from `pkg.dir`'s
+  changelog). That broke down on a real release attempt:
+  `@changesets/changelog-github` needs a `GITHUB_TOKEN` to generate a
+  changelog locally, and no local token was available. Swapping to the
+  git-only `@changesets/cli/changelog` (no token needed) fixed that, but
+  it also removed the one feature `changesets/changelog-github` added
+  over plain `pnpm version`: real per-PR/commit changelog links. At that
+  point, keeping Changesets bought only "independent per-package version
+  numbers," a feature this repo does not use, since every package here
+  always ships together at the same number already. Dropping it removed
+  a dependency, the `.changeset/` directory, and a hand-written
+  changeset-generation script, with nothing actually lost.
+
 - **`license-audit.yml` (Phase 9).** `yanovian/open-license-auditor@v1`, the
-  org's own license-scanning Action (used the same way in
-  `yanovian/chrome-ext-tabby` and the org's other repos), on every pull
-  request. `fail-on: critical` gates on strong-copyleft licenses (the GPL
+  org's own license-scanning Action (used the same way across the org's
+  other repos), on every pull request. `fail-on: critical` gates on
+  strong-copyleft licenses (the GPL
   and AGPL families); it posts one PR comment either way
   (`severity-filter: both`) so a warning-level license is visible without
   failing the check. No config file needed for this repo: the config file
@@ -665,15 +662,15 @@ tag-release TAG=v0.0.1` (the local command a maintainer runs, matching
   **`update-dependencies-breaking.yml` (Phase 9).**
   `yanovian/update-dependencies-action@v1`, scoped by `update-strategy` to
   `non-breaking` and `breaking` respectively. **This repo's cadence is
-  slower than `yanovian/chrome-ext-tabby`'s own use of the same Action on
-  purpose, not copied verbatim:** monthly for non-breaking (the 1st of
-  every month, 03:00 UTC) and every 6 months for breaking (January 1st and
-  July 1st, 05:00 UTC, offset an hour from the non-breaking run so the two
-  never race on the months both fire), against tabby's weekly/monthly.
-  jalali-js releases by hand-reviewed Changesets, not continuously the way
-  a browser extension ships, so a breaking dependency bump benefits from a
-  slower, more deliberate cadence with more real migration review between
-  runs. `min-release-age-days: 30` on the breaking workflow gives a
+  slower than a browser extension's use of the same Action on purpose,
+  not copied verbatim:** monthly for non-breaking (the 1st of every
+  month, 03:00 UTC) and every 6 months for breaking (January 1st and
+  July 1st, 05:00 UTC, offset an hour from the non-breaking run so the
+  two never race on the months both fire). jalali-js releases
+  deliberately, by hand (`make release-patch`/etc.),
+  not continuously the way a browser extension ships, so a breaking
+  dependency bump benefits from a slower, more deliberate cadence with
+  more real migration review between runs. `min-release-age-days: 30` on the breaking workflow gives a
   compromised or broken release a month to get caught before this repo
   picks it up. Both need a `PAT_TOKEN` repo secret (a real personal access
   token), not the default `GITHUB_TOKEN`: GitHub does not let a
@@ -734,10 +731,10 @@ tag-release TAG=v0.0.1` (the local command a maintainer runs, matching
 The dependency-update, license-audit, and action-pruning Actions above are
 the org's own (`yanovian/update-dependencies-action`,
 `yanovian/open-license-auditor`, `yanovian/prune-old-actions`), the same
-ones `yanovian/chrome-ext-tabby` and the org's other repos use, confirmed
-directly against that repo's own `.github/workflows/` rather than assumed.
-Reusing them was an open decision earlier in this document; it is settled
-now, as the "reuse them" bullets above show.
+ones used across the org's other repos, confirmed directly against a
+real, live usage rather than assumed. Reusing them was an open decision
+earlier in this document; it is settled now, as the "reuse them" bullets
+above show.
 
 ## Pre-commit checks
 
@@ -884,23 +881,20 @@ probe:treeshake`, or `make probe-treeshake` to build `packages/core`
   Vitest 4 by more than two years, a real compatibility risk, not just a
   staleness preference.
 - **E2E and visual tests:** Playwright.
-- **Versioning and publishing (Phase 8).** Changesets. `.changeset/config.json`:
-  `"access": "public"` (every library package publishes in the open, not
-  behind an npm org's private registry default), `"baseBranch": "master"`
-  (this repo's actual default branch; `ci.yml` already targets `master`,
-  not `main`), `changelog: ["@changesets/changelog-github", { repo:
-"yanovian/jalali-js" }]` for changelog entries linked back to the actual
-  PR/commit, and `"ignore": ["playground-react", "playground-vue",
-"playground-next", "playground-nuxt"]`, since the four playground apps
-  are `private` demo apps, never published. Root scripts: `changeset` (add
-  a changeset, interactive), `version-packages` (`changeset version`, bumps
-  versions and writes changelogs from unreleased changesets), and
-  `release` (`pnpm build && changeset publish`, builds every package for
-  real before publishing what changed). `updateInternalDependencies:
-"patch"` means a patch release of `jalali-js` bumps the packages that
-  depend on it by at least a patch too, keeping the workspace's own
-  `workspace:*` ranges meaningful after publish (Changesets rewrites
-  `workspace:*` to the real published version automatically).
+- **Versioning and publishing (Phase 8, revised after Phase 11 to drop
+  Changesets: see `release.yml`'s own entry above for why).** Plain
+  `pnpm version <bump>`, matching the org's own tag-triggered release
+  convention, extended across every package under `packages/*` (the 7
+  publishable ones; the four playground apps and the docs site live under `apps/`,
+  never touched by this). `packages/*/package.json`'s `"access": "public"`
+  under `publishConfig` (every library package publishes in the open),
+  and each cross-package dependency is `workspace:*`, which `pnpm
+publish` rewrites to the real published version automatically, the
+  same as it always did; dropping Changesets did not change this. Every
+  package starts at the same version and always gets the same bump type
+  in the same command, so they stay in sync with no config needed to
+  enforce it, unlike Changesets' `fixed` groups, which existed only to
+  approximate this same guarantee.
 - **Bundle-size budget (Phase 8).** `size-limit` plus
   `@size-limit/preset-small-lib`, checked on `packages/core`'s built
   output (`packages/core/dist/index.js`) via a `"size-limit"` array in the
@@ -975,14 +969,13 @@ test-e2e             Playwright visual e2e suite
 probe-treeshake      Confirm packages/core's built output actually tree-shakes
 size                 Bundle-size budget check
 check                CI-equivalent: typecheck, lint, format-check, test, build, size
-changeset            Record a changeset for the current change
 app-typecheck        Typecheck one app/package by name: make app-typecheck APP=playground-react
 app-build            Build one app/package by name: make app-build APP=playground-react
 test-paths           Run Vitest scoped to specific paths: make test-paths PATHS="packages/react packages/ui-react"
 docs-dev / docs-build Documentation site
 clean                Remove build output
-release              Publish through Changesets (CI-driven; the local target is a dry run)
-tag-release          Bump versions via Changesets, commit, tag, and push (triggers release.yml): make tag-release TAG=v0.0.1
+release-patch/-minor/-major  Bump every package's version, commit, tag, and push: make release-patch
+publish-packages     Publish every package to npm, skipping any already published (release.yml)
 ```
 
 `app-typecheck`, `app-build`, and `test-paths` exist for
@@ -997,11 +990,10 @@ locally, for example to reproduce one matrix cell's typecheck step by hand.
 
 - `LICENSE`: MIT. This matches the license used across the rest of this
   ecosystem, and across this org's other public repos.
-- `CONTRIBUTING.md`: setup steps, branch and PR conventions, the changeset
-  requirement, and commit style.
+- `CONTRIBUTING.md`: setup steps, branch and PR conventions, and commit
+  style.
 - `CODE_OF_CONDUCT.md`: Contributor Covenant.
 - `SECURITY.md`: how to report a vulnerability.
-- `CHANGELOG.md`: generated by Changesets, one per package.
 - `.github/ISSUE_TEMPLATE/bug_report.yml`, `feature_request.yml`, and
   `config.yml`.
 - `.github/PULL_REQUEST_TEMPLATE.md`: includes the `make check` checklist and

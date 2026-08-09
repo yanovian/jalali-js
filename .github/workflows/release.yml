@@ -1,8 +1,7 @@
 name: Release
 
-# Triggered by a maintainer pushing a tag (make release-patch, -minor, or -major), matching
-# yanovian/chrome-ext-tabby's own tag-triggered release convention exactly. That local command
-# already bumps every package under packages/* to the same new version (`pnpm version`,
+# Triggered by a maintainer pushing a tag (make release-patch, -minor, or -major). That local
+# command already bumps every package under packages/* to the same new version (`pnpm version`,
 # extended across packages via `pnpm --filter`), commits, tags, and pushes, so by the time this
 # workflow runs, the versions to publish are already committed; this just checks, publishes,
 # and creates the GitHub release.
