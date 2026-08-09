@@ -48,12 +48,31 @@ calendar.today(); // { year: 1403, month: 5, day: 15 }
 ```
 
 ```tsx
+// React
 import { DatePicker } from '@jalali-js/react';
 
 <DatePicker locale="fa" onChange={(value) => console.log(value)} />;
 // Displays Jalali. Emits a plain Gregorian value by default. Your database never
 // has to store a Jalali-shaped value.
 ```
+
+```vue
+<!-- Vue -->
+<script setup lang="ts">
+import { DatePicker } from '@jalali-js/vue';
+import type { StorageValue } from 'jalali-js';
+import { ref } from 'vue';
+
+const stored = ref<StorageValue>();
+</script>
+
+<template>
+  <DatePicker v-model="stored" locale="fa" />
+</template>
+```
+
+More copy-paste examples, including natural language parsing, range pickers, and custom
+theming: **[Examples](https://yanovian.github.io/jalali-js/guide/examples)**
 
 Full guide and API reference: **[yanovian.github.io/jalali-js](https://yanovian.github.io/jalali-js/)**
 

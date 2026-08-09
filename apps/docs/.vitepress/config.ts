@@ -21,6 +21,7 @@ export default defineConfig({
           text: 'Guide',
           items: [
             { text: 'Getting started', link: '/guide/getting-started' },
+            { text: 'Examples', link: '/guide/examples' },
             { text: 'Core concepts', link: '/guide/core-concepts' },
             { text: 'Display value vs. storage value', link: '/guide/display-vs-storage' },
             { text: 'Configuration and theming', link: '/guide/theming' },
