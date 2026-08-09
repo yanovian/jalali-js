@@ -8,6 +8,7 @@
 <p align="center">
   <a href="https://github.com/yanovian/jalali-js/actions/workflows/ci.yml"><img src="https://github.com/yanovian/jalali-js/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
   <a href="https://www.npmjs.com/package/jalali-js"><img src="https://img.shields.io/npm/v/jalali-js.svg" alt="npm version"></a>
+  <a href="https://bundlephobia.com/package/jalali-js"><img src="https://img.shields.io/bundlephobia/minzip/jalali-js" alt="Bundle size"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yanovian/jalali-js.svg" alt="License"></a>
   <a href="https://yanovian.github.io/jalali-js/"><img src="https://img.shields.io/badge/docs-yanovian.github.io-1e1b4b.svg" alt="Documentation"></a>
 </p>
