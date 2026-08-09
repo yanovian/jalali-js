@@ -8,13 +8,18 @@ npm install jalali-js
 npm install @jalali-js/react
 # Vue
 npm install @jalali-js/vue
+# No framework: plain Web Components
+npm install @jalali-js/web
 ```
 
 `jalali-js` is the core package: pure TypeScript, no framework dependency, no runtime
-dependency of its own. `@jalali-js/react` and `@jalali-js/vue` depend on it. `@jalali-js/i18n`
-(locale data and formatting) and `@jalali-js/nlp` (natural language date parsing) are separate
-packages you install only if you need them directly; the framework bindings already depend on
-`@jalali-js/i18n` themselves.
+dependency of its own. `@jalali-js/react`, `@jalali-js/vue`, and `@jalali-js/web` all depend on
+it. `@jalali-js/web` needs no framework at all: it is plain Web Components, usable from plain
+HTML/JS or dropped into any framework the same way any other HTML element is (see
+[Vanilla / Web Components](/guide/web-components)). `@jalali-js/i18n` (locale data and
+formatting) and `@jalali-js/nlp` (natural language date parsing) are separate packages you
+install only if you need them directly; every binding already depends on `@jalali-js/i18n`
+itself.
 
 ## Convert a date
 
@@ -72,5 +77,19 @@ const stored = ref<StorageValue>();
 </template>
 ```
 
+## Render a picker (no framework)
+
+```html
+<jalali-date-picker id="birth-date" system="jalali" locale="fa"></jalali-date-picker>
+<script type="module">
+  import '@jalali-js/web/date-picker.css';
+  import '@jalali-js/web';
+
+  document.getElementById('birth-date').addEventListener('change', (event) => {
+    // event.detail.value is a Gregorian ISO string by default: '2024-08-05'.
+  });
+</script>
+```
+
 Next: [Core concepts](/guide/core-concepts) covers the precision tiers and the
-display/storage split those two examples both lean on.
+display/storage split these examples all lean on.

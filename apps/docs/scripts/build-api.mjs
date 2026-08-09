@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // Generates apps/docs/api/, the API reference VitePress serves under /api/. Not committed (see
-// apps/docs/.gitignore): regenerated from the 5 packages' own types on every docs build, so it
+// apps/docs/.gitignore): regenerated from the packages' own types on every docs build, so it
 // can never drift from the real public API the way hand-written reference pages would.
 //
-// Two separate TypeDoc runs, not one: `core`, `i18n`, `nlp`, `react`, and `ui-react` are plain
-// TypeScript/TSX and convert cleanly together in TypeDoc's own multi-package "packages" mode.
+// Two separate TypeDoc runs, not one: `core`, `i18n`, `nlp`, `react`, `ui-react`, `web`, and
+// `ui-web` are plain TypeScript/TSX and convert cleanly together in TypeDoc's own multi-package
+// "packages" mode.
 // `vue` cannot join that run: its main entry point (src/index.ts) re-exports `.vue` SFCs, and
 // TypeDoc's TypeScript-compiler-based parser has no `.vue` support at all, SFC or otherwise
 // (this is a real TypeDoc limitation, not a config mistake, confirmed by trying the packages

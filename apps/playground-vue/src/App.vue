@@ -44,7 +44,10 @@ watchEffect(() => {
     }"
   >
     <h1>jalali-js playground (Vue)</h1>
-    <p style="margin: -0.5rem 0 1rem">Vue playground · <a href="../react/">React playground</a></p>
+    <p style="margin: -0.5rem 0 1rem">
+      Vue playground · <a href="../react/">React playground</a> ·
+      <a href="../vanilla/">Vanilla playground</a>
+    </p>
     <p style="margin: 0 0 1rem">
       <label><input type="checkbox" v-model="isDark" /> Dark mode</label>
       &nbsp;&nbsp;

@@ -37,7 +37,8 @@ export default function App() {
       {isDark && <style>{darkThemeCss}</style>}
       <h1>jalali-js playground</h1>
       <p style={{ margin: '-0.5rem 0 1rem' }}>
-        React playground · <a href="../vue/">Vue playground</a>
+        React playground · <a href="../vue/">Vue playground</a> ·{' '}
+        <a href="../vanilla/">Vanilla playground</a>
       </p>
       <p style={{ margin: '0 0 1rem' }}>
         <label>

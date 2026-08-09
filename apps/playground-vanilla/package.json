@@ -1,0 +1,22 @@
+{
+  "name": "playground-vanilla",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4005 --strictPort",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@jalali-js/i18n": "workspace:*",
+    "@jalali-js/ui-web": "workspace:*",
+    "@jalali-js/web": "workspace:*",
+    "jalali-js": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "vite": "8.2.0"
+  }
+}

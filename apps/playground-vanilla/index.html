@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>jalali-js playground (Vanilla / Web Components)</title>
+  </head>
+  <body>
+    <main id="app">
+      <h1>jalali-js playground (Vanilla / Web Components)</h1>
+      <p style="margin: -0.5rem 0 1rem">
+        Vanilla playground · <a href="../react/">React playground</a> ·
+        <a href="../vue/">Vue playground</a>
+      </p>
+      <p style="margin: 0 0 1rem">
+        <label><input id="dark-toggle" type="checkbox" checked /> Dark mode</label>
+        &nbsp;&nbsp;
+        <label><input id="locale-toggle" type="checkbox" /> English (unchecked: Farsi)</label>
+      </p>
+      <p>
+        No framework anywhere on this page: <code>@jalali-js/web</code> and
+        <code>@jalali-js/ui-web</code> are plain
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_components">Web Components</a>
+        (custom elements), rendered in light DOM (no shadow root), so the exact same
+        <code>date-picker.css</code> that styles the React and Vue bindings styles these too. The
+        <code>compact</code> theme is always on below, for spacing; the <code>dark</code> theme is
+        what the toggle above controls. The language toggle controls every component below except
+        the two explicit English/Farsi comparison sections, which always show both at once.
+      </p>
+      <p id="calendar-summary"></p>
+
+      <section data-testid="grid-en-jalali">
+        <h2>Grid variant, English, Jalali system</h2>
+        <jalali-date-picker system="jalali" locale="en"></jalali-date-picker>
+        <p>Stored value (Gregorian by default): <span id="stored-value">null</span></p>
+      </section>
+
+      <section data-testid="grid-fa-jalali">
+        <h2>Grid variant, Farsi</h2>
+        <jalali-date-picker system="jalali" locale="fa"></jalali-date-picker>
+      </section>
+
+      <section data-testid="quick-nav">
+        <h2>Quick year/month navigation (default on)</h2>
+        <p>Click the month or year in the header to jump straight to a month grid or year grid.</p>
+        <jalali-date-picker system="jalali" class="locale-follows"></jalali-date-picker>
+      </section>
+
+      <section data-testid="quick-nav-off">
+        <h2>Quick navigation turned off (quickNav: false)</h2>
+        <p>The month and year in the header are plain text; only the prev/next arrows page.</p>
+        <jalali-date-picker
+          system="jalali"
+          quick-nav="false"
+          class="locale-follows"
+        ></jalali-date-picker>
+      </section>
+
+      <section data-testid="no-initial-selection">
+        <h2>No initial selection (defaultDate: null)</h2>
+        <p>Opens with nothing picked, showing the placeholder until a person picks a date.</p>
+        <jalali-date-picker
+          id="no-initial-picker"
+          system="jalali"
+          class="locale-follows"
+        ></jalali-date-picker>
+      </section>
+
+      <section data-testid="dropdown">
+        <h2>Dropdown variant (date-of-birth style entry)</h2>
+        <jalali-date-picker
+          system="jalali"
+          variant="dropdown"
+          class="locale-follows"
+        ></jalali-date-picker>
+      </section>
+
+      <section data-testid="gregorian">
+        <h2>Gregorian system</h2>
+        <jalali-date-picker system="gregorian" class="locale-follows"></jalali-date-picker>
+      </section>
+
+      <section data-testid="inline-calendar">
+        <h2>Inline calendar (@jalali-js/ui-web)</h2>
+        <jalali-inline-calendar system="jalali" class="locale-follows"></jalali-inline-calendar>
+        <p>Selected: <span id="inline-selected">none</span></p>
+      </section>
+
+      <section data-testid="range-picker">
+        <h2>Range picker (@jalali-js/ui-web)</h2>
+        <jalali-range-picker system="jalali" class="locale-follows"></jalali-range-picker>
+        <p>Stored range (Gregorian by default): <span id="stored-range">null</span></p>
+      </section>
+
+      <section data-testid="custom-theme">
+        <h2>Custom CSS override (consumer-configured, not a shipped theme file)</h2>
+        <p>
+          A consumer can retheme a picker by overriding the <code>--jalali-*</code> custom
+          properties, with no theme file at all. This section follows architecture.md's own
+          documented pattern: a scoped selector under a parent class (see the "Theming contract"
+          section there).
+        </p>
+        <style>
+          .custom-theme-scope [data-jalali-datepicker-root] {
+            --jalali-primary: #c026d3;
+            --jalali-primary-fg: #ffffff;
+            --jalali-bg: #fdf4ff;
+            --jalali-fg: #581c87;
+            --jalali-radius: 20px;
+          }
+        </style>
+        <div class="custom-theme-scope">
+          <jalali-date-picker system="jalali" locale="en"></jalali-date-picker>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

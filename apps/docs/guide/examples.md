@@ -81,6 +81,20 @@ const stored = ref<StorageValue>();
 </template>
 ```
 
+## Vanilla / Web Components: the same field, no framework
+
+```html
+<jalali-date-picker id="birth-date" system="jalali" locale="fa"></jalali-date-picker>
+<script type="module">
+  import '@jalali-js/web/date-picker.css';
+  import '@jalali-js/web';
+
+  document.getElementById('birth-date').addEventListener('change', (event) => {
+    // event.detail.value is a Gregorian ISO string, e.g. '2024-08-05'. Store this.
+  });
+</script>
+```
+
 ## React: a date range field
 
 ```tsx

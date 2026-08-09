@@ -6,7 +6,9 @@
     "../../packages/i18n",
     "../../packages/nlp",
     "../../packages/react",
-    "../../packages/ui-react"
+    "../../packages/ui-react",
+    "../../packages/web",
+    "../../packages/ui-web"
   ],
   "out": "api",
   "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
