@@ -51,19 +51,7 @@ jobs:
         run: make build-packages
 
       - name: Publish to npm
-        # A plain `pnpm publish` errors on a version that's already on npm, so this checks
-        # first: safe to re-run (say, after a previous run partly failed) without erroring on
-        # whatever already published successfully.
-        run: |
-          for pkg in packages/*/; do
-            name=$(node -p "require('./${pkg}package.json').name")
-            version=$(node -p "require('./${pkg}package.json').version")
-            if npm view "$name@$version" version >/dev/null 2>&1; then
-              echo "$name@$version is already on npm, skipping"
-            else
-              (cd "$pkg" && pnpm publish --no-git-checks)
-            fi
-          done
+        run: make publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

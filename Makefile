@@ -1,8 +1,8 @@
 .PHONY: help install install-frozen dev build build-packages build-apps build-docs typecheck \
 	lint lint-fix format format-check test test-watch test-e2e test-e2e-project \
 	install-playwright check clean probe-treeshake size tag-release release-patch \
-	release-minor release-major app-typecheck app-build app-build-at-base test-paths \
-	docs-dev docs-build docs-preview
+	release-minor release-major publish-packages app-typecheck app-build app-build-at-base \
+	test-paths docs-dev docs-build docs-preview
 
 PNPM ?= pnpm
 
@@ -112,6 +112,17 @@ release-minor: ## Same as release-patch, minor bump: make release-minor
 
 release-major: ## Same as release-patch, major bump: make release-major
 	@$(MAKE) tag-release BUMP=major
+
+publish-packages: ## Publish every package/* to npm, skipping any already published at its current version (release.yml)
+	@for pkg in packages/*/; do \
+	  name=$$(node -p "require('./$${pkg}package.json').name"); \
+	  version=$$(node -p "require('./$${pkg}package.json').version"); \
+	  if npm view "$$name@$$version" version >/dev/null 2>&1; then \
+	    echo "$$name@$$version is already on npm, skipping"; \
+	  else \
+	    (cd "$$pkg" && pnpm publish --no-git-checks); \
+	  fi; \
+	done
 
 app-typecheck: ## Typecheck one app/package by name (compat-matrix.yml): make app-typecheck APP=playground-react
 	$(PNPM) --filter $(APP) typecheck
