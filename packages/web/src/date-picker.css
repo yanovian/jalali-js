@@ -1,0 +1,295 @@
+/*
+ * Default styling for @jalali-js/web. Optional: every component works with no CSS at all,
+ * styled entirely through the [data-jalali-*] attributes below (see architecture.md's
+ * "Configuration and theming"). Import this file for a usable look with no extra work.
+ *
+ * Identical to @jalali-js/react's and @jalali-js/vue's stylesheet of the same name, on
+ * purpose: every binding uses the same [data-jalali-*] attribute names (these elements render
+ * in light DOM, with no shadow boundary in the way), so a team can reuse one theme across all
+ * three.
+ *
+ * Retheme by overriding these custom properties, not by fighting the rules below. See
+ * architecture.md's "Theming contract" for what each one controls.
+ */
+[data-jalali-datepicker-root],
+[data-jalali-datepicker-dropdown],
+[data-jalali-calendar-root] {
+  --jalali-font: system-ui, sans-serif;
+  --jalali-font-size: 1rem;
+  --jalali-bg: #ffffff;
+  --jalali-fg: #1a1a1a;
+  --jalali-muted-fg: #6b6b6b;
+  --jalali-border: #d9d9d9;
+  --jalali-radius: 8px;
+  --jalali-primary: #2563eb;
+  --jalali-primary-fg: #ffffff;
+  --jalali-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --jalali-gap: 2px;
+  --jalali-input-padding: 0.5em 0.75em;
+  --jalali-popover-padding: 0.75em;
+  --jalali-day-min-size: 2.25em;
+
+  font-family: var(--jalali-font);
+  font-size: var(--jalali-font-size);
+  color: var(--jalali-fg);
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+/* Buttons should read as buttons: no drag-to-select text, no iOS press-and-hold callout. */
+[data-jalali-datepicker-input],
+[data-jalali-calendar-nav],
+button[data-jalali-calendar-title-month],
+button[data-jalali-calendar-title-year],
+[data-jalali-calendar-day],
+[data-jalali-calendar-month],
+[data-jalali-calendar-year] {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+[data-jalali-datepicker-input]:focus-visible,
+[data-jalali-calendar-nav]:focus-visible,
+button[data-jalali-calendar-title-month]:focus-visible,
+button[data-jalali-calendar-title-year]:focus-visible,
+[data-jalali-calendar-day]:focus-visible,
+[data-jalali-calendar-month]:focus-visible,
+[data-jalali-calendar-year]:focus-visible {
+  outline: 2px solid var(--jalali-primary);
+  outline-offset: 1px;
+}
+
+[data-jalali-datepicker-input] {
+  font: inherit;
+  color: inherit;
+  background: var(--jalali-bg);
+  border: 1px solid var(--jalali-border);
+  border-radius: var(--jalali-radius);
+  padding: var(--jalali-input-padding);
+  min-width: 12em;
+  cursor: pointer;
+}
+
+[data-jalali-datepicker-input]:hover {
+  border-color: var(--jalali-primary);
+}
+
+[data-jalali-datepicker-input]::placeholder {
+  color: var(--jalali-muted-fg);
+  opacity: 1;
+}
+
+[data-jalali-datepicker-popover] {
+  position: absolute;
+  z-index: 20;
+  margin-top: 0.25em;
+  background: var(--jalali-bg);
+  border: 1px solid var(--jalali-border);
+  border-radius: var(--jalali-radius);
+  box-shadow: var(--jalali-shadow);
+  padding: var(--jalali-popover-padding);
+  max-width: calc(100vw - 2rem);
+  overflow-x: auto;
+}
+
+[data-jalali-calendar-header] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+[data-jalali-calendar-nav] {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: var(--jalali-radius);
+  width: 2em;
+  height: 2em;
+  cursor: pointer;
+}
+
+[data-jalali-calendar-nav]:hover {
+  background: color-mix(in srgb, var(--jalali-fg) 8%, transparent);
+}
+
+[data-jalali-calendar-title] {
+  display: flex;
+  gap: 0.35em;
+  font-weight: 600;
+}
+
+[data-jalali-calendar-title-month],
+[data-jalali-calendar-title-year] {
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Only a real <button> (quickNav on) gets pointer affordance; the plain <span> (quickNav off)
+   stays inert text. */
+button[data-jalali-calendar-title-month],
+button[data-jalali-calendar-title-year] {
+  cursor: pointer;
+  border-radius: var(--jalali-radius);
+  padding: 0.1em 0.35em;
+  margin: -0.1em -0.35em;
+}
+
+button[data-jalali-calendar-title-month]:hover,
+button[data-jalali-calendar-title-year]:hover {
+  background: color-mix(in srgb, var(--jalali-fg) 8%, transparent);
+}
+
+[data-jalali-calendar-months],
+[data-jalali-calendar-years] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--jalali-gap);
+}
+
+[data-jalali-calendar-month],
+[data-jalali-calendar-year] {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: var(--jalali-radius);
+  padding: 0.75em 0.5em;
+  cursor: pointer;
+}
+
+[data-jalali-calendar-month]:hover,
+[data-jalali-calendar-year]:hover {
+  background: color-mix(in srgb, var(--jalali-fg) 8%, transparent);
+}
+
+[data-jalali-calendar-month][data-today],
+[data-jalali-calendar-year][data-today] {
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--jalali-primary);
+}
+
+[data-jalali-calendar-month][data-selected],
+[data-jalali-calendar-year][data-selected] {
+  background: var(--jalali-primary);
+  color: var(--jalali-primary-fg);
+}
+
+[data-jalali-calendar-grid] {
+  display: grid;
+  gap: var(--jalali-gap);
+}
+
+[data-jalali-calendar-weekdays],
+[data-jalali-calendar-week] {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(var(--jalali-day-min-size), 1fr));
+  gap: var(--jalali-gap);
+}
+
+[data-jalali-calendar-weekday] {
+  text-align: center;
+  font-size: 0.8em;
+  color: var(--jalali-muted-fg);
+  padding-block: 0.25em;
+}
+
+[data-jalali-calendar-day] {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: var(--jalali-radius);
+  aspect-ratio: 1;
+  cursor: pointer;
+}
+
+[data-jalali-calendar-day]:hover {
+  background: color-mix(in srgb, var(--jalali-fg) 8%, transparent);
+}
+
+[data-jalali-calendar-day][data-outside-month] {
+  color: var(--jalali-muted-fg);
+}
+
+[data-jalali-calendar-day][data-today] {
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--jalali-primary);
+}
+
+[data-jalali-calendar-day][data-selected] {
+  background: var(--jalali-primary);
+  color: var(--jalali-primary-fg);
+}
+
+/* Range selection (@jalali-js/ui-react, @jalali-js/ui-vue, and @jalali-js/ui-web's
+   RangePicker): the two endpoints get the same solid fill a single-date selection uses; the
+   days strictly between them get a flatter fill in the same hue, with square inner edges so
+   the highlight reads as one continuous band across the row. */
+[data-jalali-calendar-day][data-range-start],
+[data-jalali-calendar-day][data-range-end] {
+  background: var(--jalali-primary);
+  color: var(--jalali-primary-fg);
+}
+
+[data-jalali-calendar-day][data-in-range] {
+  background: color-mix(in srgb, var(--jalali-primary) 16%, transparent);
+  border-radius: 0;
+}
+
+[data-jalali-datepicker-dropdown] {
+  display: flex;
+  gap: 0.5em;
+}
+
+[data-jalali-datepicker-field] {
+  font: inherit;
+  color: inherit;
+  background: var(--jalali-bg);
+  border: 1px solid var(--jalali-border);
+  border-radius: var(--jalali-radius);
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+[data-jalali-datepicker-field]:hover {
+  border-color: var(--jalali-primary);
+}
+
+[data-jalali-datepicker-field]:focus-visible {
+  outline: 2px solid var(--jalali-primary);
+  outline-offset: 1px;
+}
+
+/* pointer: coarse (touch) gets bigger tap targets than a mouse needs. Day cells only grow
+   taller, not wider: 7 columns already fill a phone-width popover, so widening them further
+   would overflow it; a taller row still gives a real, measurably bigger tap area. Placed last
+   so it wins the cascade against the equal-specificity rules above it overrides. */
+@media (pointer: coarse) {
+  [data-jalali-datepicker-root],
+  [data-jalali-datepicker-dropdown],
+  [data-jalali-calendar-root] {
+    --jalali-gap: 4px;
+  }
+
+  [data-jalali-calendar-nav],
+  button[data-jalali-calendar-title-month],
+  button[data-jalali-calendar-title-year],
+  [data-jalali-datepicker-field] {
+    min-width: 2.75em;
+    min-height: 2.75em;
+  }
+
+  [data-jalali-calendar-day] {
+    aspect-ratio: auto;
+    min-height: 2.75em;
+  }
+}

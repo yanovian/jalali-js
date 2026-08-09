@@ -1,0 +1,22 @@
+/*
+ * A dark theme for @jalali-js/web's DatePicker/Calendar/RangePicker. Import this *after*
+ * @jalali-js/web/date-picker.css: it only overrides the same --jalali-* custom properties that
+ * stylesheet defines (see architecture.md's "Theming contract"), it does not redefine any
+ * selector or rule of its own. Any consumer's own theme can follow this same pattern: override
+ * the variables, never fight the rules.
+ *
+ * Identical to @jalali-js/ui-react's and @jalali-js/ui-vue's theme of the same name, on
+ * purpose: every binding uses the same [data-jalali-*] attribute names, so a team can reuse one
+ * theme across all three.
+ */
+[data-jalali-datepicker-root],
+[data-jalali-datepicker-dropdown],
+[data-jalali-calendar-root] {
+  --jalali-bg: #1e1e1e;
+  --jalali-fg: #ededed;
+  --jalali-muted-fg: #9a9a9a;
+  --jalali-border: #3a3a3a;
+  --jalali-primary: #60a5fa;
+  --jalali-primary-fg: #0b1220;
+  --jalali-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}

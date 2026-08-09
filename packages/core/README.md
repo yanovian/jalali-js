@@ -25,9 +25,11 @@ calendar instead of the Gregorian default.
 [Playground](https://yanovian.github.io/jalali-js/playground/react/)
 
 Part of the [jalali-js](https://github.com/yanovian/jalali-js) toolkit:
-[`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) and
-[`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) build framework bindings on top
-of this package; [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n) and
+[`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react),
+[`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue), and
+[`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web) (plain Web Components, no
+framework required) build bindings on top of this package;
+[`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n) and
 [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp) are separate, optional packages
 for display formatting and natural language parsing.
 

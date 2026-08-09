@@ -6,6 +6,7 @@ const PORTS = {
   vue: 4002,
   next: 4003,
   nuxt: 4004,
+  vanilla: 4005,
 };
 
 export default defineConfig({
@@ -32,7 +33,7 @@ export default defineConfig({
     viewport: { width: 1280, height: 900 },
   },
   // Every project needs every server; each app's own "build" runs first since a cold checkout
-  // has no dist/.next/.output yet. Playwright starts all four before any test runs and tears
+  // has no dist/.next/.output yet. Playwright starts all five before any test runs and tears
   // them all down after, regardless of which project/app a given test file targets.
   webServer: [
     {
@@ -58,6 +59,13 @@ export default defineConfig({
       command:
         'pnpm --filter playground-nuxt run build && pnpm --filter playground-nuxt run preview',
       url: `http://localhost:${PORTS.nuxt}`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+    {
+      command:
+        'pnpm --filter playground-vanilla run build && pnpm --filter playground-vanilla run preview',
+      url: `http://localhost:${PORTS.vanilla}`,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },

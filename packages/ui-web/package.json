@@ -1,0 +1,69 @@
+{
+  "name": "@jalali-js/ui-web",
+  "version": "0.0.1",
+  "description": "RangePicker, InlineCalendar, and extra themes for @jalali-js/web, built on the same headless Web Components.",
+  "keywords": [
+    "jalali",
+    "persian",
+    "farsi",
+    "web-components",
+    "custom-elements",
+    "vanilla-js",
+    "date-range",
+    "calendar",
+    "theme"
+  ],
+  "homepage": "https://yanovian.github.io/jalali-js/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanovian/jalali-js.git",
+    "directory": "packages/ui-web"
+  },
+  "type": "module",
+  "license": "MIT",
+  "author": "Yanovian LLC",
+  "sideEffects": true,
+  "files": [
+    "dist",
+    "src/themes/*.css"
+  ],
+  "types": "./src/index.ts",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./themes/*.css": "./src/themes/*.css"
+  },
+  "publishConfig": {
+    "access": "public",
+    "types": "./dist/index.d.ts",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+      },
+      "./themes/*.css": "./src/themes/*.css"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsup"
+  },
+  "dependencies": {
+    "@jalali-js/i18n": "workspace:*",
+    "@jalali-js/web": "workspace:*",
+    "jalali-js": "workspace:*"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/user-event": "^14.6.3",
+    "@types/node": "^26.2.0",
+    "jsdom": "^30.0.1"
+  }
+}

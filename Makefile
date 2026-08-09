@@ -25,7 +25,7 @@ build: ## Build all packages and apps
 build-packages: ## Build only packages/* (not apps/*), its own target so a break there is named on its own in CI
 	$(PNPM) --filter "./packages/**" build
 
-build-apps: ## Build only the four playground apps (not docs), its own target for the same reason as build-packages
+build-apps: ## Build only the playground apps (not docs), its own target for the same reason as build-packages
 	$(PNPM) --filter "./apps/**" --filter "!docs" build
 
 build-docs: ## Build the docs site (API reference generation runs first automatically)
@@ -42,12 +42,14 @@ docs-build: build-docs ## Alias for build-docs, matching architecture.md's docum
 docs-preview: embed-playgrounds build-docs ## Build and preview the docs site locally, with a fully working embedded playground, matching the real deployed site exactly
 	$(PNPM) --filter docs preview
 
-embed-playgrounds: ## Build playground-react/playground-vue at their embedded subpaths and copy them into apps/docs/public/ (pages.yml; docs-dev/docs-preview already depend on this)
+embed-playgrounds: ## Build playground-react/vue/vanilla at their embedded subpaths and copy them into apps/docs/public/ (pages.yml; docs-dev/docs-preview already depend on this)
 	$(MAKE) app-build-at-base APP=playground-react BASE=/jalali-js/playground/react/
 	$(MAKE) app-build-at-base APP=playground-vue BASE=/jalali-js/playground/vue/
-	mkdir -p apps/docs/public/playground/react apps/docs/public/playground/vue
+	$(MAKE) app-build-at-base APP=playground-vanilla BASE=/jalali-js/playground/vanilla/
+	mkdir -p apps/docs/public/playground/react apps/docs/public/playground/vue apps/docs/public/playground/vanilla
 	cp -r apps/playground-react/dist/. apps/docs/public/playground/react/
 	cp -r apps/playground-vue/dist/. apps/docs/public/playground/vue/
+	cp -r apps/playground-vanilla/dist/. apps/docs/public/playground/vanilla/
 
 typecheck: ## TypeScript check, across every package
 	$(PNPM) typecheck

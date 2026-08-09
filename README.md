@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  <b>A TypeScript-native Jalali (Persian, Shamsi) calendar toolkit, with first-class React and
-  Vue bindings.</b>
+  <b>A TypeScript-native Jalali (Persian, Shamsi) calendar toolkit, with first-class React, Vue,
+  and framework-free Web Components bindings.</b>
 </p>
 
 <p align="center">
@@ -32,13 +32,14 @@
 Most Jalali packages for JavaScript force a trade-off. A package is either a thin, math-only
 conversion function with no framework support, or a full date picker UI tied to one framework,
 often built on a legacy library like Moment. No single package covers TypeScript-native
-conversion, a real date, time, and timezone model, React and Vue bindings, and a headless
-component layer together. See [`_docs/alternatives.md`](_docs/alternatives.md) for the
-package-by-package comparison.
+conversion, a real date, time, and timezone model, React and Vue bindings, a framework-free
+Web Components option, and a headless component layer together. See
+[`_docs/alternatives.md`](_docs/alternatives.md) for the package-by-package comparison.
 
 jalali-js splits this into layers instead. One small, dependency-free core does the conversion.
-Thin framework bindings sit on top of it. A headless, themeable component layer sits on top of
-that. Use only the layer you need.
+Thin framework bindings sit on top of it, including a plain Web Components binding for a page
+with no framework, or one this project has no dedicated binding for. A headless, themeable
+component layer sits on top of that. Use only the layer you need.
 
 ## Install
 
@@ -46,6 +47,7 @@ that. Use only the layer you need.
 npm install jalali-js          # core: conversion, zero runtime dependencies
 npm install @jalali-js/react   # React bindings
 npm install @jalali-js/vue     # Vue bindings
+npm install @jalali-js/web     # No framework: plain Web Components
 ```
 
 ## Quick look
@@ -81,6 +83,15 @@ const stored = ref<StorageValue>();
 </template>
 ```
 
+```html
+<!-- No framework -->
+<jalali-date-picker id="picker" locale="fa"></jalali-date-picker>
+<script type="module">
+  import '@jalali-js/web';
+  document.getElementById('picker').addEventListener('change', (e) => console.log(e.detail.value));
+</script>
+```
+
 More copy-paste examples, including natural language parsing, range pickers, and custom
 theming, are in the [Examples](https://yanovian.github.io/jalali-js/guide/examples) guide
 linked above.
@@ -99,6 +110,9 @@ linked above.
   follows. A Jalali UI never forces a Jalali-shaped value into your database.
 - **React and Vue, both first-class,** including Next.js and Nuxt SSR with safe timezone
   resolution during server render.
+- **No framework? No problem.** `@jalali-js/web` ships the same pickers as plain Web
+  Components: usable from plain HTML/JS, or dropped into any framework this project has no
+  dedicated binding for.
 - **English and Farsi out of the box,** including natural language date input in both, and
   Finglish (`"emrooz"`, `"farda"`).
 - **Headless by default.** Data attributes and scoped slots give you full styling control. An
@@ -115,8 +129,10 @@ linked above.
 | `@jalali-js/nlp`      | Natural language date parsing, in English, Farsi, and Finglish.   |
 | `@jalali-js/react`    | React bindings: `useCalendar`, headless `Calendar`, `DatePicker`. |
 | `@jalali-js/vue`      | The same, for Vue.                                                |
+| `@jalali-js/web`      | The same, as plain Web Components. No framework required.         |
 | `@jalali-js/ui-react` | `RangePicker`, `InlineCalendar`, and extra themes, for React.     |
 | `@jalali-js/ui-vue`   | The same, for Vue.                                                |
+| `@jalali-js/ui-web`   | The same, for web.                                                |
 
 ## This repo
 

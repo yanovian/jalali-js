@@ -184,16 +184,19 @@ packages/
   nlp/                 # Natural language date parsing: en, fa, Finglish.
   react/               # React hooks and headless components. Works in Next.js.
   vue/                 # Vue composables and headless components. Works in Nuxt.
+  web/                 # Framework-free Web Components. No hooks or composables: plain custom elements.
   ui-react/            # Optional extra React components: RangePicker, InlineCalendar, themes.
   ui-vue/              # The same, for Vue.
+  ui-web/              # The same, for web.
 apps/
   docs/                # Documentation site and interactive playground.
   playground-react/    # Vite and React sandbox. An e2e screenshot target.
   playground-vue/      # Vite and Vue sandbox. An e2e screenshot target.
+  playground-vanilla/  # Vite, no framework. An e2e screenshot target.
   playground-next/     # Real Next.js app. Confirms SSR and hydration behavior.
   playground-nuxt/     # Real Nuxt app. Confirms SSR and hydration behavior.
 e2e/
-  visual/              # Playwright visual tests against all four playground apps.
+  visual/              # Playwright visual tests against all five playground apps.
 _docs/
   plan.md              # Phase-by-phase status. Start here.
   architecture.md       # This document.
