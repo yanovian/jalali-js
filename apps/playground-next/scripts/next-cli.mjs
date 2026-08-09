@@ -1,8 +1,5 @@
 #!/usr/bin/env node
-// next.config.ts's webpack() hook only runs under webpack, so dev/build must force it. The
-// flag for that is version-dependent: --webpack does not exist before Turbopack became the
-// default (a hard CLI error), and is required from that version on. This picks the right one
-// so compat-matrix.yml's older-Next-major cell builds too, not just this app's pinned version.
+// --webpack does not exist before Turbopack became the default, and is required after.
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 
