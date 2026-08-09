@@ -37,4 +37,8 @@ export interface LocalePack {
   /** Every calendar system this locale can format. A third calendar (Phase 12) adds a key here. */
   readonly monthNames: Record<CalendarSystem, MonthNames>;
   readonly weekdayNames: WeekdayNames;
+  /** Placeholder text for a closed `DatePicker`/`RangePicker` with nothing selected yet, so a
+   * consumer who passes no `placeholder` of their own never sees a genuinely blank input. */
+  readonly datePickerPlaceholder: string;
+  readonly rangePickerPlaceholder: string;
 }

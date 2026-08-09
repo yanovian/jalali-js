@@ -48,4 +48,6 @@ export const fa: LocalePack = {
     long: ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'],
     short: ['ی', 'د', 'س', 'چ', 'پ', 'ج', 'ش'],
   },
+  datePickerPlaceholder: 'انتخاب تاریخ',
+  rangePickerPlaceholder: 'انتخاب بازه تاریخ',
 };

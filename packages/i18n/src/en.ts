@@ -49,4 +49,6 @@ export const en: LocalePack = {
     long: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     short: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   },
+  datePickerPlaceholder: 'Select a date',
+  rangePickerPlaceholder: 'Select a date range',
 };
