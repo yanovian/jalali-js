@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --webpack",
-    "build": "next build --webpack",
+    "dev": "node scripts/next-cli.mjs dev",
+    "build": "node scripts/next-cli.mjs build",
     "start": "next start --port 4003",
     "typecheck": "tsc --noEmit"
   },

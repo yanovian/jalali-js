@@ -194,8 +194,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit --quiet -m "Compatibility-matrix screenshots for PR #$PR_NUMBER"
-          git push --quiet origin HEAD:visual-snapshots
+          # Nothing staged (identical re-run) would make `git commit` fail.
+          if ! git diff --staged --quiet; then
+            git commit --quiet -m "Compatibility-matrix screenshots for PR #$PR_NUMBER"
+            git push --quiet origin HEAD:visual-snapshots
+          fi
           echo "published=true" >> "$GITHUB_OUTPUT"
 
       - name: Comment on PR
