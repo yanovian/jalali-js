@@ -17,6 +17,16 @@
   Vue bindings.</b>
 </p>
 
+<p align="center">
+  <a href="https://yanovian.github.io/jalali-js/guide/getting-started">Guide</a>
+  ·
+  <a href="https://yanovian.github.io/jalali-js/guide/examples">Examples</a>
+  ·
+  <a href="https://yanovian.github.io/jalali-js/api/jalali-js/">API reference</a>
+  ·
+  <a href="https://yanovian.github.io/jalali-js/playground/react/">Playground</a>
+</p>
+
 ## Why this exists
 
 Most Jalali packages for JavaScript force a trade-off. A package is either a thin, math-only
@@ -72,9 +82,8 @@ const stored = ref<StorageValue>();
 ```
 
 More copy-paste examples, including natural language parsing, range pickers, and custom
-theming: **[Examples](https://yanovian.github.io/jalali-js/guide/examples)**
-
-Full guide and API reference: **[yanovian.github.io/jalali-js](https://yanovian.github.io/jalali-js/)**
+theming, are in the [Examples](https://yanovian.github.io/jalali-js/guide/examples) guide
+linked above.
 
 ## What you get
 
@@ -111,14 +120,14 @@ Full guide and API reference: **[yanovian.github.io/jalali-js](https://yanovian.
 
 ## This repo
 
-- [`_docs/plan.md`](_docs/plan.md): the phase-by-phase status checklist.
 - [`_docs/architecture.md`](_docs/architecture.md): the technical design. Scope, data model,
   package layout, testing strategy, CI/CD design, and tooling.
 - [`_docs/alternatives.md`](_docs/alternatives.md): the vision, the goals, and a comparison with
   existing Jalali and Persian calendar libraries.
-- [`_docs/release-checklist.md`](_docs/release-checklist.md): the release readiness checklist.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): setup, the branch and PR workflow, and the checks a
   change must pass.
+- [`_docs/release-checklist.md`](_docs/release-checklist.md): the release readiness checklist.
+- [`_docs/plan.md`](_docs/plan.md): the phase-by-phase status checklist.
 
 ## License
 
