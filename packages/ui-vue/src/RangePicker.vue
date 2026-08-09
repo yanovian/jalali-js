@@ -27,7 +27,7 @@ import {
   toStorageValue,
 } from 'jalali-js';
 import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
-import { defaultRangePlaceholder, localePackFor, type LocaleCode } from '@jalali-js/vue';
+import { localePackFor, type LocaleCode } from '@jalali-js/vue';
 
 export interface DateRange {
   start: CalendarDate;
@@ -59,7 +59,7 @@ const model = defineModel<RangeStorageValue>();
 
 const localePack = computed(() => localePackFor(props.locale));
 const resolvedPlaceholder = computed(
-  () => props.placeholder ?? defaultRangePlaceholder[props.locale],
+  () => props.placeholder ?? localePack.value.rangePickerPlaceholder,
 );
 const today = computed(() => createCalendar({ system: props.system }).today());
 const start = ref<CalendarDate | null>(props.defaultRange?.start ?? null);

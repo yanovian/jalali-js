@@ -19,7 +19,7 @@ import { createCalendar, toStorageValue } from 'jalali-js';
 import { onBeforeUnmount, onMounted, ref, useId, watch, computed } from 'vue';
 import Calendar from './Calendar.vue';
 import DropdownDateFields from './DropdownDateFields.vue';
-import { defaultDatePlaceholder, localePackFor, type LocaleCode } from './use-calendar.js';
+import { localePackFor, type LocaleCode } from './use-calendar.js';
 
 const props = withDefaults(
   defineProps<{
@@ -43,7 +43,7 @@ const model = defineModel<StorageValue>();
 
 const localePack = computed(() => localePackFor(props.locale));
 const resolvedPlaceholder = computed(
-  () => props.placeholder ?? defaultDatePlaceholder[props.locale],
+  () => props.placeholder ?? localePack.value.datePickerPlaceholder,
 );
 const date = ref<CalendarDate>(
   props.defaultDate ?? createCalendar({ system: props.system }).today(),
