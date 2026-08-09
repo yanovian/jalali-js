@@ -7,7 +7,7 @@
 // TypeScript/TSX and convert cleanly together in TypeDoc's own multi-package "packages" mode.
 // `vue` cannot join that run: its main entry point (src/index.ts) re-exports `.vue` SFCs, and
 // TypeDoc's TypeScript-compiler-based parser has no `.vue` support at all, SFC or otherwise
-// (this is a real TypeDoc limitation, not a config mistake — confirmed by trying the packages
+// (this is a real TypeDoc limitation, not a config mistake, confirmed by trying the packages
 // run with vue included and reading the resulting TS2307 "cannot find module './Calendar.vue'"
 // errors directly). `vue`'s plain-TypeScript composables (`useCalendar`,
 // `useResolvedTimeZone`) still convert fine on their own, scoped via tsconfig.vue-api.json's
