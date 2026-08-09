@@ -3,13 +3,14 @@
 > **Status as of this pass: not ready to publish.** Everything this repo can verify by itself
 > passes. Two things block release: the visual e2e baseline (below), and four operational items
 > nothing here has the credentials to check. See "What's still open" at the bottom before you run
-> `make tag-release`.
+> `make release-patch`.
 
 The checklist Phase 11 asks for. Each item below is either verified directly, with how, or
 flagged as something only a human with the right access can do (an npm or GitHub secret, a repo
 setting). This document does not publish anything by itself. Publishing happens through
-`release.yml` (see architecture.md's "CI/CD pipeline"). A maintainer triggers it by pushing a
-release tag (`make tag-release TAG=v0.0.1`), a separate, deliberate action to take when ready.
+`release.yml` (see architecture.md's "CI/CD pipeline"). A maintainer triggers it by running
+`make release-patch MESSAGE="..." TAG=v0.0.1` (see "Publishing" below), a separate, deliberate
+action to take when ready.
 
 ## Engineering readiness
 
@@ -48,9 +49,10 @@ release tag (`make tag-release TAG=v0.0.1`), a separate, deliberate action to ta
       all 7 package directories directly.
 - [x] **Initial version numbers are a deliberate choice, not a default.** Confirmed all 7 are
       still `0.0.0` and never published (`npm view jalali-js` and `npm view @jalali-js/i18n`
-      both return 404, so the names are free). The first release targets `v0.0.1`: a `patch`
-      bump for every package meant to publish (`pnpm changeset`, or `make changeset`). See
-      "Publishing" below.
+      both return 404, so the names are free). The first release targets `v0.0.1`. All 7
+      packages are in one `fixed` Changesets group (`.changeset/config.json`), so they always
+      version together: a single `patch` bump moves every one of them from `0.0.0` to `0.0.1`
+      at once. See "Publishing" below.
 
 ## Documentation readiness
 
@@ -77,17 +79,20 @@ release tag (`make tag-release TAG=v0.0.1`), a separate, deliberate action to ta
 ## Publishing (do this last, deliberately, not as part of "running the checklist")
 
 One deliberate local command, matching the org's tag-triggered release convention
-(`yanovian/chrome-ext-tabby`'s `release-patch`, `release-minor`, and `release-major`). Nothing
-publishes until a maintainer runs it.
+(`yanovian/chrome-ext-tabby`'s own `release-patch`, `release-minor`, and `release-major`).
+Nothing publishes until a maintainer runs it.
 
-1. Add a changeset per package that should reach `v0.0.1` (`patch` bump type, since every
-   package starts at `0.0.0`). Describe what ships in this first release.
-2. Review the pending changesets (`pnpm changeset status`, or `make release` for the same
-   preview). Confirm the working tree is otherwise clean.
-3. Run `make tag-release TAG=v0.0.1`. This runs `make check`, then `changeset version` (bumps
-   each package's version, writes `CHANGELOG.md` entries, and consumes the changesets), commits,
-   tags, and pushes with `--follow-tags`.
-4. Pushing the tag triggers `release.yml`. It re-runs the checks, then `changesets/action@v1`
+1. Run **one** of `make release-patch`, `make release-minor`, or `make release-major`,
+   whichever bump this release needs, with a `MESSAGE` describing what ships and the `TAG` you
+   are cutting: for example `make release-patch MESSAGE="First public release" TAG=v0.0.1`.
+   Since every package is in one `fixed` Changesets group, this one command versions, tags, and
+   releases all 7 together. There is no separate step to add a changeset by hand first.
+2. That command writes a changeset for the whole fixed group, commits it, then runs `make
+check`, `changeset version` (bumps every package to the same new version, writes each
+   `CHANGELOG.md` entry, and consumes the changeset), commits again, tags, and pushes with
+   `--follow-tags`, all in one run. Confirm the working tree is clean before you start; the
+   command refuses to run otherwise.
+3. Pushing the tag triggers `release.yml`. It re-runs the checks, then `changesets/action@v1`
    publishes (`pnpm release`: `pnpm build && changeset publish`, which publishes only a package
    whose current version is not already on npm) and creates one GitHub release per published
    package. Each release body comes from that package's own `CHANGELOG.md` entry.
@@ -98,7 +103,7 @@ back to its PR or commit. That needs a GitHub token to avoid API rate limits whe
 occasional release, since it only affects link richness in the generated changelog text, not
 whether the release succeeds.
 
-This repo has not done any of the four steps above. Publishing packages under the
+This repo has not run any of the steps above. Publishing packages under the
 `jalali-js`/`@jalali-js/*` names to the public npm registry is a real, irreversible, public
 action. It belongs to whoever owns that decision, made deliberately, not as a side effect of
 running this checklist.

@@ -1,7 +1,8 @@
 .PHONY: help install install-frozen dev build build-packages build-apps build-docs typecheck \
 	lint lint-fix format format-check test test-watch test-e2e test-e2e-project \
 	install-playwright check clean probe-treeshake size changeset release tag-release \
-	app-typecheck app-build app-build-at-base test-paths docs-dev docs-build docs-preview
+	release-patch release-minor release-major _release-cut app-typecheck app-build \
+	app-build-at-base test-paths docs-dev docs-build docs-preview
 
 PNPM ?= pnpm
 
@@ -84,14 +85,36 @@ changeset: ## Record a changeset for the current change (interactive)
 release: ## Publish through Changesets (CI-driven; this local target only previews what would release)
 	$(PNPM) exec changeset status
 
-tag-release: check ## Bump versions, commit, tag, and push (triggers release.yml, which publishes): make tag-release TAG=v0.0.1
-	@test -n "$(TAG)" || (echo "Usage: make tag-release TAG=v0.0.1" && exit 1)
+tag-release: check ## Bump versions, commit, tag, and push (triggers release.yml, which publishes): make tag-release [TAG=v0.0.1]
 	@git diff --quiet && git diff --cached --quiet || (echo "Working tree is not clean; commit or stash first." && exit 1)
 	$(PNPM) exec changeset version
 	git add -A
 	git commit -m "Version Packages"
-	git tag -a $(TAG) -m "Release $(TAG)"
+	@TAG="$(TAG)"; \
+	if [ -z "$$TAG" ]; then TAG="v$$(node -p "require('./packages/core/package.json').version")"; fi; \
+	git tag -a "$$TAG" -m "Release $$TAG"; \
 	git push origin HEAD --follow-tags
+
+release-patch: ## Write a changeset (patch bump) for the fixed group, then cut a release: make release-patch [MESSAGE="..."]
+	@$(MAKE) _release-cut BUMP=patch MESSAGE="$(MESSAGE)"
+
+release-minor: ## Same as release-patch, minor bump: make release-minor [MESSAGE="..."]
+	@$(MAKE) _release-cut BUMP=minor MESSAGE="$(MESSAGE)"
+
+release-major: ## Same as release-patch, major bump: make release-major [MESSAGE="..."]
+	@$(MAKE) _release-cut BUMP=major MESSAGE="$(MESSAGE)"
+
+# Shared implementation behind release-patch/-minor/-major (see Makefile section in
+# architecture.md's "Makefile" note): not meant to be run directly, so it carries no ## help
+# text and does not appear in `make help`. MESSAGE and the release tag are both optional: the
+# changeset script fills in MESSAGE from the commit log when it is empty, and tag-release fills
+# in the tag from the version Changesets actually produced, so the two can never disagree.
+_release-cut:
+	@git diff --quiet && git diff --cached --quiet || (echo "Working tree is not clean; commit or stash first." && exit 1)
+	node scripts/write-changeset.mjs --bump=$(BUMP) $(if $(MESSAGE),--message="$(MESSAGE)")
+	git add .changeset
+	git commit -m "Add release changeset"
+	$(MAKE) tag-release
 
 app-typecheck: ## Typecheck one app/package by name (compat-matrix.yml): make app-typecheck APP=playground-react
 	$(PNPM) --filter $(APP) typecheck
