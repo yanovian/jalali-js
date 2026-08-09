@@ -1,6 +1,22 @@
 {
   "name": "@jalali-js/i18n",
   "version": "0.0.1",
+  "description": "Locale data and display formatting for jalali-js: English and Farsi, month/weekday names, numerals, and RTL.",
+  "keywords": [
+    "jalali",
+    "persian",
+    "farsi",
+    "i18n",
+    "locale",
+    "calendar",
+    "date"
+  ],
+  "homepage": "https://yanovian.github.io/jalali-js/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanovian/jalali-js.git",
+    "directory": "packages/i18n"
+  },
   "type": "module",
   "license": "MIT",
   "author": "Yanovian LLC",

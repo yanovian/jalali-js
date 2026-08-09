@@ -1,6 +1,23 @@
 {
   "name": "jalali-js",
   "version": "0.0.1",
+  "description": "The Jalali (Persian, Shamsi) to Gregorian conversion core. TypeScript-native, zero runtime dependencies, framework-agnostic.",
+  "keywords": [
+    "jalali",
+    "persian",
+    "shamsi",
+    "farsi",
+    "iran",
+    "calendar",
+    "date",
+    "typescript"
+  ],
+  "homepage": "https://yanovian.github.io/jalali-js/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanovian/jalali-js.git",
+    "directory": "packages/core"
+  },
   "type": "module",
   "license": "MIT",
   "author": "Yanovian LLC",

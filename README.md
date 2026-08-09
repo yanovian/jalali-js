@@ -129,6 +129,10 @@ linked above.
 - [`_docs/release-checklist.md`](_docs/release-checklist.md): the release readiness checklist.
 - [`_docs/plan.md`](_docs/plan.md): the phase-by-phase status checklist.
 
+## Used by
+
+- [kissed.app](https://kissed.app)
+
 ## License
 
 [MIT](LICENSE), copyright Yanovian LLC. Open source and free to use, with no warranty.

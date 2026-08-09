@@ -1,6 +1,22 @@
 {
   "name": "@jalali-js/ui-react",
   "version": "0.0.1",
+  "description": "RangePicker, InlineCalendar, and extra themes for @jalali-js/react, built on the same headless primitives.",
+  "keywords": [
+    "jalali",
+    "persian",
+    "farsi",
+    "react",
+    "date-range",
+    "calendar",
+    "theme"
+  ],
+  "homepage": "https://yanovian.github.io/jalali-js/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanovian/jalali-js.git",
+    "directory": "packages/ui-react"
+  },
   "type": "module",
   "license": "MIT",
   "author": "Yanovian LLC",

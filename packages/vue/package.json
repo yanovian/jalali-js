@@ -1,6 +1,22 @@
 {
   "name": "@jalali-js/vue",
   "version": "0.0.1",
+  "description": "Vue bindings for jalali-js: useCalendar composable, headless Calendar grid, a default-styled DatePicker, SSR-safe timezone resolution.",
+  "keywords": [
+    "jalali",
+    "persian",
+    "farsi",
+    "vue",
+    "date-picker",
+    "calendar",
+    "date"
+  ],
+  "homepage": "https://yanovian.github.io/jalali-js/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanovian/jalali-js.git",
+    "directory": "packages/vue"
+  },
   "type": "module",
   "license": "MIT",
   "author": "Yanovian LLC",

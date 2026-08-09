@@ -1,6 +1,22 @@
 {
   "name": "@jalali-js/nlp",
   "version": "0.0.1",
+  "description": "Natural language date parsing for jalali-js, in English, Farsi, and Finglish.",
+  "keywords": [
+    "jalali",
+    "persian",
+    "farsi",
+    "nlp",
+    "date-parsing",
+    "finglish",
+    "calendar"
+  ],
+  "homepage": "https://yanovian.github.io/jalali-js/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanovian/jalali-js.git",
+    "directory": "packages/nlp"
+  },
   "type": "module",
   "license": "MIT",
   "author": "Yanovian LLC",
