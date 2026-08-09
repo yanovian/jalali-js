@@ -4,9 +4,10 @@ See [alternatives.md](./alternatives.md) for the vision and the comparison
 with other libraries. See [architecture.md](./architecture.md) for the design
 behind these decisions. This file shows only the status of each phase.
 
-Phases 0-11 are done. What's left is listed under "Later, not yet scheduled"
-below, plus the publishing step `_docs/release-checklist.md` deliberately
-leaves undone. Change an item to `[x]` as it lands.
+Phases 0-11 are done. Phases 12-13 are scheduled but not started. What's left
+after those is listed under "Later, not yet scheduled" below, plus the
+publishing step `_docs/release-checklist.md` deliberately leaves undone.
+Change an item to `[x]` as it lands.
 
 ## Phase 0: Repo scaffolding and tooling
 
@@ -602,19 +603,69 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
       irreversible, public action belongs to whoever owns that decision,
       made on purpose, not as a side effect of finishing a checklist.
 
+## Phase 12: Additional locales (`packages/i18n`, `packages/nlp`)
+
+- [ ] Confirm the next locale to add (proposed: Pashto, `ps`). Afghanistan
+      is the other country that uses the Jalali/Solar Hijri calendar
+      officially, alongside Iran, and Pashto is one of its two official
+      languages; Dari, its other official language, is a national standard
+      of Persian itself and already close enough to `fa` that a dedicated
+      pack is lower priority. The team confirms this at the start of the
+      phase.
+- [ ] Add the new `LocalePack`: month names for both calendar systems,
+      weekday names, native digits, and text direction. Follow `fa.ts`'s
+      existing pattern (see architecture.md's "Internationalization").
+- [ ] Add unit tests for the new locale pack, mirroring `en`/`fa`'s
+      existing coverage (`format()` across styles, the weekday prefix,
+      numeral rendering).
+- [ ] Wire the new locale into `@jalali-js/react` and `@jalali-js/vue`'s
+      `LocaleCode` type and `localePackFor()`.
+- [ ] Optional, separate from the i18n locale pack itself: add
+      `@jalali-js/nlp` phrase support for the new locale (`NlpLocale`, a
+      new `WordList`), if the phrase set is well understood enough to
+      write correctly. A locale pack (display only) ships either way,
+      independent of NLP support.
+- [ ] Add the new locale to the visual e2e matrix (Phase 10) and the docs
+      site's i18n guide.
+- [ ] Write up how to add a locale from scratch, in the i18n guide, as a
+      real contribution guide: a `LocalePack` is already a plain exported
+      interface with no other code to change, but that fact is currently
+      only implicit (a sentence in `guide/i18n.md`), not walked through.
+
+## Phase 13: Astronomical conversion engine (`packages/core`)
+
+- [ ] First, the cheap check: add a minimal fake `CalendarEngine`
+      implementation (a calendar with a deliberately irregular
+      month-length rule), exercised only in `packages/core`'s own test
+      suite, confirming the interface has no hidden Jalali/Gregorian-shaped
+      assumption before investing in a real second engine. See
+      architecture.md's "Calendar systems in scope" for why this replaces
+      a full second calendar system as the interface's generalizability
+      proof.
+- [ ] Implement the astronomical engine: the true vernal equinox instant at
+      the Tehran meridian, from a validated solar-position algorithm (Jean
+      Meeus's _Astronomical Algorithms_' low-precision solar position
+      method is the standard, implementable reference for this; a full
+      VSOP87 implementation is out of scope for the precision this needs).
+      Nowruz (the Jalali new year) is the Gregorian calendar day the
+      equinox instant falls on, at that meridian.
+- [ ] Expose it as an opt-in `CalendarEngine`, alongside the existing
+      arithmetic default, with no change to the rest of the public API:
+      `createCalendar({ system: 'jalali', engine: 'astronomical' })` (exact
+      option shape TBD at implementation time).
+- [ ] Add tests: agreement with the arithmetic engine across the range
+      where they should already agree (the range the arithmetic rule is
+      already validated against, per Phase 1), and explicit checks at the
+      edges where they might diverge (far future/past years), against
+      published astronomical reference data, not only against each other.
+- [ ] Document the tradeoff (slower, needs real solar-position math, only
+      matters for correctness many centuries out) and when to reach for
+      it, in architecture.md and the docs site's core-concepts guide.
+
 ## Later, not yet scheduled
 
-- A minimal fake `CalendarEngine` implementation, exercised only in
-  `packages/core`'s own test suite, to confirm the interface generalizes
-  beyond Jalali and Gregorian without shipping and maintaining a real
-  second calendar system (see architecture.md's "Calendar systems in
-  scope" for why a full second calendar, previously planned as its own
-  phase, was cut instead).
 - Any other calendar system (ISO week-date, Hebrew, or otherwise), added
   only if real user demand appears. Not a committed phase: `jalali-js` is
   named after, and scoped to, the Jalali calendar; Gregorian is in scope
   only because the storage-value contract structurally needs it, not
   because more calendars are a goal on their own.
-- More locales beyond `en` and `fa`.
-- An astronomical (vernal-equinox-based) conversion engine, as an opt-in
-  next to the arithmetic default.

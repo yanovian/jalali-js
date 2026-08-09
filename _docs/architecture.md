@@ -48,13 +48,19 @@ dependency, and its accuracy is well documented for the range a real
 application hits. The conversion engine sits behind a small internal
 interface, `CalendarEngine`. This interface lets the team add an
 astronomical engine later, as an opt-in for a use case that needs correctness
-across thousands of years, with no change to the public API. It also means
-`jalali-js`/`gregorian.ts` do not hard-code assumptions the interface itself
-should not depend on; that generalizability is checked cheaply, with a
-minimal fake `CalendarEngine` implementation in `packages/core`'s own test
-suite (a calendar with, say, a deliberately irregular month-length rule),
-not by committing to build and maintain a real second calendar system (see
-"Calendar systems in scope" above for why that was cut from the plan).
+across thousands of years, with no change to the public API — scheduled as
+Phase 13, not speculative: a real vernal-equinox-at-the-Tehran-meridian
+calculation, from Jean Meeus's low-precision solar position algorithm (a
+full VSOP87 implementation is out of scope for the precision this needs),
+exposed alongside the arithmetic default rather than replacing it. Before
+that real engine, Phase 13 starts with the cheap check first: a minimal
+fake `CalendarEngine` implementation in `packages/core`'s own test suite (a
+calendar with, say, a deliberately irregular month-length rule), confirming
+the interface has no hidden Jalali/Gregorian-shaped assumption before
+investing in the real one. Neither is a second _calendar system_: both
+engines still compute the Jalali calendar, just via two different rules
+(see "Calendar systems in scope" above for why a real second calendar
+system specifically was cut from the plan instead of scheduled).
 
 The team checks correctness with:
 
@@ -254,7 +260,12 @@ in `core`.
   Persian digits (۰ to ۹) against Latin digits, and text direction (`ltr` or
   `rtl`), so a consumer can set the `dir` attribute correctly.
 - The locale pack format lets the team add a third locale later as a data
-  file, with no code change.
+  file, with no code change. Scheduled as Phase 12, not speculative:
+  proposed next is Pashto (`ps`), Afghanistan's other official language
+  alongside Dari (Afghanistan being the other country that uses the
+  Jalali/Solar Hijri calendar officially, besides Iran); Dari itself is a
+  national standard of Persian, close enough to `fa` that a dedicated pack
+  is lower priority than Pashto.
 
 ## Natural language date parsing
 
