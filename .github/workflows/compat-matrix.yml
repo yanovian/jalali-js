@@ -220,9 +220,9 @@ jobs:
 
             const marker = '<!-- compat-matrix-comment -->';
             let body = `${marker}\n## Compatibility matrix smoke screenshots\n\n`;
-            body += 'One render per supported framework major version (chromium only; this is a smoke check for broken rendering, not a pixel diff — see the "Visual e2e results" comment for that).\n\n';
+            body += 'One render per supported framework major version (chromium only; this is a smoke check for broken rendering, not a pixel diff. See the "Visual e2e results" comment for that).\n\n';
             for (const [slug, [app, label]] of Object.entries(captions)) {
-              body += `#### ${app} — ${label}\n\n![${slug}](${rawBase}/${slug}.png)\n\n`;
+              body += `#### ${app}, ${label}\n\n![${slug}](${rawBase}/${slug}.png)\n\n`;
             }
 
             const { data: comments } = await github.rest.issues.listComments({

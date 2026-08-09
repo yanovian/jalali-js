@@ -1,7 +1,7 @@
 name: Update visual baselines
 
 # Manual only: a maintainer runs this (pick the branch to run it from in the "Run workflow"
-# dialog — typically a PR's own branch, once its screenshot diff in the e2e.yml PR comment has
+# dialog, typically a PR's own branch, once its screenshot diff in the e2e.yml PR comment has
 # been reviewed and accepted) to make that branch's current renders the new baseline everyone
 # else diffs against. Regenerates every screenshot from scratch across all three browsers and
 # force-replaces the orphan `visual-baselines` branch with the result: baselines keep no

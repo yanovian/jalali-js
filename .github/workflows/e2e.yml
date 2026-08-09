@@ -157,10 +157,10 @@ jobs:
               body += '\n### Changed screenshots\n\n';
               body += 'Each row is one screenshot test. **Baseline** is the currently accepted image; **new** is what this PR renders; **diff** highlights the pixels that changed. If this change is intentional, run `update-visual-baselines.yml` from this branch to accept it.\n\n';
               for (const shot of manifest.changed) {
-                // Explicit app/section/browser caption per image, not a bare filename: a
-                // reviewer scanning the comment should never have to guess what they're
+                // Explicit app/section/browser caption per image, not a bare filename. A
+                // reviewer scanning the comment should never have to guess what they are
                 // looking at.
-                body += `#### ${shot.app} — ${shot.test} — ${shot.browser}\n\n`;
+                body += `#### ${shot.app}, ${shot.test}, ${shot.browser}\n\n`;
                 if (shot.hasBaseline) {
                   body += `| Baseline | New | Diff |\n| --- | --- | --- |\n`;
                   body += `| ![baseline](${rawBase}/${shot.baselineFileName}) | ![new](${rawBase}/${shot.newFileName}) | ${shot.diffFileName ? `![diff](${rawBase}/${shot.diffFileName})` : '_n/a_'} |\n\n`;

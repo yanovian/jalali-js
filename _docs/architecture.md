@@ -48,8 +48,8 @@ dependency, and its accuracy is well documented for the range a real
 application hits. The conversion engine sits behind a small internal
 interface, `CalendarEngine`. This interface lets the team add an
 astronomical engine later, as an opt-in for a use case that needs correctness
-across thousands of years, with no change to the public API — scheduled as
-Phase 13, not speculative: a real vernal-equinox-at-the-Tehran-meridian
+across thousands of years, with no change to the public API. This is
+scheduled as Phase 13, not speculative: a real vernal-equinox-at-the-Tehran-meridian
 calculation, from Jean Meeus's low-precision solar position algorithm (a
 full VSOP87 implementation is out of scope for the precision this needs),
 exposed alongside the arithmetic default rather than replacing it. Before
@@ -373,7 +373,7 @@ composing themes.
 ## Documentation site (Phase 11)
 
 `apps/docs`, VitePress (the "Docs site framework" open decision, settled: lightweight,
-Vue-based, and enough for API docs plus playground embeds — see "Open decisions" below). Guide
+Vue-based, and enough for API docs plus playground embeds, see "Open decisions" below). Guide
 pages (`guide/*.md`) are hand-written and checked against real source before being written, not
 from memory: `createCalendar()`'s actual overloads, `DatePicker`'s actual props, `parse()`'s
 actual supported phrases, and so on. The API reference (`/api/`) is generated, not hand-written,
@@ -390,8 +390,8 @@ confirmed directly by trying the packages run with `vue` included and reading th
 `TS2307: Cannot find module './Calendar.vue'` errors, not assumed. `@jalali-js/vue`'s
 plain-TypeScript composables (`useCalendar`, `useResolvedTimeZone`) still convert fine on their
 own, in a second TypeDoc run scoped via `tsconfig.vue-api.json`'s `files` list (not `include`),
-so the whole package's `src/` — which still contains the unparseable `.vue` re-exports in
-`index.ts` — never enters the TypeScript program at all. The `.vue` component APIs themselves
+so the whole package's `src/`, which still contains the unparseable `.vue` re-exports in
+`index.ts`, never enters the TypeScript program at all. The `.vue` component APIs themselves
 (`Calendar`, `DatePicker`, `DropdownDateFields`, `RangePicker`, `InlineCalendar`) are
 hand-documented on `guide/vue.md` instead, the same way the wider Vue ecosystem documents SFC
 component APIs (VueUse, Vuetify): there is no robust, general TypeDoc-for-SFCs tool to reach
@@ -513,14 +513,14 @@ matches.
 **The PR comment itself** (`e2e.yml`'s `comment` job) does not show every
 screenshot on every run: `scripts/visual-comment.mjs` reads each browser
 job's Playwright JSON report (`reporter: [..., ['json', { outputFile:
-'test-results/results.json' }]]`) — the only reporter that gives
+'test-results/results.json' }]]`), the only reporter that gives
 structured, per-test attachment paths and pass/fail status; scanning
 `test-results/`'s directory-naming convention directly was considered and
 rejected as more fragile. A **passing** screenshot test has no attachment
 at all in that JSON (nothing changed, nothing to report), so only
 **changed** screenshots get images in the comment; everything else is a
 `{passed, failed}` count per browser. Every image in the comment is
-captioned with `{app} — {test name} — {browser}` directly above it (not a
+captioned with `{app}, {test name}, {browser}` directly above it (not a
 bare filename or an uncaptioned grid), and a changed screenshot shows
 baseline/new/diff side by side in one table row. `compat-matrix.yml`'s
 smoke screenshots get their own, separate PR comment (`<!--
@@ -580,14 +580,14 @@ two checks are.
   `v*.*.*`, the same trigger shape as `yanovian/chrome-ext-tabby`'s own
   `release.yml`: `make check`'s component steps
   (typecheck/lint/format-check/test), then `changesets/action@v1` in
-  publish-only mode (`publish: pnpm release`, no `version:` input — the tag
+  publish-only mode (`publish: pnpm release`, no `version:` input, since the tag
   already carries committed, bumped versions, so there is nothing left to
   "version," only to publish). `pnpm release` is `pnpm build && changeset
 publish`, which publishes every package whose current `package.json`
   version isn't already on npm. `changesets/action`'s `createGithubReleases`
   option (on by default) then creates the GitHub release: one release
   **per published package**, each with that package's own `CHANGELOG.md`
-  entry for the version just published as its body — confirmed directly
+  entry for the version just published as its body. Confirmed directly
   from the action's own source (`src/run.ts`, `maintenance/v1` branch:
   `body: changelogEntry.content`, read from `pkg.dir`'s changelog). This
   replaced two earlier drafts: the first used Changesets' own two-phase
@@ -982,9 +982,9 @@ CI/CD pipeline section above), on this repo's own cadence rather than
 copying another repo's schedule verbatim. Two more are settled as of Phase
 10 and Phase 11 respectively: where to host PR screenshots (an orphan
 branch, `visual-snapshots`, plus a second orphan branch,
-`visual-baselines`, for the diff baselines themselves — see "Visual
+`visual-baselines`, for the diff baselines themselves. See "Visual
 regression and PR screenshots" above) and the docs site framework
-(VitePress — see "Documentation site" above). The decision below is still
+(VitePress. See "Documentation site" above). The decision below is still
 open.
 
 | #   | Decision             | Proposed default                                                                     |

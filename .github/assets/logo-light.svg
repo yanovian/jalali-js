@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 100" width="460" height="100" role="img" aria-label="jalali-js">
+  <defs>
+    <linearGradient id="jalaliMarkGradLight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e1b4b" />
+      <stop offset="1" stop-color="#312e81" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(0,6)">
+    <rect x="20" y="-6" width="8" height="18" rx="4" fill="#c9a961" opacity="0.9" />
+    <rect x="60" y="-6" width="8" height="18" rx="4" fill="#c9a961" opacity="0.9" />
+    <rect x="0" y="0" width="88" height="88" rx="18" fill="url(#jalaliMarkGradLight)" />
+    <rect x="0" y="0" width="88" height="88" rx="18" fill="none" stroke="#c9a961" stroke-opacity="0.35" stroke-width="1.5" />
+    <text x="44" y="63" text-anchor="middle" font-family="'Noto Naskh Arabic','Segoe UI',Tahoma,Arial,sans-serif" font-size="44" font-weight="700" fill="#c9a961">ج</text>
+  </g>
+
+  <text x="110" y="64" font-family="ui-sans-serif,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="42" font-weight="700">
+    <tspan fill="#1e1b4b">jalali</tspan><tspan fill="#a9812f">-js</tspan>
+  </text>
+</svg>
