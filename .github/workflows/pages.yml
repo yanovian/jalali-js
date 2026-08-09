@@ -40,12 +40,9 @@ jobs:
         run: make install-frozen
 
       - name: Build and embed the playgrounds
-        # Must run before "Build docs" below: this places both playground apps under
-        # apps/docs/public/, and VitePress's own build copies public/ into dist/ automatically,
-        # the same mechanism that makes them work under `make docs-dev`/`docs-preview` locally
-        # too. playground-next and playground-nuxt are SSR apps; GitHub Pages is static-only, so
-        # they stay CI-only verification apps (ci.yml, compat-matrix.yml, e2e.yml already cover
-        # them) rather than customer-facing demos here.
+        # Must run before "Build docs": places both apps under apps/docs/public/, which
+        # VitePress's own build copies into dist/. playground-next/-nuxt are SSR, so they stay
+        # CI-only (ci.yml, compat-matrix.yml, e2e.yml), not deployed here.
         run: make embed-playgrounds
 
       - name: Build docs (API reference generation runs first automatically)
