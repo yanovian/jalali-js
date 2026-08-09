@@ -3,6 +3,11 @@
   // tsconfig.json (extending tsconfig.base.json) and is added here as a reference once it
   // exists. The "typecheck" script does not run this file directly; it delegates to each
   // package's own typecheck script instead, so it works with zero packages too.
+  //
+  // apps/playground-nuxt is deliberately NOT listed: its tsconfig.json extends
+  // ./.nuxt/tsconfig.json (Nuxt's own generated file, absent on a fresh checkout), and Vite 8's
+  // Vue transform follows every reference in this file, so building playground-vue failed
+  // trying to resolve playground-nuxt's tsconfig despite the two having no real dependency.
   "files": [],
   "references": [
     { "path": "packages/core" },
@@ -14,7 +19,6 @@
     { "path": "packages/ui-vue" },
     { "path": "apps/playground-react" },
     { "path": "apps/playground-next" },
-    { "path": "apps/playground-vue" },
-    { "path": "apps/playground-nuxt" }
+    { "path": "apps/playground-vue" }
   ]
 }
