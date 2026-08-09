@@ -2,7 +2,17 @@
   "$schema": "https://unpkg.com/@changesets/config@3.1.4/schema.json",
   "changelog": ["@changesets/changelog-github", { "repo": "yanovian/jalali-js" }],
   "commit": false,
-  "fixed": [],
+  "fixed": [
+    [
+      "jalali-js",
+      "@jalali-js/i18n",
+      "@jalali-js/nlp",
+      "@jalali-js/react",
+      "@jalali-js/vue",
+      "@jalali-js/ui-react",
+      "@jalali-js/ui-vue"
+    ]
+  ],
   "linked": [],
   "access": "public",
   "baseBranch": "master",
