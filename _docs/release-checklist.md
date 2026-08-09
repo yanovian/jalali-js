@@ -69,7 +69,12 @@ setting). This document does not publish anything by itself. Publishing happens 
 - [ ] **`NPM_TOKEN` repo secret exists. UNVERIFIED.** `gh secret list` fails (invalid token in
       this environment). Check Settings, then Secrets and variables, then Actions.
 - [ ] **`PAT_TOKEN` repo secret exists. UNVERIFIED.** Same tool, same failure. Check the same
-      Settings page.
+      Settings page. Needed by `update-dependencies-*.yml` and by
+      `update-visual-baselines.yml`'s push to `visual-baselines`, if that branch has ruleset
+      protection with a force-push bypass list: GitHub does not expose the default
+      `GITHUB_TOKEN`'s bot identity as a selectable bypass actor there, only real users, teams,
+      and installed Apps, so `PAT_TOKEN`'s owning account needs to be the one added to that
+      list.
 - [ ] **GitHub Pages is enabled. UNVERIFIED.** `gh api repos/yanovian/jalali-js/pages` returned
       `401 Bad credentials`. Check Settings, then Pages, directly.
 - [ ] **The `@jalali-js` npm org exists, and this identity can publish to it. UNVERIFIED.**

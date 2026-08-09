@@ -390,26 +390,25 @@ check`, bump, commit, tag, and push with `--follow-tags`, all locally,
       happened: `HEAD` already tagged means nothing to release, and a
       package already on npm at that version gets skipped, not
       re-published.
-
-      This went through two earlier designs before landing here, both
-          worth recording since they were real, considered trade-offs, not
-          just discarded drafts. The first used Changesets, since this repo
-          has 7 independently-nameable packages, and Changesets is the
-          standard tool for that; `changesets/action@v1` handled npm
-          publishing and, in one revision, per-package GitHub releases
-          sourced from each package's own `CHANGELOG.md`. That broke down for
-          a reason worth stating plainly: `@changesets/changelog-github`
-          (later swapped for the git-only `@changesets/cli/changelog`) needed
-          a `GITHUB_TOKEN` to generate changelogs locally, and a maintainer
-          release run failed on exactly that, with no way to create one
-          without a personal access token they were not able to use. Once
-          forced to remove that dependency, the actual value Changesets added
-          over plain `pnpm version` shrank to "independent per-package
-          version numbers," a feature this repo does not use: every package
-          here already always ships together, at the same number, so nothing
-          was actually lost moving to the simpler mechanism, and one more
-          dependency, the `.changeset/` directory, and a hand-written
-          changeset-generation script all went away with it.
+- [x] This went through two earlier designs before landing here, both
+      worth recording since they were real, considered trade-offs, not
+      just discarded drafts. The first used Changesets, since this repo
+      has 7 independently-nameable packages, and Changesets is the
+      standard tool for that; `changesets/action@v1` handled npm
+      publishing and, in one revision, per-package GitHub releases
+      sourced from each package's own `CHANGELOG.md`. That broke down for
+      a reason worth stating plainly: `@changesets/changelog-github`
+      (later swapped for the git-only `@changesets/cli/changelog`) needed
+      a `GITHUB_TOKEN` to generate changelogs locally, and a maintainer
+      release run failed on exactly that, with no way to create one
+      without a personal access token they were not able to use. Once
+      forced to remove that dependency, the actual value Changesets added
+      over plain `pnpm version` shrank to "independent per-package
+      version numbers," a feature this repo does not use: every package
+      here already always ships together, at the same number, so nothing
+      was actually lost moving to the simpler mechanism, and one more
+      dependency, the `.changeset/` directory, and a hand-written
+      changeset-generation script all went away with it.
 
 ## Phase 9: Expand continuous integration
 
