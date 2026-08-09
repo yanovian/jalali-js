@@ -13,7 +13,7 @@
   --jalali-font-size: 1rem;
   --jalali-bg: #ffffff;
   --jalali-fg: #1a1a1a;
-  --jalali-muted-fg: #767676;
+  --jalali-muted-fg: #6b6b6b;
   --jalali-border: #d9d9d9;
   --jalali-radius: 8px;
   --jalali-primary: #2563eb;
@@ -22,13 +22,38 @@
   --jalali-gap: 2px;
   --jalali-input-padding: 0.5em 0.75em;
   --jalali-popover-padding: 0.75em;
-  --jalali-day-min-size: 2em;
+  --jalali-day-min-size: 2.25em;
 
   font-family: var(--jalali-font);
   font-size: var(--jalali-font-size);
   color: var(--jalali-fg);
   position: relative;
   display: inline-block;
+  max-width: 100%;
+}
+
+/* Buttons should read as buttons: no drag-to-select text, no iOS press-and-hold callout. */
+[data-jalali-datepicker-input],
+[data-jalali-calendar-nav],
+button[data-jalali-calendar-title-month],
+button[data-jalali-calendar-title-year],
+[data-jalali-calendar-day],
+[data-jalali-calendar-month],
+[data-jalali-calendar-year] {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+[data-jalali-datepicker-input]:focus-visible,
+[data-jalali-calendar-nav]:focus-visible,
+button[data-jalali-calendar-title-month]:focus-visible,
+button[data-jalali-calendar-title-year]:focus-visible,
+[data-jalali-calendar-day]:focus-visible,
+[data-jalali-calendar-month]:focus-visible,
+[data-jalali-calendar-year]:focus-visible {
+  outline: 2px solid var(--jalali-primary);
+  outline-offset: 1px;
 }
 
 [data-jalali-datepicker-input] {
@@ -42,9 +67,13 @@
   cursor: pointer;
 }
 
-[data-jalali-datepicker-input]:focus-visible {
-  outline: 2px solid var(--jalali-primary);
-  outline-offset: 1px;
+[data-jalali-datepicker-input]:hover {
+  border-color: var(--jalali-primary);
+}
+
+[data-jalali-datepicker-input]::placeholder {
+  color: var(--jalali-muted-fg);
+  opacity: 1;
 }
 
 [data-jalali-datepicker-popover] {
@@ -56,6 +85,8 @@
   border-radius: var(--jalali-radius);
   box-shadow: var(--jalali-shadow);
   padding: var(--jalali-popover-padding);
+  max-width: calc(100vw - 2rem);
+  overflow-x: auto;
 }
 
 [data-jalali-calendar-header] {
@@ -221,4 +252,39 @@ button[data-jalali-calendar-title-year]:hover {
   border: 1px solid var(--jalali-border);
   border-radius: var(--jalali-radius);
   padding: 0.5em;
+  cursor: pointer;
+}
+
+[data-jalali-datepicker-field]:hover {
+  border-color: var(--jalali-primary);
+}
+
+[data-jalali-datepicker-field]:focus-visible {
+  outline: 2px solid var(--jalali-primary);
+  outline-offset: 1px;
+}
+
+/* pointer: coarse (touch) gets bigger tap targets than a mouse needs. Day cells only grow
+   taller, not wider: 7 columns already fill a phone-width popover, so widening them further
+   would overflow it; a taller row still gives a real, measurably bigger tap area. Placed last
+   so it wins the cascade against the equal-specificity rules above it overrides. */
+@media (pointer: coarse) {
+  [data-jalali-datepicker-root],
+  [data-jalali-datepicker-dropdown],
+  [data-jalali-calendar-root] {
+    --jalali-gap: 4px;
+  }
+
+  [data-jalali-calendar-nav],
+  button[data-jalali-calendar-title-month],
+  button[data-jalali-calendar-title-year],
+  [data-jalali-datepicker-field] {
+    min-width: 2.75em;
+    min-height: 2.75em;
+  }
+
+  [data-jalali-calendar-day] {
+    aspect-ratio: auto;
+    min-height: 2.75em;
+  }
 }
