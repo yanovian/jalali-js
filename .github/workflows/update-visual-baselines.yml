@@ -1,14 +1,19 @@
 name: Update visual baselines
 
-# Manual only: a maintainer runs this (pick the branch to run it from in the "Run workflow"
-# dialog, typically a PR's own branch, once its screenshot diff in the e2e.yml PR comment has
-# been reviewed and accepted) to make that branch's current renders the new baseline everyone
-# else diffs against. Regenerates every screenshot from scratch across all three browsers and
-# force-replaces the orphan `visual-baselines` branch with the result: baselines keep no
-# history of their own on purpose (only the current one is ever meaningful for diffing), unlike
-# `visual-snapshots`, which accumulates per-PR so old PR comments keep working.
+# Runs automatically on every push to master, so baselines never need a human to keep them
+# current. A pull request already gets full review, including its screenshot diff in the
+# e2e.yml PR comment, before it can merge. Once it merges, master's new render is by definition
+# the accepted one, so this job regenerates every screenshot from scratch across all three
+# browsers and force-replaces the orphan `visual-baselines` branch with the result. Baselines
+# keep no history of their own on purpose (only the current one is ever meaningful for
+# diffing), unlike `visual-snapshots`, which accumulates per-PR so old PR comments keep
+# working. `workflow_dispatch` stays available too, for the one-time bootstrap on a repo with
+# no `visual-baselines` branch yet, or to force a re-baseline with no code change (for example,
+# after a Playwright or browser engine upgrade shifts font rendering).
 
 on:
+  push:
+    branches: [master]
   workflow_dispatch:
 
 permissions:

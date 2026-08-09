@@ -109,8 +109,11 @@ Everything checkable from this environment passes. Two things are not yet confir
 worth resolving first:
 
 1. **No visual-baseline branch exists yet.** `visual-baselines` and `visual-snapshots` are both
-   absent from `origin`. Run `update-visual-baselines.yml` once, before or shortly after this
-   release, so `e2e.yml` has a real baseline to diff against on the next PR.
+   absent from `origin`. `update-visual-baselines.yml` now runs automatically on every push to
+   `master` (fixed in this pass: it used to be a manual `workflow_dispatch` step that nobody had
+   ever run), so the next merge to `master` creates the branch on its own. To get a baseline in
+   place sooner, without waiting for a merge, run `update-visual-baselines.yml` once by hand
+   (`workflow_dispatch` still works) so `e2e.yml` has something to diff against right away.
 2. **Four operational items are unverified.** They are not confirmed wrong, only unchecked: this
    environment's `gh` and `npm` credentials are both invalid. Confirm the `NPM_TOKEN` and
    `PAT_TOKEN` secrets, GitHub Pages being enabled, and `@jalali-js` npm org access, from a

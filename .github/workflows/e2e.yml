@@ -1,10 +1,12 @@
 name: E2E visual tests
 
 # Baselines for `toHaveScreenshot()` are not committed to `master` (see .gitignore and
-# architecture.md's "Visual regression and PR screenshots"): they live on the orphan
-# `visual-baselines` branch and are restored into place before each run. A repo with no
-# `visual-baselines` branch yet (before this workflow's first-ever bootstrap) fails every
-# screenshot test until a maintainer runs update-visual-baselines.yml once.
+# architecture.md's "Visual regression and PR screenshots"). They live on the orphan
+# `visual-baselines` branch and get restored into place before each run.
+# update-visual-baselines.yml keeps that branch current automatically, on every push to
+# master, so no maintainer has to remember to run it. A repo with no `visual-baselines` branch
+# yet (before that workflow's first-ever run) fails every screenshot test until it has run at
+# least once.
 
 on:
   pull_request:

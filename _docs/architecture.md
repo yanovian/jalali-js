@@ -500,15 +500,27 @@ e2e/`); a repo with no `visual-baselines` branch yet fails every
   grow. Pruning merged/closed PRs' subdirectories is a reasonable future
   addition, not built here.
 
-**Accepting a visual change** (Phase 10's "baseline diff check... passes
-when the PR updates the baseline"): a maintainer runs
-`update-visual-baselines.yml` (`workflow_dispatch` only, picking the PR's
-branch as the ref to run from in GitHub's UI) once they have reviewed the
-diff in the PR comment and are satisfied it is intentional. It regenerates
-every screenshot from scratch (`playwright test --update-snapshots`,
-all three browsers) and force-replaces `visual-baselines` with the result;
-the next `e2e.yml` run on that PR then passes, since the new baseline now
-matches.
+**Accepting a visual change.** `update-visual-baselines.yml` runs
+automatically on every push to `master`, so no maintainer ever has to run
+it by hand. It regenerates every screenshot from scratch
+(`playwright test --update-snapshots`, all three browsers) and
+force-replaces `visual-baselines` with the result. A `workflow_dispatch`
+trigger stays available too, for the one-time bootstrap on a repo with no
+`visual-baselines` branch yet, or to force a re-baseline with no code
+change.
+
+This means a PR that intentionally changes rendering keeps showing
+"changed" screenshots in its `e2e.yml` comment for as long as it stays
+open: the baseline only catches up after merge, not before. That is by
+design, not a gap to close. A changed screenshot is not the same claim as
+a broken build; it means "a human should look at this," the same role a
+code diff plays in review. The reviewer looks at the baseline, new, and
+diff images in the PR comment and decides whether the change is
+intentional, then approves and merges on that judgment. `e2e.yml` is not
+wired up as a required, merge-blocking status check for this reason: a
+PR that touches no rendering-affecting code still gets a clean pass,
+since the baseline already matches, but a PR that does change rendering
+is expected to show a diff until it merges.
 
 **The PR comment itself** (`e2e.yml`'s `comment` job) does not show every
 screenshot on every run: `scripts/visual-comment.mjs` reads each browser

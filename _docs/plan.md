@@ -543,29 +543,35 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
       report and picks one image per **changed** screenshot test only (a
       passing test has no attachment in that report at all, so there is
       nothing to show for it beyond a pass count); every image is
-      captioned `{app} — {test name} — {browser}` directly above it, with
+      captioned `{app}, {test name}, {browser}` directly above it, with
       baseline/new/diff shown side by side for a real change. Verified
       against a real forced pixel diff, not just read: copied a different
       baseline over one screenshot, confirmed `toHaveScreenshot()` failed
       with real attachments, and confirmed the script produced correctly
       captioned, correctly copied images before restoring the baseline.
-- [x] Add a baseline diff check that fails the build on an unacknowledged
-      visual change, and passes when the PR updates the baseline with the
-      change. Baselines are not committed to `master` at all (`.gitignore`
+- [x] Add a baseline diff check that surfaces an unacknowledged visual
+      change for review, and catches up automatically once that change
+      merges. Baselines are not committed to `master` at all (`.gitignore`
       excludes `e2e/**/*-snapshots/`, `test-results/`, `playwright-report/`,
       the same "no binary images in `master`'s history" reasoning that
-      already applied to PR-run screenshots): they live on their own
+      already applied to PR-run screenshots). They live on their own
       orphan `visual-baselines` branch, force-pushed as a single commit
       each time (no history kept; only the current baseline is ever
-      meaningful), restored into place before each `e2e.yml` run. "The PR
-      updates the baseline" means a maintainer runs the new
-      `update-visual-baselines.yml` (`workflow_dispatch`, run from the
-      PR's branch) once they have reviewed the diff in the PR comment;
-      that regenerates every screenshot and force-replaces
-      `visual-baselines`, after which `e2e.yml` passes on that PR. A repo
-      with no `visual-baselines` branch yet fails every screenshot test
-      until a maintainer runs this once, an expected one-time bootstrap
-      step, not a bug.
+      meaningful), restored into place before each `e2e.yml` run. Revised
+      after Phase 11 from a manual design: `update-visual-baselines.yml`
+      first shipped as `workflow_dispatch` only, run by hand from a PR's
+      branch once a maintainer had reviewed its diff comment. That manual
+      step was never actually run, so the repo shipped Phase 11 with no
+      working baseline at all. Fixed by triggering the same workflow on
+      every push to `master` instead, so it keeps `visual-baselines`
+      current with zero manual steps. A PR that intentionally changes
+      rendering keeps showing "changed" screenshots for as long as it
+      stays open; the baseline only catches up after merge. That is
+      expected: the reviewer's job is to look at the diff images in the
+      PR comment and merge on that judgment, the same as any other code
+      review, not to chase a green check first. `workflow_dispatch` still
+      stays available too, for the one-time bootstrap on a repo with no
+      `visual-baselines` branch yet.
 - [x] Found and fixed a real bug while building this: an opened calendar
       popover is `position: absolute` and pokes outside its parent
       section's own box, so screenshotting the section clipped the
@@ -621,8 +627,8 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
       writing it: the root `README.md` still said "Phase 0 done, calendar
       logic not started," badly stale against the repo's actual state; and
       none of the 7 publishable packages had their own `README.md` (npm's
-      registry page reads a package's own README, not the repo root's) —
-      all 7 now have one. Publishing itself (adding a `patch`-bump
+      registry page reads a package's own README, not the repo root's).
+      All 7 now have one. Publishing itself (adding a `patch`-bump
       changeset per package, then `make tag-release TAG=v0.0.1`) is
       deliberately not done as part of this phase: a real, irreversible,
       public action belongs to whoever owns that decision, made on
