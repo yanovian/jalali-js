@@ -10,8 +10,13 @@
 // does not have to restate them by hand. Merge and bot commits (past "Version Packages" and
 // "Add release changeset" runs) are filtered out, since they describe this release process
 // itself, not what shipped.
+//
+// Idempotent by design, since `make release-patch` (and `-minor`/`-major`) is meant to be safe
+// to run again by mistake: if a changeset is already pending, or HEAD is already tagged with
+// nothing new since, this exits 0 without writing anything, instead of duplicating a changeset
+// or starting an unwanted second release.
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const args = Object.fromEntries(
@@ -51,9 +56,36 @@ function messageFromCommitLog() {
   return subjects.length > 0 ? subjects.map((line) => `- ${line}`).join('\n') : 'Release.';
 }
 
+const rootDir = fileURLToPath(new URL('..', import.meta.url));
+
+function hasPendingChangeset() {
+  return readdirSync(`${rootDir}/.changeset`).some(
+    (name) => name.endsWith('.md') && name !== 'README.md',
+  );
+}
+
+function headAlreadyTagged() {
+  try {
+    execFileSync('git', ['describe', '--tags', '--exact-match', 'HEAD'], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+if (hasPendingChangeset()) {
+  console.log(
+    'A changeset is already pending; not writing another. Run `make tag-release` to continue that release.',
+  );
+  process.exit(0);
+}
+if (headAlreadyTagged()) {
+  console.log('HEAD is already tagged and nothing has changed since; nothing to release.');
+  process.exit(0);
+}
+
 const message = args.message || messageFromCommitLog();
 
-const rootDir = fileURLToPath(new URL('..', import.meta.url));
 const config = JSON.parse(readFileSync(`${rootDir}/.changeset/config.json`, 'utf8'));
 const [fixedGroup] = config.fixed;
 if (!fixedGroup || fixedGroup.length === 0) {

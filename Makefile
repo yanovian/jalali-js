@@ -1,8 +1,8 @@
 .PHONY: help install install-frozen dev build build-packages build-apps build-docs typecheck \
 	lint lint-fix format format-check test test-watch test-e2e test-e2e-project \
-	install-playwright check clean probe-treeshake size changeset release tag-release \
-	release-patch release-minor release-major _release-cut app-typecheck app-build \
-	app-build-at-base test-paths docs-dev docs-build docs-preview
+	install-playwright check clean probe-treeshake size tag-release release-patch \
+	release-minor release-major app-typecheck app-build app-build-at-base test-paths \
+	docs-dev docs-build docs-preview
 
 PNPM ?= pnpm
 
@@ -79,42 +79,39 @@ size: ## Check packages/core's bundle-size budget (size-limit)
 	$(PNPM) --filter jalali-js build
 	$(PNPM) size
 
-changeset: ## Record a changeset for the current change (interactive)
-	$(PNPM) exec changeset
-
-release: ## Publish through Changesets (CI-driven; this local target only previews what would release)
-	$(PNPM) exec changeset status
-
-tag-release: check ## Bump versions, commit, tag, and push (triggers release.yml, which publishes): make tag-release [TAG=v0.0.1]
+# Bumps every package under packages/* to the same new version in one call (they always start
+# in sync and always get the same bump type, so they stay in sync with no extra bookkeeping),
+# commits, tags, and pushes. Matches yanovian/chrome-ext-tabby's own release-patch/-minor/-major
+# (`pnpm version <bump>`), extended across multiple packages via `pnpm --filter ... exec`, since
+# plain `pnpm version` only ever bumps one package.json. Safe to run again by mistake: it refuses
+# to start if the tree is dirty, and no-ops cleanly if HEAD is already tagged with nothing new
+# since, rather than cutting an unwanted second release.
+tag-release: check
+	@test -n "$(BUMP)" || (echo "Usage: make tag-release BUMP=patch|minor|major (or use make release-patch/-minor/-major)" && exit 1)
 	@git diff --quiet && git diff --cached --quiet || (echo "Working tree is not clean; commit or stash first." && exit 1)
-	$(PNPM) exec changeset version
-	git add -A
-	git commit -m "Version Packages"
-	@TAG="$(TAG)"; \
-	if [ -z "$$TAG" ]; then TAG="v$$(node -p "require('./packages/core/package.json').version")"; fi; \
-	git tag -a "$$TAG" -m "Release $$TAG"; \
+	@if git describe --tags --exact-match HEAD >/dev/null 2>&1; then \
+	  echo "HEAD is already tagged ($$(git describe --tags --exact-match HEAD)); nothing to release."; \
+	  exit 0; \
+	fi
+	$(PNPM) --filter "./packages/**" exec -- pnpm version $(BUMP) --no-git-tag-version
+	@TAG="v$$(node -p "require('./packages/core/package.json').version")"; \
+	git add -A; \
+	git commit -m "Release $$TAG"; \
+	if git rev-parse -q --verify "refs/tags/$$TAG" >/dev/null; then \
+	  echo "Tag $$TAG already exists; not creating it again."; \
+	else \
+	  git tag -a "$$TAG" -m "Release $$TAG"; \
+	fi; \
 	git push origin HEAD --follow-tags
 
-release-patch: ## Write a changeset (patch bump) for the fixed group, then cut a release: make release-patch [MESSAGE="..."]
-	@$(MAKE) _release-cut BUMP=patch MESSAGE="$(MESSAGE)"
+release-patch: ## Bump every package's patch version, commit, tag, and push (triggers release.yml, which publishes): make release-patch
+	@$(MAKE) tag-release BUMP=patch
 
-release-minor: ## Same as release-patch, minor bump: make release-minor [MESSAGE="..."]
-	@$(MAKE) _release-cut BUMP=minor MESSAGE="$(MESSAGE)"
+release-minor: ## Same as release-patch, minor bump: make release-minor
+	@$(MAKE) tag-release BUMP=minor
 
-release-major: ## Same as release-patch, major bump: make release-major [MESSAGE="..."]
-	@$(MAKE) _release-cut BUMP=major MESSAGE="$(MESSAGE)"
-
-# Shared implementation behind release-patch/-minor/-major (see Makefile section in
-# architecture.md's "Makefile" note): not meant to be run directly, so it carries no ## help
-# text and does not appear in `make help`. MESSAGE and the release tag are both optional: the
-# changeset script fills in MESSAGE from the commit log when it is empty, and tag-release fills
-# in the tag from the version Changesets actually produced, so the two can never disagree.
-_release-cut:
-	@git diff --quiet && git diff --cached --quiet || (echo "Working tree is not clean; commit or stash first." && exit 1)
-	node scripts/write-changeset.mjs --bump=$(BUMP) $(if $(MESSAGE),--message="$(MESSAGE)")
-	git add .changeset
-	git commit -m "Add release changeset"
-	$(MAKE) tag-release
+release-major: ## Same as release-patch, major bump: make release-major
+	@$(MAKE) tag-release BUMP=major
 
 app-typecheck: ## Typecheck one app/package by name (compat-matrix.yml): make app-typecheck APP=playground-react
 	$(PNPM) --filter $(APP) typecheck

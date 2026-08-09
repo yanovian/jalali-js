@@ -98,10 +98,17 @@ check`, `changeset version` (bumps every package to the same new version, writes
    package. Each release body comes from that package's own `CHANGELOG.md` entry.
 
 `@changesets/changelog-github` (the changelog format `changeset version` uses) links each entry
-back to its PR or commit. That needs a GitHub token to avoid API rate limits when run locally
-(`GITHUB_TOKEN` in the environment, or an authenticated `gh` CLI). It is harmless to skip for an
-occasional release, since it only affects link richness in the generated changelog text, not
-whether the release succeeds.
+back to its PR or commit, and needs a `GITHUB_TOKEN` in the environment to do it. This is a hard
+requirement, not an optional nicety: without it, `changeset version` fails outright (confirmed
+directly, not assumed, when a real release attempt hit exactly this). Create one at
+`https://github.com/settings/tokens/new?scopes=read:user,repo:status` (a classic token, those
+two scopes are enough) and `export GITHUB_TOKEN=...` in your shell before running
+`make release-patch`/`-minor`/`-major` or `make tag-release`.
+
+If a release attempt fails at this step, the changeset it already wrote and committed is still
+there; do not re-run `make release-<patch|minor|major>`, since that writes and commits a second
+changeset on top of the first one. Set `GITHUB_TOKEN` and run `make tag-release` directly
+instead, which picks up the changeset that already exists.
 
 This repo has not run any of the steps above. Publishing packages under the
 `jalali-js`/`@jalali-js/*` names to the public npm registry is a real, irreversible, public
