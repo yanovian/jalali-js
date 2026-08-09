@@ -10,7 +10,6 @@
 
 - [ ] `make check` passes (typecheck, lint, format-check, tests)
 - [ ] Added or updated tests for new or changed behavior
-- [ ] Added a changeset (`pnpm changeset`) for a change to a published package
 - [ ] Updated `_docs/plan.md` if this closes a phase item
 
 ## Screenshots

@@ -5,7 +5,7 @@ and PR workflow, and the checks a change must pass.
 
 See [`_docs/plan.md`](_docs/plan.md) for the current phase status,
 [`_docs/architecture.md`](_docs/architecture.md) for the technical design,
-[`_docs/release-checklist.md`](_docs/release-checklist.md) for what "ready for v1.0" means, and
+[`_docs/release-checklist.md`](_docs/release-checklist.md) for what "ready to release" means, and
 [`AGENTS.md`](AGENTS.md) for the writing style used in this repo's docs and
 comments.
 
@@ -48,14 +48,6 @@ so first means fewer surprises at commit time.
 - Add or update tests for any new or changed behavior.
 - Run `make check` before you open a PR. CI runs the same checks and blocks
   a merge on failure.
-- If your change affects a published package, add a changeset:
-
-  ```sh
-  make changeset
-  ```
-
-  Describe the change in plain language. The changeset becomes the package's
-  changelog entry.
 
 ## Commit style
 
