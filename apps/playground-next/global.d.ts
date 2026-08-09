@@ -1,5 +1,3 @@
-// A newer Next.js major ships an ambient declaration for a side-effect CSS import; an older
-// one (still in the compat matrix, see .github/workflows/compat-matrix.yml) does not, and
-// TypeScript then fails app/page.tsx's `import '@jalali-js/react/date-picker.css'`. This
-// declares it directly so typecheck does not depend on which Next major supplies it.
+// Next 15 (still in the compat matrix) ships no ambient CSS-import declaration, unlike a
+// newer major, so typecheck fails app/page.tsx's date-picker.css side-effect import.
 declare module '*.css';
