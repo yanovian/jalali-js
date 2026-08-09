@@ -1,7 +1,7 @@
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { LocaleCode } from '@jalali-js/react';
-import { localePackFor } from '@jalali-js/react';
+import { defaultRangePlaceholder, localePackFor } from '@jalali-js/react';
 import type { CalendarDate, CalendarSystem, StorageValue, ValueFormat } from 'jalali-js';
 import {
   buildCalendarGrid,
@@ -144,7 +144,7 @@ export function RangePicker({
         readOnly
         role="combobox"
         data-jalali-datepicker-input
-        placeholder={placeholder}
+        placeholder={placeholder ?? defaultRangePlaceholder[locale]}
         value={displayText}
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="dialog"

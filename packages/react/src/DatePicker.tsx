@@ -6,7 +6,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Calendar } from './Calendar.js';
 import { DropdownDateFields } from './DropdownDateFields.js';
 import type { LocaleCode } from './use-calendar.js';
-import { localePackFor } from './use-calendar.js';
+import { defaultDatePlaceholder, localePackFor } from './use-calendar.js';
 
 export interface DatePickerProps {
   /** Which calendar system the picker displays and selects in. Default: 'jalali'. */
@@ -105,7 +105,7 @@ export function DatePicker({
         readOnly
         role="combobox"
         data-jalali-datepicker-input
-        placeholder={placeholder}
+        placeholder={placeholder ?? defaultDatePlaceholder[locale]}
         value={formatDate(date, localePack, displayFormat)}
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="dialog"

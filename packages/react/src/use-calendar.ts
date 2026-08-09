@@ -10,6 +10,19 @@ export function localePackFor(locale: LocaleCode): LocalePack {
   return locale === 'fa' ? fa : en;
 }
 
+// A closed DatePicker/RangePicker with nothing selected yet must never show a genuinely blank
+// input: that reads as broken, not as "nothing chosen." `DatePicker` shows today by default so
+// this never applies to it in practice, but `RangePicker` has no natural default range, so it
+// needs a real fallback when a consumer passes no `placeholder` of their own.
+export const defaultDatePlaceholder: Record<LocaleCode, string> = {
+  en: 'Select a date',
+  fa: 'انتخاب تاریخ',
+};
+export const defaultRangePlaceholder: Record<LocaleCode, string> = {
+  en: 'Select a date range',
+  fa: 'انتخاب بازه تاریخ',
+};
+
 export interface UseCalendarOptions {
   /** Which calendar system the hook's date is expressed in. Default: 'jalali'. */
   system?: CalendarSystem;
