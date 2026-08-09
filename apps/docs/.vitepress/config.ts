@@ -1,15 +1,42 @@
 import { defineConfig } from 'vitepress';
 
+// GitHub Pages serves a project site (not a custom domain or a <org>.github.io user page) under
+// /<repo-name>/, not /. If pages.yml ever gains a custom domain (a CNAME file), SITE_URL and
+// `base` below both need to become '/' to match.
+const SITE_URL = 'https://yanovian.github.io/jalali-js/';
+const SITE_DESCRIPTION =
+  'A TypeScript-native Jalali (Persian) calendar toolkit, with first-class React and Vue bindings.';
+
 export default defineConfig({
   title: 'jalali-js',
-  description: 'A TypeScript-native Jalali (Persian) calendar library.',
-  // GitHub Pages serves a project site (not a custom domain or a <org>.github.io user page)
-  // under /<repo-name>/, not /. If pages.yml ever gains a custom domain (a CNAME file), this
-  // needs to become '/' to match.
+  description: SITE_DESCRIPTION,
   base: '/jalali-js/',
   cleanUrls: true,
   srcExclude: ['**/README.md'],
+  // `head` entries are inserted into the page verbatim, not run through VitePress's own `base`
+  // rewriting (unlike `themeConfig.logo` and markdown-referenced assets), so every href below
+  // is written out with the `/jalali-js/` prefix by hand; a root-relative path here would 404
+  // once deployed under the project-site base path.
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/jalali-js/favicon.svg' }],
+    ['link', { rel: 'icon', type: 'image/png', href: '/jalali-js/favicon.png' }],
+    ['link', { rel: 'apple-touch-icon', href: '/jalali-js/apple-touch-icon.png' }],
+    ['meta', { name: 'theme-color', content: '#1e1b4b' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:site_name', content: 'jalali-js' }],
+    ['meta', { property: 'og:title', content: 'jalali-js' }],
+    ['meta', { property: 'og:description', content: SITE_DESCRIPTION }],
+    ['meta', { property: 'og:url', content: SITE_URL }],
+    ['meta', { property: 'og:image', content: `${SITE_URL}og-image.png` }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: 'jalali-js' }],
+    ['meta', { name: 'twitter:description', content: SITE_DESCRIPTION }],
+    ['meta', { name: 'twitter:image', content: `${SITE_URL}og-image.png` }],
+  ],
   themeConfig: {
+    logo: { src: '/favicon.svg', alt: 'jalali-js' },
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API', link: '/api/jalali-js/' },
