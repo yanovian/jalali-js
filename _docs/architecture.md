@@ -361,14 +361,14 @@ composing themes.
 
 ## Testing strategy
 
-| Layer          | Tool                       | What it covers                                                                                                             |
-| -------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Unit           | Vitest                     | Conversion correctness, leap-year rules, formatting, i18n data, NLP parsing                                                |
-| Property-based | fast-check                 | Round-trip checks across a large range of random dates                                                                     |
-| Type-level     | `tsd` or `expect-type`     | The public API types work as documented, for example a precision tier rejects a field it does not have                     |
-| Component      | Vitest and Testing Library | React and Vue binding behavior, tested alone                                                                               |
-| E2E and visual | Playwright                 | A real browser render of all four playground apps, across locale, direction, precision, theme, and browser combinations    |
-| Compatibility  | GitHub Actions matrix      | Each playground app built, typechecked, and tested against every still-supported major version of its underlying framework |
+| Layer          | Tool                       | What it covers                                                                                                              |
+| -------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Unit           | Vitest                     | Conversion correctness, leap-year rules, formatting, i18n data, NLP parsing                                                 |
+| Property-based | fast-check                 | Round-trip checks across a large range of random dates                                                                      |
+| Type-level     | `tsd` or `expect-type`     | The public API types work as documented, for example a precision tier rejects a field it does not have                      |
+| Component      | Vitest and Testing Library | React and Vue binding behavior, tested alone                                                                                |
+| E2E and visual | Playwright                 | A real browser render of all four playground apps, across locale, calendar system, picker variant, and browser combinations |
+| Compatibility  | GitHub Actions matrix      | Each playground app built, typechecked, and tested against every still-supported major version of its underlying framework  |
 
 ### Cross-browser coverage
 
@@ -396,33 +396,89 @@ Actions matrix job per `{app, framework version}` cell, in parallel. A
 type-only check would miss, fails here instead of in a downstream
 consumer's install.
 
-### Visual regression and PR screenshots
+### Visual regression and PR screenshots (Phase 10)
 
-Playwright takes screenshots of the calendar in a set matrix, for example
-`{en, fa}` by `{date, datetime, zoned-datetime}` by `{default theme}` by
-`{chromium, firefox, webkit}`, across all four playground apps:
-`playground-react`, `playground-vue`, `playground-next`, and
-`playground-nuxt`. It also takes one smoke screenshot per `{app, framework
-version}` cell from the compatibility matrix above, so a maintainer sees
-whether a framework upgrade changed rendering, not only whether the build
-succeeded; that smoke shot skips the full locale/precision/theme/browser
-cross product; one representative configuration per cell is enough to
-catch a rendering regression, and the full cross product already runs on
-the current framework version. On every pull request, a CI job:
+`playwright.config.ts` (repo root; `testDir: 'e2e'`) defines three browser
+projects (chromium, firefox, webkit) and a `webServer` array that builds
+and starts all four playground apps (ports 4001-4004) before any test
+runs. `e2e/playground-react.spec.ts` and `e2e/playground-vue.spec.ts`
+screenshot each `data-testid`-marked section of the playground page
+(`grid-en-jalali`, `grid-fa-jalali`, `dropdown`, `gregorian`,
+`inline-calendar`, `range-picker`), plus one extra screenshot of an opened
+calendar-grid popover (the actual month grid, not just the closed input);
+`e2e/playground-next.spec.ts` and `e2e/playground-nuxt.spec.ts` each take
+one full-page screenshot, since those two apps exist to exercise SSR and
+hydration (see their own page components), not to demonstrate the
+locale/system/variant matrix the React/Vue playgrounds already cover.
 
-1. Runs the Playwright visual suite (both matrices above, each a set of
-   parallel matrix jobs) and saves the PNG files as a build artifact.
-2. Publishes the images somewhere a PR comment can link to. The proposal is
-   to commit them to an orphan `visual-snapshots` branch. A raw GitHub URL
-   then embeds directly in Markdown, with no third-party service and no
-   cost. `actions/github-script` posts or updates one PR comment with the
-   image grid, covering both matrices. A paid visual-diff service, such as
-   Chromatic or Percy, is a reasonable upgrade later, if pixel-diff review
-   becomes slow. It is not required for v1.
-3. Fails the check when a screenshot differs from its baseline past a set
-   threshold, and the PR does not update the baseline. This stops silent
-   visual drift, while it still lets an intended visual change move through
-   review.
+**No screenshot PNG, of any kind, lives on `master`.** `.gitignore` excludes
+`test-results/`, `playwright-report/`, and `e2e/**/*-snapshots/` (the
+baseline PNGs `toHaveScreenshot()` diffs against) for the same reason PR-run
+screenshots were already going to an orphan branch instead of a regular
+commit: binary images bloat every future clone and every future `git log`
+walk forever if they land in `master`'s history. This phase extends that
+principle to baselines too, on a **second** orphan branch,
+`visual-baselines`, separate from `visual-snapshots`:
+
+- **`visual-baselines`** holds only the currently accepted baseline PNGs.
+  `e2e.yml` fetches it and extracts straight into `e2e/**/*-snapshots/`
+  before running tests (`git archive origin/visual-baselines | tar -x -C
+e2e/`); a repo with no `visual-baselines` branch yet fails every
+  screenshot test until one is created. Force-pushed, single commit, no
+  history kept: only the current baseline is ever meaningful for diffing,
+  so keeping old ones around only costs storage.
+- **`visual-snapshots`** holds per-PR screenshots for human review,
+  accumulating under `pr-<number>/` (`e2e.yml`'s own changed screenshots
+  under `pr-<number>/`, `compat-matrix.yml`'s smoke screenshots under
+  `pr-<number>/compat/`), a real commit per run, never force-pushed: an
+  old PR's comment must keep linking to real images for as long as that
+  PR stays open (or is referenced later), so this branch is allowed to
+  grow. Pruning merged/closed PRs' subdirectories is a reasonable future
+  addition, not built here.
+
+**Accepting a visual change** (Phase 10's "baseline diff check... passes
+when the PR updates the baseline"): a maintainer runs
+`update-visual-baselines.yml` (`workflow_dispatch` only, picking the PR's
+branch as the ref to run from in GitHub's UI) once they have reviewed the
+diff in the PR comment and are satisfied it is intentional. It regenerates
+every screenshot from scratch (`playwright test --update-snapshots`,
+all three browsers) and force-replaces `visual-baselines` with the result;
+the next `e2e.yml` run on that PR then passes, since the new baseline now
+matches.
+
+**The PR comment itself** (`e2e.yml`'s `comment` job) does not show every
+screenshot on every run: `scripts/visual-comment.mjs` reads each browser
+job's Playwright JSON report (`reporter: [..., ['json', { outputFile:
+'test-results/results.json' }]]`) — the only reporter that gives
+structured, per-test attachment paths and pass/fail status; scanning
+`test-results/`'s directory-naming convention directly was considered and
+rejected as more fragile. A **passing** screenshot test has no attachment
+at all in that JSON (nothing changed, nothing to report), so only
+**changed** screenshots get images in the comment; everything else is a
+`{passed, failed}` count per browser. Every image in the comment is
+captioned with `{app} — {test name} — {browser}` directly above it (not a
+bare filename or an uncaptioned grid), and a changed screenshot shows
+baseline/new/diff side by side in one table row. `compat-matrix.yml`'s
+smoke screenshots get their own, separate PR comment (`<!--
+compat-matrix-comment -->` marker, distinct from `e2e.yml`'s `<!--
+visual-e2e-comment -->`): the two workflows cannot easily merge into one
+comment across separate workflow runs without cross-workflow artifact
+lookups, and a maintainer reading two clearly-titled comments ("Visual e2e
+results" vs. "Compatibility matrix smoke screenshots") loses nothing
+compared to one merged comment.
+
+Verified the whole mechanism locally, including the parts that only
+matter once a screenshot actually changes: forced a genuine pixel diff
+(copied a different baseline over `dropdown`'s), confirmed
+`toHaveScreenshot()` failed with real `-actual.png`/`-diff.png`/
+`-expected.png` attachments, ran `scripts/visual-comment.mjs` against
+that real `results.json`, and confirmed it produced correctly captioned,
+correctly copied images and manifest, before restoring the baseline. Also
+caught and fixed a real bug this way: an opened calendar popover is
+`position: absolute` and pokes outside its parent section's own box, so a
+section-scoped screenshot silently clipped it to a two-line sliver; fixed
+by screenshotting the popover element itself (`page.getByRole('dialog')`)
+instead of its ancestor section.
 
 ## CI/CD pipeline
 

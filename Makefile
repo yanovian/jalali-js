@@ -1,6 +1,6 @@
 .PHONY: help install install-frozen dev build build-packages build-apps typecheck lint lint-fix \
-	format format-check test test-watch check clean probe-treeshake size changeset release \
-	app-typecheck app-build test-paths
+	format format-check test test-watch test-e2e test-e2e-project install-playwright check clean \
+	probe-treeshake size changeset release app-typecheck app-build test-paths
 
 PNPM ?= pnpm
 
@@ -46,6 +46,15 @@ test: ## Unit and property tests (Vitest), once
 
 test-watch: ## Unit and property tests (Vitest), watch mode
 	$(PNPM) test:watch
+
+test-e2e: ## Playwright visual e2e suite, every browser (build + browser install run automatically)
+	$(PNPM) test:e2e
+
+test-e2e-project: ## Playwright visual e2e suite, one browser (e2e.yml): make test-e2e-project PROJECT=chromium
+	$(PNPM) exec playwright test --project=$(PROJECT)
+
+install-playwright: ## Install Playwright browser binaries: make install-playwright BROWSERS="chromium firefox webkit"
+	$(PNPM) exec playwright install --with-deps $(BROWSERS)
 
 check: typecheck lint format-check test build size ## CI-equivalent: typecheck, lint, format-check, test, build, size
 

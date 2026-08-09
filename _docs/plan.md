@@ -466,27 +466,86 @@ PATHS="packages/react packages/ui-react"`) to the Makefile to cover
 
 ## Phase 10: Visual e2e tests and PR screenshot bot
 
-- [ ] Add a Playwright config that targets all four playground apps,
-      including `playground-next` and `playground-nuxt`.
-- [ ] Add cross-browser coverage: Chromium, Firefox, and WebKit (Playwright's
+- [x] Add a Playwright config that targets all four playground apps,
+      including `playground-next` and `playground-nuxt`. `playwright.config.ts`
+      (repo root, `testDir: 'e2e'`): a `webServer` array builds and starts
+      all four apps (ports 4001-4004; each app's own `preview`/`start`
+      script) before any test runs.
+- [x] Add cross-browser coverage: Chromium, Firefox, and WebKit (Playwright's
       three engines, covering Chrome/Edge, Firefox, and Safari's rendering
       engine without needing real per-OS browser installs). Runs as its own
       matrix dimension, in parallel per browser, alongside the visual
-      matrix below.
-- [ ] Add the screenshot capture matrix: locale, precision, theme, and
-      browser (from the cross-browser job above).
-- [ ] Add one smoke screenshot per `{app, framework version}` cell from
+      matrix below. Three `projects` in `playwright.config.ts`; `e2e.yml`
+      runs one job per browser (`make test-e2e-project PROJECT=...`).
+- [x] Add the screenshot capture matrix: locale, precision, theme, and
+      browser (from the cross-browser job above). `e2e/playground-react.spec.ts`
+      and `e2e/playground-vue.spec.ts` screenshot each `data-testid`
+      section of the playground page (locale x calendar system x picker
+      variant: grid English/Jalali, grid Farsi/Jalali, dropdown, Gregorian,
+      inline calendar, range picker), plus the opened calendar-grid
+      popover itself; `e2e/playground-next.spec.ts` and
+      `e2e/playground-nuxt.spec.ts` each take one full-page screenshot
+      (they exist to prove SSR/hydration, not to re-demonstrate the
+      locale/system/variant matrix the other two already cover). Browser
+      comes for free: Playwright suffixes every baseline filename with the
+      project name and platform. Theme is whichever theme the playground
+      already ships with (dark + compact, see Phase 7); no runtime
+      theme-toggle exists to make theme a true fourth matrix axis, and
+      building one was out of scope here.
+- [x] Add one smoke screenshot per `{app, framework version}` cell from
       Phase 9's peer-dependency compatibility matrix, so a maintainer can
       see whether a framework upgrade broke rendering, not only whether the
       build succeeded, feeding the same PR comment grid as the main visual
-      matrix.
-- [ ] Add a publish step that commits screenshots to an orphan
-      `visual-snapshots` branch, for linkable raw URLs.
-- [ ] Add a PR comment bot, using `actions/github-script`, that posts or
+      matrix. Extended `compat-matrix.yml`: after building and typechecking
+      each cell, a "Smoke screenshot" step starts that cell's app and
+      captures one full-page screenshot with the `playwright screenshot`
+      CLI (chromium only; the axis under test here is the framework
+      version, not the browser). Feeds a separate PR comment
+      ("Compatibility matrix smoke screenshots", not literally the same
+      comment as the main visual suite: merging them needs cross-workflow
+      artifact lookups across two separate workflow files, not worth the
+      complexity for two clearly-titled comments on the same PR instead).
+- [x] Add a publish step that commits screenshots to an orphan
+      `visual-snapshots` branch, for linkable raw URLs. Accumulates under
+      `pr-<number>/` (a real commit per run, never force-pushed), so an
+      older PR's comment keeps linking to real images. Both `e2e.yml` and
+      `compat-matrix.yml` publish here (the latter under `pr-<number>/compat/`).
+- [x] Add a PR comment bot, using `actions/github-script`, that posts or
       updates one comment with the image grid, covering every matrix above.
-- [ ] Add a baseline diff check that fails the build on an unacknowledged
+      `scripts/visual-comment.mjs` reads each browser's Playwright JSON
+      report and picks one image per **changed** screenshot test only (a
+      passing test has no attachment in that report at all, so there is
+      nothing to show for it beyond a pass count); every image is
+      captioned `{app} — {test name} — {browser}` directly above it, with
+      baseline/new/diff shown side by side for a real change. Verified
+      against a real forced pixel diff, not just read: copied a different
+      baseline over one screenshot, confirmed `toHaveScreenshot()` failed
+      with real attachments, and confirmed the script produced correctly
+      captioned, correctly copied images before restoring the baseline.
+- [x] Add a baseline diff check that fails the build on an unacknowledged
       visual change, and passes when the PR updates the baseline with the
-      change.
+      change. Baselines are not committed to `master` at all (`.gitignore`
+      excludes `e2e/**/*-snapshots/`, `test-results/`, `playwright-report/`,
+      the same "no binary images in `master`'s history" reasoning that
+      already applied to PR-run screenshots): they live on their own
+      orphan `visual-baselines` branch, force-pushed as a single commit
+      each time (no history kept; only the current baseline is ever
+      meaningful), restored into place before each `e2e.yml` run. "The PR
+      updates the baseline" means a maintainer runs the new
+      `update-visual-baselines.yml` (`workflow_dispatch`, run from the
+      PR's branch) once they have reviewed the diff in the PR comment;
+      that regenerates every screenshot and force-replaces
+      `visual-baselines`, after which `e2e.yml` passes on that PR. A repo
+      with no `visual-baselines` branch yet fails every screenshot test
+      until a maintainer runs this once, an expected one-time bootstrap
+      step, not a bug.
+- [x] Found and fixed a real bug while building this: an opened calendar
+      popover is `position: absolute` and pokes outside its parent
+      section's own box, so screenshotting the section clipped the
+      popover to a two-line sliver instead of showing the actual grid.
+      Fixed by screenshotting the popover element itself
+      (`page.getByRole('dialog')`) instead of its ancestor section, in
+      both `playground-react.spec.ts` and `playground-vue.spec.ts`.
 
 ## Phase 11: Docs site and v1.0 release
 

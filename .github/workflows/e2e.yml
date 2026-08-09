@@ -1,0 +1,195 @@
+name: E2E visual tests
+
+# Baselines for `toHaveScreenshot()` are not committed to `master` (see .gitignore and
+# architecture.md's "Visual regression and PR screenshots"): they live on the orphan
+# `visual-baselines` branch and are restored into place before each run. A repo with no
+# `visual-baselines` branch yet (before this workflow's first-ever bootstrap) fails every
+# screenshot test until a maintainer runs update-visual-baselines.yml once.
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    name: ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    strategy:
+      # One job per browser, in parallel: the same deliberate, scoped exception to this
+      # pipeline's usual single-runner style as Phase 9's compat-matrix.yml (see
+      # architecture.md's CI/CD pipeline).
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: make install-frozen
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Restore visual baselines
+        run: |
+          if git fetch origin visual-baselines --depth=1 2>/dev/null; then
+            git archive origin/visual-baselines | tar -x -C e2e/
+            echo "Restored baselines from origin/visual-baselines."
+          else
+            echo "::warning::No visual-baselines branch found; every screenshot test will fail until a maintainer runs update-visual-baselines.yml."
+          fi
+
+      - name: Run Playwright
+        run: pnpm exec playwright test --project=${{ matrix.browser }}
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-results-${{ matrix.browser }}
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: warn
+
+  comment:
+    name: Publish and comment
+    needs: [visual]
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: visual-results-*
+          path: results
+
+      - name: Build manifest of changed screenshots
+        run: |
+          node scripts/visual-comment.mjs /tmp/publish \
+            chromium=results/visual-results-chromium/results.json \
+            firefox=results/visual-results-firefox/results.json \
+            webkit=results/visual-results-webkit/results.json
+
+      - name: Publish changed screenshots to visual-snapshots
+        id: publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [ ! -f /tmp/publish/manifest.json ] || [ "$(node -pe "JSON.parse(require('fs').readFileSync('/tmp/publish/manifest.json')).changed.length")" = "0" ]; then
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          WORK=$(mktemp -d)
+          if git ls-remote --exit-code --heads origin visual-snapshots >/dev/null 2>&1; then
+            git clone --quiet --depth=1 --branch visual-snapshots \
+              "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$WORK"
+          else
+            git clone --quiet --depth=1 \
+              "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$WORK"
+            (cd "$WORK" && git checkout --orphan visual-snapshots && git rm -rf . >/dev/null 2>&1 || true)
+          fi
+          rm -rf "$WORK/pr-$PR_NUMBER"
+          mkdir -p "$WORK/pr-$PR_NUMBER"
+          cp /tmp/publish/*.png "$WORK/pr-$PR_NUMBER/" 2>/dev/null || true
+          cp /tmp/publish/manifest.json "$WORK/pr-$PR_NUMBER/"
+          cd "$WORK"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit --quiet -m "Visual screenshots for PR #$PR_NUMBER"
+          git push --quiet origin HEAD:visual-snapshots
+          echo "published=true" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on PR
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const manifest = fs.existsSync('/tmp/publish/manifest.json')
+              ? JSON.parse(fs.readFileSync('/tmp/publish/manifest.json', 'utf8'))
+              : { changed: [], counts: {} };
+            const published = '${{ steps.publish.outputs.published }}' === 'true';
+            const prNumber = context.issue.number;
+            const rawBase = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/visual-snapshots/pr-${prNumber}`;
+
+            const marker = '<!-- visual-e2e-comment -->';
+            let body = `${marker}\n## Visual e2e results\n\n`;
+
+            const browsers = Object.keys(manifest.counts).sort();
+            if (browsers.length === 0) {
+              body += '_No results were collected (the browser jobs may have failed before producing a report)._\n';
+            } else {
+              body += '| Browser | Passed | Changed |\n| --- | --- | --- |\n';
+              for (const browser of browsers) {
+                const c = manifest.counts[browser];
+                body += `| ${browser} | ${c.passed} | ${c.failed} |\n`;
+              }
+            }
+
+            if (manifest.changed.length > 0) {
+              body += '\n### Changed screenshots\n\n';
+              body += 'Each row is one screenshot test. **Baseline** is the currently accepted image; **new** is what this PR renders; **diff** highlights the pixels that changed. If this change is intentional, run `update-visual-baselines.yml` from this branch to accept it.\n\n';
+              for (const shot of manifest.changed) {
+                // Explicit app/section/browser caption per image, not a bare filename: a
+                // reviewer scanning the comment should never have to guess what they're
+                // looking at.
+                body += `#### ${shot.app} — ${shot.test} — ${shot.browser}\n\n`;
+                if (shot.hasBaseline) {
+                  body += `| Baseline | New | Diff |\n| --- | --- | --- |\n`;
+                  body += `| ![baseline](${rawBase}/${shot.baselineFileName}) | ![new](${rawBase}/${shot.newFileName}) | ${shot.diffFileName ? `![diff](${rawBase}/${shot.diffFileName})` : '_n/a_'} |\n\n`;
+                } else {
+                  body += `_No baseline exists yet for this screenshot._\n\n![new](${rawBase}/${shot.newFileName})\n\n`;
+                }
+              }
+            } else if (published === false && browsers.length > 0) {
+              body += '\n No screenshots changed. \n';
+            }
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find((c) => c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }

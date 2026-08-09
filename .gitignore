@@ -5,6 +5,15 @@ next-env.d.ts
 .nuxt/
 .output/
 coverage/
+# Playwright's own run output (actual/diff images, traces, HTML report), and the baseline PNGs
+# `toHaveScreenshot()` diffs against: none of these binary images live on `master`, on purpose,
+# the same reason PR-run screenshots live on the orphan `visual-snapshots` branch instead of a
+# regular commit (see architecture.md's "Visual regression and PR screenshots"). Baselines live
+# on their own orphan `visual-baselines` branch instead, fetched into these same paths before a
+# test run and pushed back only when a maintainer explicitly accepts a visual change.
+test-results/
+playwright-report/
+e2e/**/*-snapshots/
 *.tsbuildinfo
 .DS_Store
 *.log

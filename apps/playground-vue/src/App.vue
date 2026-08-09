@@ -26,28 +26,28 @@ const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
     </p>
     <p>امروز: {{ jalali.format(jalali.today(), { style: 'long', weekday: true }) }}</p>
 
-    <section>
+    <section data-testid="grid-en-jalali">
       <h2>Grid variant, English, Jalali system</h2>
       <DatePicker v-model="stored" system="jalali" locale="en" />
       <p>Stored value (Gregorian by default): {{ JSON.stringify(stored) }}</p>
     </section>
 
-    <section>
+    <section data-testid="grid-fa-jalali">
       <h2>Grid variant, Farsi</h2>
       <DatePicker system="jalali" locale="fa" />
     </section>
 
-    <section>
+    <section data-testid="dropdown">
       <h2>Dropdown variant (date-of-birth style entry)</h2>
       <DatePicker system="jalali" locale="en" variant="dropdown" />
     </section>
 
-    <section>
+    <section data-testid="gregorian">
       <h2>Gregorian system</h2>
       <DatePicker system="gregorian" locale="en" />
     </section>
 
-    <section>
+    <section data-testid="inline-calendar">
       <h2>Inline calendar (@jalali-js/ui-vue)</h2>
       <InlineCalendar
         system="jalali"
@@ -58,7 +58,7 @@ const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
       <p>Selected: {{ inlineSelected ? JSON.stringify(inlineSelected) : 'none' }}</p>
     </section>
 
-    <section>
+    <section data-testid="range-picker">
       <h2>Range picker (@jalali-js/ui-vue)</h2>
       <RangePicker v-model="storedRange" system="jalali" locale="en" />
       <p>Stored range (Gregorian by default): {{ JSON.stringify(storedRange) }}</p>

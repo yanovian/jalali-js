@@ -29,28 +29,28 @@ export default function App() {
       </p>
       <CalendarSummary />
 
-      <section>
+      <section data-testid="grid-en-jalali">
         <h2>Grid variant, English, Jalali system</h2>
         <DatePicker system="jalali" locale="en" onChange={(value) => setStored(value)} />
         <p>Stored value (Gregorian by default): {JSON.stringify(stored)}</p>
       </section>
 
-      <section>
+      <section data-testid="grid-fa-jalali">
         <h2>Grid variant, Farsi</h2>
         <DatePicker system="jalali" locale="fa" />
       </section>
 
-      <section>
+      <section data-testid="dropdown">
         <h2>Dropdown variant (date-of-birth style entry)</h2>
         <DatePicker system="jalali" locale="en" variant="dropdown" />
       </section>
 
-      <section>
+      <section data-testid="gregorian">
         <h2>Gregorian system</h2>
         <DatePicker system="gregorian" locale="en" />
       </section>
 
-      <section>
+      <section data-testid="inline-calendar">
         <h2>Inline calendar (@jalali-js/ui-react)</h2>
         <InlineCalendar
           system="jalali"
@@ -61,7 +61,7 @@ export default function App() {
         <p>Selected: {inlineSelected ? JSON.stringify(inlineSelected) : 'none'}</p>
       </section>
 
-      <section>
+      <section data-testid="range-picker">
         <h2>Range picker (@jalali-js/ui-react)</h2>
         <RangePicker system="jalali" locale="en" onChange={(value) => setStoredRange(value)} />
         <p>Stored range (Gregorian by default): {JSON.stringify(storedRange)}</p>

@@ -34,37 +34,58 @@ jobs:
           # React: the last two majors under active support/maintenance.
           - app: playground-react
             label: react@18
+            slug: react-18
             override: 'react@^18 react-dom@^18 @types/react@^18 @types/react-dom@^18'
             test-paths: 'packages/react packages/ui-react'
+            preview-script: preview
+            port: 4001
           - app: playground-react
             label: react@19 (current)
+            slug: react-19
             override: 'react@^19 react-dom@^19 @types/react@^19 @types/react-dom@^19'
             test-paths: 'packages/react packages/ui-react'
+            preview-script: preview
+            port: 4001
           # Vue 2 reached end-of-life 2023-12-31 and is intentionally excluded; Vue 3 is the
           # only currently maintained major, so this is a matrix of one on purpose, not an
           # oversight.
           - app: playground-vue
             label: vue@3 (current)
+            slug: vue-3
             override: 'vue@^3.4'
             test-paths: 'packages/vue packages/ui-vue'
+            preview-script: preview
+            port: 4002
           # Next.js: the last two majors.
           - app: playground-next
             label: next@15
+            slug: next-15
             override: 'next@^15'
             test-paths: ''
+            preview-script: start
+            port: 4003
           - app: playground-next
             label: next@16 (current)
+            slug: next-16
             override: 'next@^16'
             test-paths: ''
+            preview-script: start
+            port: 4003
           # Nuxt: the last two majors.
           - app: playground-nuxt
             label: nuxt@3
+            slug: nuxt-3
             override: 'nuxt@^3'
             test-paths: ''
+            preview-script: preview
+            port: 4004
           - app: playground-nuxt
             label: nuxt@4 (current)
+            slug: nuxt-4
             override: 'nuxt@^4'
             test-paths: ''
+            preview-script: preview
+            port: 4004
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -99,3 +120,129 @@ jobs:
       - name: Test affected packages
         if: matrix.test-paths != ''
         run: make test-paths PATHS="${{ matrix.test-paths }}"
+
+      - name: Smoke screenshot at ${{ matrix.label }}
+        # Not part of the pass/fail gate above (rendering differences across framework versions
+        # are not necessarily bugs): a plain capture for a human to eyeball in the PR comment, so
+        # a framework upgrade that silently breaks layout is visible even though the build and
+        # typecheck both succeeded. One browser (chromium) is enough here; the axis under test is
+        # the framework version, not the browser (see e2e.yml for the actual cross-browser suite).
+        run: |
+          make install-playwright BROWSERS=chromium
+          pnpm --filter ${{ matrix.app }} run ${{ matrix.preview-script }} &
+          for i in $(seq 1 60); do
+            curl -sf "http://localhost:${{ matrix.port }}/" >/dev/null && break
+            sleep 1
+          done
+          mkdir -p /tmp/compat-screenshot
+          pnpm exec playwright screenshot --wait-for-timeout=500 --full-page \
+            "http://localhost:${{ matrix.port }}/" "/tmp/compat-screenshot/screenshot.png"
+
+      - name: Upload screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: compat-screenshot-${{ matrix.slug }}
+          path: /tmp/compat-screenshot/screenshot.png
+          retention-days: 14
+
+  comment:
+    name: Comment compat screenshots
+    needs: [compat]
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download screenshots
+        uses: actions/download-artifact@v4
+        with:
+          pattern: compat-screenshot-*
+          path: screenshots
+
+      - name: Publish to visual-snapshots
+        id: publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          shopt -s nullglob
+          FOUND=(screenshots/compat-screenshot-*/screenshot.png)
+          if [ ${#FOUND[@]} -eq 0 ]; then
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          WORK=$(mktemp -d)
+          if git ls-remote --exit-code --heads origin visual-snapshots >/dev/null 2>&1; then
+            git clone --quiet --depth=1 --branch visual-snapshots \
+              "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$WORK"
+          else
+            git clone --quiet --depth=1 \
+              "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$WORK"
+            (cd "$WORK" && git checkout --orphan visual-snapshots && git rm -rf . >/dev/null 2>&1 || true)
+          fi
+          rm -rf "$WORK/pr-$PR_NUMBER/compat"
+          mkdir -p "$WORK/pr-$PR_NUMBER/compat"
+          for dir in screenshots/compat-screenshot-*/; do
+            slug=$(basename "$dir" | sed 's/^compat-screenshot-//')
+            cp "$dir/screenshot.png" "$WORK/pr-$PR_NUMBER/compat/$slug.png"
+          done
+          cd "$WORK"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit --quiet -m "Compatibility-matrix screenshots for PR #$PR_NUMBER"
+          git push --quiet origin HEAD:visual-snapshots
+          echo "published=true" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on PR
+        if: steps.publish.outputs.published == 'true'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const rawBase = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/visual-snapshots/pr-${prNumber}/compat`;
+            // matrix.label/matrix.app aren't available in this job (a separate job from the
+            // matrix), so the slug->caption mapping is repeated here; keep in sync with the
+            // `matrix.include` list above if a cell is ever added or renamed.
+            const captions = {
+              'react-18': ['playground-react', 'React 18'],
+              'react-19': ['playground-react', 'React 19 (current)'],
+              'vue-3': ['playground-vue', 'Vue 3 (current)'],
+              'next-15': ['playground-next', 'Next.js 15'],
+              'next-16': ['playground-next', 'Next.js 16 (current)'],
+              'nuxt-3': ['playground-nuxt', 'Nuxt 3'],
+              'nuxt-4': ['playground-nuxt', 'Nuxt 4 (current)'],
+            };
+
+            const marker = '<!-- compat-matrix-comment -->';
+            let body = `${marker}\n## Compatibility matrix smoke screenshots\n\n`;
+            body += 'One render per supported framework major version (chromium only; this is a smoke check for broken rendering, not a pixel diff — see the "Visual e2e results" comment for that).\n\n';
+            for (const [slug, [app, label]] of Object.entries(captions)) {
+              body += `#### ${app} — ${label}\n\n![${slug}](${rawBase}/${slug}.png)\n\n`;
+            }
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find((c) => c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
