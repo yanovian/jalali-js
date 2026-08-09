@@ -26,12 +26,10 @@
   --jalali-input-padding: 0.5em 0.75em;
   --jalali-popover-padding: 0.75em;
   --jalali-day-min-size: 2.25em;
-  --jalali-color-scheme: light;
 
   font-family: var(--jalali-font);
   font-size: var(--jalali-font-size);
   color: var(--jalali-fg);
-  color-scheme: var(--jalali-color-scheme);
   position: relative;
   display: inline-block;
   max-width: 100%;
