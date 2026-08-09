@@ -66,6 +66,31 @@ export default function App() {
         <RangePicker system="jalali" locale="en" onChange={(value) => setStoredRange(value)} />
         <p>Stored range (Gregorian by default): {JSON.stringify(storedRange)}</p>
       </section>
+
+      <section data-testid="custom-theme">
+        <h2>Custom CSS override (consumer-configured, not a shipped theme file)</h2>
+        <p>
+          A consumer can retheme a picker by overriding the <code>--jalali-*</code> custom
+          properties, with no theme file at all. The theme imports above already set some of those
+          properties directly on every picker&rsquo;s root element, and since custom properties
+          inherit rather than cascade by specificity, an ancestor&rsquo;s inline style cannot win
+          against a value set directly on the root itself. This section instead follows
+          architecture.md&rsquo;s own documented pattern: a scoped selector under a parent class
+          (see the &quot;Theming contract&quot; section there).
+        </p>
+        <style>{`
+          .custom-theme-scope [data-jalali-datepicker-root] {
+            --jalali-primary: #c026d3;
+            --jalali-primary-fg: #ffffff;
+            --jalali-bg: #fdf4ff;
+            --jalali-fg: #581c87;
+            --jalali-radius: 20px;
+          }
+        `}</style>
+        <div className="custom-theme-scope">
+          <DatePicker system="jalali" locale="en" />
+        </div>
+      </section>
     </main>
   );
 }

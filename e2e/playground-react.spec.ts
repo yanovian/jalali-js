@@ -10,6 +10,7 @@ const SECTIONS = [
   { testId: 'gregorian', name: 'gregorian.png' },
   { testId: 'inline-calendar', name: 'inline-calendar.png' },
   { testId: 'range-picker', name: 'range-picker.png' },
+  { testId: 'custom-theme', name: 'custom-theme.png' },
 ] as const;
 
 test.describe('playground-react', () => {
@@ -34,5 +35,23 @@ test.describe('playground-react', () => {
     const popover = section.getByRole('dialog');
     await expect(popover).toBeVisible();
     await expect(popover).toHaveScreenshot('calendar-grid-open.png');
+  });
+
+  test('custom CSS override actually applies, not just looks unchanged', async ({ page }) => {
+    // A screenshot diff only proves the render changed from its baseline; it does not prove a
+    // specific configured value took effect. This asserts on the real computed styles instead,
+    // so a broken override (say, a CSS specificity regression that lets the default value win)
+    // fails with a clear "expected X, got Y" instead of a pixel diff that could be misread as
+    // an unrelated visual regression.
+    const root = page.getByTestId('custom-theme').locator('[data-jalali-datepicker-root]');
+    const input = page.getByTestId('custom-theme').locator('[data-jalali-datepicker-input]');
+
+    await expect(root).toHaveCSS('--jalali-primary', '#c026d3');
+    await expect(root).toHaveCSS('--jalali-bg', '#fdf4ff');
+    await expect(root).toHaveCSS('--jalali-radius', '20px');
+
+    // The custom property is only half the proof; confirm a rule that consumes it actually
+    // resolved to the overridden value, not the library's own default.
+    await expect(input).toHaveCSS('border-radius', '20px');
   });
 });
