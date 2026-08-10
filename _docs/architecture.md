@@ -180,8 +180,8 @@ Plain pnpm workspace scripts are enough at this size.
 ```
 packages/
   core/               # jalali-js core. Zero runtime dependencies.
-  i18n/                # Locale data: en, fa. Names, numerals, direction.
-  nlp/                 # Natural language date parsing: en, fa, Finglish.
+  i18n/                # Locale data: en, fa, ps. Names, numerals, direction.
+  nlp/                 # Natural language date parsing: en, fa, ps.
   react/               # React hooks and headless components. Works in Next.js.
   vue/                 # Vue composables and headless components. Works in Nuxt.
   web/                 # Framework-free Web Components. No hooks or composables: plain custom elements.
@@ -236,7 +236,7 @@ const back = fromGregorian(g, 'jalali'); // round-trips
 
 cal.format(today, { style: 'long' }); // "۱۵ مرداد ۱۴۰۵"
 cal.isLeapYear(1403); // true
-cal.parse('farda'); // Finglish for "tomorrow"
+cal.parse('فردا'); // Farsi for "tomorrow"
 ```
 
 ### Framework bindings sketch
@@ -284,12 +284,14 @@ in `core`.
 
 - The parser reads a phrase and returns a `CalendarDate`, or `null` when it
   cannot read the phrase.
-- v1 supports three input styles: English words (`today`, `tomorrow`, `next
-Farvardin`), Farsi words in Persian script (`امروز`, `فردا`), and Finglish,
-  Farsi words written with Latin letters (`emrooz`, `farda`). Finglish
-  support covers common spelling variants for each word. Phase 12 added a
-  fourth: Pashto (`نن`, `سبا`, `راتلونکې اونۍ`), with the relative terms
-  sourced from CLDR's `ps` relative-time data through ICU.
+- The parser supports three languages: English words (`today`, `tomorrow`,
+  `next Farvardin`, with the transliterated Jalali month names), Farsi
+  words in Persian script (`امروز`, `فردا`), and Pashto (`نن`, `سبا`,
+  `راتلونکې اونۍ`), added in Phase 12 with the relative terms sourced from
+  CLDR's `ps` relative-time data through ICU.
+- v1 also shipped a "Finglish" style (`fa-Latn`). It was removed after
+  v0.1.0. Finglish is wrong and a bad practice: it works against the
+  language. Farsi input uses Persian script.
 - The parser covers a fixed, testable set of relative terms and explicit
   day, month, and year phrases. It is not a general natural language engine.
 - Each supported word list lives in `packages/nlp`, next to the locale data

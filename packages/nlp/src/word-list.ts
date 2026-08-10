@@ -1,12 +1,11 @@
 import { en, fa, ps } from '@jalali-js/i18n';
 
 /**
- * The input styles this parser supports (see architecture.md's "Natural language date
- * parsing"). `'fa-Latn'` is Finglish: Farsi words written with Latin letters. The tag follows
- * the BCP 47 pattern of language plus script, the same shape a real BCP 47 tag for this would
- * take. `'ps'` is Pashto (Phase 12).
+ * The languages this parser supports (see architecture.md's "Natural language date parsing"):
+ * English, Farsi in Persian script, and Pashto (`'ps'`, Phase 12). English input accepts the
+ * transliterated Jalali month names (`Mehr`, `Aban`, `Azar`); Farsi input uses Persian script.
  */
-export type NlpLocale = 'en' | 'fa' | 'fa-Latn' | 'ps';
+export type NlpLocale = 'en' | 'fa' | 'ps';
 
 export interface WordList {
   today: readonly string[];
@@ -49,20 +48,6 @@ export const fa_wordList: WordList = {
   monthNames: asVariantList(fa.monthNames.jalali.long),
 };
 
-export const faLatn_wordList: WordList = {
-  today: ['emrooz', 'emruz', 'emrouz'],
-  tomorrow: ['farda', 'fardaa'],
-  yesterday: ['dirooz', 'diruz', 'dirouz'],
-  nextWeek: ['hafte ayande', 'hafteh ayande', 'hafte baad', 'hafte bad'],
-  nextMonthMarkers: ['ayande', 'aayande', 'baad', 'bad'],
-  nextMonthOrder: 'suffix',
-  // The same Latin transliterations as the English word list: these already are Finglish
-  // spellings of the Jalali months, not English words, so they are shared rather than
-  // re-typed. A month can still gain Finglish-specific variants later (see WordList's doc
-  // comment) without this list needing to diverge from en_wordList for that reason alone.
-  monthNames: asVariantList(en.monthNames.jalali.long),
-};
-
 // Every phrase below except 'بله اونۍ' comes straight from CLDR's `ps` relative-time data,
 // read through ICU (`Intl.RelativeTimeFormat('ps')`), the same verifiable source ps.ts's
 // month and weekday names come from. 'بله اونۍ' ("the other/next week") is the common
@@ -87,8 +72,6 @@ export function getWordList(locale: NlpLocale): WordList {
       return en_wordList;
     case 'fa':
       return fa_wordList;
-    case 'fa-Latn':
-      return faLatn_wordList;
     case 'ps':
       return ps_wordList;
   }

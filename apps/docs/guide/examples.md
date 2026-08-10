@@ -45,7 +45,7 @@ import { parse } from '@jalali-js/nlp';
 
 parse('tomorrow', 'en');
 parse('فردا', 'fa');
-parse('farda', 'fa-Latn'); // Finglish
+parse('نن', 'ps'); // Pashto for 'today'
 parse('next Farvardin', 'en');
 ```
 

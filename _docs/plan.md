@@ -190,6 +190,13 @@ needed for "tomorrow", "yesterday", and "next week"). It moves along a
 date's Julian Day Number, so it is correct across a month or year boundary
 for either calendar system with no extra per-system logic.
 
+Revised after v0.1.0, during Phase 12: the Finglish input style
+(`fa-Latn`) was removed. Finglish is wrong and a bad practice: it works
+against the language. English input accepts the transliterated month
+names (`Mehr`, `Aban`, `Azar`); Farsi input uses Persian script.
+`NlpLocale` is now `'en' | 'fa' | 'ps'`. Breaking change, recorded in
+`CHANGELOG.md`.
+
 ## Phase 5: React bindings (`packages/react`)
 
 - [x] Confirm the default `DatePicker` UI variant (calendar-grid popup

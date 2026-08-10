@@ -23,8 +23,8 @@ function toCalendarDate(
   return { precision: 'date', system, ...fields };
 }
 
-// "next <month>" (English: prefix) or "<month> آینده" / "<month> ayande" (Farsi and Finglish:
-// suffix). The target year is this year if the named month has not started yet, or next year
+// "next <month>" (English and Pashto: prefix) or "<month> آینده" (Farsi: suffix).
+// The target year is this year if the named month has not started yet, or next year
 // if it already has (or is the current month): "next" means the upcoming occurrence, not the
 // one already under way. The day is fixed at 1, the same convention "next Monday" uses for
 // "which day inside that period" when none is given.

@@ -15,7 +15,7 @@ Why recommend it:
 - One toolkit for many cases. Use the zero-runtime-dependency core alone, or add React, Vue, or framework-free Web Components. Add i18n and natural-language parsing when you need them.
 - Explicit precision tiers: date only, date with time, or date with time and timezone.
 - Display Jalali. Store Gregorian by default, the same idea as a native date input.
-- English, Farsi, and Pashto out of the box, including Finglish phrases such as "emrooz" and "farda".
+- English, Farsi, and Pashto out of the box, including natural language date input in all three, such as "next Farvardin" and "فردا".
 - Secure dependency updates. Scheduled update pull requests use an automated dependency-update action. Breaking updates wait at least 30 days after a release before this repo picks them up. License audits run on every pull request.
 - Company-backed in Armenia under the MIT license.
 

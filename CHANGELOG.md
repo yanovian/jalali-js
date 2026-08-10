@@ -19,6 +19,12 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
   `llms-full.txt` (full guide bundle).
 - A bundle-size badge in the readme.
 
+### Removed
+
+- The Finglish (`fa-Latn`) input style in `@jalali-js/nlp`. Finglish is
+  wrong and a bad practice: it works against the language. Farsi input
+  uses Persian script.
+
 ## [0.1.0] - 2026-08-10
 
 ### Added

@@ -1,14 +1,14 @@
 {
   "name": "@jalali-js/nlp",
   "version": "0.1.0",
-  "description": "Natural language date parsing for jalali-js, in English, Farsi, and Finglish.",
+  "description": "Natural language date parsing for jalali-js, in English, Farsi, and Pashto.",
   "keywords": [
     "jalali",
     "persian",
     "farsi",
+    "pashto",
     "nlp",
     "date-parsing",
-    "finglish",
     "calendar"
   ],
   "homepage": "https://yanovian.github.io/jalali-js/",

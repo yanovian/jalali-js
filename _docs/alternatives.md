@@ -30,10 +30,9 @@ PR screenshots, dependency and license audits, and automated releases.
 - Framework bindings that feel native in React, Vue, Nuxt, and Next.js.
 - Full Persian (Farsi) and English support: month names, weekday names,
   Persian numerals, and right-to-left text layout.
-- Natural language date input in v1, in Farsi, English, and Finglish (Farsi
-  words written with Latin letters, such as "farda" for "tomorrow"). A user
-  can type a phrase like "today", "next Farvardin", "فردا", or "emrooz", and
-  the library parses it into a calendar date.
+- Natural language date input in v1, in Farsi and English. A user can type
+  a phrase like "today", "next Farvardin", or "فردا", and the library
+  parses it into a calendar date.
 - A headless component layer by default, so a consumer can style everything.
   An optional pre-styled reference component ships on top of it.
 - A CI pipeline that blocks a merge on lint, typecheck, unit test, and visual
