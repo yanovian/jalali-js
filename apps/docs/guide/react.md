@@ -104,3 +104,92 @@ import { EventCalendar, InlineCalendar, RangePicker } from '@jalali-js/ui-react'
 <RangePicker system="jalali" locale="en" onChange={(value, range) => { /* ... */ }} />
 <EventCalendar system="jalali" locale="en" events={events} onEventClick={setActive} />
 ```
+
+## Prop tables
+
+Checked against source. Types are shortened. Full signatures live in the
+[API reference](/api/@jalali-js/react/).
+
+### `DatePicker`
+
+| Prop            | Type                                       | Default           | Meaning                                  |
+| --------------- | ------------------------------------------ | ----------------- | ---------------------------------------- |
+| `system`        | `'jalali' \| 'gregorian'`                  | `'jalali'`        | Display calendar                         |
+| `locale`        | `'en' \| 'fa' \| 'ps'`                     | `'en'`            | UI language                              |
+| `defaultDate`   | `CalendarDate \| CalendarDateTime \| null` | today             | Initial selection. `null` is empty       |
+| `precision`     | `'date' \| 'datetime'`                     | `'date'`          | Day only, or day plus time               |
+| `minuteStep`    | `number`                                   | `1`               | Minute step when `precision` is datetime |
+| `disabledHours` | `number[]`                                 | -                 | Hidden hours 0-23                        |
+| `quickNav`      | `boolean`                                  | `true`            | Month and year jump grids                |
+| `onChange`      | `(value, date) => void`                    | -                 | Storage value and raw date               |
+| `valueFormat`   | `ValueFormat`                              | `'gregorian-iso'` | Shape of storage `value`                 |
+| `displayFormat` | `FormatOptions`                            | -                 | Input text format                        |
+| `variant`       | `'grid' \| 'dropdown'`                     | `'grid'`          | Grid popover or Y/M/D selects            |
+| `rules`         | `SelectionRules`                           | -                 | Min/max and blocked days                 |
+| `showHolidays`  | `boolean`                                  | `false`           | Mark holidays (Jalali)                   |
+| `blockHolidays` | `boolean`                                  | `false`           | Block holidays (Jalali)                  |
+| `holidayRegion` | `'IR' \| 'AF' \| 'TJ'`                     | `'IR'`            | Holiday pack                             |
+| `placeholder`   | `string`                                   | locale pack       | Empty input text                         |
+| `className`     | `string`                                   | -                 | Root class                               |
+
+### `Calendar` / `InlineCalendar`
+
+| Prop                    | Type                   | Default        | Meaning                   |
+| ----------------------- | ---------------------- | -------------- | ------------------------- |
+| `system`                | `CalendarSystem`       | `'jalali'`     | Display calendar          |
+| `locale`                | `LocaleCode`           | `'en'`         | UI language               |
+| `value`                 | `CalendarDate \| null` | `null`         | Selected day              |
+| `onSelect`              | `(date) => void`       | -              | Day picked                |
+| `initialDisplayedMonth` | `{ year, month }`      | value or today | Opening month             |
+| `quickNav`              | `boolean`              | `true`         | Month and year jump grids |
+| `rules`                 | `SelectionRules`       | -              | Min/max and blocked days  |
+| `showHolidays`          | `boolean`              | `false`        | Mark holidays             |
+| `blockHolidays`         | `boolean`              | `false`        | Block holidays            |
+| `holidayRegion`         | `HolidayRegion`        | `'IR'`         | Holiday pack              |
+| `className`             | `string`               | -              | Root class                |
+
+### `TimePicker`
+
+| Prop            | Type             | Default                  | Meaning             |
+| --------------- | ---------------- | ------------------------ | ------------------- |
+| `value`         | `TimeOfDay`      | -                        | Controlled time     |
+| `defaultValue`  | `TimeOfDay`      | `{ hour: 0, minute: 0 }` | Uncontrolled seed   |
+| `minuteStep`    | `number`         | `1`                      | Minute options step |
+| `disabledHours` | `number[]`       | -                        | Hidden hours        |
+| `locale`        | `LocaleCode`     | `'en'`                   | Digits language     |
+| `onChange`      | `(time) => void` | -                        | Time changed        |
+| `className`     | `string`         | -                        | Root class          |
+
+### `RangePicker` (`@jalali-js/ui-react`)
+
+| Prop            | Type                     | Default           | Meaning                      |
+| --------------- | ------------------------ | ----------------- | ---------------------------- |
+| `system`        | `CalendarSystem`         | `'jalali'`        | Display calendar             |
+| `locale`        | `LocaleCode`             | `'en'`            | UI language                  |
+| `defaultRange`  | `{ start, end }`         | -                 | Initial range                |
+| `onChange`      | `(value, range) => void` | -                 | Fires when both ends are set |
+| `valueFormat`   | `ValueFormat`            | `'gregorian-iso'` | Storage shape for ends       |
+| `displayFormat` | `FormatOptions`          | -                 | Input text format            |
+| `rules`         | `SelectionRules`         | -                 | Day and range limits         |
+| `showHolidays`  | `boolean`                | `false`           | Mark holidays                |
+| `blockHolidays` | `boolean`                | `false`           | Block holidays               |
+| `holidayRegion` | `HolidayRegion`          | `'IR'`            | Holiday pack                 |
+| `placeholder`   | `string`                 | -                 | Empty input text             |
+| `className`     | `string`                 | -                 | Root class                   |
+
+### `TimeRangePicker` (`@jalali-js/ui-react`)
+
+| Prop            | Type              | Default            | Meaning                   |
+| --------------- | ----------------- | ------------------ | ------------------------- |
+| `locale`        | `LocaleCode`      | `'en'`             | Digits language           |
+| `defaultRange`  | `{ start, end }`  | `09:00` to `17:00` | Initial range             |
+| `minuteStep`    | `number`          | `1`                | Minute step for both ends |
+| `disabledHours` | `number[]`        | -                  | Hidden hours              |
+| `onChange`      | `(range) => void` | -                  | Range changed             |
+| `className`     | `string`          | -                  | Root class                |
+
+### `EventCalendar` (`@jalali-js/ui-react`)
+
+See [Event calendar](/guide/event-calendar) for the event model. Props: `system`, `locale`,
+`view` (`month` \| `week` \| `day`, default `month`), `events`, `initialDisplayedMonth`,
+`initialDate`, `displayFormat`, `onEventClick`, `onDayClick`, `className`.

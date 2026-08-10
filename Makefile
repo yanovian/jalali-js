@@ -107,6 +107,7 @@ tag-release: check
 	  echo "HEAD is already tagged ($$(git describe --tags --exact-match HEAD)); nothing to release."; \
 	  exit 0; \
 	fi
+	node scripts/prepare-changelog.mjs $(BUMP)
 	$(PNPM) --filter "./packages/**" exec -- pnpm version $(BUMP) --no-git-tag-version
 	@TAG="v$$(node -p "require('./packages/core/package.json').version")"; \
 	git add -A; \

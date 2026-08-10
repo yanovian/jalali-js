@@ -953,21 +953,21 @@ The guides explain concepts well. What they lack is the reference density a
 consumer scans for: exact props per component, and a copy-paste answer for
 each common scenario.
 
-- [ ] Add a prop table to every component's guide section (`react`, `vue`,
+- [x] Add a prop table to every component's guide section (`react`, `vue`,
       `web`, and the `ui-*` packages): name, type, default, and a one-line
       description. Keep each table checked against the real source.
-- [ ] Add a recipes page: default to today, min/max bounds, weekend
+- [x] Add a recipes page: default to today, min/max bounds, weekend
       blocking, epoch output for an API, form submission, programmatic
       set and clear, and SSR usage. One short, complete, copy-paste
       example per recipe.
-- [ ] Add a programmatic-control section: how to set, read, and clear the
+- [x] Add a programmatic-control section: how to set, read, and clear the
       value from outside the component, per binding.
-- [ ] Add a support statement page: which browsers and mobile behaviors
+- [x] Add a support statement page: which browsers and mobile behaviors
       the e2e suite actually verifies (Chromium, Firefox, and WebKit
       today), stated from the real CI matrix, not aspiration.
-- [ ] Keep `CHANGELOG.md` current: add a release step that fails
-      `make release-*` when the changelog has no entry for the new
-      version.
+- [x] Keep `CHANGELOG.md` current: `make release-*` promotes
+      `## [Unreleased]` to the new version heading (and compare links),
+      and fails when there are no release notes.
 
 ## Phase 22: Interactive demo playground (`apps/`)
 

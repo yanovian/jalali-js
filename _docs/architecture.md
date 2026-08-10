@@ -294,6 +294,9 @@ in `core`.
   for month, week, and day, plus `EventCalendar` in each `ui-*` package.
   The consumer owns events and editing. Recurring expansion stays on the
   consumer side.
+- Phase 21 added prop tables, a recipes page, a browser support page from
+  the e2e matrix, and a changelog promote step on `make release-*`
+  (`scripts/prepare-changelog.mjs`).
 
 ## Natural language date parsing
 

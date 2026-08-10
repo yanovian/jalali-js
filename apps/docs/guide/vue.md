@@ -121,11 +121,90 @@ const storedRange = ref<RangeStorageValue>();
 </template>
 ```
 
-## Component API reference
+## Prop tables
 
-`@jalali-js/vue`'s and `@jalali-js/ui-vue`'s `.vue` single-file components aren't in the
-[generated API reference](/api/@jalali-js/vue/) (only their plain-TypeScript composables are):
-TypeDoc's TypeScript-based parser has no `.vue` SFC support, the same reason the wider Vue
-ecosystem (VueUse, Vuetify) hand-documents component APIs rather than auto-generating them. The
-prop tables on this page are that hand-written documentation, kept in sync with each component's
-own `defineProps<...>()` by hand.
+`.vue` SFCs are not in the generated API. These tables match `defineProps` in source.
+
+Binding note: `DatePicker` and `RangePicker` use `v-model` for the storage value (write
+channel). Seed with `defaultDate` / `defaultRange`. `Calendar` uses `:value` and `@select`.
+`TimePicker` / `TimeRangePicker` emit `change`. `EventCalendar` emits `eventClick` and
+`dayClick`.
+
+### `DatePicker`
+
+| Prop            | Type                                       | Default           | Meaning                            |
+| --------------- | ------------------------------------------ | ----------------- | ---------------------------------- |
+| `system`        | `'jalali' \| 'gregorian'`                  | `'jalali'`        | Display calendar                   |
+| `locale`        | `'en' \| 'fa' \| 'ps'`                     | `'en'`            | UI language                        |
+| `defaultDate`   | `CalendarDate \| CalendarDateTime \| null` | today             | Initial selection. `null` is empty |
+| `precision`     | `'date' \| 'datetime'`                     | `'date'`          | Day only, or day plus time         |
+| `minuteStep`    | `number`                                   | `1`               | Minute step when datetime          |
+| `disabledHours` | `number[]`                                 | -                 | Hidden hours 0-23                  |
+| `quickNav`      | `boolean`                                  | `true`            | Month and year jump grids          |
+| `valueFormat`   | `ValueFormat`                              | `'gregorian-iso'` | Shape of `v-model`                 |
+| `displayFormat` | `FormatOptions`                            | -                 | Input text format                  |
+| `variant`       | `'grid' \| 'dropdown'`                     | `'grid'`          | Grid popover or Y/M/D selects      |
+| `rules`         | `SelectionRules`                           | -                 | Min/max and blocked days           |
+| `showHolidays`  | `boolean`                                  | `false`           | Mark holidays (Jalali)             |
+| `blockHolidays` | `boolean`                                  | `false`           | Block holidays (Jalali)            |
+| `holidayRegion` | `'IR' \| 'AF' \| 'TJ'`                     | `'IR'`            | Holiday pack                       |
+| `placeholder`   | `string`                                   | locale pack       | Empty input text                   |
+
+### `Calendar` / `InlineCalendar`
+
+| Prop                    | Type                   | Default        | Meaning                   |
+| ----------------------- | ---------------------- | -------------- | ------------------------- |
+| `system`                | `CalendarSystem`       | `'jalali'`     | Display calendar          |
+| `locale`                | `LocaleCode`           | `'en'`         | UI language               |
+| `value`                 | `CalendarDate \| null` | `null`         | Selected day              |
+| `initialDisplayedMonth` | `{ year, month }`      | value or today | Opening month             |
+| `quickNav`              | `boolean`              | `true`         | Month and year jump grids |
+| `rules`                 | `SelectionRules`       | -              | Min/max and blocked days  |
+| `showHolidays`          | `boolean`              | `false`        | Mark holidays             |
+| `blockHolidays`         | `boolean`              | `false`        | Block holidays            |
+| `holidayRegion`         | `HolidayRegion`        | `'IR'`         | Holiday pack              |
+
+Emit: `select` with the picked `CalendarDate`.
+
+### `TimePicker`
+
+| Prop            | Type         | Default                  | Meaning             |
+| --------------- | ------------ | ------------------------ | ------------------- |
+| `value`         | `TimeOfDay`  | -                        | Controlled time     |
+| `defaultValue`  | `TimeOfDay`  | `{ hour: 0, minute: 0 }` | Uncontrolled seed   |
+| `minuteStep`    | `number`     | `1`                      | Minute options step |
+| `disabledHours` | `number[]`   | -                        | Hidden hours        |
+| `locale`        | `LocaleCode` | `'en'`                   | Digits language     |
+
+Emit: `change` with `TimeOfDay`.
+
+### `RangePicker` (`@jalali-js/ui-vue`)
+
+| Prop            | Type             | Default           | Meaning              |
+| --------------- | ---------------- | ----------------- | -------------------- |
+| `system`        | `CalendarSystem` | `'jalali'`        | Display calendar     |
+| `locale`        | `LocaleCode`     | `'en'`            | UI language          |
+| `defaultRange`  | `{ start, end }` | -                 | Initial range        |
+| `valueFormat`   | `ValueFormat`    | `'gregorian-iso'` | Shape of `v-model`   |
+| `displayFormat` | `FormatOptions`  | -                 | Input text format    |
+| `rules`         | `SelectionRules` | -                 | Day and range limits |
+| `showHolidays`  | `boolean`        | `false`           | Mark holidays        |
+| `blockHolidays` | `boolean`        | `false`           | Block holidays       |
+| `holidayRegion` | `HolidayRegion`  | `'IR'`            | Holiday pack         |
+| `placeholder`   | `string`         | -                 | Empty input text     |
+
+### `TimeRangePicker` (`@jalali-js/ui-vue`)
+
+| Prop            | Type             | Default            | Meaning                   |
+| --------------- | ---------------- | ------------------ | ------------------------- |
+| `locale`        | `LocaleCode`     | `'en'`             | Digits language           |
+| `defaultRange`  | `{ start, end }` | `09:00` to `17:00` | Initial range             |
+| `minuteStep`    | `number`         | `1`                | Minute step for both ends |
+| `disabledHours` | `number[]`       | -                  | Hidden hours              |
+
+Emit: `change` with the time range.
+
+### `EventCalendar` (`@jalali-js/ui-vue`)
+
+See [Event calendar](/guide/event-calendar). Props match React except callbacks are emits
+`eventClick` and `dayClick`.

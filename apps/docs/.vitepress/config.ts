@@ -106,6 +106,7 @@ export default defineConfig({
           items: [
             { text: 'Getting started', link: '/guide/getting-started' },
             { text: 'Examples', link: '/guide/examples' },
+            { text: 'Recipes', link: '/guide/recipes' },
             { text: 'Core concepts', link: '/guide/core-concepts' },
             { text: 'Display value vs. storage value', link: '/guide/display-vs-storage' },
             { text: 'Configuration and theming', link: '/guide/theming' },
@@ -118,6 +119,7 @@ export default defineConfig({
             { text: 'Vanilla / Web Components', link: '/guide/web-components' },
             { text: 'Internationalization', link: '/guide/i18n' },
             { text: 'Natural language parsing', link: '/guide/nlp' },
+            { text: 'Browser support', link: '/guide/browser-support' },
             { text: 'Comparison with alternatives', link: '/guide/comparison' },
           ],
         },

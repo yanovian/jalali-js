@@ -83,6 +83,90 @@ npm install @jalali-js/ui-web
 </script>
 ```
 
+## Attribute and property tables
+
+Boolean attributes use presence for on. Set `"false"` to turn them off. Objects
+(`rules`, `defaultDate`, `events`) are JavaScript properties only.
+
+### `<jalali-date-picker>`
+
+| Name             | Kind  | Default         | Meaning                                  |
+| ---------------- | ----- | --------------- | ---------------------------------------- |
+| `system`         | attr  | `jalali`        | Display calendar                         |
+| `locale`         | attr  | `en`            | UI language                              |
+| `variant`        | attr  | `grid`          | `grid` or `dropdown`                     |
+| `precision`      | attr  | `date`          | `date` or `datetime`                     |
+| `minute-step`    | attr  | `1`             | Minute step                              |
+| `disabled-hours` | attr  | -               | Comma-separated hours                    |
+| `value-format`   | attr  | `gregorian-iso` | Storage shape                            |
+| `placeholder`    | attr  | locale pack     | Empty input text                         |
+| `quick-nav`      | attr  | on              | Month and year jump grids                |
+| `show-holidays`  | attr  | off             | Mark holidays                            |
+| `block-holidays` | attr  | off             | Block holidays                           |
+| `holiday-region` | attr  | `IR`            | Holiday pack                             |
+| `defaultDate`    | prop  | today           | Initial selection. `null` is empty       |
+| `rules`          | prop  | -               | Selection limits                         |
+| `value`          | prop  | -               | Get or set selection (set does not emit) |
+| `change`         | event | -               | `{ value, date }`                        |
+
+### `<jalali-calendar>` / `<jalali-inline-calendar>`
+
+| Name                    | Kind  | Default  | Meaning                   |
+| ----------------------- | ----- | -------- | ------------------------- |
+| `system`                | attr  | `jalali` | Display calendar          |
+| `locale`                | attr  | `en`     | UI language               |
+| `quick-nav`             | attr  | on       | Month and year jump grids |
+| `show-holidays`         | attr  | off      | Mark holidays             |
+| `block-holidays`        | attr  | off      | Block holidays            |
+| `holiday-region`        | attr  | `IR`     | Holiday pack              |
+| `value`                 | prop  | `null`   | Selected day              |
+| `rules`                 | prop  | -        | Selection limits          |
+| `initialDisplayedMonth` | prop  | -        | Opening month             |
+| `select`                | event | -        | `{ date }`                |
+
+### `<jalali-time-picker>`
+
+| Name             | Kind  | Default  | Meaning               |
+| ---------------- | ----- | -------- | --------------------- |
+| `locale`         | attr  | `en`     | Digits language       |
+| `minute-step`    | attr  | `1`      | Minute options step   |
+| `disabled-hours` | attr  | -        | Comma-separated hours |
+| `value`          | prop  | midnight | Current time          |
+| `change`         | event | -        | `{ time }`            |
+
+### `<jalali-range-picker>`
+
+| Name                                                  | Kind  | Default             | Meaning              |
+| ----------------------------------------------------- | ----- | ------------------- | -------------------- |
+| `system` / `locale` / `value-format` / `placeholder`  | attr  | same as date picker | Shared picker attrs  |
+| `show-holidays` / `block-holidays` / `holiday-region` | attr  | off / off / `IR`    | Holiday flags        |
+| `defaultRange`                                        | prop  | -                   | Initial range        |
+| `rules`                                               | prop  | -                   | Day and range limits |
+| `change`                                              | event | -                   | `{ value, range }`   |
+
+### `<jalali-time-range-picker>`
+
+| Name             | Kind  | Default            | Meaning               |
+| ---------------- | ----- | ------------------ | --------------------- |
+| `locale`         | attr  | `en`               | Digits language       |
+| `minute-step`    | attr  | `1`                | Minute step           |
+| `disabled-hours` | attr  | -                  | Comma-separated hours |
+| `defaultRange`   | prop  | `09:00` to `17:00` | Initial range         |
+| `change`         | event | -                  | `{ range }`           |
+
+### `<jalali-event-calendar>`
+
+| Name                    | Kind  | Default  | Meaning                   |
+| ----------------------- | ----- | -------- | ------------------------- |
+| `system`                | attr  | `jalali` | Display calendar          |
+| `locale`                | attr  | `en`     | UI language               |
+| `view`                  | attr  | `month`  | `month`, `week`, or `day` |
+| `events`                | prop  | `[]`     | Events to layout          |
+| `initialDisplayedMonth` | prop  | -        | Month anchor              |
+| `initialDate`           | prop  | today    | Week or day anchor        |
+| `event-click`           | event | -        | `{ event }`               |
+| `day-click`             | event | -        | `{ date }`                |
+
 ## No shadow DOM, on purpose
 
 These elements render in light DOM: no `attachShadow()`, no encapsulation boundary. That is

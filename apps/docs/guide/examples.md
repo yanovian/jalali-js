@@ -5,7 +5,8 @@ description: Copy-paste snippets for conversion, pickers, ranges, NLP, and themi
 # Examples
 
 Short, self-contained snippets for common tasks. Each one is copy-paste ready: it shows every
-import it needs. For the concepts behind them, see [Getting started](/guide/getting-started),
+import it needs. For task-shaped answers (bounds, epoch, forms, SSR), see
+[Recipes](/guide/recipes). For concepts, see [Getting started](/guide/getting-started),
 [Core concepts](/guide/core-concepts), and [Configuration and theming](/guide/theming).
 
 ## Convert between calendars

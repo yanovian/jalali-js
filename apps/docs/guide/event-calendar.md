@@ -128,6 +128,24 @@ el.addEventListener('event-click', (event) => {
 <jalali-event-calendar system="jalali" locale="en" view="week"></jalali-event-calendar>
 ```
 
+## Props (React)
+
+| Prop                    | Type                         | Default    | Meaning              |
+| ----------------------- | ---------------------------- | ---------- | -------------------- |
+| `system`                | `CalendarSystem`             | `'jalali'` | Display calendar     |
+| `locale`                | `LocaleCode`                 | `'en'`     | UI language          |
+| `view`                  | `'month' \| 'week' \| 'day'` | `'month'`  | Visible view         |
+| `events`                | `CalendarEvent[]`            | `[]`       | Events to layout     |
+| `initialDisplayedMonth` | `{ year, month }`            | -          | Month anchor (day 1) |
+| `initialDate`           | `{ year, month, day }`       | today      | Week or day anchor   |
+| `displayFormat`         | `FormatOptions`              | -          | Day label format     |
+| `onEventClick`          | `(event) => void`            | -          | Event chip clicked   |
+| `onDayClick`            | `(date) => void`             | -          | Day cell clicked     |
+| `className`             | `string`                     | -          | Root class           |
+
+Vue: same props, emits `eventClick` and `dayClick`. Web: attrs `system`, `locale`, `view`;
+props `events`, `initialDisplayedMonth`, `initialDate`; events `event-click`, `day-click`.
+
 ## Styling
 
 Import the same `date-picker.css` as the other pickers. Event chips use

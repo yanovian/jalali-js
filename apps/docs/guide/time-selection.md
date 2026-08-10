@@ -24,14 +24,17 @@ import { TimePicker } from '@jalali-js/react';
 />;
 ```
 
-| Prop            | Meaning                                    |
-| --------------- | ------------------------------------------ |
-| `minuteStep`    | Minute options step. Default: `1`.         |
-| `disabledHours` | Hours 0-23 that do not appear in the list. |
-| `locale`        | Digit style and text direction.            |
+| Prop            | Type             | Default                  | Meaning              |
+| --------------- | ---------------- | ------------------------ | -------------------- |
+| `value`         | `TimeOfDay`      | -                        | Controlled time      |
+| `defaultValue`  | `TimeOfDay`      | `{ hour: 0, minute: 0 }` | Uncontrolled seed    |
+| `minuteStep`    | `number`         | `1`                      | Minute options step  |
+| `disabledHours` | `number[]`       | -                        | Hidden hours 0-23    |
+| `locale`        | `LocaleCode`     | `'en'`                   | Digits and direction |
+| `onChange`      | `(time) => void` | -                        | Time changed (React) |
 
-Vue uses `@change`. The Web Component is `<jalali-time-picker>`, with `minute-step` and
-`disabled-hours` (comma-separated) as attributes, and `.value` as a property.
+Vue uses `@change`. Web: `<jalali-time-picker>`, attrs `minute-step` and `disabled-hours`,
+prop `.value`.
 
 ## `DatePicker` with `precision="datetime"`
 

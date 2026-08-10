@@ -11,6 +11,11 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- Docs depth: prop tables on the React, Vue, and Web guides, a recipes
+  page (including programmatic set/read/clear), and a browser support
+  page from the real e2e matrix. `make release-*` promotes
+  `## [Unreleased]` to the new version heading and fails when there are
+  no release notes (`scripts/prepare-changelog.mjs`).
 - `EventCalendar` in `@jalali-js/ui-react`, `@jalali-js/ui-vue`, and
   `@jalali-js/ui-web`, with a framework-free `CalendarEvent` model and
   layout helpers in `jalali-js` (`layoutMonthEvents`, `layoutWeekEvents`,
