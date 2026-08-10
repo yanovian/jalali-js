@@ -9,81 +9,41 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
-### Changed
-
-- Visual e2e screenshot mismatches are advisory. They report baseline /
-  new / diff in the PR comment and do not fail the e2e job. Functional
-  assertions still fail the job.
-- Hosted playgrounds are interactive demos: URL-driven controls, live
-  value, theme editor, code snippets, and binding links. The visual
-  matrix keeps the same `data-testid` cells for e2e.
-- Every publishable package README is a full npm page: badges, contents,
-  install, compatibility, quick start, API surface, key options (with
-  links to the docs prop tables), theming, and links. Keywords in each
-  `package.json` are expanded for registry search.
-
 ### Added
 
-- `make check-readmes` and `_docs/readme-structure.md`, wired into
-  `make check`, CI, and the release workflow.
-- Date and range picker popovers flip and clamp to stay in the viewport.
-- Opt-in astronomical Jalali engine: `engine: 'astronomical'` on
-  `createCalendar()`, `toGregorian()`, and `fromGregorian()`. Nowruz uses
-  the March equinox at the Tehran meridian (52.5°E) from Meeus low-precision
-  solar longitude. The arithmetic engine stays the default.
-- Docs depth: prop tables on the React, Vue, and Web guides, a recipes
-  page (including programmatic set/read/clear), and a browser support
-  page from the real e2e matrix. `make release-*` promotes
-  `## [Unreleased]` to the new version heading and fails when there are
-  no release notes (`scripts/prepare-changelog.mjs`).
-- `EventCalendar` in `@jalali-js/ui-react`, `@jalali-js/ui-vue`, and
-  `@jalali-js/ui-web`, with a framework-free `CalendarEvent` model and
-  layout helpers in `jalali-js` (`layoutMonthEvents`, `layoutWeekEvents`,
-  `layoutDayTimedEvents`). Views: `month`, `week`, and `day`. The consumer
-  owns the event list and editing UI. Recurring rules expand on the
-  consumer side before pass-in.
-- `formatRelative()` in `@jalali-js/i18n`: "۳ روز پیش", "3 days ago",
-  "in 2 months", and a today string per locale. Uses `diffDates()` for
-  unit selection. Digits follow `numerals`.
-- `@jalali-js/holidays`: offline Iran (`IR`) holidays. `AF` and `TJ` are
-  reserved. Fixed solar rules plus lunar year table (1402-1426). Names in
-  `regions/ir/names/{en,fa,ps}.ts`. API takes optional `{ region }`. Pickers
-  take `showHolidays`, `blockHolidays`, and `holidayRegion`. Update with
-  `make update-holidays YEARS=next`. Yearly CI opens a PR when data changes.
-- Time selection: a headless `TimePicker` in React, Vue, and Web Components
-  (`minuteStep`, `disabledHours`), a `precision: 'datetime'` option on
-  `DatePicker` that adds a time panel and emits a datetime storage value,
-  and a `TimeRangePicker` in the `ui-*` packages. Shared option lists live
-  in the core (`listHours`, `listMinutes`, `withTime`).
-- Selection rules in every picker: a `SelectionRules` type in the core
-  (`minDate`, `maxDate`, `enabledDates`, `disabledDates`,
-  `disabledWeekdays`), resolved by `isDateSelectable()` and wired through
-  `buildCalendarGrid()`. Blocked days render disabled with a
-  `data-disabled` attribute, reject selection, and drop out of the Tab
-  order. `RangePicker` also refuses a range that crosses a blocked day
-  (`isRangeSelectable()`): the second click starts a new range instead.
-- Format templates and strict parsing in `@jalali-js/i18n`: a `template`
-  option on `format()` (`YYYY`, `MM`, `M`, `DD`, `D`, `MMMM`, `MMM`,
-  `dddd`, `ddd`) and its reverse, `parseTemplate()`. Parsing accepts
-  Latin and native digits and returns `null` when the input does not
-  match the template or the date does not exist.
-- Date math and query helpers in the core: `addMonths`, `addYears`,
-  `diffDates`, `startOf`, `endOf`, `isBefore`, `isAfter`, `isSameDay`,
-  `isBetween`, and `isToday`. All work per calendar system and clamp
-  month ends (Esfand 30 plus one year gives Esfand 29).
-- Pashto (`ps`) support: a locale pack with Afghanistan's own month names,
-  sourced from CLDR, wired into the React, Vue, and Web Components
-  bindings, plus Pashto phrase parsing in `@jalali-js/nlp`.
-- An "Adding a locale" contribution walkthrough in the i18n guide.
-- LLM-friendly docs on the docs site: `llms.txt` (index) and
-  `llms-full.txt` (full guide bundle).
-- A bundle-size badge in the readme.
+- Core date math: `addMonths`, `addYears`, `diffDates`, `startOf`,
+  `endOf`, `isBefore`, `isAfter`, `isSameDay`, `isBetween`, `isToday`.
+- Opt-in astronomical Jalali engine (`engine: 'astronomical'`). Arithmetic
+  stays the default.
+- Selection rules on every picker (`minDate`, `maxDate`, enabled/disabled
+  dates and weekdays). `RangePicker` also blocks ranges that cross a
+  blocked day.
+- Time selection: `TimePicker`, `DatePicker` `precision: 'datetime'`, and
+  `TimeRangePicker` in the `ui-*` packages.
+- `@jalali-js/holidays`: offline Iran (`IR`) holidays, picker hooks
+  (`showHolidays`, `blockHolidays`, `holidayRegion`), and
+  `make update-holidays`.
+- `formatRelative()` and format templates / `parseTemplate()` in
+  `@jalali-js/i18n`.
+- `EventCalendar` (month, week, day) in `ui-react`, `ui-vue`, and `ui-web`,
+  plus core layout helpers.
+- Pashto (`ps`) locale and NLP phrases.
+- Docs: prop tables, recipes, browser support, `llms.txt`, release
+  changelog promotion (`make release-*`).
+- Interactive playgrounds (URL state, live value, theme, snippets) behind
+  `/playground/*`. Popovers flip and clamp in the viewport.
+- Full npm READMEs for every package, plus `make check-readmes` in CI and
+  release.
+
+### Changed
+
+- Visual e2e screenshot mismatches are advisory in the PR comment. They
+  do not fail the job. Functional asserts still fail the job.
+- Package `keywords` expanded for npm search.
 
 ### Removed
 
-- The Finglish (`fa-Latn`) input style in `@jalali-js/nlp`. Finglish is
-  wrong and a bad practice: it works against the language. Farsi input
-  uses Persian script.
+- Finglish (`fa-Latn`) NLP input. Farsi uses Persian script.
 
 ## [0.1.0] - 2026-08-10
 
