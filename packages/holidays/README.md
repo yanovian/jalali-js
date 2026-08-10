@@ -32,7 +32,7 @@ npm install @jalali-js/holidays
 | Reserved     | `AF`, `TJ`                           |
 | Dependencies | None at runtime                      |
 | Lunar table  | Shipped years (see pack `yearRange`) |
-| Node         | CI uses Node 24                      |
+| Node         | 22 and 24 (CI matrix)                |
 
 ## Quick start
 

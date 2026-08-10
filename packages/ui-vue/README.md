@@ -30,11 +30,11 @@ import '@jalali-js/vue/date-picker.css';
 
 ## Compatibility
 
-| Item  | Support          |
-| ----- | ---------------- |
-| Vue   | 3.4+ (CI: Vue 3) |
-| Peers | `vue` `>=3.4`    |
-| Node  | CI uses Node 24  |
+| Item  | Support               |
+| ----- | --------------------- |
+| Vue   | 3.4+ (CI: Vue 3)      |
+| Peers | `vue` `>=3.4`         |
+| Node  | 22 and 24 (CI matrix) |
 
 ## Quick start
 

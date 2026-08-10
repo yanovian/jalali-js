@@ -31,7 +31,7 @@ npm install @jalali-js/i18n
 | Locales      | `en`, `fa`, `ps`         |
 | Dependencies | `jalali-js` only         |
 | Runtime      | Modern Node and browsers |
-| Node         | CI uses Node 24          |
+| Node         | 22 and 24 (CI matrix)    |
 
 React, Vue, and Web bindings already depend on this package through a `locale` prop. Use it
 directly when you format dates outside a component.

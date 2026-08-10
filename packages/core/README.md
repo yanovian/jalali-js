@@ -29,7 +29,8 @@ npm install jalali-js
 
 | Item         | Support                                       |
 | ------------ | --------------------------------------------- |
-| Runtime      | Modern Node and browsers (CI uses Node 24)    |
+| Runtime      | Modern Node and browsers                      |
+| Node         | 22 and 24 (CI matrix)                         |
 | TypeScript   | First-class types, no `@types` package        |
 | Dependencies | None at runtime                               |
 | Frameworks   | None required. Bindings are separate packages |

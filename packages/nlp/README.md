@@ -29,7 +29,7 @@ npm install @jalali-js/nlp
 | ------------ | ------------------------------ |
 | Locales      | `en`, `fa`, `ps`               |
 | Dependencies | `jalali-js`, `@jalali-js/i18n` |
-| Node         | CI uses Node 24                |
+| Node         | 22 and 24 (CI matrix)          |
 
 ## Quick start
 

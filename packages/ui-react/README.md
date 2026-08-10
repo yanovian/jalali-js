@@ -34,7 +34,7 @@ import '@jalali-js/react/date-picker.css';
 | ----- | ------------------------------ |
 | React | 18 and 19 (CI matrix)          |
 | Peers | `react` and `react-dom` `>=18` |
-| Node  | CI uses Node 24                |
+| Node  | 22 and 24 (CI matrix)          |
 
 ## Quick start
 

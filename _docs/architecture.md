@@ -612,18 +612,18 @@ The pipeline uses GitHub Actions. It follows the pattern already used across
 this org's repos: pnpm and Node setup, single-runner jobs with no matrix, and
 reusable internal actions for dependency updates and license audits.
 
-**Exception: the Phase 9 peer-dependency compatibility matrix and the Phase
-10 cross-browser visual suite both use a real GitHub Actions
-`strategy.matrix`, deliberately, not the single-runner style above.** A
-compatibility check across several supported major versions of React, Vue,
-Next.js, and Nuxt, and a visual suite across several browser engines, are
-exactly the case a matrix exists for: the work is the same job repeated
+**Exception: three checks use a real GitHub Actions `strategy.matrix`,
+deliberately, not the single-runner style above:** the Phase 9
+peer-dependency compatibility matrix, the Phase 10 cross-browser visual
+suite, and the Node LTS matrix in `ci.yml`. A compatibility check across
+several supported majors of React, Vue, Next.js, Nuxt, Node, or browser
+engines is the case a matrix exists for: the work is the same job repeated
 over an axis of inputs, and running it serially would multiply CI
 wall-clock time by the size of that axis for no benefit. The rest of the
-pipeline (`ci.yml`'s install/typecheck/lint/format-check/readmes/test/build, and
-the scheduled maintenance workflows) stays single-runner, since none of
-that work is naturally shaped as "the same job, many inputs" the way these
-two checks are.
+pipeline (`ci.yml`'s full install/typecheck/lint/format-check/readmes/test/build
+on Node 24, and the scheduled maintenance workflows) stays single-runner,
+since none of that work is naturally shaped as "the same job, many inputs"
+the way these checks are.
 
 - **`ci.yml`.** This workflow exists from Phase 0, not from a later phase.
   Its first version ran install, typecheck, lint, format-check, and unit
@@ -635,8 +635,10 @@ two checks are.
   "Check bundle size" step (`pnpm size`, `packages/core`'s `size-limit`
   budget from Phase 8) run after the packages build so `packages/core/dist`
   already exists. A Playwright visual suite with screenshot upload or
-  comment is still Phase 10. No phase after Phase 0 ships a change with no
-  CI check behind it.
+  comment is still Phase 10. The `node-matrix` job runs typecheck, unit
+  tests, and package builds on each supported Node LTS (22 and 24). Lint,
+  docs, playground apps, and size stay on the Node 24 `test` job. No phase
+  after Phase 0 ships a change with no CI check behind it.
 - **`release.yml` (Phase 8, matches the org's own tag-triggered release
   convention, trigger and mechanism both).** One workflow, triggered by a
   pushed tag matching `v*.*.*`. `make release-patch` (`-minor`/`-major`)

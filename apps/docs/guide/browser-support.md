@@ -1,10 +1,23 @@
 ---
-description: Browsers the e2e suite verifies today.
+description: Browsers and Node versions the CI suite verifies today.
 ---
 
 # Browser support
 
-This page states what CI verifies. It is not a promise about every browser.
+This page states what CI verifies. It is not a promise about every browser
+or every Node release.
+
+## Node matrix
+
+`.github/workflows/ci.yml` runs a slim `node-matrix` job on each supported
+Node LTS, in parallel with the full Node 24 gate:
+
+| Node | Role in CI                                             |
+| ---- | ------------------------------------------------------ |
+| 22   | Maintenance LTS. Typecheck, unit tests, package builds |
+| 24   | Active LTS. Full CI gate, plus the same slim checks    |
+
+EOL Node majors (20 and older) are out of scope.
 
 ## Visual e2e matrix
 

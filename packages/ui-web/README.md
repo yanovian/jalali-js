@@ -36,7 +36,7 @@ import '@jalali-js/web/date-picker.css';
 | -------- | ---------------------------------------------- |
 | Runtime  | Modern browsers with Custom Elements           |
 | Peers    | None (`@jalali-js/web` is a normal dependency) |
-| Node     | CI uses Node 24                                |
+| Node     | 22 and 24 (CI matrix)                          |
 | Verified | Chromium, Firefox, WebKit in e2e               |
 
 ## Quick start

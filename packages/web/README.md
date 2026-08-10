@@ -37,7 +37,7 @@ Importing the package registers the custom elements.
 | -------- | ------------------------------------------- |
 | Runtime  | Modern browsers with Custom Elements        |
 | Peers    | None                                        |
-| Node     | CI uses Node 24                             |
+| Node     | 22 and 24 (CI matrix)                       |
 | Verified | Chromium, Firefox, WebKit in the e2e matrix |
 
 ## Quick start

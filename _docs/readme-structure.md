@@ -14,7 +14,7 @@ Use these exact `##` headings (the check script matches them):
 3. `## Contents` with anchor links to the sections below.
 4. `## Install`
 5. `## Compatibility` (peers from `package.json`, framework majors from the
-   CI matrix, Node version CI uses).
+   CI matrix, Node majors from the CI Node matrix).
 6. `## Quick start` (smallest working example).
 7. One or more API sections (`## API`, `## Components`, or similar) with a
    short example per main export.

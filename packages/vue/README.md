@@ -35,7 +35,7 @@ import '@jalali-js/vue/date-picker.css';
 | Vue   | 3.4+ (CI matrix: Vue 3) |
 | Nuxt  | 3 and 4 (CI matrix)     |
 | Peers | `vue` `>=3.4`           |
-| Node  | CI uses Node 24         |
+| Node  | 22 and 24 (CI matrix)   |
 
 ## Quick start
 

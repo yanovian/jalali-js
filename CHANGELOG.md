@@ -12,6 +12,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Added
+
+- CI Node matrix for LTS 22 and 24 (typecheck, unit tests, package builds).
+
 ### Fixed
 
 - Docs badge fixed.
