@@ -30,6 +30,24 @@ comments.
 When you update a doc under `_docs/`, check it against these rules before you
 finish.
 
+## Changelog
+
+When a change is user-facing or otherwise notable, add a bullet under
+`## [Unreleased]` in `CHANGELOG.md`. Follow Keep a Changelog sections
+(`Added`, `Changed`, `Fixed`, `Removed`).
+
+Keep each bullet short:
+
+- One idea per bullet. Prefer one or two lines.
+- Name the API, package, or behavior. Skip long rationale and file paths.
+- Do not paste commit messages or phase numbers.
+- Match the tone of recent `Unreleased` bullets. Prefer the short form over
+  a design essay.
+- Do not use em dashes.
+
+`make release-*` promotes `## [Unreleased]` into the version heading. Leave
+that step to the maintainer.
+
 ## End of a task
 
 After you finish a task that changes code, suggest a branch name, a PR

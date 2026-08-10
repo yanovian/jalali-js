@@ -5,6 +5,9 @@ This file records all notable changes to this project. The format follows
 [Semantic Versioning](https://semver.org/). Every package in this monorepo
 releases together, at the same version number.
 
+Keep bullets short: one idea, one or two lines, name the API or behavior.
+Agents follow the Changelog section in [`AGENTS.md`](AGENTS.md).
+
 Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
