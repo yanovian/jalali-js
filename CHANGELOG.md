@@ -11,6 +11,9 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- `formatRelative()` in `@jalali-js/i18n`: "۳ روز پیش", "3 days ago",
+  "in 2 months", and a today string per locale. Uses `diffDates()` for
+  unit selection. Digits follow `numerals`.
 - `@jalali-js/holidays`: offline Iran (`IR`) holidays. `AF` and `TJ` are
   reserved. Fixed solar rules plus lunar year table (1402-1426). Names in
   `regions/ir/names/{en,fa,ps}.ts`. API takes optional `{ region }`. Pickers

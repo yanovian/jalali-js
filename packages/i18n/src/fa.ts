@@ -50,4 +50,19 @@ export const fa: LocalePack = {
   },
   datePickerPlaceholder: 'انتخاب تاریخ',
   rangePickerPlaceholder: 'انتخاب بازه تاریخ',
+  relative: {
+    today: 'امروز',
+    past: {
+      day: { one: '{n} روز پیش', other: '{n} روز پیش' },
+      week: { one: '{n} هفته پیش', other: '{n} هفته پیش' },
+      month: { one: '{n} ماه پیش', other: '{n} ماه پیش' },
+      year: { one: '{n} سال پیش', other: '{n} سال پیش' },
+    },
+    future: {
+      day: { one: '{n} روز دیگر', other: '{n} روز دیگر' },
+      week: { one: '{n} هفته بعد', other: '{n} هفته بعد' },
+      month: { one: '{n} ماه بعد', other: '{n} ماه بعد' },
+      year: { one: '{n} سال بعد', other: '{n} سال بعد' },
+    },
+  },
 };

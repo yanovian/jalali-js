@@ -7,7 +7,7 @@ npm install @jalali-js/i18n
 ```
 
 ```ts
-import { format, parseTemplate, en, fa, ps } from '@jalali-js/i18n';
+import { format, formatRelative, parseTemplate, en, fa, ps } from '@jalali-js/i18n';
 
 const date = {
   precision: 'date' as const,
@@ -16,11 +16,13 @@ const date = {
   month: 5,
   day: 15,
 };
+const earlier = { ...date, day: 12 };
 
 format(date, en); // '15 Mordad 1403'
 format(date, fa); // '۱۵ مرداد ۱۴۰۳'
 format(date, ps); // '۱۵ زمری ۱۴۰۳' (Pashto, with Afghanistan's month names)
 
+formatRelative(earlier, date, fa); // '۳ روز پیش'
 format(date, en, { template: 'YYYY/MM/DD' }); // '1403/05/15'
 parseTemplate('1403/05/15', 'YYYY/MM/DD', en); // the date above, or null on a mismatch
 ```

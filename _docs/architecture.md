@@ -288,6 +288,8 @@ in `core`.
   and native digits, and rejects dates that do not exist. One tokenizer
   in `template.ts` serves both directions. Free-form input stays in
   `packages/nlp`.
+- Phase 19 added `formatRelative(from, to, locale)`. Unit selection uses
+  `diffDates()` from core. Phrases live on each `LocalePack.relative`.
 
 ## Natural language date parsing
 

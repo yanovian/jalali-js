@@ -1,10 +1,23 @@
-import type { CalendarSystem } from 'jalali-js';
+import type { CalendarSystem, DiffUnit } from 'jalali-js';
 
 /** A calendar system's month names, in the two styles `format()` can pick between. */
 export interface MonthNames {
   /** 12 entries, index 0 is month 1 (matching a `CalendarDate.month` value of 1). */
   readonly long: readonly string[];
   readonly short: readonly string[];
+}
+
+/** One and other forms for a relative unit. `{n}` is the formatted count. */
+export interface RelativeUnitForms {
+  readonly one: string;
+  readonly other: string;
+}
+
+/** Relative display phrases for `formatRelative()`. */
+export interface RelativeForms {
+  readonly today: string;
+  readonly past: Record<DiffUnit, RelativeUnitForms>;
+  readonly future: Record<DiffUnit, RelativeUnitForms>;
 }
 
 /**
@@ -41,4 +54,6 @@ export interface LocalePack {
    * consumer who passes no `placeholder` of their own never sees a genuinely blank input. */
   readonly datePickerPlaceholder: string;
   readonly rangePickerPlaceholder: string;
+  /** Phrases for `formatRelative()`. */
+  readonly relative: RelativeForms;
 }

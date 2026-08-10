@@ -51,4 +51,19 @@ export const en: LocalePack = {
   },
   datePickerPlaceholder: 'Select a date',
   rangePickerPlaceholder: 'Select a date range',
+  relative: {
+    today: 'today',
+    past: {
+      day: { one: '{n} day ago', other: '{n} days ago' },
+      week: { one: '{n} week ago', other: '{n} weeks ago' },
+      month: { one: '{n} month ago', other: '{n} months ago' },
+      year: { one: '{n} year ago', other: '{n} years ago' },
+    },
+    future: {
+      day: { one: 'in {n} day', other: 'in {n} days' },
+      week: { one: 'in {n} week', other: 'in {n} weeks' },
+      month: { one: 'in {n} month', other: 'in {n} months' },
+      year: { one: 'in {n} year', other: 'in {n} years' },
+    },
+  },
 };

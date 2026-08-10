@@ -64,4 +64,19 @@ export const ps: LocalePack = {
   },
   datePickerPlaceholder: 'نېټه وټاکئ',
   rangePickerPlaceholder: 'د نېټو واټن وټاکئ',
+  relative: {
+    today: 'نن',
+    past: {
+      day: { one: '{n} ورځ مخکې', other: '{n} ورځې مخکې' },
+      week: { one: '{n} اونۍ مخکې', other: '{n} اونۍ مخکې' },
+      month: { one: '{n} مياشت مخکې', other: '{n} مياشتې مخکې' },
+      year: { one: '{n} کال مخکې', other: '{n} کاله مخکې' },
+    },
+    future: {
+      day: { one: 'په {n} ورځ کې', other: 'په {n} ورځو کې' },
+      week: { one: 'په {n} اونۍ کې', other: 'په {n} اونيو کې' },
+      month: { one: 'په {n} مياشت کې', other: 'په {n} مياشتو کې' },
+      year: { one: 'په {n} کال کې', other: 'په {n} کالونو کې' },
+    },
+  },
 };

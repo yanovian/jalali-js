@@ -912,11 +912,12 @@ and `TJ` are reserved under `src/regions/<code>/`.
 
 ## Phase 19: Relative time output (`packages/i18n`)
 
-- [ ] Add `formatRelative(from, to, locale)`: "۳ روز پیش", "3 days ago",
+- [x] Add `formatRelative(from, to, locale)`: "۳ روز پیش", "3 days ago",
       "in 2 months". Unit selection uses Phase 14's `diffDates()`. Digits
-      follow the existing `numerals` option.
-- [ ] Add unit tests per locale, per unit, and for the "today" case.
-- [ ] Document it in the i18n guide.
+      follow the existing `numerals` option. Relative phrases live on
+      each `LocalePack` (`relative.today` / past / future).
+- [x] Add unit tests per locale, per unit, and for the "today" case.
+- [x] Document it in the i18n guide.
 
 ## Phase 20: Event calendar (`packages/ui-*`)
 
