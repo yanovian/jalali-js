@@ -24,7 +24,7 @@ describe('formatNumber', () => {
     expect(formatNumber(1990, 'native', fa.digits)).toBe('۱۹۹۰');
   });
 
-  it('renders native Pashto digits (arabext, the same glyph set as fa)', () => {
+  it('renders native Pashto digits (the same glyph set as fa)', () => {
     expect(formatNumber(1403, 'native', ps.digits)).toBe('۱۴۰۳');
     expect(formatNumber(0, 'native', ps.digits)).toBe('۰');
   });

@@ -55,7 +55,7 @@ multi-thousand-year range, and against an independent, published 121-year refere
 ## Locale packs
 
 `@jalali-js/i18n` exports `en`, `fa`, and `ps` (Pashto, with Afghanistan's own zodiac-based
-month names for the same Solar Hijri calendar), each a `LocalePack`: month names (for both
+names for the same Jalali months), each a `LocalePack`: month names (for both
 calendar systems, so `en` includes English transliterations of the Jalali months and `fa`
 includes Persian transliterations of the Gregorian ones), weekday names, digit style, and text
 direction. `format()` takes a date plus a locale pack and renders it; the React, Vue, and Web

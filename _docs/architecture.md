@@ -260,19 +260,23 @@ in `core`.
 
 - Locales at launch: `en` and `fa`. Phase 12 added `ps` (Pashto),
   Afghanistan's other official language alongside Dari (Afghanistan being
-  the other country that uses the Jalali/Solar Hijri calendar officially,
-  besides Iran); Dari itself is a national standard of Persian, close
-  enough to `fa` that a dedicated pack is lower priority.
+  the other country that uses the Jalali calendar officially, besides
+  Iran); Dari itself is a national standard of Persian, close enough to
+  `fa` that a dedicated pack is lower priority.
 - Locale data covers: month names, weekday names in full and short form,
   native digits against Latin digits, and text direction (`ltr` or `rtl`),
   so a consumer can set the `dir` attribute correctly.
 - The locale pack format lets the team add another locale as a data file,
   with no code change: `ps.ts` proved this for real, landing as one data
-  file plus a `LocaleCode` union entry per binding. Its names and digits
-  come from CLDR's own `ps` data, read through ICU (Node's `Intl`), the
-  same verification source Phase 1 used for the calendar arithmetic.
-  Afghanistan names the Solar Hijri months after the zodiac signs, so
-  `ps`'s Jalali month names share nothing with `fa`'s Persian ones.
+  file plus one entry in `@jalali-js/i18n`'s shared locale table
+  (`locale-packs.ts`), which the react, vue, and web bindings re-export.
+  Its names and digits come from CLDR's own `ps` data, read through ICU
+  (Node's `Intl`), the same verification source Phase 1 used for the
+  calendar arithmetic.
+  Afghanistan names the Jalali months after the zodiac signs, so `ps`'s
+  month names share nothing with `fa`'s Persian ones. The two name sets
+  label the same months of the same calendar (see `ps.ts`'s own comment
+  for the direct ICU verification).
 - The docs site's i18n guide has the step-by-step "Adding a locale"
   walkthrough for contributors.
 

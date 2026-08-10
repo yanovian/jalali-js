@@ -78,7 +78,7 @@ describe('format: Pashto locale', () => {
     expect(format(gregorianDate, ps)).toBe('۵ اګست ۲۰۲۴');
   });
 
-  it('prefixes the weekday name when asked, with an Arabic comma separator', () => {
+  it('prefixes the weekday name when asked, with the same "،" separator fa uses', () => {
     // 2024-08-05 / 15 Mordad 1403 is a Monday: دونۍ in Pashto.
     expect(format(jalaliDate, ps, { weekday: true })).toBe('دونۍ، ۱۵ زمری ۱۴۰۳');
   });

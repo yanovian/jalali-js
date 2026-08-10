@@ -671,7 +671,7 @@ actually passed CI ever gets baselined.
 ## Phase 12: Additional locales (`packages/i18n`, `packages/nlp`)
 
 - [x] Confirm the next locale to add (proposed: Pashto, `ps`). Afghanistan
-      is the other country that uses the Jalali/Solar Hijri calendar
+      is the other country that uses the Jalali calendar
       officially, alongside Iran, and Pashto is one of its two official
       languages; Dari, its other official language, is a national standard
       of Persian itself and already close enough to `fa` that a dedicated
@@ -682,11 +682,15 @@ actually passed CI ever gets baselined.
       `src/ps.ts`. Every name and digit comes from CLDR's `ps` locale data,
       read through ICU (Node's `Intl`), not from memory, the same
       verification source Phase 1 used for the calendar arithmetic.
-      Afghanistan names the Solar Hijri months after the zodiac signs
-      (وری through کب), so `ps`'s Jalali month names share nothing with
-      `fa`'s Persian ones. CLDR has no abbreviated Pashto month or weekday
-      forms, so `short` reuses `long`, the same choice `fa.ts` makes for
-      its month names.
+      Afghanistan names the Jalali months after the zodiac signs
+      (وری through کب), so `ps`'s month names share nothing with
+      `fa`'s Persian ones. They are two name sets for the same months of
+      the same calendar, verified directly: ICU reports identical year,
+      month, and day numbers for the `ps-AF` and `en` Persian-calendar
+      locales across 20,000 random dates (1900-2100), and وری names the
+      same day فروردین names (Nowruz). CLDR has no abbreviated Pashto
+      month or weekday forms, so `short` reuses `long`, the same choice
+      `fa.ts` makes for its month names.
 - [x] Add unit tests for the new locale pack, mirroring `en`/`fa`'s
       existing coverage (`format()` across styles, the weekday prefix,
       numeral rendering). `format.test.ts`'s Pashto suite and a
@@ -694,10 +698,14 @@ actually passed CI ever gets baselined.
 - [x] Wire the new locale into `@jalali-js/react` and `@jalali-js/vue`'s
       `LocaleCode` type and `localePackFor()`. Also `@jalali-js/web`,
       which landed after this item was written and carries the same
-      `LocaleCode`. The four web elements each parsed their `locale`
-      attribute with a hardcoded `'fa' : 'en'` ternary; those now share
-      one `parseLocaleAttribute()` in `packages/web/src/locale.ts`, so
-      the next locale changes one table, not four call sites.
+      `LocaleCode`. Doing this showed the wiring itself was duplicated:
+      each binding held its own copy of the code-to-pack table, and the
+      four web elements each parsed their `locale` attribute with a
+      hardcoded `'fa' : 'en'` ternary. Both now live once in
+      `@jalali-js/i18n` (`locale-packs.ts`: `LocaleCode`,
+      `localePackFor()`, `isLocaleCode()`); the bindings re-export them,
+      and the web elements share one `parseLocaleAttribute()`. The next
+      locale changes one table, not three bindings and four call sites.
 - [x] Optional, separate from the i18n locale pack itself: add
       `@jalali-js/nlp` phrase support for the new locale (`NlpLocale`, a
       new `WordList`), if the phrase set is well understood enough to
