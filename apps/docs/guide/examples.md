@@ -122,7 +122,7 @@ function EventDatePicker() {
 }
 ```
 
-## React: month event calendar
+## React: event calendar (month, week, or day)
 
 ```tsx
 import '@jalali-js/react/date-picker.css';
@@ -136,9 +136,25 @@ const events: CalendarEvent[] = [
     start: { year: 1403, month: 5, day: 10 },
     end: { year: 1403, month: 5, day: 12 },
   },
+  {
+    id: 'meeting',
+    title: 'Meeting',
+    start: { year: 1403, month: 5, day: 15 },
+    end: { year: 1403, month: 5, day: 15 },
+    allDay: false,
+    startTime: { hour: 14, minute: 0 },
+    endTime: { hour: 15, minute: 0 },
+  },
 ];
 
-<EventCalendar system="jalali" locale="en" events={events} onEventClick={console.log} />;
+<EventCalendar
+  system="jalali"
+  locale="en"
+  view="week"
+  initialDate={{ year: 1403, month: 5, day: 15 }}
+  events={events}
+  onEventClick={console.log}
+/>;
 ```
 
 ## A custom theme, without a theme file

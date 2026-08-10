@@ -92,4 +92,29 @@ describe('EventCalendar', () => {
     expect(parts).toHaveLength(2);
     expect(parts[1]! - parts[0]!).toBeGreaterThanOrEqual(2);
   });
+
+  it('renders week and day views with timed placement', () => {
+    const { rerender } = render(
+      <EventCalendar
+        locale="en"
+        view="week"
+        initialDate={{ year: 1403, month: 5, day: 15 }}
+        events={demoEvents}
+      />,
+    );
+    expect(document.querySelector('[data-view="week"]')).toBeTruthy();
+    expect(document.querySelector('[data-jalali-eventcalendar-timed]')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Meeting' })).toHaveAttribute('data-timed');
+
+    rerender(
+      <EventCalendar
+        locale="en"
+        view="day"
+        initialDate={{ year: 1403, month: 5, day: 15 }}
+        events={demoEvents}
+      />,
+    );
+    expect(document.querySelector('[data-view="day"]')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Meeting' })).toBeInTheDocument();
+  });
 });

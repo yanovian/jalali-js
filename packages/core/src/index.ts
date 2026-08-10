@@ -18,15 +18,27 @@ export type {
 export { createCalendar } from './calendar.js';
 export type { CalendarGridDay } from './calendar-grid.js';
 export { buildCalendarGrid, nextMonth, previousMonth } from './calendar-grid.js';
-export type { CalendarEvent, EventLaneSegment } from './event-calendar.js';
+export type {
+  CalendarEvent,
+  EventCalendarView,
+  EventLaneSegment,
+  TimedEventBlock,
+} from './event-calendar.js';
 export {
+  daysForEventView,
   eventCoversDate,
   eventIsAllDay,
+  eventMinutesOnDate,
   eventsForDate,
   findEventById,
   isValidEventSpan,
+  laneCountOf,
+  layoutDayTimedEvents,
+  layoutDaysTimedEvents,
   layoutMonthEvents,
   layoutWeekEvents,
+  shiftEventViewAnchor,
+  timedBlockStyle,
 } from './event-calendar.js';
 export type { CalendarDateFields, CalendarEngine } from './calendar-engine.js';
 export type { CalendarSystem } from './convert.js';

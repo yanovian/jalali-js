@@ -126,17 +126,43 @@
       </section>
 
       <section data-testid="event-calendar">
-        <h2>Event calendar (@jalali-js/ui-web)</h2>
+        <h2>Event calendar month (@jalali-js/ui-web)</h2>
         <p>
-          Mordad 1403 with two seed events. The consumer owns the list. Set
+          Mordad 1403. Multi-day all-day chips plus timed events. Set
           <code>.events</code> in <code>main.ts</code>. Listen for <code>event-click</code>.
         </p>
         <jalali-event-calendar
           id="event-calendar"
           system="jalali"
+          view="month"
           class="locale-follows"
         ></jalali-event-calendar>
         <p>Last event click: <span id="event-click-log">none</span></p>
+      </section>
+
+      <section data-testid="event-calendar-week">
+        <h2>Event calendar week</h2>
+        <p>
+          Week of 15 Mordad 1403. All-day row on top. Timed grid below. Overlapping Meeting and
+          Call share side-by-side lanes.
+        </p>
+        <jalali-event-calendar
+          id="event-calendar-week"
+          system="jalali"
+          view="week"
+          class="locale-follows"
+        ></jalali-event-calendar>
+      </section>
+
+      <section data-testid="event-calendar-day">
+        <h2>Event calendar day</h2>
+        <p>15 Mordad 1403. Same seed events, one day column with a timed grid.</p>
+        <jalali-event-calendar
+          id="event-calendar-day"
+          system="jalali"
+          view="day"
+          class="locale-follows"
+        ></jalali-event-calendar>
       </section>
 
       <section data-testid="selection-rules">

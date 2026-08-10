@@ -75,4 +75,19 @@ describe('EventCalendar', () => {
       day: 15,
     });
   });
+
+  it('renders week and day views', async () => {
+    const wrapper = mount(EventCalendar, {
+      props: {
+        locale: 'en',
+        view: 'week',
+        initialDate: { year: 1403, month: 5, day: 15 },
+        events: demoEvents,
+      },
+    });
+    expect(wrapper.find('[data-view="week"]').exists()).toBe(true);
+    expect(wrapper.find('[data-jalali-eventcalendar-timed]').exists()).toBe(true);
+    await wrapper.setProps({ view: 'day' });
+    expect(wrapper.find('[data-view="day"]').exists()).toBe(true);
+  });
 });

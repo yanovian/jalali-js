@@ -1,19 +1,29 @@
 <script setup lang="ts">
-/**
- * Month event calendar. The consumer owns the event list and editing UI.
- * This component only lays events out and fires click callbacks.
- */
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import { localePackFor, type LocaleCode } from '@jalali-js/vue';
-import type { CalendarDate, CalendarEvent, CalendarSystem } from 'jalali-js';
+import type {
+  CalendarDate,
+  CalendarDateFields,
+  CalendarEvent,
+  CalendarSystem,
+  EventCalendarView,
+} from 'jalali-js';
 import {
   buildCalendarGrid,
   createCalendar,
+  dayOfWeek,
+  daysForEventView,
+  eventIsAllDay,
   findEventById,
+  isSameDay,
+  laneCountOf,
+  layoutDaysTimedEvents,
   layoutMonthEvents,
-  nextMonth,
-  previousMonth,
+  layoutWeekEvents,
+  listHours,
+  shiftEventViewAnchor,
+  timedBlockStyle,
 } from 'jalali-js';
 import { computed, ref } from 'vue';
 
@@ -21,13 +31,16 @@ const props = withDefaults(
   defineProps<{
     system?: CalendarSystem;
     locale?: LocaleCode;
+    view?: EventCalendarView;
     events?: readonly CalendarEvent[];
     initialDisplayedMonth?: { year: number; month: number };
+    initialDate?: CalendarDateFields;
     displayFormat?: FormatOptions;
   }>(),
   {
     system: 'jalali',
     locale: 'en',
+    view: 'month',
     events: () => [],
   },
 );
@@ -39,28 +52,66 @@ const emit = defineEmits<{
 
 const localePack = computed(() => localePackFor(props.locale));
 const today = computed(() => createCalendar({ system: props.system }).today());
-const displayed = ref(
-  props.initialDisplayedMonth ?? { year: today.value.year, month: today.value.month },
+const anchor = ref<CalendarDateFields>(
+  props.initialDate
+    ? { ...props.initialDate }
+    : props.initialDisplayedMonth
+      ? { ...props.initialDisplayedMonth, day: 1 }
+      : { year: today.value.year, month: today.value.month, day: today.value.day },
 );
 
 const weeks = computed(() =>
-  buildCalendarGrid(props.system, displayed.value.year, displayed.value.month, today.value, null),
+  props.view === 'month'
+    ? buildCalendarGrid(props.system, anchor.value.year, anchor.value.month, today.value, null)
+    : null,
 );
-const weekLayouts = computed(() => layoutMonthEvents(props.events, weeks.value));
+const monthLayouts = computed(() =>
+  weeks.value ? layoutMonthEvents(props.events, weeks.value) : null,
+);
 
-const monthLabel = computed(
-  () => localePack.value.monthNames[props.system].long[displayed.value.month - 1],
+const periodDays = computed(() =>
+  props.view === 'month' ? null : daysForEventView(props.system, props.view, anchor.value),
 );
-const yearLabel = computed(() =>
-  formatNumber(displayed.value.year, localePack.value.defaultNumerals, localePack.value.digits),
+const allDayEvents = computed(() => props.events.filter(eventIsAllDay));
+const allDaySegments = computed(() =>
+  periodDays.value ? layoutWeekEvents(allDayEvents.value, periodDays.value) : [],
 );
+const timedLayouts = computed(() =>
+  periodDays.value ? layoutDaysTimedEvents(props.events, periodDays.value) : [],
+);
+const allDayLaneCount = computed(() => laneCountOf(allDaySegments.value));
+
+const title = computed(() => {
+  if (props.view === 'month') {
+    const monthLabel = localePack.value.monthNames[props.system].long[anchor.value.month - 1];
+    const yearLabel = formatNumber(
+      anchor.value.year,
+      localePack.value.defaultNumerals,
+      localePack.value.digits,
+    );
+    return `${monthLabel} ${yearLabel}`;
+  }
+  if (!periodDays.value?.length) return '';
+  if (props.view === 'day') {
+    return formatDate(
+      periodDays.value[0]!,
+      localePack.value,
+      props.displayFormat ?? { style: 'long' },
+    );
+  }
+  const start = formatDate(periodDays.value[0]!, localePack.value, { style: 'short' });
+  const end = formatDate(periodDays.value[periodDays.value.length - 1]!, localePack.value, {
+    style: 'short',
+  });
+  return `${start} – ${end}`;
+});
+
 const previousGlyph = computed(() => (localePack.value.direction === 'rtl' ? '›' : '‹'));
 const nextGlyph = computed(() => (localePack.value.direction === 'rtl' ? '‹' : '›'));
-
-function laneCount(weekIndex: number): number {
-  const segments = weekLayouts.value[weekIndex] ?? [];
-  return segments.reduce((max, segment) => Math.max(max, segment.lane + 1), 0);
-}
+const navLabel = computed(() =>
+  props.view === 'month' ? 'month' : props.view === 'week' ? 'week' : 'day',
+);
+const hours = listHours();
 
 function onEventClick(eventId: string, click: MouseEvent): void {
   click.stopPropagation();
@@ -70,27 +121,38 @@ function onEventClick(eventId: string, click: MouseEvent): void {
 </script>
 
 <template>
-  <div :dir="localePack.direction" data-jalali-calendar-root data-jalali-eventcalendar-root>
+  <div
+    :dir="localePack.direction"
+    data-jalali-calendar-root
+    data-jalali-eventcalendar-root
+    :data-view="view"
+  >
     <div data-jalali-calendar-header>
       <button
         type="button"
         data-jalali-calendar-nav="previous"
-        aria-label="Previous month"
-        @click="displayed = previousMonth(system, displayed.year, displayed.month)"
+        :aria-label="`Previous ${navLabel}`"
+        @click="anchor = shiftEventViewAnchor(system, view, anchor, -1)"
       >
         {{ previousGlyph }}
       </button>
-      <span data-jalali-calendar-title>{{ monthLabel }} {{ yearLabel }}</span>
+      <span data-jalali-calendar-title>{{ title }}</span>
       <button
         type="button"
         data-jalali-calendar-nav="next"
-        aria-label="Next month"
-        @click="displayed = nextMonth(system, displayed.year, displayed.month)"
+        :aria-label="`Next ${navLabel}`"
+        @click="anchor = shiftEventViewAnchor(system, view, anchor, 1)"
       >
         {{ nextGlyph }}
       </button>
     </div>
-    <div role="grid" data-jalali-calendar-grid data-jalali-eventcalendar-grid>
+
+    <div
+      v-if="view === 'month' && weeks && monthLayouts"
+      role="grid"
+      data-jalali-calendar-grid
+      data-jalali-eventcalendar-grid
+    >
       <div role="row" data-jalali-calendar-weekdays>
         <span
           v-for="(name, index) in localePack.weekdayNames.short"
@@ -126,13 +188,13 @@ function onEventClick(eventId: string, click: MouseEvent): void {
         <div
           data-jalali-eventcalendar-lanes
           :style="
-            laneCount(weekIndex) > 0
-              ? { gridTemplateRows: `repeat(${laneCount(weekIndex)}, auto)` }
+            laneCountOf(monthLayouts[weekIndex] ?? []) > 0
+              ? { gridTemplateRows: `repeat(${laneCountOf(monthLayouts[weekIndex] ?? [])}, auto)` }
               : undefined
           "
         >
           <button
-            v-for="segment in weekLayouts[weekIndex] ?? []"
+            v-for="segment in monthLayouts[weekIndex] ?? []"
             :key="`${segment.eventId}-${segment.startWeekday}-${segment.lane}`"
             type="button"
             data-jalali-eventcalendar-event
@@ -146,6 +208,81 @@ function onEventClick(eventId: string, click: MouseEvent): void {
             @click="onEventClick(segment.eventId, $event)"
           >
             {{ segment.title }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div v-else-if="periodDays" data-jalali-eventcalendar-period>
+      <div
+        data-jalali-eventcalendar-days
+        :style="{ gridTemplateColumns: `repeat(${periodDays.length}, minmax(0, 1fr))` }"
+      >
+        <button
+          v-for="day in periodDays"
+          :key="`${day.year}-${day.month}-${day.day}`"
+          type="button"
+          data-jalali-calendar-day
+          :data-today="isSameDay(day, today) ? '' : undefined"
+          :aria-current="isSameDay(day, today) ? 'date' : undefined"
+          :aria-label="formatDate(day, localePack, displayFormat ?? { style: 'long' })"
+          @click="emit('dayClick', day)"
+        >
+          <span data-jalali-eventcalendar-dayname>
+            {{ localePack.weekdayNames.short[dayOfWeek(day, system)] }}
+          </span>
+          {{ formatNumber(day.day, localePack.defaultNumerals, localePack.digits) }}
+        </button>
+      </div>
+      <div
+        data-jalali-eventcalendar-lanes
+        data-jalali-eventcalendar-allday
+        :style="{
+          gridTemplateColumns: `repeat(${periodDays.length}, minmax(0, 1fr))`,
+          gridTemplateRows: allDayLaneCount > 0 ? `repeat(${allDayLaneCount}, auto)` : undefined,
+        }"
+      >
+        <button
+          v-for="segment in allDaySegments"
+          :key="`${segment.eventId}-${segment.startWeekday}-${segment.lane}`"
+          type="button"
+          data-jalali-eventcalendar-event
+          :data-continues-before="segment.continuesBefore ? '' : undefined"
+          :data-continues-after="segment.continuesAfter ? '' : undefined"
+          data-all-day=""
+          :style="{
+            gridColumn: `${segment.startWeekday + 1} / ${segment.endWeekday + 2}`,
+            gridRow: segment.lane + 1,
+          }"
+          @click="onEventClick(segment.eventId, $event)"
+        >
+          {{ segment.title }}
+        </button>
+      </div>
+      <div
+        data-jalali-eventcalendar-timed
+        :style="{ gridTemplateColumns: `auto repeat(${periodDays.length}, minmax(0, 1fr))` }"
+      >
+        <div data-jalali-eventcalendar-hours>
+          <span v-for="hour in hours" :key="hour" data-jalali-eventcalendar-hour>
+            {{ formatNumber(hour, localePack.defaultNumerals, localePack.digits) }}
+          </span>
+        </div>
+        <div
+          v-for="(day, dayIndex) in periodDays"
+          :key="`${day.year}-${day.month}-${day.day}`"
+          data-jalali-eventcalendar-daycol
+        >
+          <button
+            v-for="block in timedLayouts[dayIndex] ?? []"
+            :key="`${block.eventId}-${block.startMinute}-${block.lane}`"
+            type="button"
+            data-jalali-eventcalendar-event
+            data-timed=""
+            :style="timedBlockStyle(block, Math.max(1, laneCountOf(timedLayouts[dayIndex] ?? [])))"
+            @click="onEventClick(block.eventId, $event)"
+          >
+            {{ block.title }}
           </button>
         </div>
       </div>

@@ -290,9 +290,10 @@ in `core`.
   `packages/nlp`.
 - Phase 19 added `formatRelative(from, to, locale)`. Unit selection uses
   `diffDates()` from core. Phrases live on each `LocalePack.relative`.
-- Phase 20 added a core event model (`CalendarEvent`) and month layout
-  helpers, plus `EventCalendar` in each `ui-*` package. The consumer owns
-  events and editing. Recurring expansion stays on the consumer side.
+- Phase 20 added a core event model (`CalendarEvent`) and layout helpers
+  for month, week, and day, plus `EventCalendar` in each `ui-*` package.
+  The consumer owns events and editing. Recurring expansion stays on the
+  consumer side.
 
 ## Natural language date parsing
 

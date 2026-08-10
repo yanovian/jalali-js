@@ -1,15 +1,15 @@
 ---
-description: Month event calendar with consumer-owned events in React, Vue, and Web Components.
+description: Month, week, and day event calendars with consumer-owned events.
 ---
 
 # Event calendar
 
-Show your own events on a month grid. The library lays events out. You own storage and editing.
+Show your own events on a calendar. The library lays events out. You own storage and editing.
 
 ## Scope
 
-- Month view ships in `@jalali-js/ui-react`, `@jalali-js/ui-vue`, and `@jalali-js/ui-web`.
-- Week and day views are later work.
+- `view` is `'month'` (default), `'week'`, or `'day'`.
+- Ships in `@jalali-js/ui-react`, `@jalali-js/ui-vue`, and `@jalali-js/ui-web`.
 - Recurring rules do not expand inside the library. Expand them, then pass flat `CalendarEvent` rows.
 
 ## Event model
@@ -24,7 +24,16 @@ Show your own events on a month grid. The library lays events out. You own stora
 | `allDay`                | Optional. Default is true when no times are set.        |
 | `startTime` / `endTime` | Optional times of day for timed events.                 |
 
-Layout helpers (`layoutMonthEvents`, `eventsForDate`, and related) are pure functions, next to `buildCalendarGrid()`.
+Layout helpers (`layoutMonthEvents`, `layoutWeekEvents`, `layoutDayTimedEvents`, and related)
+are pure functions, next to `buildCalendarGrid()`.
+
+## Views
+
+- **Month**: all-day style chips on the month grid.
+- **Week** / **Day**: an all-day row plus a 24-hour timed grid. Timed events use
+  `startTime` / `endTime`. Overlaps get side-by-side lanes.
+
+Set the anchor with `initialDisplayedMonth` (month) or `initialDate` (week and day).
 
 ## React
 
@@ -39,11 +48,22 @@ const events: CalendarEvent[] = [
     start: { year: 1403, month: 5, day: 10 },
     end: { year: 1403, month: 5, day: 12 },
   },
+  {
+    id: 'meeting',
+    title: 'Meeting',
+    start: { year: 1403, month: 5, day: 15 },
+    end: { year: 1403, month: 5, day: 15 },
+    allDay: false,
+    startTime: { hour: 14, minute: 0 },
+    endTime: { hour: 15, minute: 0 },
+  },
 ];
 
 <EventCalendar
   system="jalali"
   locale="en"
+  view="week"
+  initialDate={{ year: 1403, month: 5, day: 15 }}
   events={events}
   onEventClick={(event) => console.log(event.id)}
   onDayClick={(date) => console.log(date)}
@@ -63,6 +83,9 @@ const events: CalendarEvent[] = [
     title: 'Meeting',
     start: { year: 1403, month: 5, day: 15 },
     end: { year: 1403, month: 5, day: 15 },
+    allDay: false,
+    startTime: { hour: 14, minute: 0 },
+    endTime: { hour: 15, minute: 0 },
   },
 ];
 </script>
@@ -71,6 +94,8 @@ const events: CalendarEvent[] = [
   <EventCalendar
     system="jalali"
     locale="en"
+    view="day"
+    :initial-date="{ year: 1403, month: 5, day: 15 }"
     :events="events"
     @event-click="(event) => console.log(event.id)"
     @day-click="(date) => console.log(date)"
@@ -84,6 +109,8 @@ const events: CalendarEvent[] = [
 import '@jalali-js/ui-web';
 
 const el = document.querySelector('jalali-event-calendar')!;
+el.view = 'week';
+el.initialDate = { year: 1403, month: 5, day: 15 };
 el.events = [
   {
     id: 'workshop',
@@ -98,7 +125,7 @@ el.addEventListener('event-click', (event) => {
 ```
 
 ```html
-<jalali-event-calendar system="jalali" locale="en"></jalali-event-calendar>
+<jalali-event-calendar system="jalali" locale="en" view="week"></jalali-event-calendar>
 ```
 
 ## Styling

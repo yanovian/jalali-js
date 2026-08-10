@@ -1,15 +1,18 @@
 import type { CalendarDate } from './calendar-date.js';
 import type { CalendarDateFields } from './calendar-engine.js';
-import { compareDates, isSameDay } from './date-math.js';
+import type { CalendarSystem } from './convert.js';
+import { addDays, addMonths, compareDates, isSameDay, startOf } from './date-math.js';
 import type { TimeOfDay } from './time-of-day.js';
+
+export type EventCalendarView = 'month' | 'week' | 'day';
 
 /**
  * A consumer-owned calendar event. The library lays events out. The consumer
  * owns storage and editing.
  *
  * `start` and `end` are inclusive date fields in the calendar system the
- * month view uses. Timed events may set `startTime` / `endTime`. Recurring
- * rules are not expanded here: expand them before you pass the array.
+ * view uses. Timed events may set `startTime` / `endTime`. Recurring rules
+ * are not expanded here: expand them before you pass the array.
  */
 export interface CalendarEvent {
   id: string;
@@ -22,19 +25,31 @@ export interface CalendarEvent {
   endTime?: TimeOfDay;
 }
 
-/** One event chip or bar segment inside a week row. */
+/** One event chip or bar segment inside an all-day row. */
 export interface EventLaneSegment {
   eventId: string;
   title: string;
   lane: number;
-  /** Inclusive weekday index in the week (0-6). */
+  /** Inclusive day index in the visible day list. */
   startWeekday: number;
-  /** Inclusive weekday index in the week (0-6). */
+  /** Inclusive day index in the visible day list. */
   endWeekday: number;
   continuesBefore: boolean;
   continuesAfter: boolean;
   allDay: boolean;
 }
+
+/** One timed block inside a day column (minutes from midnight). */
+export interface TimedEventBlock {
+  eventId: string;
+  title: string;
+  lane: number;
+  startMinute: number;
+  endMinute: number;
+}
+
+const MINUTES_PER_DAY = 24 * 60;
+const DEFAULT_TIMED_MINUTES = 60;
 
 function asFields(date: CalendarDateFields): CalendarDateFields {
   return { year: date.year, month: date.month, day: date.day };
@@ -80,19 +95,75 @@ function weekdayIndex(week: readonly CalendarDate[], date: CalendarDateFields): 
   return week.findIndex((day) => isSameDay(day, date));
 }
 
+function toMinute(time: TimeOfDay | undefined, fallback: number): number {
+  if (!time) return fallback;
+  return Math.min(MINUTES_PER_DAY, Math.max(0, time.hour * 60 + time.minute));
+}
+
+/** Days shown for `view` around `anchor` (week = 7, day = 1). */
+export function daysForEventView(
+  system: CalendarSystem,
+  view: Exclude<EventCalendarView, 'month'>,
+  anchor: CalendarDateFields,
+): CalendarDate[] {
+  if (view === 'day') {
+    return [{ precision: 'date', system, ...asFields(anchor) }];
+  }
+  const start = startOf(anchor, 'week', system);
+  return Array.from({ length: 7 }, (_, index) => {
+    const fields = index === 0 ? start : addDays(start, index, system);
+    return { precision: 'date' as const, system, ...fields };
+  });
+}
+
+/** Move the anchor by one month, week, or day. */
+export function shiftEventViewAnchor(
+  system: CalendarSystem,
+  view: EventCalendarView,
+  anchor: CalendarDateFields,
+  direction: -1 | 1,
+): CalendarDateFields {
+  if (view === 'month') {
+    const next = addMonths({ ...anchor, day: 1 }, direction, system);
+    return { year: next.year, month: next.month, day: 1 };
+  }
+  return addDays(anchor, view === 'week' ? direction * 7 : direction, system);
+}
+
 /**
- * Lay out events that touch one week row. Each segment keeps one lane across
- * the days it spans in that week. Pure function: no DOM, no framework.
+ * Timed span of `event` on `date`, in minutes from midnight. Null when the
+ * event is all-day or does not cover the date.
+ */
+export function eventMinutesOnDate(
+  event: CalendarEvent,
+  date: CalendarDateFields,
+): { startMinute: number; endMinute: number } | null {
+  if (eventIsAllDay(event) || !eventCoversDate(event, date)) return null;
+  const day = asFields(date);
+  const isStart = isSameDay(event.start, day);
+  const isEnd = isSameDay(event.end, day);
+  const startMinute = isStart ? toMinute(event.startTime, 0) : 0;
+  let endMinute = isEnd ? toMinute(event.endTime, MINUTES_PER_DAY) : MINUTES_PER_DAY;
+  if (isStart && isEnd && endMinute <= startMinute) {
+    endMinute = Math.min(MINUTES_PER_DAY, startMinute + DEFAULT_TIMED_MINUTES);
+  }
+  if (endMinute <= startMinute) return null;
+  return { startMinute, endMinute };
+}
+
+/**
+ * Lay out events that touch a day list (week or day). Each segment keeps one
+ * lane across the days it spans. Pure function: no DOM, no framework.
  */
 export function layoutWeekEvents(
   events: readonly CalendarEvent[],
   week: readonly CalendarDate[],
 ): EventLaneSegment[] {
-  if (week.length !== 7) {
-    throw new Error(`layoutWeekEvents() expects 7 days, got ${week.length}`);
+  if (week.length < 1) {
+    throw new Error('layoutWeekEvents() expects at least 1 day');
   }
   const weekStart = asFields(week[0]!);
-  const weekEnd = asFields(week[6]!);
+  const weekEnd = asFields(week[week.length - 1]!);
 
   const candidates = events
     .filter((event) => isValidEventSpan(event))
@@ -153,6 +224,86 @@ export function layoutMonthEvents(
       week.map((cell) => cell.date),
     ),
   );
+}
+
+/** Timed blocks for one day, with overlap lanes. */
+export function layoutDayTimedEvents(
+  events: readonly CalendarEvent[],
+  date: CalendarDateFields,
+): TimedEventBlock[] {
+  const candidates = events
+    .map((event) => {
+      const span = eventMinutesOnDate(event, date);
+      if (!span) return null;
+      return { event, ...span };
+    })
+    .filter(
+      (entry): entry is { event: CalendarEvent; startMinute: number; endMinute: number } =>
+        entry !== null,
+    )
+    .sort((a, b) => {
+      if (a.startMinute !== b.startMinute) return a.startMinute - b.startMinute;
+      const aLength = a.endMinute - a.startMinute;
+      const bLength = b.endMinute - b.startMinute;
+      if (aLength !== bLength) return bLength - aLength;
+      return a.event.id < b.event.id ? -1 : a.event.id > b.event.id ? 1 : 0;
+    });
+
+  const occupied: Array<{ lane: number; start: number; end: number }> = [];
+  const blocks: TimedEventBlock[] = [];
+
+  for (const candidate of candidates) {
+    let lane = 0;
+    for (;;) {
+      const hits = occupied.some(
+        (entry) =>
+          entry.lane === lane &&
+          !(candidate.endMinute <= entry.start || candidate.startMinute >= entry.end),
+      );
+      if (!hits) break;
+      lane += 1;
+    }
+    occupied.push({ lane, start: candidate.startMinute, end: candidate.endMinute });
+    blocks.push({
+      eventId: candidate.event.id,
+      title: candidate.event.title,
+      lane,
+      startMinute: candidate.startMinute,
+      endMinute: candidate.endMinute,
+    });
+  }
+
+  return blocks;
+}
+
+export function layoutDaysTimedEvents(
+  events: readonly CalendarEvent[],
+  days: readonly CalendarDateFields[],
+): TimedEventBlock[][] {
+  return days.map((day) => layoutDayTimedEvents(events, day));
+}
+
+/** CSS-friendly placement for a timed block inside a day column. */
+export function timedBlockStyle(
+  block: TimedEventBlock,
+  laneCount: number,
+): {
+  top: string;
+  height: string;
+  insetInlineStart: string;
+  width: string;
+} {
+  const lanes = Math.max(1, laneCount);
+  return {
+    top: `${(block.startMinute / MINUTES_PER_DAY) * 100}%`,
+    height: `${((block.endMinute - block.startMinute) / MINUTES_PER_DAY) * 100}%`,
+    insetInlineStart: `${(block.lane / lanes) * 100}%`,
+    width: `${(1 / lanes) * 100}%`,
+  };
+}
+
+export function laneCountOf(segments: readonly { lane: number }[]): number {
+  return segments.reduce((max, segment) => Math.max(max, segment.lane + 1), 0);
 }
 
 /** Look up an event by id. */

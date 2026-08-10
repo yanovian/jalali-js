@@ -934,13 +934,18 @@ owns the event data and the persistence.
       and gets callbacks (`onEventClick`, `onDayClick`). No built-in modal
       or storage; the consumer renders their own editing UI from the
       callbacks.
-- [ ] Add week and day views, after the month view lands.
+- [x] Add week and day views, after the month view lands.
 - [x] Decide the recurring-event scope at implementation time: a pure
       rule-expansion helper is likely enough, with the expansion done on
       the consumer's side. Document the choice.
 - [x] Add unit tests for the layout functions, component tests per
       binding, playground sections, visual e2e coverage, and a docs guide
       page.
+- [x] Seed the playground with enough events to show multi-day all-day
+      chips, timed blocks, and overlap lanes in month, week, and day
+      sections (`event-calendar`, `event-calendar-week`,
+      `event-calendar-day`). Rich interactive controls for those views
+      wait for Phase 22.
 
 ## Phase 21: Docs depth and recipes
 
@@ -981,13 +986,19 @@ A visitor gets an interactive page. The e2e suite opens each section with
 an explicit URL and always screenshots the exact same state.
 
 - [ ] Design one shared demo layout: a tab or section per component
-      (`DatePicker` in both variants, `RangePicker`, `InlineCalendar`, and
-      each later component as it lands), with a binding switch for React,
-      Vue, and Web Components.
+      (`DatePicker` in both variants, `RangePicker`, `InlineCalendar`,
+      `EventCalendar`, and each later component as it lands), with a
+      binding switch for React, Vue, and Web Components.
 - [ ] Add live controls for the real props: locale, calendar system,
       picker variant, display format, and `valueFormat`. Wire in the
-      selection rules and time options as Phases 16 and 17 land. The
+      selection rules and time options as Phases 16 and 17 land. For
+      `EventCalendar`, add a view control (`month` / `week` / `day`) and
+      a small editable seed event list so a visitor can see all-day chips,
+      timed blocks, and overlap lanes without reading the guide. The
       rendered component updates as the visitor changes a control.
+- [ ] Keep three fixed screenshot cells for `EventCalendar` (month, week,
+      day) under stable `data-testid`s, so the visual e2e suite still
+      captures each view even after the interactive shell lands.
 - [ ] Show the emitted value next to each component, live. This makes the
       display-value against storage-value contract visible: the display
       shows Jalali while the emitted value stays Gregorian.

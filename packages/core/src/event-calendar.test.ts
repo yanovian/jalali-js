@@ -2,12 +2,16 @@ import { describe, expect, it } from 'vitest';
 import type { CalendarDate } from './calendar-date.js';
 import { buildCalendarGrid } from './calendar-grid.js';
 import {
+  daysForEventView,
   eventCoversDate,
+  eventMinutesOnDate,
   eventsForDate,
   findEventById,
   isValidEventSpan,
+  layoutDayTimedEvents,
   layoutMonthEvents,
   layoutWeekEvents,
+  shiftEventViewAnchor,
   type CalendarEvent,
 } from './event-calendar.js';
 
@@ -109,5 +113,62 @@ describe('event-calendar layout', () => {
     const events = [event('x', { year: 1403, month: 5, day: 1 })];
     expect(findEventById(events, 'x')?.title).toBe('x');
     expect(findEventById(events, 'missing')).toBeUndefined();
+  });
+
+  it('builds week and day day-lists from an anchor', () => {
+    const week = daysForEventView('jalali', 'week', { year: 1403, month: 5, day: 15 });
+    expect(week).toHaveLength(7);
+    expect(week[0]).toMatchObject({ year: 1403, month: 5, day: 13 });
+    expect(daysForEventView('jalali', 'day', { year: 1403, month: 5, day: 15 })).toEqual([
+      { precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 },
+    ]);
+  });
+
+  it('shifts the anchor by view', () => {
+    expect(shiftEventViewAnchor('jalali', 'day', { year: 1403, month: 5, day: 15 }, 1)).toEqual({
+      year: 1403,
+      month: 5,
+      day: 16,
+    });
+    expect(shiftEventViewAnchor('jalali', 'week', { year: 1403, month: 5, day: 15 }, -1)).toEqual({
+      year: 1403,
+      month: 5,
+      day: 8,
+    });
+    expect(shiftEventViewAnchor('jalali', 'month', { year: 1403, month: 5, day: 15 }, 1)).toEqual({
+      year: 1403,
+      month: 6,
+      day: 1,
+    });
+  });
+
+  it('lays timed events into minute blocks with overlap lanes', () => {
+    const events: CalendarEvent[] = [
+      {
+        id: 'a',
+        title: 'A',
+        start: { year: 1403, month: 5, day: 15 },
+        end: { year: 1403, month: 5, day: 15 },
+        allDay: false,
+        startTime: { hour: 9, minute: 0 },
+        endTime: { hour: 10, minute: 0 },
+      },
+      {
+        id: 'b',
+        title: 'B',
+        start: { year: 1403, month: 5, day: 15 },
+        end: { year: 1403, month: 5, day: 15 },
+        allDay: false,
+        startTime: { hour: 9, minute: 30 },
+        endTime: { hour: 10, minute: 30 },
+      },
+    ];
+    expect(eventMinutesOnDate(events[0]!, { year: 1403, month: 5, day: 15 })).toEqual({
+      startMinute: 9 * 60,
+      endMinute: 10 * 60,
+    });
+    const layout = layoutDayTimedEvents(events, { year: 1403, month: 5, day: 15 });
+    expect(layout).toHaveLength(2);
+    expect(layout[0]!.lane).not.toBe(layout[1]!.lane);
   });
 });

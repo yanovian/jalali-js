@@ -67,4 +67,17 @@ describe('jalali-event-calendar', () => {
       day: 15,
     });
   });
+
+  it('supports week and day views', () => {
+    const el = document.createElement('jalali-event-calendar') as JalaliEventCalendarElement;
+    el.setAttribute('locale', 'en');
+    el.setAttribute('view', 'week');
+    el.initialDate = { year: 1403, month: 5, day: 15 };
+    el.events = demoEvents;
+    document.body.append(el);
+    expect(el.getAttribute('data-view')).toBe('week');
+    expect(el.querySelector('[data-jalali-eventcalendar-timed]')).toBeTruthy();
+    el.view = 'day';
+    expect(el.getAttribute('data-view')).toBe('day');
+  });
 });

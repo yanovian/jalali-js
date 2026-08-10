@@ -116,6 +116,12 @@ const demoEvents: CalendarEvent[] = [
     end: { year: 1403, month: 5, day: 12 },
   },
   {
+    id: 'offsite',
+    title: 'Offsite',
+    start: { year: 1403, month: 5, day: 14 },
+    end: { year: 1403, month: 5, day: 16 },
+  },
+  {
     id: 'meeting',
     title: 'Meeting',
     start: { year: 1403, month: 5, day: 15 },
@@ -123,6 +129,24 @@ const demoEvents: CalendarEvent[] = [
     allDay: false,
     startTime: { hour: 14, minute: 0 },
     endTime: { hour: 15, minute: 0 },
+  },
+  {
+    id: 'call',
+    title: 'Call',
+    start: { year: 1403, month: 5, day: 15 },
+    end: { year: 1403, month: 5, day: 15 },
+    allDay: false,
+    startTime: { hour: 14, minute: 30 },
+    endTime: { hour: 15, minute: 30 },
+  },
+  {
+    id: 'standup',
+    title: 'Standup',
+    start: { year: 1403, month: 5, day: 16 },
+    end: { year: 1403, month: 5, day: 16 },
+    allDay: false,
+    startTime: { hour: 9, minute: 0 },
+    endTime: { hour: 9, minute: 30 },
   },
 ];
 const eventCalendar = document.getElementById('event-calendar') as JalaliEventCalendarElement;
@@ -132,6 +156,18 @@ eventCalendar.addEventListener('event-click', (event) => {
   const { event: clicked } = (event as CustomEvent<EventCalendarEventClickDetail>).detail;
   document.getElementById('event-click-log')!.textContent = clicked.title;
 });
+
+const eventCalendarWeek = document.getElementById(
+  'event-calendar-week',
+) as JalaliEventCalendarElement;
+eventCalendarWeek.initialDate = { year: 1403, month: 5, day: 15 };
+eventCalendarWeek.events = demoEvents;
+
+const eventCalendarDay = document.getElementById(
+  'event-calendar-day',
+) as JalaliEventCalendarElement;
+eventCalendarDay.initialDate = { year: 1403, month: 5, day: 15 };
+eventCalendarDay.events = demoEvents;
 
 // Selection rules are a JS property, not an attribute: the rules object is not representable
 // as a plain HTML attribute string.

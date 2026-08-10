@@ -19,6 +19,12 @@ const DEMO_EVENTS: CalendarEvent[] = [
     end: { year: 1403, month: 5, day: 12 },
   },
   {
+    id: 'offsite',
+    title: 'Offsite',
+    start: { year: 1403, month: 5, day: 14 },
+    end: { year: 1403, month: 5, day: 16 },
+  },
+  {
     id: 'meeting',
     title: 'Meeting',
     start: { year: 1403, month: 5, day: 15 },
@@ -26,6 +32,24 @@ const DEMO_EVENTS: CalendarEvent[] = [
     allDay: false,
     startTime: { hour: 14, minute: 0 },
     endTime: { hour: 15, minute: 0 },
+  },
+  {
+    id: 'call',
+    title: 'Call',
+    start: { year: 1403, month: 5, day: 15 },
+    end: { year: 1403, month: 5, day: 15 },
+    allDay: false,
+    startTime: { hour: 14, minute: 30 },
+    endTime: { hour: 15, minute: 30 },
+  },
+  {
+    id: 'standup',
+    title: 'Standup',
+    start: { year: 1403, month: 5, day: 16 },
+    end: { year: 1403, month: 5, day: 16 },
+    allDay: false,
+    startTime: { hour: 9, minute: 0 },
+    endTime: { hour: 9, minute: 30 },
   },
 ];
 
@@ -50,7 +74,7 @@ export default function App() {
       style={{
         fontFamily: 'system-ui, sans-serif',
         padding: '2rem',
-        maxWidth: 640,
+        maxWidth: 900,
         background: isDark ? '#141414' : '#ffffff',
         color: isDark ? '#ededed' : '#1a1a1a',
         minHeight: '100vh',
@@ -188,18 +212,47 @@ export default function App() {
       </section>
 
       <section data-testid="event-calendar">
-        <h2>Event calendar (@jalali-js/ui-react)</h2>
+        <h2>Event calendar month (@jalali-js/ui-react)</h2>
         <p>
-          Mordad 1403 with two seed events. The consumer owns the list. Clicks only fire callbacks.
+          Mordad 1403. Multi-day all-day chips plus timed events. The consumer owns the list. Clicks
+          only fire callbacks.
         </p>
         <EventCalendar
           system="jalali"
           locale={locale}
+          view="month"
           initialDisplayedMonth={{ year: 1403, month: 5 }}
           events={DEMO_EVENTS}
           onEventClick={(event) => setEventClickLog(event.title)}
         />
         <p>Last event click: {eventClickLog}</p>
+      </section>
+
+      <section data-testid="event-calendar-week">
+        <h2>Event calendar week</h2>
+        <p>
+          Week of 15 Mordad 1403. All-day row on top. Timed grid below. Overlapping Meeting and Call
+          share side-by-side lanes.
+        </p>
+        <EventCalendar
+          system="jalali"
+          locale={locale}
+          view="week"
+          initialDate={{ year: 1403, month: 5, day: 15 }}
+          events={DEMO_EVENTS}
+        />
+      </section>
+
+      <section data-testid="event-calendar-day">
+        <h2>Event calendar day</h2>
+        <p>15 Mordad 1403. Same seed events, one day column with a timed grid.</p>
+        <EventCalendar
+          system="jalali"
+          locale={locale}
+          view="day"
+          initialDate={{ year: 1403, month: 5, day: 15 }}
+          events={DEMO_EVENTS}
+        />
       </section>
 
       <section data-testid="selection-rules">
