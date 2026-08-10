@@ -10,7 +10,7 @@
   <a href="https://www.npmjs.com/package/jalali-js"><img src="https://img.shields.io/npm/v/jalali-js.svg" alt="npm version"></a>
   <a href="https://bundlejs.com/?q=jalali-js"><img src="https://deno.bundlejs.com/badge?q=jalali-js" alt="Bundle size"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yanovian/jalali-js.svg" alt="License"></a>
-  <a href="https://jalali-js.yanovian.com/"><img src="https://img.shields.io/badge/docs-jalali-js.yanovian.com-1e1b4b.svg" alt="Documentation"></a>
+  <a href="https://jalali-js.yanovian.com/"><img src="https://img.shields.io/badge/docs-jalali--js.yanovian.com-1e1b4b.svg" alt="Documentation"></a>
 </p>
 
 <p align="center">

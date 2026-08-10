@@ -12,6 +12,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Fixed
+
+- Docs badge fixed.
+
 ## [0.2.0] - 2026-08-10
 
 ### Added
