@@ -43,6 +43,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 - Visual e2e screenshot mismatches are advisory in the PR comment. They
   do not fail the job. Functional asserts still fail the job.
 - Package `keywords` expanded for npm search.
+- ESLint ignores VitePress cache and generated docs API output.
 
 ### Removed
 
