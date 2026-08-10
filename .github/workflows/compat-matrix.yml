@@ -88,13 +88,13 @@ jobs:
             port: 4004
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
@@ -139,7 +139,7 @@ jobs:
             "http://localhost:${{ matrix.port }}/" "/tmp/compat-screenshot/screenshot.png"
 
       - name: Upload screenshot
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: compat-screenshot-${{ matrix.slug }}
           path: /tmp/compat-screenshot/screenshot.png
@@ -155,10 +155,10 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download screenshots
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: compat-screenshot-*
           path: screenshots
