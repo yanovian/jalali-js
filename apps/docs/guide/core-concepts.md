@@ -52,6 +52,51 @@ needs, runs in constant time, and needs no runtime dependency. It's checked agai
 ICU (`Intl.DateTimeFormat` with the Persian calendar) with zero mismatches across a
 multi-thousand-year range, and against an independent, published 121-year reference table.
 
+## Date math and queries
+
+The core ships date helpers next to the conversion engine. Each works per calendar system,
+with zero runtime dependencies:
+
+```ts
+import {
+  addDays,
+  addMonths,
+  addYears,
+  diffDates,
+  startOf,
+  endOf,
+  isBefore,
+  isAfter,
+  isSameDay,
+  isBetween,
+  isToday,
+} from 'jalali-js';
+
+addDays({ year: 1403, month: 12, day: 30 }, 1, 'jalali'); // 1404-01-01
+addMonths({ year: 1403, month: 1, day: 31 }, 6, 'jalali'); // 1403-07-30 (day clamped)
+addYears({ year: 1403, month: 12, day: 30 }, 1, 'jalali'); // 1404-12-29 (day clamped)
+
+diffDates(a, b, 'month', 'jalali'); // signed whole months from b to a
+
+startOf({ year: 1403, month: 5, day: 15 }, 'week', 'jalali'); // 1403-05-13, a Saturday
+startOf({ year: 2024, month: 8, day: 5 }, 'week', 'gregorian', 1); // week start: 1 = Monday
+endOf({ year: 1403, month: 5, day: 15 }, 'month', 'jalali'); // 1403-05-31
+
+isBefore(a, b); // compareDates(a, b) < 0
+isBetween(date, start, end); // bounds included
+isToday(date, 'jalali');
+```
+
+Three rules to know:
+
+- `addMonths()` and `addYears()` clamp the day to the target month's length. Esfand 30 of a
+  leap year plus one year gives Esfand 29.
+- `diffDates()` truncates toward zero: a unit counts only once it has fully passed. Units:
+  `day`, `week`, `month`, `year`.
+- `startOf()` and `endOf()` take the week start day as a parameter, since Jalali weeks start
+  on Saturday and Gregorian weeks commonly start on Sunday or Monday. The default is the
+  system's own convention (`WEEK_START_DAY`).
+
 ## Locale packs
 
 `@jalali-js/i18n` exports `en`, `fa`, and `ps` (Pashto, with Afghanistan's own zodiac-based

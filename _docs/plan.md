@@ -4,13 +4,13 @@ See [alternatives.md](./alternatives.md) for the vision and the goals. See
 [architecture.md](./architecture.md) for the design behind these decisions.
 This file shows only the status of each phase.
 
-Phases 0-12 are done, and the first releases are published (v0.0.1 through
-v0.1.0; see `CHANGELOG.md`). v0.1.0 also shipped the Web Components bindings
-(`packages/web`, `packages/ui-web`), which landed outside the phase list.
-Phases 13-24 are scheduled but not started. Phases 14-18 add the features
-real apps ask for first, so they can land before Phase 13. What's left after
-those is listed under "Later, not yet scheduled" below. Change an item to
-`[x]` as it lands.
+Phases 0-12 and 14 are done, and the first releases are published (v0.0.1
+through v0.1.0; see `CHANGELOG.md`). v0.1.0 also shipped the Web Components
+bindings (`packages/web`, `packages/ui-web`), which landed outside the phase
+list. Phase 13 and Phases 15-24 are scheduled but not started. Phases 14-18
+add the features real apps ask for first, so they land before Phase 13.
+What's left after those is listed under "Later, not yet scheduled" below.
+Change an item to `[x]` as it lands.
 
 ## Phase 0: Repo scaffolding and tooling
 
@@ -774,21 +774,38 @@ The core has `addDays()` and `compareDates()` only. Real apps need more
 arithmetic: age calculations, deadlines, and reports all diff and shift
 dates. This phase completes the set, still with zero runtime dependencies.
 
-- [ ] Add `addMonths()` and `addYears()`. Clamp the day to the target
+- [x] Add `addMonths()` and `addYears()`. Clamp the day to the target
       month's length (Esfand 30 in a leap year plus one year gives
       Esfand 29). Work per calendar system, like `addDays()`.
-- [ ] Add `diffDates(a, b, unit)` with `day`, `week`, `month`, and `year`
+      `src/date-math.ts`. `addYears()` is `addMonths()` with the months
+      scaled by `monthsInYear`, one implementation, not two.
+- [x] Add `diffDates(a, b, unit)` with `day`, `week`, `month`, and `year`
       units, per calendar system. Define and document the truncation rule
-      (a full unit must pass before it counts).
-- [ ] Add `startOf()` and `endOf()` for week, month, and year. Take the
+      (a full unit must pass before it counts). Signed like
+      `compareDates()`: positive when `a` is later. Month and year steps
+      resolve the last partial unit through `addMonths()`/`addYears()`
+      themselves, clamping included, so
+      `diffDates(addMonths(d, n), d, 'month')` is always exactly `n`.
+- [x] Add `startOf()` and `endOf()` for week, month, and year. Take the
       week start day as a parameter, since Jalali weeks start on Saturday
-      and Gregorian weeks commonly start on Monday or Sunday.
-- [ ] Add the query helpers: `isBefore()`, `isAfter()`, `isSameDay()`,
+      and Gregorian weeks commonly start on Monday or Sunday. The default
+      is the per-system `WEEK_START_DAY` table, moved out of
+      `calendar-grid.ts` so the grid and these helpers share one
+      definition instead of two copies.
+- [x] Add the query helpers: `isBefore()`, `isAfter()`, `isSameDay()`,
       `isBetween()`, and `isToday()`. Thin wrappers over `compareDates()`,
-      so each stays one line and tree-shakeable.
-- [ ] Add property tests against Julian Day Number arithmetic, and boundary
-      tests around leap Esfand and month ends.
-- [ ] Document the helpers in the docs site's core-concepts guide.
+      so each stays one line and tree-shakeable. `isBetween()` includes
+      both bounds; `isToday()` reads the same local clock
+      `createCalendar().today()` reads.
+- [x] Add property tests against Julian Day Number arithmetic, and boundary
+      tests around leap Esfand and month ends. `date-math.test.ts`. The
+      antisymmetry property caught a real wart before it shipped:
+      `diffDates()` could return `-0` (from `Math.trunc` on a small
+      negative fraction, and from negating a zero diff). Fixed in the
+      implementation, not the test.
+- [x] Document the helpers in the docs site's core-concepts guide. The
+      "Date math and queries" section: the full import list, the clamping
+      rule, the truncation rule, and the week start parameter.
 
 ## Phase 15: Format templates and strict parsing (`packages/i18n`)
 

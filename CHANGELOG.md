@@ -11,6 +11,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- Date math and query helpers in the core: `addMonths`, `addYears`,
+  `diffDates`, `startOf`, `endOf`, `isBefore`, `isAfter`, `isSameDay`,
+  `isBetween`, and `isToday`. All work per calendar system and clamp
+  month ends (Esfand 30 plus one year gives Esfand 29).
 - Pashto (`ps`) support: a locale pack with Afghanistan's own month names,
   sourced from CLDR, wired into the React, Vue, and Web Components
   bindings, plus Pashto phrase parsing in `@jalali-js/nlp`.

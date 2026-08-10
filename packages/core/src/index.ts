@@ -22,7 +22,22 @@ export type { CalendarDateFields, CalendarEngine } from './calendar-engine.js';
 export type { CalendarSystem } from './convert.js';
 export { fromGregorian, getCalendarEngine, toGregorian } from './convert.js';
 export { dayOfWeek } from './day-of-week.js';
-export { addDays, compareDates } from './date-math.js';
+export {
+  addDays,
+  addMonths,
+  addYears,
+  compareDates,
+  diffDates,
+  endOf,
+  isAfter,
+  isBefore,
+  isBetween,
+  isSameDay,
+  isToday,
+  startOf,
+  WEEK_START_DAY,
+} from './date-math.js';
+export type { DiffUnit, PeriodUnit } from './date-math.js';
 export { gregorianEngine } from './gregorian.js';
 export { jalaliEngine } from './jalali.js';
 export type { NativeCalendarObject, StorageValue, ValueFormat } from './storage-value.js';

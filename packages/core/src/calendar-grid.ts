@@ -1,7 +1,7 @@
 import type { CalendarDate } from './calendar-date.js';
 import type { CalendarSystem } from './convert.js';
 import { getCalendarEngine } from './convert.js';
-import { addDays } from './date-math.js';
+import { addDays, WEEK_START_DAY } from './date-math.js';
 import { dayOfWeek } from './day-of-week.js';
 
 export interface CalendarGridDay {
@@ -10,14 +10,6 @@ export interface CalendarGridDay {
   isToday: boolean;
   isSelected: boolean;
 }
-
-// The day a week starts on, as a dayOfWeek() index (0 = Sunday, 6 = Saturday). Jalali weeks
-// culturally start on Saturday; Gregorian ones on Sunday. This is a grid-layout concern, not a
-// locale (language) one, so it is keyed by calendar system rather than living in a locale pack.
-const WEEK_START_DAY: Record<CalendarSystem, number> = {
-  jalali: 6,
-  gregorian: 0,
-};
 
 function isSameDate(a: CalendarDate, b: CalendarDate): boolean {
   return a.system === b.system && a.year === b.year && a.month === b.month && a.day === b.day;
