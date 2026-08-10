@@ -141,8 +141,8 @@ linked above.
   package layout, testing strategy, CI/CD design, and tooling.
 - [`_docs/alternatives.md`](_docs/alternatives.md): the vision, the goals, and a comparison with
   existing Jalali and Persian calendar libraries.
-- Docs site [`llms.txt`](https://yanovian.github.io/jalali-js/llms.txt): curated index for language
-  models. Prefer this over scraping HTML when an agent needs this library's docs.
+- Docs for agents: [`llms.txt`](https://yanovian.github.io/jalali-js/llms.txt) (index) and
+  [`llms-full.txt`](https://yanovian.github.io/jalali-js/llms-full.txt) (full guide bundle).
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): setup, the branch and PR workflow, and the checks a
   change must pass.
 - [`_docs/release-checklist.md`](_docs/release-checklist.md): the release readiness checklist.
