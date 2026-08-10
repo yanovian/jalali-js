@@ -11,17 +11,11 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
-- `@jalali-js/holidays`: official Iran (`IR`) public holiday data with zero
-  runtime dependencies. Afghanistan (`AF`) and Tajikistan (`TJ`) are reserved
-  region codes and are not shipped yet. Iran's list combines fixed solar
-  (Jalali) national days and lunar Islamic observances. Fixed days come from
-  rules. Lunar days come from a per-year table (Jalali years 1402-1425
-  today). Names live in per-language files under
-  `regions/ir/names/{en,fa,ps}.ts`. API: `isHoliday()`, `holidaysOn()`,
-  `holidaysInMonth()`, with optional `{ region }`. Each holiday has
-  `kind: 'fixed' | 'lunar'`. Pickers take `showHolidays`, `blockHolidays`,
-  and `holidayRegion` (default `'IR'`); holiday days render with
-  `data-holiday`. Refresh the Iran lunar table with `make update-holidays`.
+- `@jalali-js/holidays`: offline Iran (`IR`) holidays. `AF` and `TJ` are
+  reserved. Fixed solar rules plus lunar year table (1402-1426). Names in
+  `regions/ir/names/{en,fa,ps}.ts`. API takes optional `{ region }`. Pickers
+  take `showHolidays`, `blockHolidays`, and `holidayRegion`. Update with
+  `make update-holidays YEARS=next`. Yearly CI opens a PR when data changes.
 - Time selection: a headless `TimePicker` in React, Vue, and Web Components
   (`minuteStep`, `disabledHours`), a `precision: 'datetime'` option on
   `DatePicker` that adds a time panel and emits a datetime storage value,

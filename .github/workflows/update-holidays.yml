@@ -1,0 +1,71 @@
+name: Update holidays
+
+# Yearly fetch of the next Iran lunar year. Opens a PR when files change.
+# Needs PAT_TOKEN (same as dependency-update workflows) so the PR can run ci.yml.
+
+on:
+  schedule:
+    - cron: '0 4 25 3 *' # 25 March 04:00 UTC
+  workflow_dispatch:
+    inputs:
+      years:
+        description: 'Jalali years (space-separated) or next'
+        required: false
+        default: 'next'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: make install-frozen
+
+      - id: fetch
+        env:
+          YEARS_INPUT: ${{ github.event.inputs.years || 'next' }}
+        run: |
+          YEARS=$(echo "$YEARS_INPUT" | xargs)
+          [ -n "$YEARS" ] || YEARS=next
+          echo "years=$YEARS" >> "$GITHUB_OUTPUT"
+          make update-holidays YEARS="$YEARS"
+
+      - env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          YEARS: ${{ steps.fetch.outputs.years }}
+        run: |
+          if git diff --quiet -- \
+            packages/holidays/data/ir/lunar \
+            packages/holidays/src/regions/ir/lunar-table.ts; then
+            echo "Nothing has changed."
+            exit 0
+          fi
+
+          BRANCH="chore/update-holidays-$(echo "$YEARS" | tr ' ' '-')"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add packages/holidays/data/ir/lunar packages/holidays/src/regions/ir/lunar-table.ts
+          git commit -m "Update Iran lunar holidays (${YEARS})."
+          git push -u origin HEAD
+
+          if gh pr list --head "$BRANCH" --state open --json number --jq 'length' | grep -qx '0'; then
+            gh pr create \
+              --title "Update Iran lunar holidays (${YEARS})" \
+              --body "Fetch Iran lunar holidays for \`${YEARS}\` and rebuild the generated table."
+          else
+            echo "Pull request for ${BRANCH} already open; branch updated."
+          fi

@@ -1,12 +1,6 @@
 /**
- * Official Iranian public holiday ids.
- *
- * Fixed solar (Jalali) ids keep the same month and day every year.
- * Lunar Islamic ids appear only in the per-year table.
- * Ids use Iranian Persian forms, not Arabic calques.
- *
- * `IRAN_LUNAR_HOLIDAY_IDS` is also the allow-list that
- * `scripts/update-holidays.mjs` reads. Keep that export name stable.
+ * Iran holiday ids. Fixed = solar Jalali. Lunar = year table only.
+ * `IRAN_LUNAR_HOLIDAY_IDS` is the allow-list for scripts/update-holidays.mjs.
  */
 
 export const IRAN_FIXED_HOLIDAY_IDS = [

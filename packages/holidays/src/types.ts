@@ -5,23 +5,10 @@ export interface HolidayDateFields {
   day: number;
 }
 
-/**
- * Country or region whose official holiday list to use.
- *
- * - `IR`: Iran (shipped). Official Iranian public holidays.
- * - `AF`: Afghanistan (planned, not shipped yet).
- * - `TJ`: Tajikistan (planned, not shipped yet).
- *
- * Each country has its own official list. Do not treat Iran's table as the
- * holidays for Afghanistan or Tajikistan.
- */
+/** `IR` ships today. `AF` and `TJ` are reserved. */
 export type HolidayRegion = 'IR' | 'AF' | 'TJ';
 
-/**
- * Display names for every locale this monorepo ships (`en`, `fa`, `ps`),
- * matching `@jalali-js/i18n`'s `LocaleCode`. Kept as a structural type so this
- * package stays free of a runtime dependency on i18n.
- */
+/** Locales this monorepo ships. Structural so this package stays free of i18n. */
 export type HolidayLocale = 'en' | 'fa' | 'ps';
 
 export interface HolidayNames {
@@ -36,10 +23,7 @@ export type HolidayId = import('./regions/ir/ids.js').IranHolidayId;
 export interface Holiday {
   id: HolidayId;
   names: HolidayNames;
-  /**
-   * `fixed`: solar / Jalali (same month and day every year, for example Nowruz).
-   * `lunar`: Islamic lunar observance (Jalali date shifts; from the year table).
-   */
+  /** `fixed`: solar Jalali. `lunar`: Islamic day from the year table. */
   kind: 'fixed' | 'lunar';
 }
 
@@ -50,17 +34,11 @@ export interface HolidayOccurrence extends Holiday {
 }
 
 export interface HolidayQueryOptions {
-  /**
-   * Whose official holiday list to use. Default: `'IR'` (Iran). Afghanistan
-   * and Tajikistan are planned region codes; they are not shipped yet.
-   */
+  /** Default: `'IR'`. */
   region?: HolidayRegion;
 }
 
-/**
- * One country's holiday data and resolvers. Iran ships today. Other regions
- * plug in here with their own fixed rules, lunar tables, and name files.
- */
+/** One region pack. Iran ships today. */
 export interface RegionHolidayPack {
   region: HolidayRegion;
   label: HolidayNames;

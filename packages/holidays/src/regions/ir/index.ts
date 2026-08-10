@@ -25,13 +25,7 @@ function lunarInMonth(year: number, month: number): HolidayOccurrence[] {
     }));
 }
 
-/**
- * Official public holidays of Iran. The list combines two calendars:
- * fixed solar (Jalali) national days such as Nowruz, and lunar Islamic
- * observances whose Jalali date shifts each year. Fixed days come from
- * rules. Lunar days come from the University of Tehran Calendar Centre
- * year table.
- */
+/** Iran pack: fixed solar rules plus lunar year table. */
 export const iranHolidayPack: RegionHolidayPack = {
   region: 'IR',
   label: {

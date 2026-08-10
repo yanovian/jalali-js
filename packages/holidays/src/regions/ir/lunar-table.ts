@@ -8,12 +8,9 @@ export interface LunarHolidayEntry {
 }
 
 /** Inclusive Jalali year range covered by {@link LUNAR_BY_YEAR}. */
-export const LUNAR_YEAR_RANGE = { min: 1402, max: 1425 } as const;
+export const LUNAR_YEAR_RANGE = { min: 1402, max: 1426 } as const;
 
-/**
- * Iran's lunar-based official holidays, keyed by Jalali year. Sourced from
- * the published official calendar (University of Tehran Calendar Centre).
- */
+/** Iran lunar official holidays by Jalali year. */
 export const LUNAR_BY_YEAR: Readonly<Record<number, readonly LunarHolidayEntry[]>> = {
   // University of Tehran Calendar Centre / official Iran holiday list (via emrooz.app). Martyrdom of Imam Reza is 30 Safar, two Jalali days after Demise of the Prophet.
   1402: [
@@ -506,5 +503,26 @@ export const LUNAR_BY_YEAR: Readonly<Record<number, readonly LunarHolidayEntry[]
     { month: 10, day: 7, id: 'martyrdom-imam-reza' },
     { month: 10, day: 15, id: 'martyrdom-imam-askari' },
     { month: 10, day: 24, id: 'birth-prophet' },
+  ],
+  // University of Tehran Calendar Centre / official Iran holiday list (via emrooz.app). Martyrdom of Imam Reza is 30 Safar, two Jalali days after Demise of the Prophet when the source omits it.
+  1426: [
+    { month: 1, day: 10, id: 'martyrdom-fatemeh' },
+    { month: 2, day: 19, id: 'birth-imam-ali' },
+    { month: 3, day: 2, id: 'mabas' },
+    { month: 3, day: 19, id: 'birth-imam-mahdi' },
+    { month: 4, day: 24, id: 'martyrdom-imam-ali' },
+    { month: 5, day: 2, id: 'eyd-fetr' },
+    { month: 5, day: 3, id: 'eyd-fetr-holiday' },
+    { month: 5, day: 26, id: 'martyrdom-imam-sadegh' },
+    { month: 7, day: 8, id: 'eyd-qorban' },
+    { month: 7, day: 16, id: 'eyd-ghadir' },
+    { month: 8, day: 7, id: 'tasua' },
+    { month: 8, day: 8, id: 'ashura' },
+    { month: 9, day: 17, id: 'arbain' },
+    { month: 9, day: 25, id: 'demise-prophet' },
+    { month: 9, day: 27, id: 'martyrdom-imam-reza' },
+    { month: 10, day: 4, id: 'martyrdom-imam-askari' },
+    { month: 10, day: 13, id: 'birth-prophet' },
+    { month: 12, day: 28, id: 'martyrdom-fatemeh' },
   ],
 };

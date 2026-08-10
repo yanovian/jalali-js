@@ -709,6 +709,10 @@ publish-packages` (skipping any already published at that version, so a
   token), not the default `GITHUB_TOKEN`: GitHub does not let a
   GITHUB_TOKEN-authored pull request trigger this repo's own `ci.yml`, so
   nothing would check the update once it opened.
+- **`update-holidays.yml` (Phase 18).** Yearly on 25 March (and
+  `workflow_dispatch`). Runs `make update-holidays YEARS=next`, opens a
+  PR when files change, otherwise logs `Nothing has changed.` Uses
+  `PAT_TOKEN` so the PR can trigger `ci.yml`.
 - **`prune-old-actions.yaml` (Phase 9).** `yanovian/prune-old-actions@v1`,
   daily, `days-ago: 30`, matching the org's other repos exactly (no reason
   for this one's cadence to differ).
@@ -972,18 +976,14 @@ publish` rewrites to the real published version automatically, the
   emits a `CalendarDateTime` through the existing storage-value contract.
   `TimeRangePicker` in the `ui-*` packages is two `TimePicker`s side by
   side.
-- **Holiday data (Phase 18) stays out of core.** `@jalali-js/holidays` is
-  a data package with zero runtime dependencies. Today it ships Iran
-  (`IR`) only. Afghanistan (`AF`) and Tajikistan (`TJ`) are reserved
-  region codes. Each region pack lives under `src/regions/<code>/`, with
-  per-language name files under `names/{en,fa,ps}.ts`. Fixed solar
-  holidays are rules. Lunar holidays are a per-year table refreshed by
-  `make update-holidays`. `buildCalendarGrid()` takes an optional
-  `isHolidayDay` predicate and marks `isHoliday` on each cell. Bindings
-  pass that predicate through `resolveCalendarHolidays()` when
-  `showHolidays` is on, and merge holiday dates into `disabledDates`
-  when `blockHolidays` is on, so blocking reuses the Phase 16 rule model.
-  Pickers take `holidayRegion` (default `'IR'`).
+- **Holiday data (Phase 18) stays out of core.** `@jalali-js/holidays`
+  ships Iran (`IR`) today. `AF` and `TJ` are reserved. Packs live under
+  `src/regions/<code>/` with `names/{en,fa,ps}.ts`. Fixed solar days are
+  rules. Lunar days are a per-year table (`make update-holidays`).
+  `buildCalendarGrid()` takes optional `isHolidayDay`. Bindings use
+  `resolveCalendarHolidays()` for `showHolidays` / `blockHolidays`
+  (blocking reuses Phase 16 `disabledDates`). Default `holidayRegion`
+  is `'IR'`.
 
 ## Makefile
 
@@ -1027,7 +1027,7 @@ format / format-check Prettier, write mode or check mode (the CI gate)
 test / test-watch     Unit and property tests (Vitest)
 test-e2e             Playwright visual e2e suite
 probe-treeshake      Confirm packages/core's built output actually tree-shakes
-update-holidays      Rebuild the Iran lunar holiday table from packages/holidays/data/ir/lunar/*.json
+update-holidays      Fetch/regen Iran lunar data (`YEARS=next|1426|...`)
 size                 Bundle-size budget check
 check                CI-equivalent: typecheck, lint, format-check, test, build, size
 app-typecheck        Typecheck one app/package by name: make app-typecheck APP=playground-react

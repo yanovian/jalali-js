@@ -200,13 +200,10 @@ watchEffect(() => {
     </section>
 
     <section data-testid="holidays">
-      <h2>Iran official holidays (showHolidays)</h2>
+      <h2>Iran holidays (showHolidays)</h2>
       <p>
-        Farvardin 1403 with <code>showHolidays</code> and the default
-        <code>holiday-region=&quot;IR&quot;</code>. Iran official holidays render with
-        <code>data-holiday</code>. Nowruz, Jomhoori Eslami, Sizdah Bedar, and Eyd-e Fetr all fall in
-        this month. Afghanistan and Tajikistan may use different lists; those regions are not
-        shipped yet.
+        Farvardin 1403, <code>holiday-region=&quot;IR&quot;</code>. Holiday days get
+        <code>data-holiday</code>.
       </p>
       <InlineCalendar
         system="jalali"

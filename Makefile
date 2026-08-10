@@ -87,8 +87,8 @@ probe-treeshake: ## Confirm packages/core's built output actually tree-shakes
 	$(PNPM) --filter jalali-js build
 	$(PNPM) probe:treeshake
 
-update-holidays: ## Rebuild regions/ir/lunar-table.ts from data/ir/lunar/*.json
-	node scripts/update-holidays.mjs
+update-holidays: ## Fetch/regen Iran lunar data. YEARS=next|1426|1403 1404
+	node scripts/update-holidays.mjs $(YEARS)
 
 size: ## Check packages/core's bundle-size budget (size-limit)
 	$(PNPM) --filter jalali-js build

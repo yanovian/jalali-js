@@ -98,11 +98,11 @@ describe('@jalali-js/holidays', () => {
   });
 
   it('does not invent lunar holidays outside the covered year range', () => {
-    expect(HOLIDAY_YEAR_RANGE).toEqual({ min: 1402, max: 1425 });
-    expect(holidayYearRange({ region: 'IR' })).toEqual({ min: 1402, max: 1425 });
+    expect(HOLIDAY_YEAR_RANGE).toEqual({ min: 1402, max: 1426 });
+    expect(holidayYearRange({ region: 'IR' })).toEqual({ min: 1402, max: 1426 });
     expect(isHoliday({ year: 1399, month: 4, day: 26 })).toBe(false);
-    expect(isHoliday({ year: 1426, month: 1, day: 1 })).toBe(true);
-    expect(isHoliday({ year: 1426, month: 4, day: 4 })).toBe(false);
+    expect(isHoliday({ year: 1427, month: 1, day: 1 })).toBe(true);
+    expect(isHoliday({ year: 1427, month: 4, day: 4 })).toBe(false);
     expect(isHoliday({ year: 1399, month: 1, day: 1 })).toBe(true);
   });
 
@@ -113,6 +113,7 @@ describe('@jalali-js/holidays', () => {
     expect(isHoliday({ year: 1406, month: 3, day: 25 })).toBe(true);
     expect(isHoliday({ year: 1406, month: 12, day: 8 })).toBe(true);
     expect(isHoliday({ year: 1425, month: 10, day: 5 })).toBe(true);
+    expect(isHoliday({ year: 1426, month: 1, day: 10 })).toBe(true);
   });
 
   it('includes adjacent-month holidays when building a block list', () => {
