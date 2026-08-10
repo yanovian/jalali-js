@@ -925,20 +925,20 @@ Many apps need a month grid that renders their own events, not only a
 picker. This stays headless-first, like everything else here: the consumer
 owns the event data and the persistence.
 
-- [ ] Add a framework-free event model and layout module: an event has a
+- [x] Add a framework-free event model and layout module: an event has a
       date span, an optional time span, and an all-day flag. Multi-day
       spans and overlap layout are pure functions, tested on their own,
       like `buildCalendarGrid()`.
-- [ ] Add an `EventCalendar` month view to `ui-react`, `ui-vue`, and
+- [x] Add an `EventCalendar` month view to `ui-react`, `ui-vue`, and
       `ui-web`. Controlled component: the consumer passes the event array
       and gets callbacks (`onEventClick`, `onDayClick`). No built-in modal
       or storage; the consumer renders their own editing UI from the
       callbacks.
 - [ ] Add week and day views, after the month view lands.
-- [ ] Decide the recurring-event scope at implementation time: a pure
+- [x] Decide the recurring-event scope at implementation time: a pure
       rule-expansion helper is likely enough, with the expansion done on
       the consumer's side. Document the choice.
-- [ ] Add unit tests for the layout functions, component tests per
+- [x] Add unit tests for the layout functions, component tests per
       binding, playground sections, visual e2e coverage, and a docs guide
       page.
 

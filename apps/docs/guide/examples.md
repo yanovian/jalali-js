@@ -122,6 +122,25 @@ function EventDatePicker() {
 }
 ```
 
+## React: month event calendar
+
+```tsx
+import '@jalali-js/react/date-picker.css';
+import { EventCalendar } from '@jalali-js/ui-react';
+import type { CalendarEvent } from 'jalali-js';
+
+const events: CalendarEvent[] = [
+  {
+    id: 'workshop',
+    title: 'Workshop',
+    start: { year: 1403, month: 5, day: 10 },
+    end: { year: 1403, month: 5, day: 12 },
+  },
+];
+
+<EventCalendar system="jalali" locale="en" events={events} onEventClick={console.log} />;
+```
+
 ## A custom theme, without a theme file
 
 `--jalali-*` custom properties inherit, so a naive override on a wrapping element can lose to a

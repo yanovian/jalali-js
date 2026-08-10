@@ -7,9 +7,9 @@ import '@jalali-js/ui-vue/themes/compact.css';
 import darkThemeCss from '@jalali-js/ui-vue/themes/dark.css?inline';
 import type { LocaleCode } from '@jalali-js/vue';
 import { DatePicker, TimePicker, useCalendar } from '@jalali-js/vue';
-import { InlineCalendar, RangePicker, TimeRangePicker } from '@jalali-js/ui-vue';
+import { EventCalendar, InlineCalendar, RangePicker, TimeRangePicker } from '@jalali-js/ui-vue';
 import type { RangeStorageValue, TimeRange } from '@jalali-js/ui-vue';
-import type { CalendarDate, StorageValue, TimeOfDay } from 'jalali-js';
+import type { CalendarDate, CalendarEvent, StorageValue, TimeOfDay } from 'jalali-js';
 import { ref, watchEffect } from 'vue';
 
 const stored = ref<StorageValue>();
@@ -18,6 +18,24 @@ const storedDatetime = ref<StorageValue>();
 const time = ref<TimeOfDay>({ hour: 14, minute: 30 });
 const timeRange = ref<TimeRange>();
 const inlineSelected = ref<CalendarDate | null>(null);
+const eventClickLog = ref('none');
+const demoEvents: CalendarEvent[] = [
+  {
+    id: 'workshop',
+    title: 'Workshop',
+    start: { year: 1403, month: 5, day: 10 },
+    end: { year: 1403, month: 5, day: 12 },
+  },
+  {
+    id: 'meeting',
+    title: 'Meeting',
+    start: { year: 1403, month: 5, day: 15 },
+    end: { year: 1403, month: 5, day: 15 },
+    allDay: false,
+    startTime: { hour: 14, minute: 0 },
+    endTime: { hour: 15, minute: 0 },
+  },
+];
 const datetimeDefault = {
   precision: 'datetime' as const,
   system: 'jalali' as const,
@@ -182,6 +200,21 @@ watchEffect(() => {
       <h2>Time range picker (@jalali-js/ui-vue)</h2>
       <TimeRangePicker :locale="locale" :minute-step="15" @change="(next) => (timeRange = next)" />
       <p>Selected range: {{ JSON.stringify(timeRange) }}</p>
+    </section>
+
+    <section data-testid="event-calendar">
+      <h2>Event calendar (@jalali-js/ui-vue)</h2>
+      <p>
+        Mordad 1403 with two seed events. The consumer owns the list. Clicks only fire callbacks.
+      </p>
+      <EventCalendar
+        system="jalali"
+        :locale="locale"
+        :initial-displayed-month="{ year: 1403, month: 5 }"
+        :events="demoEvents"
+        @event-click="(event) => (eventClickLog = event.title)"
+      />
+      <p>Last event click: {{ eventClickLog }}</p>
     </section>
 
     <section data-testid="selection-rules">

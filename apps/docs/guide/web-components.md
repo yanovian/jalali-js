@@ -63,10 +63,12 @@ date; leave it unset for today's date.
 
 Full property and event list: [`JalaliDatePickerElement`](/api/@jalali-js/web/classes/JalaliDatePickerElement).
 
-## Range picker and inline calendar
+## Range picker, event calendar, and inline calendar
 
-`@jalali-js/ui-web` adds `<jalali-range-picker>` and `<jalali-inline-calendar>` on the same
-primitives; see [Configuration and theming](/guide/theming#range-picker-and-inline-calendar).
+`@jalali-js/ui-web` adds `<jalali-range-picker>`, `<jalali-event-calendar>`, and
+`<jalali-inline-calendar>` on the same primitives; see
+[Configuration and theming](/guide/theming#range-picker-event-calendar-and-inline-calendar) and
+[Event calendar](/guide/event-calendar).
 
 ```sh
 npm install @jalali-js/ui-web
@@ -75,6 +77,7 @@ npm install @jalali-js/ui-web
 ```html
 <jalali-inline-calendar system="jalali" locale="en"></jalali-inline-calendar>
 <jalali-range-picker system="jalali" locale="en"></jalali-range-picker>
+<jalali-event-calendar system="jalali" locale="en"></jalali-event-calendar>
 <script type="module">
   import '@jalali-js/ui-web';
 </script>

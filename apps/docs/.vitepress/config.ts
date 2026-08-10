@@ -112,6 +112,7 @@ export default defineConfig({
             { text: 'Selection rules', link: '/guide/selection-rules' },
             { text: 'Time selection', link: '/guide/time-selection' },
             { text: 'Holidays', link: '/guide/holidays' },
+            { text: 'Event calendar', link: '/guide/event-calendar' },
             { text: 'React', link: '/guide/react' },
             { text: 'Vue', link: '/guide/vue' },
             { text: 'Vanilla / Web Components', link: '/guide/web-components' },

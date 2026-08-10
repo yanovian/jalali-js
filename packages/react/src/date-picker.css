@@ -24,6 +24,8 @@
   --jalali-input-padding: 0.5em 0.75em;
   --jalali-popover-padding: 0.75em;
   --jalali-day-min-size: 2.25em;
+  --jalali-event-bg: #dbeafe;
+  --jalali-event-fg: #1e3a8a;
 
   font-family: var(--jalali-font);
   font-size: var(--jalali-font-size);
@@ -315,6 +317,59 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-timepicker-separator] {
   color: var(--jalali-muted-fg);
   user-select: none;
+}
+
+[data-jalali-eventcalendar-root] {
+  display: block;
+  width: min(100%, 36em);
+  background: var(--jalali-bg);
+  border: 1px solid var(--jalali-border);
+  border-radius: var(--jalali-radius);
+  padding: var(--jalali-popover-padding);
+}
+
+[data-jalali-eventcalendar-week] {
+  display: grid;
+  gap: 0.15em;
+  margin-top: 0.25em;
+}
+
+[data-jalali-eventcalendar-days],
+[data-jalali-eventcalendar-lanes] {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--jalali-gap);
+}
+
+[data-jalali-eventcalendar-days] [data-jalali-calendar-day] {
+  min-height: 1.75em;
+  aspect-ratio: auto;
+}
+
+[data-jalali-eventcalendar-event] {
+  min-width: 0;
+  margin: 0;
+  padding: 0.1em 0.35em;
+  border: 0;
+  border-radius: calc(var(--jalali-radius) * 0.5);
+  background: var(--jalali-event-bg);
+  color: var(--jalali-event-fg);
+  font: inherit;
+  font-size: 0.75em;
+  text-align: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+[data-jalali-eventcalendar-event][data-continues-before] {
+  border-start-start-radius: 0;
+}
+
+[data-jalali-eventcalendar-event][data-continues-after] {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
 }
 
 [data-jalali-timerangepicker-root] {

@@ -87,18 +87,20 @@ function Clock() {
 }
 ```
 
-## Range picker and inline calendar
+## Range picker, event calendar, and inline calendar
 
-`@jalali-js/ui-react` adds `RangePicker` and `InlineCalendar` on the same primitives; see
-[Configuration and theming](/guide/theming#range-picker-and-inline-calendar).
+`@jalali-js/ui-react` adds `RangePicker`, `EventCalendar`, and `InlineCalendar` on the same
+primitives; see [Configuration and theming](/guide/theming#range-picker-event-calendar-and-inline-calendar)
+and [Event calendar](/guide/event-calendar).
 
 ```sh
 npm install @jalali-js/ui-react
 ```
 
 ```tsx
-import { InlineCalendar, RangePicker } from '@jalali-js/ui-react';
+import { EventCalendar, InlineCalendar, RangePicker } from '@jalali-js/ui-react';
 
 <InlineCalendar system="jalali" locale="en" value={selected} onSelect={setSelected} />
 <RangePicker system="jalali" locale="en" onChange={(value, range) => { /* ... */ }} />
+<EventCalendar system="jalali" locale="en" events={events} onEventClick={setActive} />
 ```

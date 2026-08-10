@@ -11,6 +11,11 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- Month `EventCalendar` in `@jalali-js/ui-react`, `@jalali-js/ui-vue`, and
+  `@jalali-js/ui-web`, with a framework-free `CalendarEvent` model and
+  layout helpers in `jalali-js` (`layoutMonthEvents`, `eventsForDate`).
+  The consumer owns the event list and editing UI. Recurring rules expand
+  on the consumer side before pass-in. Week and day views are later work.
 - `formatRelative()` in `@jalali-js/i18n`: "۳ روز پیش", "3 days ago",
   "in 2 months", and a today string per locale. Uses `diffDates()` for
   unit selection. Digits follow `numerals`.

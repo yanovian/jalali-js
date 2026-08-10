@@ -1,3 +1,5 @@
+export { EventCalendar } from './EventCalendar.js';
+export type { EventCalendarProps } from './EventCalendar.js';
 export { InlineCalendar } from './InlineCalendar.js';
 export type { InlineCalendarProps } from './InlineCalendar.js';
 export { RangePicker } from './RangePicker.js';

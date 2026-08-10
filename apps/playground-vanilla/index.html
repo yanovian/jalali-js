@@ -125,6 +125,20 @@
         <p>Selected range: <span id="selected-time-range">null</span></p>
       </section>
 
+      <section data-testid="event-calendar">
+        <h2>Event calendar (@jalali-js/ui-web)</h2>
+        <p>
+          Mordad 1403 with two seed events. The consumer owns the list. Set
+          <code>.events</code> in <code>main.ts</code>. Listen for <code>event-click</code>.
+        </p>
+        <jalali-event-calendar
+          id="event-calendar"
+          system="jalali"
+          class="locale-follows"
+        ></jalali-event-calendar>
+        <p>Last event click: <span id="event-click-log">none</span></p>
+      </section>
+
       <section data-testid="selection-rules">
         <h2>Selection rules (min/max, blocked dates, blocked weekdays)</h2>
         <p>

@@ -132,7 +132,7 @@ linked above.
 | `@jalali-js/react`    | React bindings: `useCalendar`, headless `Calendar`, `DatePicker`. |
 | `@jalali-js/vue`      | The same, for Vue.                                                |
 | `@jalali-js/web`      | The same, as plain Web Components. No framework required.         |
-| `@jalali-js/ui-react` | `RangePicker`, `InlineCalendar`, and extra themes, for React.     |
+| `@jalali-js/ui-react` | `RangePicker`, `EventCalendar`, `InlineCalendar`, and themes.     |
 | `@jalali-js/ui-vue`   | The same, for Vue.                                                |
 | `@jalali-js/ui-web`   | The same, for web.                                                |
 

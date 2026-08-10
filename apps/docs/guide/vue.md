@@ -95,10 +95,11 @@ const timeZone = useResolvedTimeZone('auto'); // 'UTC' during SSR, the real zone
 </script>
 ```
 
-## Range picker and inline calendar
+## Range picker, event calendar, and inline calendar
 
-`@jalali-js/ui-vue` adds `RangePicker` and `InlineCalendar` on the same primitives; see
-[Configuration and theming](/guide/theming#range-picker-and-inline-calendar).
+`@jalali-js/ui-vue` adds `RangePicker`, `EventCalendar`, and `InlineCalendar` on the same
+primitives; see [Configuration and theming](/guide/theming#range-picker-event-calendar-and-inline-calendar)
+and [Event calendar](/guide/event-calendar).
 
 ```sh
 npm install @jalali-js/ui-vue
@@ -106,7 +107,7 @@ npm install @jalali-js/ui-vue
 
 ```vue
 <script setup lang="ts">
-import { InlineCalendar, RangePicker } from '@jalali-js/ui-vue';
+import { EventCalendar, InlineCalendar, RangePicker } from '@jalali-js/ui-vue';
 import type { RangeStorageValue } from '@jalali-js/ui-vue';
 import { ref } from 'vue';
 
@@ -116,6 +117,7 @@ const storedRange = ref<RangeStorageValue>();
 <template>
   <InlineCalendar system="jalali" locale="en" :value="selected" @select="selected = $event" />
   <RangePicker v-model="storedRange" system="jalali" locale="en" />
+  <EventCalendar system="jalali" locale="en" :events="events" @event-click="onEvent" />
 </template>
 ```
 

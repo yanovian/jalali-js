@@ -11,14 +11,16 @@ import type {
 import { localePackFor } from '@jalali-js/web';
 import { format as formatDate } from '@jalali-js/i18n';
 // A bare import for its side effect: registering <jalali-inline-calendar>,
-// <jalali-range-picker>, and <jalali-time-range-picker>.
+// <jalali-range-picker>, <jalali-time-range-picker>, and <jalali-event-calendar>.
 import '@jalali-js/ui-web';
 import type {
+  EventCalendarEventClickDetail,
+  JalaliEventCalendarElement,
   JalaliInlineCalendarElement,
   RangePickerChangeEventDetail,
   TimeRangePickerChangeEventDetail,
 } from '@jalali-js/ui-web';
-import type { CalendarDate } from 'jalali-js';
+import type { CalendarDate, CalendarEvent } from 'jalali-js';
 import { createCalendar } from 'jalali-js';
 
 const jalaliToday = createCalendar({ system: 'jalali' }).today();
@@ -104,6 +106,31 @@ datetimePicker.addEventListener('change', (event) => {
 document.getElementById('time-range-picker')!.addEventListener('change', (event) => {
   const { range } = (event as CustomEvent<TimeRangePickerChangeEventDetail>).detail;
   document.getElementById('selected-time-range')!.textContent = JSON.stringify(range);
+});
+
+const demoEvents: CalendarEvent[] = [
+  {
+    id: 'workshop',
+    title: 'Workshop',
+    start: { year: 1403, month: 5, day: 10 },
+    end: { year: 1403, month: 5, day: 12 },
+  },
+  {
+    id: 'meeting',
+    title: 'Meeting',
+    start: { year: 1403, month: 5, day: 15 },
+    end: { year: 1403, month: 5, day: 15 },
+    allDay: false,
+    startTime: { hour: 14, minute: 0 },
+    endTime: { hour: 15, minute: 0 },
+  },
+];
+const eventCalendar = document.getElementById('event-calendar') as JalaliEventCalendarElement;
+eventCalendar.initialDisplayedMonth = { year: 1403, month: 5 };
+eventCalendar.events = demoEvents;
+eventCalendar.addEventListener('event-click', (event) => {
+  const { event: clicked } = (event as CustomEvent<EventCalendarEventClickDetail>).detail;
+  document.getElementById('event-click-log')!.textContent = clicked.title;
 });
 
 // Selection rules are a JS property, not an attribute: the rules object is not representable

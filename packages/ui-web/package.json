@@ -1,7 +1,7 @@
 {
   "name": "@jalali-js/ui-web",
   "version": "0.1.0",
-  "description": "RangePicker, InlineCalendar, and extra themes for @jalali-js/web, built on the same headless Web Components.",
+  "description": "RangePicker, EventCalendar, InlineCalendar, and extra themes for @jalali-js/web, built on the same headless Web Components.",
   "keywords": [
     "jalali",
     "persian",

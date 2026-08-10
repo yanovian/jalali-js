@@ -18,6 +18,16 @@ export type {
 export { createCalendar } from './calendar.js';
 export type { CalendarGridDay } from './calendar-grid.js';
 export { buildCalendarGrid, nextMonth, previousMonth } from './calendar-grid.js';
+export type { CalendarEvent, EventLaneSegment } from './event-calendar.js';
+export {
+  eventCoversDate,
+  eventIsAllDay,
+  eventsForDate,
+  findEventById,
+  isValidEventSpan,
+  layoutMonthEvents,
+  layoutWeekEvents,
+} from './event-calendar.js';
 export type { CalendarDateFields, CalendarEngine } from './calendar-engine.js';
 export type { CalendarSystem } from './convert.js';
 export { fromGregorian, getCalendarEngine, toGregorian } from './convert.js';

@@ -1,7 +1,13 @@
+import { defineEventCalendarElement } from './EventCalendar.js';
 import { defineInlineCalendarElement } from './InlineCalendar.js';
 import { defineRangePickerElement } from './RangePicker.js';
 import { defineTimeRangePickerElement } from './TimeRangePicker.js';
 
+export { JalaliEventCalendarElement, defineEventCalendarElement } from './EventCalendar.js';
+export type {
+  EventCalendarDayClickDetail,
+  EventCalendarEventClickDetail,
+} from './EventCalendar.js';
 export { JalaliInlineCalendarElement, defineInlineCalendarElement } from './InlineCalendar.js';
 export { JalaliRangePickerElement, defineRangePickerElement } from './RangePicker.js';
 export type { DateRange, RangePickerChangeEventDetail, RangeStorageValue } from './RangePicker.js';
@@ -10,6 +16,7 @@ export type { TimeRange, TimeRangePickerChangeEventDetail } from './TimeRangePic
 
 // package.json sets "sideEffects": true, the same reason @jalali-js/web does: a bundler must
 // never tree-shake these calls away, or the elements never register.
+defineEventCalendarElement();
 defineInlineCalendarElement();
 defineRangePickerElement();
 defineTimeRangePickerElement();

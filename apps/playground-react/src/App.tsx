@@ -6,10 +6,28 @@ import '@jalali-js/ui-react/themes/compact.css';
 import darkThemeCss from '@jalali-js/ui-react/themes/dark.css?inline';
 import type { LocaleCode } from '@jalali-js/react';
 import { DatePicker, TimePicker, useCalendar } from '@jalali-js/react';
-import { InlineCalendar, RangePicker, TimeRangePicker } from '@jalali-js/ui-react';
+import { EventCalendar, InlineCalendar, RangePicker, TimeRangePicker } from '@jalali-js/ui-react';
 import type { RangeStorageValue } from '@jalali-js/ui-react';
-import type { CalendarDate, StorageValue, TimeOfDay } from 'jalali-js';
+import type { CalendarDate, CalendarEvent, StorageValue, TimeOfDay } from 'jalali-js';
 import { useState } from 'react';
+
+const DEMO_EVENTS: CalendarEvent[] = [
+  {
+    id: 'workshop',
+    title: 'Workshop',
+    start: { year: 1403, month: 5, day: 10 },
+    end: { year: 1403, month: 5, day: 12 },
+  },
+  {
+    id: 'meeting',
+    title: 'Meeting',
+    start: { year: 1403, month: 5, day: 15 },
+    end: { year: 1403, month: 5, day: 15 },
+    allDay: false,
+    startTime: { hour: 14, minute: 0 },
+    endTime: { hour: 15, minute: 0 },
+  },
+];
 
 function CalendarSummary() {
   const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
@@ -23,6 +41,7 @@ export default function App() {
   const [time, setTime] = useState<TimeOfDay>({ hour: 14, minute: 30 });
   const [timeRange, setTimeRange] = useState<{ start: TimeOfDay; end: TimeOfDay } | null>(null);
   const [inlineSelected, setInlineSelected] = useState<CalendarDate | null>(null);
+  const [eventClickLog, setEventClickLog] = useState<string>('none');
   const [isDark, setIsDark] = useState(true);
   const [locale, setLocale] = useState<LocaleCode>('fa');
 
@@ -166,6 +185,21 @@ export default function App() {
         <h2>Time range picker (@jalali-js/ui-react)</h2>
         <TimeRangePicker locale={locale} minuteStep={15} onChange={setTimeRange} />
         <p>Selected range: {JSON.stringify(timeRange)}</p>
+      </section>
+
+      <section data-testid="event-calendar">
+        <h2>Event calendar (@jalali-js/ui-react)</h2>
+        <p>
+          Mordad 1403 with two seed events. The consumer owns the list. Clicks only fire callbacks.
+        </p>
+        <EventCalendar
+          system="jalali"
+          locale={locale}
+          initialDisplayedMonth={{ year: 1403, month: 5 }}
+          events={DEMO_EVENTS}
+          onEventClick={(event) => setEventClickLog(event.title)}
+        />
+        <p>Last event click: {eventClickLog}</p>
       </section>
 
       <section data-testid="selection-rules">

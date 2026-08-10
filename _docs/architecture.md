@@ -186,7 +186,7 @@ packages/
   react/               # React hooks and headless components. Works in Next.js.
   vue/                 # Vue composables and headless components. Works in Nuxt.
   web/                 # Framework-free Web Components. No hooks or composables: plain custom elements.
-  ui-react/            # Optional extra React components: RangePicker, InlineCalendar, themes.
+  ui-react/            # Optional React UI: RangePicker, EventCalendar, InlineCalendar, themes.
   ui-vue/              # The same, for Vue.
   ui-web/              # The same, for web.
 apps/
@@ -290,6 +290,9 @@ in `core`.
   `packages/nlp`.
 - Phase 19 added `formatRelative(from, to, locale)`. Unit selection uses
   `diffDates()` from core. Phrases live on each `LocalePack.relative`.
+- Phase 20 added a core event model (`CalendarEvent`) and month layout
+  helpers, plus `EventCalendar` in each `ui-*` package. The consumer owns
+  events and editing. Recurring expansion stays on the consumer side.
 
 ## Natural language date parsing
 

@@ -68,15 +68,17 @@ import '@jalali-js/ui-react/themes/dark.css'; // colors
 import '@jalali-js/ui-react/themes/compact.css'; // spacing and sizing
 ```
 
-## Range picker and inline calendar
+## Range picker, event calendar, and inline calendar
 
-`@jalali-js/ui-react` (and `@jalali-js/ui-vue`) add two more components on the same headless
+`@jalali-js/ui-react` (and `@jalali-js/ui-vue`) add more components on the same headless
 primitives:
 
 - **`RangePicker`**: a start/end date-range picker. Two-click selection (first click sets the
   start, second sets the end and closes the popover); clicking before the current start
   restarts the range from the new point instead of erroring. Hovering after a start is picked
   previews the range a completed selection would produce.
+- **`EventCalendar`**: a month grid for consumer-owned events. See
+  [Event calendar](/guide/event-calendar).
 - **`InlineCalendar`**: `Calendar` re-exported under a more discoverable name, for an
   always-visible grid with no popover around it.
 
