@@ -1,6 +1,6 @@
 {
   "name": "@jalali-js/react",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "React bindings for jalali-js: useCalendar hook, headless Calendar grid, a default-styled DatePicker, SSR-safe timezone resolution.",
   "keywords": [
     "jalali",

@@ -1,6 +1,6 @@
 {
   "name": "jalali-js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "The Jalali (Persian, Shamsi) to Gregorian conversion core. TypeScript-native, zero runtime dependencies, framework-agnostic.",
   "keywords": [
     "jalali",
