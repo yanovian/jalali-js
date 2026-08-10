@@ -1,0 +1,85 @@
+# Changelog
+
+This file records all notable changes to this project. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow
+[Semantic Versioning](https://semver.org/). Every package in this monorepo
+releases together, at the same version number.
+
+Planned work lives in [`_docs/plan.md`](_docs/plan.md).
+
+## [Unreleased]
+
+### Added
+
+- LLM-friendly docs on the docs site: `llms.txt` (index) and
+  `llms-full.txt` (full guide bundle).
+- A bundle-size badge in the readme.
+
+## [0.1.0] - 2026-08-10
+
+### Added
+
+- Web Components bindings, with no framework required: `@jalali-js/web`
+  (`Calendar`, `DatePicker`, `DropdownDateFields`) and `@jalali-js/ui-web`
+  (`RangePicker`, `InlineCalendar`, and the dark and compact themes).
+- Quick month and year navigation in the React and Vue calendars.
+- The calendar shows the selected date as text.
+
+### Changed
+
+- Better dark mode styling across the pickers.
+- Playground improvements.
+- SEO material and a better comparison table on the docs site.
+
+### Fixed
+
+- Native select rendering in WebKit dark mode.
+- The compatibility matrix workflow for Next.js 15 and Nuxt 3.
+
+## [0.0.3] - 2026-08-09
+
+### Changed
+
+- Better package description text on the npm pages.
+
+## [0.0.2] - 2026-08-09
+
+### Changed
+
+- More package information on the npm pages.
+
+## [0.0.1] - 2026-08-09
+
+The initial release. This covers phases 0 through 11 of the plan.
+
+### Added
+
+- `jalali-js`, the conversion core, with zero runtime dependencies:
+  Jalali to Gregorian conversion and back (a 33-year-cycle arithmetic
+  rule, verified against ICU), the three precision tiers (`CalendarDate`,
+  `CalendarDateTime`, `ZonedCalendarDateTime`), the `createCalendar()`
+  factory, SSR-safe timezone resolution, the Gregorian storage-value
+  contract with the `valueFormat` option, date math (`addDays()`,
+  `compareDates()`, `dayOfWeek()`), and the calendar grid builder.
+- `@jalali-js/i18n`: `en` and `fa` locale packs, `format()` with display
+  presets, and Persian numerals.
+- `@jalali-js/nlp`: natural language date parsing in English, Farsi, and
+  Finglish.
+- `@jalali-js/react`: the `useCalendar` hook, the headless `Calendar`,
+  `DatePicker` (grid and dropdown variants), and `useResolvedTimeZone`.
+- `@jalali-js/vue`: the same, as composables and single-file components.
+- `@jalali-js/ui-react` and `@jalali-js/ui-vue`: `RangePicker`,
+  `InlineCalendar`, and the dark and compact themes.
+- A CSS custom-property theming contract shared by every binding.
+- The docs site (VitePress): guides, a generated API reference, and the
+  hosted React and Vue playgrounds.
+- The build and release pipeline, CI (typecheck, lint, format check,
+  tests, a bundle-size budget, and a tree-shaking probe), the
+  peer-dependency compatibility matrix, and visual e2e tests with a PR
+  screenshot bot.
+
+[unreleased]: https://github.com/yanovian/jalali-js/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/yanovian/jalali-js/compare/v0.0.3...v0.1.0
+[0.0.3]: https://github.com/yanovian/jalali-js/compare/v0.0.2...v0.0.3
+[0.0.2]: https://github.com/yanovian/jalali-js/compare/v0.0.1...v0.0.2
+[0.0.1]: https://github.com/yanovian/jalali-js/releases/tag/v0.0.1
