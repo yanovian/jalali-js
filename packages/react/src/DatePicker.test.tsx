@@ -149,3 +149,59 @@ describe('DatePicker (dropdown variant)', () => {
     expect(screen.getByRole('combobox', { name: 'Day' })).toHaveValue('30');
   });
 });
+
+describe('DatePicker (precision: datetime)', () => {
+  it('shows the time next to the date in the input', () => {
+    render(
+      <DatePicker
+        locale="en"
+        precision="datetime"
+        defaultDate={{
+          ...initialDate,
+          precision: 'datetime',
+          hour: 14,
+          minute: 30,
+          second: 0,
+          millisecond: 0,
+        }}
+      />,
+    );
+    expect(screen.getByRole('combobox')).toHaveValue('15 Mordad 1403 14:30');
+  });
+
+  it('keeps the popover open after a day pick, and emits a datetime storage value', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DatePicker locale="en" precision="datetime" defaultDate={initialDate} onChange={onChange} />,
+    );
+    await user.click(screen.getByRole('combobox'));
+    await user.click(screen.getByRole('gridcell', { name: '20 Mordad 1403' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(onChange).toHaveBeenCalledWith('2024-08-10T00:00:00.000', {
+      precision: 'datetime',
+      system: 'jalali',
+      year: 1403,
+      month: 5,
+      day: 20,
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+    });
+  });
+
+  it('emits the updated time when the hour changes', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DatePicker locale="en" precision="datetime" defaultDate={initialDate} onChange={onChange} />,
+    );
+    await user.click(screen.getByRole('combobox'));
+    await user.selectOptions(screen.getByLabelText('Hour'), '9');
+    expect(onChange).toHaveBeenCalledWith(
+      '2024-08-05T09:00:00.000',
+      expect.objectContaining({ hour: 9, minute: 0, precision: 'datetime' }),
+    );
+  });
+});

@@ -5,10 +5,10 @@ import '@jalali-js/ui-react/themes/compact.css';
 // comment), so injecting/removing it as a <style> tag turns the picker theme on and off cleanly.
 import darkThemeCss from '@jalali-js/ui-react/themes/dark.css?inline';
 import type { LocaleCode } from '@jalali-js/react';
-import { DatePicker, useCalendar } from '@jalali-js/react';
-import { InlineCalendar, RangePicker } from '@jalali-js/ui-react';
+import { DatePicker, TimePicker, useCalendar } from '@jalali-js/react';
+import { InlineCalendar, RangePicker, TimeRangePicker } from '@jalali-js/ui-react';
 import type { RangeStorageValue } from '@jalali-js/ui-react';
-import type { CalendarDate, StorageValue } from 'jalali-js';
+import type { CalendarDate, StorageValue, TimeOfDay } from 'jalali-js';
 import { useState } from 'react';
 
 function CalendarSummary() {
@@ -19,6 +19,9 @@ function CalendarSummary() {
 export default function App() {
   const [stored, setStored] = useState<StorageValue | null>(null);
   const [storedRange, setStoredRange] = useState<RangeStorageValue | null>(null);
+  const [storedDatetime, setStoredDatetime] = useState<StorageValue | null>(null);
+  const [time, setTime] = useState<TimeOfDay>({ hour: 14, minute: 30 });
+  const [timeRange, setTimeRange] = useState<{ start: TimeOfDay; end: TimeOfDay } | null>(null);
   const [inlineSelected, setInlineSelected] = useState<CalendarDate | null>(null);
   const [isDark, setIsDark] = useState(true);
   const [locale, setLocale] = useState<LocaleCode>('fa');
@@ -127,6 +130,42 @@ export default function App() {
         <h2>Range picker (@jalali-js/ui-react)</h2>
         <RangePicker system="jalali" locale={locale} onChange={(value) => setStoredRange(value)} />
         <p>Stored range (Gregorian by default): {JSON.stringify(storedRange)}</p>
+      </section>
+
+      <section data-testid="time-picker">
+        <h2>Time picker</h2>
+        <p>Hour and minute selects, with a 15-minute step.</p>
+        <TimePicker locale={locale} value={time} minuteStep={15} onChange={setTime} />
+        <p>Selected time: {JSON.stringify(time)}</p>
+      </section>
+
+      <section data-testid="datetime-picker">
+        <h2>Date and time (precision: datetime)</h2>
+        <DatePicker
+          system="jalali"
+          locale={locale}
+          precision="datetime"
+          minuteStep={15}
+          defaultDate={{
+            precision: 'datetime',
+            system: 'jalali',
+            year: 1403,
+            month: 5,
+            day: 15,
+            hour: 14,
+            minute: 30,
+            second: 0,
+            millisecond: 0,
+          }}
+          onChange={(value) => setStoredDatetime(value)}
+        />
+        <p>Stored value (Gregorian by default): {JSON.stringify(storedDatetime)}</p>
+      </section>
+
+      <section data-testid="time-range-picker">
+        <h2>Time range picker (@jalali-js/ui-react)</h2>
+        <TimeRangePicker locale={locale} minuteStep={15} onChange={setTimeRange} />
+        <p>Selected range: {JSON.stringify(timeRange)}</p>
       </section>
 
       <section data-testid="selection-rules">

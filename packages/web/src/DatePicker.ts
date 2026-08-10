@@ -1,45 +1,64 @@
-import { format as formatDate } from '@jalali-js/i18n';
+import type { LocalePack } from '@jalali-js/i18n';
+import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type {
   CalendarDate,
+  CalendarDateTime,
   CalendarSystem,
   SelectionRules,
   StorageValue,
+  TimeOfDay,
   ValueFormat,
 } from 'jalali-js';
-import { createCalendar, toStorageValue } from 'jalali-js';
+import { createCalendar, timeOfDay, toStorageValue, withTime } from 'jalali-js';
 import { JalaliCalendarElement, type CalendarSelectEventDetail } from './Calendar.js';
 import { JalaliDropdownDateFieldsElement } from './DropdownDateFields.js';
+import { JalaliTimePickerElement, type TimePickerChangeEventDetail } from './TimePicker.js';
 import { el } from './dom.js';
 import { localePackFor, parseLocaleAttribute, type LocaleCode } from './locale.js';
 
 export interface DatePickerChangeEventDetail {
   value: StorageValue;
-  date: CalendarDate;
+  date: CalendarDate | CalendarDateTime;
 }
 
 export type Variant = 'grid' | 'dropdown';
+export type DatePickerPrecision = 'date' | 'datetime';
+
+function displayValue(date: CalendarDate | CalendarDateTime, localePack: LocalePack): string {
+  const datePart = formatDate(date, localePack);
+  if (date.precision === 'date') return datePart;
+  const hour = formatNumber(date.hour, localePack.defaultNumerals, localePack.digits, 2);
+  const minute = formatNumber(date.minute, localePack.defaultNumerals, localePack.digits, 2);
+  return `${datePart} ${hour}:${minute}`;
+}
+
+function asDateOnly(date: CalendarDate | CalendarDateTime): CalendarDate {
+  return {
+    precision: 'date',
+    system: date.system,
+    year: date.year,
+    month: date.month,
+    day: date.day,
+  };
+}
 
 /**
  * A working, default-styled date picker built on `<jalali-calendar>` (the headless primitive)
- * and `<jalali-dropdown-date-fields>`. Import `@jalali-js/web/date-picker.css` for its default
- * appearance, or style `[data-jalali-datepicker-*]` yourself; nothing here requires the
- * stylesheet to function, and nothing is hidden behind a shadow boundary.
+ * and `<jalali-dropdown-date-fields>`. With `precision="datetime"`, a `<jalali-time-picker>`
+ * sits under the grid. Import `@jalali-js/web/date-picker.css` for its default appearance.
  *
- * `.value` (the property, not an attribute: a `StorageValue` is not always a plain string) is
- * the *storage* value, shaped by `value-format`, not the raw `CalendarDate`; listen for
- * `change` to read both forms. `.defaultDate` seeds the initial selection: unset defaults to
- * today, `null` opens with nothing selected (showing `placeholder`).
- *
- * Attributes: `system`, `locale`, `variant` ('grid' | 'dropdown'), `value-format`,
- * `placeholder`, `quick-nav` (set to "false" to turn off; grid variant only). `.rules` is a
- * property only (a `SelectionRules` object; grid variant only): blocked days render disabled
- * and reject selection.
+ * Attributes: `system`, `locale`, `variant`, `precision` ('date' | 'datetime'), `minute-step`,
+ * `disabled-hours` (comma-separated), `value-format`, `placeholder`, `quick-nav`. `.rules` and
+ * `.defaultDate` are properties only.
  */
 export class JalaliDatePickerElement extends HTMLElement {
   static observedAttributes = [
     'system',
     'locale',
     'variant',
+    'precision',
+    'minute-step',
+    'disabled-hours',
     'value-format',
     'placeholder',
     'quick-nav',
@@ -48,12 +67,15 @@ export class JalaliDatePickerElement extends HTMLElement {
   #system: CalendarSystem = 'jalali';
   #locale: LocaleCode = 'en';
   #variant: Variant = 'grid';
+  #precision: DatePickerPrecision = 'date';
+  #minuteStep = 1;
+  #disabledHours: number[] = [];
   #valueFormat: ValueFormat = 'gregorian-iso';
   #placeholder: string | undefined;
   #quickNav = true;
-  #defaultDate: CalendarDate | null | undefined;
+  #defaultDate: CalendarDate | CalendarDateTime | null | undefined;
   #rules: SelectionRules | undefined;
-  #date: CalendarDate | null = null;
+  #date: CalendarDate | CalendarDateTime | null = null;
   #dateInitialized = false;
   #open = false;
   #connected = false;
@@ -89,6 +111,31 @@ export class JalaliDatePickerElement extends HTMLElement {
     this.render();
   }
 
+  get precision(): DatePickerPrecision {
+    return this.#precision;
+  }
+  set precision(value: DatePickerPrecision) {
+    this.#precision = value;
+    this.#dateInitialized = false;
+    this.render();
+  }
+
+  get minuteStep(): number {
+    return this.#minuteStep;
+  }
+  set minuteStep(value: number) {
+    this.#minuteStep = value;
+    this.render();
+  }
+
+  get disabledHours(): readonly number[] {
+    return this.#disabledHours;
+  }
+  set disabledHours(value: readonly number[]) {
+    this.#disabledHours = [...value];
+    this.render();
+  }
+
   get valueFormat(): ValueFormat {
     return this.#valueFormat;
   }
@@ -113,10 +160,10 @@ export class JalaliDatePickerElement extends HTMLElement {
   }
 
   /** Unset: defaults to today. `null`: no initial selection. */
-  get defaultDate(): CalendarDate | null | undefined {
+  get defaultDate(): CalendarDate | CalendarDateTime | null | undefined {
     return this.#defaultDate;
   }
-  set defaultDate(value: CalendarDate | null | undefined) {
+  set defaultDate(value: CalendarDate | CalendarDateTime | null | undefined) {
     this.#defaultDate = value;
     this.#dateInitialized = false;
     this.render();
@@ -131,11 +178,11 @@ export class JalaliDatePickerElement extends HTMLElement {
   }
 
   /** The current selection, or `null`. Setting it does not emit `change`. */
-  get value(): CalendarDate | null {
+  get value(): CalendarDate | CalendarDateTime | null {
     this.#ensureDateInitialized();
     return this.#date;
   }
-  set value(value: CalendarDate | null) {
+  set value(value: CalendarDate | CalendarDateTime | null) {
     this.#date = value;
     this.#dateInitialized = true;
     this.render();
@@ -156,7 +203,18 @@ export class JalaliDatePickerElement extends HTMLElement {
     if (name === 'system') this.#system = value === 'gregorian' ? 'gregorian' : 'jalali';
     else if (name === 'locale') this.#locale = parseLocaleAttribute(value);
     else if (name === 'variant') this.#variant = value === 'dropdown' ? 'dropdown' : 'grid';
-    else if (name === 'value-format' && value) this.#valueFormat = value as ValueFormat;
+    else if (name === 'precision') {
+      this.#precision = value === 'datetime' ? 'datetime' : 'date';
+      this.#dateInitialized = false;
+    } else if (name === 'minute-step' && value) this.#minuteStep = Number(value);
+    else if (name === 'disabled-hours') {
+      this.#disabledHours = value
+        ? value
+            .split(',')
+            .map((part) => Number(part.trim()))
+            .filter((hour) => Number.isInteger(hour) && hour >= 0 && hour <= 23)
+        : [];
+    } else if (name === 'value-format' && value) this.#valueFormat = value as ValueFormat;
     else if (name === 'placeholder') this.#placeholder = value ?? undefined;
     else if (name === 'quick-nav') this.#quickNav = value !== 'false';
     if (this.#connected) this.render();
@@ -164,10 +222,14 @@ export class JalaliDatePickerElement extends HTMLElement {
 
   #ensureDateInitialized(): void {
     if (this.#dateInitialized) return;
-    this.#date =
-      this.#defaultDate === null
-        ? null
-        : (this.#defaultDate ?? createCalendar({ system: this.#system }).today());
+    if (this.#defaultDate === null) {
+      this.#date = null;
+    } else {
+      const seed = this.#defaultDate ?? createCalendar({ system: this.#system }).today();
+      if (this.#precision === 'date') this.#date = asDateOnly(seed);
+      else
+        this.#date = seed.precision === 'datetime' ? seed : withTime(seed, { hour: 0, minute: 0 });
+    }
     this.#dateInitialized = true;
   }
 
@@ -184,7 +246,7 @@ export class JalaliDatePickerElement extends HTMLElement {
     this.render();
   }
 
-  #selectDate(next: CalendarDate): void {
+  #emit(next: CalendarDate | CalendarDateTime): void {
     this.#date = next;
     this.#dateInitialized = true;
     this.dispatchEvent(
@@ -193,6 +255,31 @@ export class JalaliDatePickerElement extends HTMLElement {
         bubbles: true,
       }),
     );
+  }
+
+  #selectDay(next: CalendarDate): void {
+    const time = this.#date ? timeOfDay(this.#date) : { hour: 0, minute: 0 };
+    this.#emit(this.#precision === 'datetime' ? withTime(next, time) : next);
+    if (this.#precision === 'date') this.#setOpen(false);
+    else this.render();
+  }
+
+  #selectTime(time: TimeOfDay): void {
+    const today = createCalendar({ system: this.#system }).today();
+    this.#emit(withTime(this.#date ?? today, time));
+    this.render();
+  }
+
+  #makeTimePicker(): JalaliTimePickerElement {
+    const timePicker = new JalaliTimePickerElement();
+    timePicker.locale = this.#locale;
+    timePicker.minuteStep = this.#minuteStep;
+    timePicker.disabledHours = this.#disabledHours;
+    timePicker.value = this.#date ? timeOfDay(this.#date) : { hour: 0, minute: 0 };
+    timePicker.addEventListener('change', (event) => {
+      this.#selectTime((event as CustomEvent<TimePickerChangeEventDetail>).detail.time);
+    });
+    return timePicker;
   }
 
   render(): void {
@@ -206,11 +293,13 @@ export class JalaliDatePickerElement extends HTMLElement {
       const fields = new JalaliDropdownDateFieldsElement();
       fields.system = this.#system;
       fields.locale = this.#locale;
-      fields.date = this.#date ?? today;
+      fields.date = this.#date ? asDateOnly(this.#date) : today;
       fields.addEventListener('change', (event) => {
-        this.#selectDate((event as CustomEvent<{ date: CalendarDate }>).detail.date);
+        this.#selectDay((event as CustomEvent<{ date: CalendarDate }>).detail.date);
       });
-      this.replaceChildren(fields);
+      const children: Node[] = [fields];
+      if (this.#precision === 'datetime') children.push(this.#makeTimePicker());
+      this.replaceChildren(...children);
       return;
     }
 
@@ -223,7 +312,7 @@ export class JalaliDatePickerElement extends HTMLElement {
       'aria-haspopup': 'dialog',
       'aria-expanded': this.#open ? 'true' : 'false',
     });
-    input.value = this.#date ? formatDate(this.#date, localePack) : '';
+    input.value = this.#date ? displayValue(this.#date, localePack) : '';
     input.addEventListener('click', () => this.#setOpen(!this.#open));
 
     const children: (Node | string)[] = [input];
@@ -233,16 +322,21 @@ export class JalaliDatePickerElement extends HTMLElement {
       calendar.system = this.#system;
       calendar.locale = this.#locale;
       calendar.quickNav = this.#quickNav;
-      calendar.value = this.#date;
+      calendar.value = this.#date ? asDateOnly(this.#date) : null;
       calendar.rules = this.#rules;
       calendar.addEventListener('select', (event) => {
-        this.#selectDate((event as CustomEvent<CalendarSelectEventDetail>).detail.date);
-        this.#setOpen(false);
+        this.#selectDay((event as CustomEvent<CalendarSelectEventDetail>).detail.date);
       });
+      const popoverChildren: Node[] = [calendar];
+      if (this.#precision === 'datetime') popoverChildren.push(this.#makeTimePicker());
       const popover = el(
         'div',
-        { 'data-jalali-datepicker-popover': true, role: 'dialog', 'aria-label': 'Choose a date' },
-        [calendar],
+        {
+          'data-jalali-datepicker-popover': true,
+          role: 'dialog',
+          'aria-label': this.#precision === 'datetime' ? 'Choose a date and time' : 'Choose a date',
+        },
+        popoverChildren,
       );
       input.setAttribute('aria-controls', 'jalali-datepicker-popover');
       popover.id = 'jalali-datepicker-popover';

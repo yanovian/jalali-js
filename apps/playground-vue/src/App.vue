@@ -6,15 +6,29 @@ import '@jalali-js/ui-vue/themes/compact.css';
 // comment), so injecting/removing it as a <style> tag turns the picker theme on and off cleanly.
 import darkThemeCss from '@jalali-js/ui-vue/themes/dark.css?inline';
 import type { LocaleCode } from '@jalali-js/vue';
-import { DatePicker, useCalendar } from '@jalali-js/vue';
-import { InlineCalendar, RangePicker } from '@jalali-js/ui-vue';
-import type { RangeStorageValue } from '@jalali-js/ui-vue';
-import type { CalendarDate, StorageValue } from 'jalali-js';
+import { DatePicker, TimePicker, useCalendar } from '@jalali-js/vue';
+import { InlineCalendar, RangePicker, TimeRangePicker } from '@jalali-js/ui-vue';
+import type { RangeStorageValue, TimeRange } from '@jalali-js/ui-vue';
+import type { CalendarDate, StorageValue, TimeOfDay } from 'jalali-js';
 import { ref, watchEffect } from 'vue';
 
 const stored = ref<StorageValue>();
 const storedRange = ref<RangeStorageValue>();
+const storedDatetime = ref<StorageValue>();
+const time = ref<TimeOfDay>({ hour: 14, minute: 30 });
+const timeRange = ref<TimeRange>();
 const inlineSelected = ref<CalendarDate | null>(null);
+const datetimeDefault = {
+  precision: 'datetime' as const,
+  system: 'jalali' as const,
+  year: 1403,
+  month: 5,
+  day: 15,
+  hour: 14,
+  minute: 30,
+  second: 0,
+  millisecond: 0,
+};
 const selectionRules = {
   minDate: { year: 1403, month: 5, day: 5 },
   maxDate: { year: 1403, month: 5, day: 28 },
@@ -137,6 +151,37 @@ watchEffect(() => {
       <h2>Range picker (@jalali-js/ui-vue)</h2>
       <RangePicker v-model="storedRange" system="jalali" :locale="locale" />
       <p>Stored range (Gregorian by default): {{ JSON.stringify(storedRange) }}</p>
+    </section>
+
+    <section data-testid="time-picker">
+      <h2>Time picker</h2>
+      <p>Hour and minute selects, with a 15-minute step.</p>
+      <TimePicker
+        :locale="locale"
+        :value="time"
+        :minute-step="15"
+        @change="(next) => (time = next)"
+      />
+      <p>Selected time: {{ JSON.stringify(time) }}</p>
+    </section>
+
+    <section data-testid="datetime-picker">
+      <h2>Date and time (precision: datetime)</h2>
+      <DatePicker
+        v-model="storedDatetime"
+        system="jalali"
+        :locale="locale"
+        precision="datetime"
+        :minute-step="15"
+        :default-date="datetimeDefault"
+      />
+      <p>Stored value (Gregorian by default): {{ JSON.stringify(storedDatetime) }}</p>
+    </section>
+
+    <section data-testid="time-range-picker">
+      <h2>Time range picker (@jalali-js/ui-vue)</h2>
+      <TimeRangePicker :locale="locale" :minute-step="15" @change="(next) => (timeRange = next)" />
+      <p>Selected range: {{ JSON.stringify(timeRange) }}</p>
     </section>
 
     <section data-testid="selection-rules">

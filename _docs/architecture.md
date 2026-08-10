@@ -963,6 +963,13 @@ publish` rewrites to the real published version automatically, the
   keyboard navigation skips blocked days. Range pickers block a candidate
   range that crosses a blocked day: the second click starts a new range
   instead of completing one.
+- **Time selection (Phase 17) keeps the same DRY shape.** Hour and minute
+  option lists, and `withTime()` / `timeOfDay()`, live in `packages/core`.
+  Each binding ships one headless `TimePicker`. `DatePicker` adds a
+  `precision: 'datetime'` option that mounts that picker under the grid and
+  emits a `CalendarDateTime` through the existing storage-value contract.
+  `TimeRangePicker` in the `ui-*` packages is two `TimePicker`s side by
+  side.
 
 ## Makefile
 

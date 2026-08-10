@@ -4,10 +4,10 @@ See [alternatives.md](./alternatives.md) for the vision and the goals. See
 [architecture.md](./architecture.md) for the design behind these decisions.
 This file shows only the status of each phase.
 
-Phases 0-12 and 14-16 are done, and the first releases are published (v0.0.1
+Phases 0-12 and 14-17 are done, and the first releases are published (v0.0.1
 through v0.1.0; see `CHANGELOG.md`). v0.1.0 also shipped the Web Components
 bindings (`packages/web`, `packages/ui-web`), which landed outside the phase
-list. Phase 13 and Phases 17-24 are scheduled but not started. Phases 14-18
+list. Phase 13 and Phases 18-24 are scheduled but not started. Phases 14-18
 add the features real apps ask for first, so they land before Phase 13.
 What's left after those is listed under "Later, not yet scheduled" below.
 Change an item to `[x]` as it lands.
@@ -876,17 +876,22 @@ binding at once.
 The core already models `date + time` and `date + time + timezone`
 (Phase 2), but no component exposes a time. This phase closes that gap.
 
-- [ ] Add a `TimePicker` component to `react`, `vue`, and `web`: hour and
+- [x] Add a `TimePicker` component to `react`, `vue`, and `web`: hour and
       minute fields, a `minuteStep` option, and a `disabledHours` option.
       Headless first, with the same `data-jalali-*` attribute contract and
-      an optional default stylesheet, like `DatePicker`.
-- [ ] Add a `precision` prop to `DatePicker` (`'date'` default,
+      an optional default stylesheet, like `DatePicker`. Done. Option lists
+      and `withTime()` / `timeOfDay()` live once in `packages/core`.
+- [x] Add a `precision` prop to `DatePicker` (`'date'` default,
       `'datetime'` adds the time panel). The emitted storage value carries
-      the time, through the existing Phase 2 storage-value contract.
-- [ ] Add a `TimeRangePicker` to the `ui-*` packages, next to
-      `RangePicker`.
-- [ ] Add unit tests per binding, playground sections, visual e2e
-      coverage, and a docs guide section.
+      the time, through the existing Phase 2 storage-value contract. Done:
+      the popover stays open after a day pick so the person can set the
+      time.
+- [x] Add a `TimeRangePicker` to the `ui-*` packages, next to
+      `RangePicker`. Done as two `TimePicker`s side by side.
+- [x] Add unit tests per binding, playground sections, visual e2e
+      coverage, and a docs guide section. Done:
+      `apps/docs/guide/time-selection.md`, playground sections, and e2e
+      section entries.
 
 ## Phase 18: Holiday data (`packages/holidays`)
 

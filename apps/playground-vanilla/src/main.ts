@@ -4,14 +4,20 @@ import darkThemeCss from '@jalali-js/ui-web/themes/dark.css?inline';
 import type {
   DatePickerChangeEventDetail,
   JalaliDatePickerElement,
+  JalaliTimePickerElement,
   LocaleCode,
+  TimePickerChangeEventDetail,
 } from '@jalali-js/web';
 import { localePackFor } from '@jalali-js/web';
 import { format as formatDate } from '@jalali-js/i18n';
-// A bare import for its side effect: registering <jalali-inline-calendar> and
-// <jalali-range-picker>, since only types are imported from it below.
+// A bare import for its side effect: registering <jalali-inline-calendar>,
+// <jalali-range-picker>, and <jalali-time-range-picker>.
 import '@jalali-js/ui-web';
-import type { JalaliInlineCalendarElement, RangePickerChangeEventDetail } from '@jalali-js/ui-web';
+import type {
+  JalaliInlineCalendarElement,
+  RangePickerChangeEventDetail,
+  TimeRangePickerChangeEventDetail,
+} from '@jalali-js/ui-web';
 import type { CalendarDate } from 'jalali-js';
 import { createCalendar } from 'jalali-js';
 
@@ -69,6 +75,36 @@ document
     const { value } = (event as CustomEvent<RangePickerChangeEventDetail>).detail;
     document.getElementById('stored-range')!.textContent = JSON.stringify(value);
   });
+
+const timePicker = document.getElementById('time-picker') as JalaliTimePickerElement;
+timePicker.value = { hour: 14, minute: 30 };
+timePicker.addEventListener('change', (event) => {
+  const { time } = (event as CustomEvent<TimePickerChangeEventDetail>).detail;
+  document.getElementById('selected-time')!.textContent = JSON.stringify(time);
+});
+document.getElementById('selected-time')!.textContent = JSON.stringify(timePicker.value);
+
+const datetimePicker = document.getElementById('datetime-picker') as JalaliDatePickerElement;
+datetimePicker.defaultDate = {
+  precision: 'datetime',
+  system: 'jalali',
+  year: 1403,
+  month: 5,
+  day: 15,
+  hour: 14,
+  minute: 30,
+  second: 0,
+  millisecond: 0,
+};
+datetimePicker.addEventListener('change', (event) => {
+  const { value } = (event as CustomEvent<DatePickerChangeEventDetail>).detail;
+  document.getElementById('stored-datetime')!.textContent = JSON.stringify(value);
+});
+
+document.getElementById('time-range-picker')!.addEventListener('change', (event) => {
+  const { range } = (event as CustomEvent<TimeRangePickerChangeEventDetail>).detail;
+  document.getElementById('selected-time-range')!.textContent = JSON.stringify(range);
+});
 
 // Selection rules are a JS property, not an attribute: the rules object is not representable
 // as a plain HTML attribute string.

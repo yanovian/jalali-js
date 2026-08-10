@@ -11,6 +11,11 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- Time selection: a headless `TimePicker` in React, Vue, and Web Components
+  (`minuteStep`, `disabledHours`), a `precision: 'datetime'` option on
+  `DatePicker` that adds a time panel and emits a datetime storage value,
+  and a `TimeRangePicker` in the `ui-*` packages. Shared option lists live
+  in the core (`listHours`, `listMinutes`, `withTime`).
 - Selection rules in every picker: a `SelectionRules` type in the core
   (`minDate`, `maxDate`, `enabledDates`, `disabledDates`,
   `disabledWeekdays`), resolved by `isDateSelectable()` and wired through

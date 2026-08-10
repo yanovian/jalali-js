@@ -1,18 +1,23 @@
-import type { FormatOptions } from '@jalali-js/i18n';
-import { format as formatDate } from '@jalali-js/i18n';
+import type { FormatOptions, LocalePack } from '@jalali-js/i18n';
+import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type {
   CalendarDate,
+  CalendarDateTime,
   CalendarSystem,
   SelectionRules,
   StorageValue,
+  TimeOfDay,
   ValueFormat,
 } from 'jalali-js';
-import { createCalendar, toStorageValue } from 'jalali-js';
+import { createCalendar, timeOfDay, toStorageValue, withTime } from 'jalali-js';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Calendar } from './Calendar.js';
 import { DropdownDateFields } from './DropdownDateFields.js';
+import { TimePicker } from './TimePicker.js';
 import type { LocaleCode } from './use-calendar.js';
 import { localePackFor } from './use-calendar.js';
+
+export type DatePickerPrecision = 'date' | 'datetime';
 
 export interface DatePickerProps {
   /** Which calendar system the picker displays and selects in. Default: 'jalali'. */
@@ -23,7 +28,16 @@ export interface DatePickerProps {
    * The initial selection. Default: today, in `system`. Pass `null` for no initial selection,
    * so the picker opens empty and shows `placeholder` until a person picks a date.
    */
-  defaultDate?: CalendarDate | null;
+  defaultDate?: CalendarDate | CalendarDateTime | null;
+  /**
+   * `'date'` (default) selects a day only. `'datetime'` adds a time panel under the grid and
+   * emits a `CalendarDateTime` through the storage-value contract.
+   */
+  precision?: DatePickerPrecision;
+  /** Minute options step for the time panel. Default: 1. Used only when `precision` is `'datetime'`. */
+  minuteStep?: number;
+  /** Hours that do not appear in the time panel (0-23). Used only when `precision` is `'datetime'`. */
+  disabledHours?: readonly number[] | undefined;
   /**
    * Let a person click the month or year in the grid popover's header to jump straight to a
    * month grid or a year grid. Default: true. Has no effect on the dropdown variant.
@@ -31,10 +45,10 @@ export interface DatePickerProps {
   quickNav?: boolean;
   /**
    * Called with the selection, in both forms: `value`, shaped by `valueFormat` (what an app
-   * should store), and `date`, the raw `CalendarDate` (what an app should keep displaying).
+   * should store), and `date`, the raw calendar value (what an app should keep displaying).
    * See architecture.md's "Display value against storage value" for why these can differ.
    */
-  onChange?: (value: StorageValue, date: CalendarDate) => void;
+  onChange?: (value: StorageValue, date: CalendarDate | CalendarDateTime) => void;
   /** How `value` (above) is shaped. Default: 'gregorian-iso', a calendar-agnostic value. */
   valueFormat?: ValueFormat;
   /** How the date reads inside the picker's own text input / month title. */
@@ -48,24 +62,40 @@ export interface DatePickerProps {
   className?: string;
 }
 
-function emitChange(
+function displayValue(
+  date: CalendarDate | CalendarDateTime,
+  localePack: LocalePack,
+  displayFormat: FormatOptions | undefined,
+): string {
+  const datePart = formatDate(date, localePack, displayFormat);
+  if (date.precision === 'date') return datePart;
+  const hour = formatNumber(date.hour, localePack.defaultNumerals, localePack.digits, 2);
+  const minute = formatNumber(date.minute, localePack.defaultNumerals, localePack.digits, 2);
+  return `${datePart} ${hour}:${minute}`;
+}
+
+function toPickerValue(
   date: CalendarDate,
-  valueFormat: ValueFormat,
-  onChange?: DatePickerProps['onChange'],
-): void {
-  onChange?.(toStorageValue(date, valueFormat), date);
+  time: TimeOfDay,
+  precision: DatePickerPrecision,
+): CalendarDate | CalendarDateTime {
+  return precision === 'datetime' ? withTime(date, time) : date;
 }
 
 /**
  * A working, default-styled date picker built on `Calendar` (the headless primitive) and
- * `DropdownDateFields`. Import `@jalali-js/react/date-picker.css` for its default appearance,
- * or style `[data-jalali-datepicker-*]` yourself; nothing about the component requires the
- * stylesheet to function.
+ * `DropdownDateFields`. With `precision: 'datetime'`, a `TimePicker` sits under the grid.
+ * Import `@jalali-js/react/date-picker.css` for its default appearance, or style
+ * `[data-jalali-datepicker-*]` yourself; nothing about the component requires the stylesheet
+ * to function.
  */
 export function DatePicker({
   system = 'jalali',
   locale = 'en',
   defaultDate,
+  precision = 'date',
+  minuteStep = 1,
+  disabledHours,
   quickNav,
   onChange,
   valueFormat = 'gregorian-iso',
@@ -77,9 +107,20 @@ export function DatePicker({
 }: DatePickerProps) {
   const localePack = useMemo(() => localePackFor(locale), [locale]);
   const today = useMemo(() => createCalendar({ system }).today(), [system]);
-  const [date, setDate] = useState<CalendarDate | null>(() =>
-    defaultDate === null ? null : (defaultDate ?? today),
-  );
+  const [date, setDate] = useState<CalendarDate | CalendarDateTime | null>(() => {
+    if (defaultDate === null) return null;
+    const seed = defaultDate ?? today;
+    if (precision === 'date') {
+      return {
+        precision: 'date',
+        system: seed.system,
+        year: seed.year,
+        month: seed.month,
+        day: seed.day,
+      };
+    }
+    return seed.precision === 'datetime' ? seed : withTime(seed, { hour: 0, minute: 0 });
+  });
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const popoverId = useId();
@@ -100,20 +141,44 @@ export function DatePicker({
     };
   }, [open]);
 
-  function selectDate(next: CalendarDate) {
+  function emit(next: CalendarDate | CalendarDateTime) {
     setDate(next);
-    emitChange(next, valueFormat, onChange);
+    onChange?.(toStorageValue(next, valueFormat), next);
+  }
+
+  function selectDay(next: CalendarDate) {
+    const time = date ? timeOfDay(date) : { hour: 0, minute: 0 };
+    emit(toPickerValue(next, time, precision));
+    if (precision === 'date') setOpen(false);
+  }
+
+  function selectTime(time: TimeOfDay) {
+    emit(withTime(date ?? today, time));
   }
 
   if (variant === 'dropdown') {
+    const day: CalendarDate = date
+      ? {
+          precision: 'date',
+          system: date.system,
+          year: date.year,
+          month: date.month,
+          day: date.day,
+        }
+      : today;
     return (
-      <DropdownDateFields
-        system={system}
-        locale={locale}
-        date={date ?? today}
-        onChange={selectDate}
-        className={className}
-      />
+      <div className={className} dir={localePack.direction} data-jalali-datepicker-root>
+        <DropdownDateFields system={system} locale={locale} date={day} onChange={selectDay} />
+        {precision === 'datetime' && (
+          <TimePicker
+            locale={locale}
+            value={date ? timeOfDay(date) : { hour: 0, minute: 0 }}
+            minuteStep={minuteStep}
+            disabledHours={disabledHours}
+            onChange={selectTime}
+          />
+        )}
+      </div>
     );
   }
 
@@ -125,25 +190,46 @@ export function DatePicker({
         role="combobox"
         data-jalali-datepicker-input
         placeholder={placeholder ?? localePack.datePickerPlaceholder}
-        value={date ? formatDate(date, localePack, displayFormat) : ''}
+        value={date ? displayValue(date, localePack, displayFormat) : ''}
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={open ? popoverId : undefined}
       />
       {open && (
-        <div id={popoverId} data-jalali-datepicker-popover role="dialog" aria-label="Choose a date">
+        <div
+          id={popoverId}
+          data-jalali-datepicker-popover
+          role="dialog"
+          aria-label={precision === 'datetime' ? 'Choose a date and time' : 'Choose a date'}
+        >
           <Calendar
             system={system}
             locale={locale}
-            value={date}
+            value={
+              date
+                ? {
+                    precision: 'date',
+                    system: date.system,
+                    year: date.year,
+                    month: date.month,
+                    day: date.day,
+                  }
+                : null
+            }
             quickNav={quickNav}
             rules={rules}
-            onSelect={(next) => {
-              selectDate(next);
-              setOpen(false);
-            }}
+            onSelect={selectDay}
           />
+          {precision === 'datetime' && (
+            <TimePicker
+              locale={locale}
+              value={date ? timeOfDay(date) : { hour: 0, minute: 0 }}
+              minuteStep={minuteStep}
+              disabledHours={disabledHours}
+              onChange={selectTime}
+            />
+          )}
         </div>
       )}
     </div>

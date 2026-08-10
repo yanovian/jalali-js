@@ -44,6 +44,8 @@ export type { SelectionRules } from './selection-rules.js';
 export { isDateSelectable, isRangeSelectable } from './selection-rules.js';
 export type { NativeCalendarObject, StorageValue, ValueFormat } from './storage-value.js';
 export { toStorageValue } from './storage-value.js';
+export type { DateFieldsWithSystem, TimeOfDay } from './time-of-day.js';
+export { listHours, listMinutes, snapMinute, timeOfDay, withTime } from './time-of-day.js';
 export {
   getOffsetMinutes,
   instantToZonedFields,

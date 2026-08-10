@@ -111,6 +111,12 @@ Rule dates are plain `{ year, month, day }` fields, read in the date's own calen
 Every picker takes a `rules` prop and reads it through `buildCalendarGrid()`. See
 [Selection rules](/guide/selection-rules).
 
+## Time of day
+
+`TimeOfDay` is `{ hour, minute }`. `withTime(date, time)` builds a `CalendarDateTime`.
+`TimePicker` exposes hour and minute selects. `DatePicker` takes `precision: 'datetime'` to
+add a time panel under the grid. See [Time selection](/guide/time-selection).
+
 ## Locale packs
 
 `@jalali-js/i18n` exports `en`, `fa`, and `ps` (Pashto, with Afghanistan's own zodiac-based

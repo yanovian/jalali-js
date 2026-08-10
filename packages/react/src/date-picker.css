@@ -8,6 +8,7 @@
  */
 [data-jalali-datepicker-root],
 [data-jalali-datepicker-dropdown],
+[data-jalali-timepicker-root],
 [data-jalali-calendar-root] {
   --jalali-font: system-ui, sans-serif;
   --jalali-font-size: 1rem;
@@ -274,6 +275,52 @@ button[data-jalali-calendar-title-year]:hover {
   outline-offset: 1px;
 }
 
+[data-jalali-timepicker-root] {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  margin-top: 0.75em;
+  padding-top: 0.75em;
+  border-top: 1px solid var(--jalali-border);
+}
+
+[data-jalali-timepicker-field] {
+  font: inherit;
+  color: inherit;
+  background: var(--jalali-bg);
+  border: 1px solid var(--jalali-border);
+  border-radius: var(--jalali-radius);
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+[data-jalali-timepicker-field]:hover {
+  border-color: var(--jalali-primary);
+}
+
+[data-jalali-timepicker-field]:focus-visible {
+  outline: 2px solid var(--jalali-primary);
+  outline-offset: 1px;
+}
+
+[data-jalali-timepicker-separator] {
+  color: var(--jalali-muted-fg);
+  user-select: none;
+}
+
+[data-jalali-timerangepicker-root] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75em;
+}
+
+[data-jalali-timerangepicker-root] [data-jalali-timepicker-root] {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
 /* pointer: coarse (touch) gets bigger tap targets than a mouse needs. Day cells only grow
    taller, not wider: 7 columns already fill a phone-width popover, so widening them further
    would overflow it; a taller row still gives a real, measurably bigger tap area. Placed last
@@ -281,6 +328,7 @@ button[data-jalali-calendar-title-year]:hover {
 @media (pointer: coarse) {
   [data-jalali-datepicker-root],
   [data-jalali-datepicker-dropdown],
+  [data-jalali-timepicker-root],
   [data-jalali-calendar-root] {
     --jalali-gap: 4px;
   }
@@ -288,7 +336,8 @@ button[data-jalali-calendar-title-year]:hover {
   [data-jalali-calendar-nav],
   button[data-jalali-calendar-title-month],
   button[data-jalali-calendar-title-year],
-  [data-jalali-datepicker-field] {
+  [data-jalali-datepicker-field],
+  [data-jalali-timepicker-field] {
     min-width: 2.75em;
     min-height: 2.75em;
   }

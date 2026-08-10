@@ -92,6 +92,39 @@
         <p>Stored range (Gregorian by default): <span id="stored-range">null</span></p>
       </section>
 
+      <section data-testid="time-picker">
+        <h2>Time picker</h2>
+        <p>Hour and minute selects, with a 15-minute step.</p>
+        <jalali-time-picker
+          id="time-picker"
+          class="locale-follows"
+          minute-step="15"
+        ></jalali-time-picker>
+        <p>Selected time: <span id="selected-time">null</span></p>
+      </section>
+
+      <section data-testid="datetime-picker">
+        <h2>Date and time (precision: datetime)</h2>
+        <jalali-date-picker
+          id="datetime-picker"
+          system="jalali"
+          precision="datetime"
+          minute-step="15"
+          class="locale-follows"
+        ></jalali-date-picker>
+        <p>Stored value (Gregorian by default): <span id="stored-datetime">null</span></p>
+      </section>
+
+      <section data-testid="time-range-picker">
+        <h2>Time range picker (@jalali-js/ui-web)</h2>
+        <jalali-time-range-picker
+          id="time-range-picker"
+          class="locale-follows"
+          minute-step="15"
+        ></jalali-time-range-picker>
+        <p>Selected range: <span id="selected-time-range">null</span></p>
+      </section>
+
       <section data-testid="selection-rules">
         <h2>Selection rules (min/max, blocked dates, blocked weekdays)</h2>
         <p>
