@@ -1,3 +1,7 @@
+---
+description: Why components show Jalali by default and emit a Gregorian storage value.
+---
+
 # Display value vs. storage value
 
 The calendar system is a display setting. It is not a storage setting. A component can show a

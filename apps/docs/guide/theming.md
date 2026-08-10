@@ -1,3 +1,7 @@
+---
+description: Headless styling, CSS themes, range picker, and inline calendar options.
+---
+
 # Configuration and theming
 
 ## Visual configuration matrix

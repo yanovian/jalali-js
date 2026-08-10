@@ -1,3 +1,7 @@
+---
+description: Calendar system, precision tiers, conversion engine, and locale packs.
+---
+
 # Core concepts
 
 ## Calendar system is a display setting

@@ -1,3 +1,7 @@
+---
+description: Parse English, Farsi, and Finglish date phrases into calendar dates.
+---
+
 # Natural language parsing
 
 ```sh

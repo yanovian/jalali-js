@@ -1,3 +1,7 @@
+---
+description: Framework-free Web Components pickers for plain HTML or any host framework.
+---
+
 # Vanilla / Web Components
 
 ```sh

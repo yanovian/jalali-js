@@ -1,3 +1,7 @@
+---
+description: Install the core or a framework binding, then convert a date or render a picker.
+---
+
 # Getting started
 
 ## Install

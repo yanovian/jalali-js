@@ -1,3 +1,7 @@
+---
+description: Vue bindings, DatePicker, headless Calendar, and Nuxt SSR notes.
+---
+
 # Vue
 
 ```sh

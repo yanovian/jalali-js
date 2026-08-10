@@ -1,3 +1,7 @@
+---
+description: React bindings, DatePicker, headless Calendar, and Next.js SSR notes.
+---
+
 # React
 
 ```sh

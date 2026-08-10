@@ -1,3 +1,7 @@
+---
+description: Copy-paste snippets for conversion, pickers, ranges, NLP, and theming.
+---
+
 # Examples
 
 Short, self-contained snippets for common tasks. Each one is copy-paste ready: it shows every

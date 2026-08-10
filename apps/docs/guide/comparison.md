@@ -1,3 +1,7 @@
+---
+description: Side-by-side comparison of jalali-js with other Jalali and Persian calendar packages.
+---
+
 # Comparison with alternatives
 
 The existing set of Jalali and Persian calendar tools for JavaScript is split across many small
