@@ -1,13 +1,16 @@
 # Plan
 
-See [alternatives.md](./alternatives.md) for the vision and the comparison
-with other libraries. See [architecture.md](./architecture.md) for the design
-behind these decisions. This file shows only the status of each phase.
+See [alternatives.md](./alternatives.md) for the vision and the goals. See
+[architecture.md](./architecture.md) for the design behind these decisions.
+This file shows only the status of each phase.
 
-Phases 0-11 are done. Phases 12-13 are scheduled but not started. What's left
-after those is listed under "Later, not yet scheduled" below, plus the
-publishing step `_docs/release-checklist.md` deliberately leaves undone.
-Change an item to `[x]` as it lands.
+Phases 0-11 are done, and the first releases are published (v0.0.1 through
+v0.1.0; see `CHANGELOG.md`). v0.1.0 also shipped the Web Components bindings
+(`packages/web`, `packages/ui-web`), which landed outside the phase list.
+Phases 12-24 are scheduled but not started. Phases 14-18 add the features
+real apps ask for first, so they can land before Phase 13. What's left after
+those is listed under "Later, not yet scheduled" below. Change an item to
+`[x]` as it lands.
 
 ## Phase 0: Repo scaffolding and tooling
 
@@ -721,6 +724,289 @@ actually passed CI ever gets baselined.
 - [ ] Document the tradeoff (slower, needs real solar-position math, only
       matters for correctness many centuries out) and when to reach for
       it, in architecture.md and the docs site's core-concepts guide.
+
+## Phase 14: Date math and query helpers (`packages/core`)
+
+The core has `addDays()` and `compareDates()` only. Real apps need more
+arithmetic: age calculations, deadlines, and reports all diff and shift
+dates. This phase completes the set, still with zero runtime dependencies.
+
+- [ ] Add `addMonths()` and `addYears()`. Clamp the day to the target
+      month's length (Esfand 30 in a leap year plus one year gives
+      Esfand 29). Work per calendar system, like `addDays()`.
+- [ ] Add `diffDates(a, b, unit)` with `day`, `week`, `month`, and `year`
+      units, per calendar system. Define and document the truncation rule
+      (a full unit must pass before it counts).
+- [ ] Add `startOf()` and `endOf()` for week, month, and year. Take the
+      week start day as a parameter, since Jalali weeks start on Saturday
+      and Gregorian weeks commonly start on Monday or Sunday.
+- [ ] Add the query helpers: `isBefore()`, `isAfter()`, `isSameDay()`,
+      `isBetween()`, and `isToday()`. Thin wrappers over `compareDates()`,
+      so each stays one line and tree-shakeable.
+- [ ] Add property tests against Julian Day Number arithmetic, and boundary
+      tests around leap Esfand and month ends.
+- [ ] Document the helpers in the docs site's core-concepts guide.
+
+## Phase 15: Format templates and strict parsing (`packages/i18n`)
+
+`format()` covers presets only. A consumer who needs `1404/12/30` or
+`30 Esfand 1404` in an exact shape has to build it by hand. This phase adds
+token templates, and the reverse: strict parsing of a known shape (the NLP
+package stays the home for free-form input).
+
+- [ ] Add template support to `format()`: year, month, day, weekday, and
+      month-name tokens, locale-aware, for both calendar systems. Presets
+      stay; templates are additive.
+- [ ] Add `parseTemplate(input, template, options)`. Return a
+      `CalendarDate`, or `null` when the input does not match. Accept both
+      Latin and Persian digits.
+- [ ] Add round-trip tests: format with a template, parse it back, get the
+      same date, across locales and calendar systems.
+- [ ] Document the token table in the docs site's i18n guide.
+
+## Phase 16: Selection rules for every picker
+
+No picker can restrict what a user picks. Booking, scheduling, and form
+apps all need this. This phase adds one shared rule model, wired into every
+binding at once.
+
+- [ ] Add a `SelectionRules` type to `packages/core`: `minDate`, `maxDate`,
+      `enabledDates`, `disabledDates`, and `disabledWeekdays`. Add one
+      resolver, `isDateSelectable(date, rules)`, with a documented priority
+      order: the whitelist wins, then the blacklist, then weekdays, then
+      the min/max bounds.
+- [ ] Wire the rules into `buildCalendarGrid()`, so every binding gets the
+      same behavior from one implementation. Blocked days render with a
+      `data-disabled` attribute and reject selection.
+- [ ] Expose the rule props on `Calendar`, `DatePicker`, and `RangePicker`
+      in `react`, `vue`, `web`, and the `ui-*` packages.
+- [ ] Make keyboard navigation skip blocked days.
+- [ ] Decide the range-picker behavior when a blocked day falls inside a
+      candidate range (block the range, or split it). Decide at
+      implementation time and document the choice.
+- [ ] Add unit tests per binding, playground sections, and visual e2e
+      coverage for the blocked-day rendering.
+- [ ] Add a guide page with copy-paste examples: min/max bounds, weekend
+      blocking (Thursday and Friday), and a whitelist of open dates.
+
+## Phase 17: Time selection
+
+The core already models `date + time` and `date + time + timezone`
+(Phase 2), but no component exposes a time. This phase closes that gap.
+
+- [ ] Add a `TimePicker` component to `react`, `vue`, and `web`: hour and
+      minute fields, a `minuteStep` option, and a `disabledHours` option.
+      Headless first, with the same `data-jalali-*` attribute contract and
+      an optional default stylesheet, like `DatePicker`.
+- [ ] Add a `precision` prop to `DatePicker` (`'date'` default,
+      `'datetime'` adds the time panel). The emitted storage value carries
+      the time, through the existing Phase 2 storage-value contract.
+- [ ] Add a `TimeRangePicker` to the `ui-*` packages, next to
+      `RangePicker`.
+- [ ] Add unit tests per binding, playground sections, visual e2e
+      coverage, and a docs guide section.
+
+## Phase 18: Holiday data (`packages/holidays`)
+
+Iranian apps mark official holidays in almost every calendar UI. This
+package ships the holiday data bundled and versioned, with zero network
+calls at runtime. It works offline, adds no latency, and sends no user
+traffic anywhere.
+
+- [ ] Add `@jalali-js/holidays`, a data-only package with zero runtime
+      dependencies. Fixed Jalali holidays (Nowruz, and so on) come from a
+      rule. Lunar-based observed holidays come from a per-year data table
+      with a stated, documented year range, sourced from the published
+      official calendar.
+- [ ] Add the API: `isHoliday(date)`, `holidaysOn(date)`, and
+      `holidaysInMonth(year, month)`, with holiday names in `en` and `fa`.
+- [ ] Wire a `showHolidays` option into the pickers: holidays render with a
+      `data-holiday` attribute and a default style, plus an option that
+      also blocks selection (through Phase 16's rule model).
+- [ ] Add a maintained update path: a documented script that refreshes the
+      per-year table, so a yearly data update is one small pull request.
+- [ ] Add unit tests against known official dates, playground and e2e
+      coverage, and a docs guide page that states the offline guarantee
+      and the covered year range.
+
+## Phase 19: Relative time output (`packages/i18n`)
+
+- [ ] Add `formatRelative(from, to, locale)`: "۳ روز پیش", "3 days ago",
+      "in 2 months". Unit selection uses Phase 14's `diffDates()`. Digits
+      follow the existing `numerals` option.
+- [ ] Add unit tests per locale, per unit, and for the "today" case.
+- [ ] Document it in the i18n guide.
+
+## Phase 20: Event calendar (`packages/ui-*`)
+
+Many apps need a month grid that renders their own events, not only a
+picker. This stays headless-first, like everything else here: the consumer
+owns the event data and the persistence.
+
+- [ ] Add a framework-free event model and layout module: an event has a
+      date span, an optional time span, and an all-day flag. Multi-day
+      spans and overlap layout are pure functions, tested on their own,
+      like `buildCalendarGrid()`.
+- [ ] Add an `EventCalendar` month view to `ui-react`, `ui-vue`, and
+      `ui-web`. Controlled component: the consumer passes the event array
+      and gets callbacks (`onEventClick`, `onDayClick`). No built-in modal
+      or storage; the consumer renders their own editing UI from the
+      callbacks.
+- [ ] Add week and day views, after the month view lands.
+- [ ] Decide the recurring-event scope at implementation time: a pure
+      rule-expansion helper is likely enough, with the expansion done on
+      the consumer's side. Document the choice.
+- [ ] Add unit tests for the layout functions, component tests per
+      binding, playground sections, visual e2e coverage, and a docs guide
+      page.
+
+## Phase 21: Docs depth and recipes
+
+The guides explain concepts well. What they lack is the reference density a
+consumer scans for: exact props per component, and a copy-paste answer for
+each common scenario.
+
+- [ ] Add a prop table to every component's guide section (`react`, `vue`,
+      `web`, and the `ui-*` packages): name, type, default, and a one-line
+      description. Keep each table checked against the real source.
+- [ ] Add a recipes page: default to today, min/max bounds, weekend
+      blocking, epoch output for an API, form submission, programmatic
+      set and clear, and SSR usage. One short, complete, copy-paste
+      example per recipe.
+- [ ] Add a programmatic-control section: how to set, read, and clear the
+      value from outside the component, per binding.
+- [ ] Add a support statement page: which browsers and mobile behaviors
+      the e2e suite actually verifies (Chromium, Firefox, and WebKit
+      today), stated from the real CI matrix, not aspiration.
+- [ ] Keep `CHANGELOG.md` current: add a release step that fails
+      `make release-*` when the changelog has no entry for the new
+      version.
+
+## Phase 22: Interactive demo playground (`apps/`)
+
+The hosted playground pages exist to exercise the components for tests.
+They are plain lists of sections. A visitor who evaluates the library needs
+more: live controls, the current value, and matching code to copy. This
+phase turns the hosted playground into a real demo site.
+
+The playground pages carry a second job that must survive this redesign:
+they are the render targets for the visual e2e suite and its PR screenshot
+comment (Phase 10). A screenshot test needs a deterministic render state on
+every run. Live controls make a page stateful, so this phase must serve
+both jobs by design, not by luck. The mechanism: the demo derives its full
+control state from URL parameters, with fixed defaults when none are given.
+A visitor gets an interactive page. The e2e suite opens each section with
+an explicit URL and always screenshots the exact same state.
+
+- [ ] Design one shared demo layout: a tab or section per component
+      (`DatePicker` in both variants, `RangePicker`, `InlineCalendar`, and
+      each later component as it lands), with a binding switch for React,
+      Vue, and Web Components.
+- [ ] Add live controls for the real props: locale, calendar system,
+      picker variant, display format, and `valueFormat`. Wire in the
+      selection rules and time options as Phases 16 and 17 land. The
+      rendered component updates as the visitor changes a control.
+- [ ] Show the emitted value next to each component, live. This makes the
+      display-value against storage-value contract visible: the display
+      shows Jalali while the emitted value stays Gregorian.
+- [ ] Add a live theme editor: color, spacing, and shape controls that
+      write the `--jalali-*` custom properties, plus a dark against light
+      toggle and a compact toggle.
+- [ ] Generate the code snippet from the current control state, one per
+      binding, with a copy button. A visitor copies working code, not a
+      generic example.
+- [ ] Add a host-page direction toggle (LTR against RTL), to show the
+      layout stays correct in both.
+- [ ] Add a viewport-position demo: a picker near the screen edges, to
+      show the popover flips and clamps to stay on screen. Build the
+      flip-and-clamp behavior first if the components lack it.
+- [ ] Make the layout work well on a phone, with touch-friendly targets.
+- [ ] Drive the full control state from URL parameters, with fixed
+      defaults. This is the seam that keeps the page deterministic for
+      screenshots while staying interactive for a visitor (see the note
+      above). Also useful on its own: a visitor can share a link to an
+      exact configuration.
+- [ ] Keep the stable `data-testid` structure the visual e2e suite
+      screenshots (Phase 10), and point every existing screenshot test at
+      an explicit URL state, so each test keeps covering the same
+      locale, system, and variant cell it covers today. The PR comment
+      keeps its full image grid; no cell silently disappears.
+- [ ] Add screenshot coverage for the demo shell itself: one default-state
+      screenshot per tab, and one with a non-default control state, so a
+      broken control panel fails visibly in the PR comment too.
+- [ ] Expect the redesign pull request to show every screenshot as
+      changed in the PR comment. Review the images there. The baseline
+      branch catches up automatically after merge (the Phase 10 flow,
+      unchanged). Land Phase 23 first, so this pull request reports its
+      visual changes in the comment without a failing check.
+- [ ] Link the demo site prominently from the docs home page and the
+      readme.
+
+## Phase 23: Visual changes report, they do not fail CI
+
+Today a changed screenshot fails the e2e job, and the PR comment then shows
+the diff images. The red check reads like a defect, but a visual change is
+often the point of the pull request. Phase 10 already states the design:
+the reviewer judges the diff images in the PR comment, not a green check.
+The job status should match that design. A visual change should report,
+not block.
+
+- [ ] Split the e2e assertions into two classes. Functional assertions
+      (interaction, emitted values, computed styles) keep failing the job.
+      Screenshot comparisons become advisory: they report, they do not
+      fail.
+- [ ] Implement the advisory comparison: wrap the screenshot assertion so
+      a pixel mismatch is caught, attaches three images to the test report
+      (the baseline as "what it was", the new capture as "what it is now",
+      and the diff), records an annotation, and lets the test pass. A
+      missing baseline (a first run) is also advisory, and attaches the
+      new capture alone.
+- [ ] Update `scripts/visual-comment.mjs` to select images by that
+      annotation, not by test failure. The comment shows "was" against
+      "now", with the diff, per test and per browser, and states plainly
+      when nothing changed.
+- [ ] Keep the job red for real errors: a crashed app, a failed functional
+      assertion, or a screenshot that cannot be captured at all still
+      fails the run.
+- [ ] Verify both directions for real, the same way Phase 10 verified the
+      comment bot: force a pixel change and confirm the job stays green
+      while the comment shows "was" against "now"; force a functional
+      failure and confirm the job goes red.
+- [ ] Update architecture.md's CI/CD section and Phase 10's description of
+      the flow: the check gates functional correctness only, the reviewer
+      judges visuals in the comment, and the baseline branch flow stays
+      unchanged.
+
+## Phase 24: npm package pages
+
+npm renders each package's own `README.md` as its registry page. Today each
+one is a short blurb: install, one example, and links (about 40 lines).
+That page is the first thing an evaluating developer reads, often before
+the docs site. It should answer their questions by itself.
+
+- [ ] Define one shared readme structure and apply it to every publishable
+      package: badges (version, license, docs; bundle size on the core),
+      a one-line pitch, a table of contents, install, compatibility (peer
+      dependencies, framework versions, Node versions, from the real
+      `package.json` and CI matrix), quick start, one section per exported
+      component or function with a short example, an options table per
+      component, a theming section, links (docs site, playground,
+      changelog, the sibling packages), and license.
+- [ ] Keep one source of truth for the options tables. Phase 21 adds prop
+      tables to the docs site; decide at implementation time whether the
+      readmes share generated content with those or link to them, so the
+      two never drift apart.
+- [ ] Verify the rendered result on npm's own renderer before release:
+      anchors in the table of contents resolve, tables render, and no
+      section falls back to raw markup. npm strips some HTML, so check
+      the real page, not only a GitHub preview.
+- [ ] Review each package's `package.json` metadata, since the registry
+      page reads it too: `description`, `keywords` (searchable terms such
+      as jalali, shamsi, persian, datepicker, and the framework name),
+      `homepage` (the docs site), and `repository`.
+- [ ] Add a readme check to the release flow: a package whose readme is
+      missing a required section (from the shared structure above) fails
+      the check, so the pages stay complete as packages grow.
 
 ## Later, not yet scheduled
 
