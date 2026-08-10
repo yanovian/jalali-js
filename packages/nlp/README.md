@@ -1,7 +1,7 @@
 # @jalali-js/nlp
 
 Natural language date parsing for [jalali-js](https://github.com/yanovian/jalali-js), in
-English, Farsi, and Finglish (Farsi written in Latin script).
+English, Farsi, Finglish (Farsi written in Latin script), and Pashto.
 
 ```sh
 npm install @jalali-js/nlp
@@ -14,6 +14,7 @@ parse('today', 'en');
 parse('next Farvardin', 'en');
 parse('فردا', 'fa'); // 'tomorrow'
 parse('emrooz', 'fa-Latn'); // 'today', in Finglish
+parse('نن', 'ps'); // 'today', in Pashto
 parse('banana', 'en'); // null: not a recognized phrase
 ```
 

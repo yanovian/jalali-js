@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { formatNumber } from './numerals.js';
 import { en } from './en.js';
 import { fa } from './fa.js';
+import { ps } from './ps.js';
 
 describe('formatNumber', () => {
   it('renders latin digits unchanged', () => {
@@ -21,5 +22,10 @@ describe('formatNumber', () => {
 
   it('preserves digit order (not just a per-digit substitution table mismatch)', () => {
     expect(formatNumber(1990, 'native', fa.digits)).toBe('۱۹۹۰');
+  });
+
+  it('renders native Pashto digits (arabext, the same glyph set as fa)', () => {
+    expect(formatNumber(1403, 'native', ps.digits)).toBe('۱۴۰۳');
+    expect(formatNumber(0, 'native', ps.digits)).toBe('۰');
   });
 });

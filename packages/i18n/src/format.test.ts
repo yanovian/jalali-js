@@ -2,6 +2,7 @@ import type { CalendarDate } from 'jalali-js';
 import { describe, expect, it } from 'vitest';
 import { en } from './en.js';
 import { fa } from './fa.js';
+import { ps } from './ps.js';
 import { format } from './format.js';
 
 // 2024-08-05 is 15 Mordad 1403 on the Jalali calendar, and a Monday (see day-of-week.test.ts
@@ -64,6 +65,31 @@ describe('format: Farsi locale', () => {
 
   it('can be overridden to Latin numerals explicitly', () => {
     expect(format(jalaliDate, fa, { numerals: 'latin' })).toBe('15 مرداد 1403');
+  });
+});
+
+describe('format: Pashto locale', () => {
+  it('formats a Jalali date with the Afghan zodiac month name and native digits by default', () => {
+    // Jalali month 5 is زمری in Pashto (Afghanistan's zodiac month names, not Iran's مرداد).
+    expect(format(jalaliDate, ps)).toBe('۱۵ زمری ۱۴۰۳');
+  });
+
+  it('formats a Gregorian date with its Pashto month name', () => {
+    expect(format(gregorianDate, ps)).toBe('۵ اګست ۲۰۲۴');
+  });
+
+  it('prefixes the weekday name when asked, with an Arabic comma separator', () => {
+    // 2024-08-05 / 15 Mordad 1403 is a Monday: دونۍ in Pashto.
+    expect(format(jalaliDate, ps, { weekday: true })).toBe('دونۍ، ۱۵ زمری ۱۴۰۳');
+  });
+
+  it('reuses the long forms in short style (CLDR ps has no distinct abbreviated forms)', () => {
+    expect(format(jalaliDate, ps, { style: 'short' })).toBe('۱۵ زمری ۱۴۰۳');
+    expect(format(jalaliDate, ps, { weekday: true, style: 'short' })).toBe('دونۍ، ۱۵ زمری ۱۴۰۳');
+  });
+
+  it('can be overridden to Latin numerals explicitly', () => {
+    expect(format(jalaliDate, ps, { numerals: 'latin' })).toBe('15 زمری 1403');
   });
 });
 

@@ -1,5 +1,5 @@
 ---
-description: Parse English, Farsi, and Finglish date phrases into calendar dates.
+description: Parse English, Farsi, Finglish, and Pashto date phrases into calendar dates.
 ---
 
 # Natural language parsing
@@ -9,8 +9,8 @@ npm install @jalali-js/nlp
 ```
 
 `parse()` reads a short natural-language phrase and returns a `CalendarDate`, or `null` when it
-doesn't recognize the phrase. Three locales: `en`, `fa`, and `fa-Latn` (Finglish, Persian
-written in Latin script).
+doesn't recognize the phrase. Four locales: `en`, `fa`, `fa-Latn` (Finglish, Persian written in
+Latin script), and `ps` (Pashto).
 
 ```ts
 import { parse } from '@jalali-js/nlp';
@@ -28,6 +28,10 @@ parse('فروردین آینده', 'fa'); // 'next Farvardin'
 
 parse('emrooz', 'fa-Latn'); // 'today', written in Finglish
 parse('farda', 'fa-Latn'); // 'tomorrow'
+
+parse('نن', 'ps'); // 'today', in Pashto
+parse('راتلونکې اونۍ', 'ps'); // 'next week'
+parse('راتلونکی وری', 'ps'); // 'next Wray' (the Afghan name of Jalali month 1)
 
 parse('banana', 'en'); // null: not a recognized phrase
 ```

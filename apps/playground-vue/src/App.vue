@@ -67,8 +67,8 @@ watchEffect(() => {
       works by importing more than one (see the CSS imports at the top of this file). Every
       component below shares one page-wide theme, since the theming contract is CSS custom
       properties on each picker's root element, the same design a whole-app theme switch relies on.
-      The language toggle controls every component below except the two explicit English/Farsi
-      comparison sections, which always show both at once.
+      The language toggle controls every component below except the explicit fixed-locale comparison
+      sections (English, Farsi, and Pashto), which always show their own locale.
     </p>
     <p>امروز: {{ jalali.format(jalali.today(), { style: 'long', weekday: true }) }}</p>
 
@@ -81,6 +81,11 @@ watchEffect(() => {
     <section data-testid="grid-fa-jalali">
       <h2>Grid variant, Farsi</h2>
       <DatePicker system="jalali" locale="fa" />
+    </section>
+
+    <section data-testid="grid-ps-jalali">
+      <h2>Grid variant, Pashto (Afghan month names)</h2>
+      <DatePicker system="jalali" locale="ps" />
     </section>
 
     <section data-testid="quick-nav">

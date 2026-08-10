@@ -1,13 +1,15 @@
 import type { CalendarDate, CalendarSystem } from 'jalali-js';
 import { createCalendar } from 'jalali-js';
 import type { FormatOptions, LocalePack } from '@jalali-js/i18n';
-import { en, fa, format as formatDate } from '@jalali-js/i18n';
+import { en, fa, ps, format as formatDate } from '@jalali-js/i18n';
 import { useCallback, useMemo, useState } from 'react';
 
-export type LocaleCode = 'en' | 'fa';
+export type LocaleCode = 'en' | 'fa' | 'ps';
+
+const localePacks: Record<LocaleCode, LocalePack> = { en, fa, ps };
 
 export function localePackFor(locale: LocaleCode): LocalePack {
-  return locale === 'fa' ? fa : en;
+  return localePacks[locale];
 }
 
 export interface UseCalendarOptions {

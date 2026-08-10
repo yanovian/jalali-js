@@ -2,7 +2,7 @@ import { formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem } from 'jalali-js';
 import { getCalendarEngine } from 'jalali-js';
 import { el } from './dom.js';
-import { localePackFor, type LocaleCode } from './locale.js';
+import { localePackFor, parseLocaleAttribute, type LocaleCode } from './locale.js';
 
 export interface DropdownDateFieldsChangeEventDetail {
   date: CalendarDate;
@@ -70,7 +70,7 @@ export class JalaliDropdownDateFieldsElement extends HTMLElement {
 
   attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
     if (name === 'system') this.#system = value === 'gregorian' ? 'gregorian' : 'jalali';
-    else if (name === 'locale') this.#locale = value === 'fa' ? 'fa' : 'en';
+    else if (name === 'locale') this.#locale = parseLocaleAttribute(value);
     if (this.#connected) this.render();
   }
 

@@ -114,8 +114,8 @@ linked above.
 - **No framework? No problem.** `@jalali-js/web` ships the same pickers as plain Web
   Components: usable from plain HTML/JS, or dropped into any framework this project has no
   dedicated binding for.
-- **English and Farsi out of the box,** including natural language date input in both, and
-  Finglish (`"emrooz"`, `"farda"`).
+- **English, Farsi, and Pashto out of the box,** including natural language date input in all
+  three, and Finglish (`"emrooz"`, `"farda"`).
 - **Headless by default.** Data attributes and scoped slots give you full styling control. An
   optional pre-styled `DatePicker` sits on top for teams that want one ready to use.
 - **Visual regressions get caught before merge.** Every pull request gets automated screenshots
@@ -126,8 +126,8 @@ linked above.
 | Package               | What it is                                                        |
 | --------------------- | ----------------------------------------------------------------- |
 | `jalali-js`           | The conversion core. Zero runtime dependencies.                   |
-| `@jalali-js/i18n`     | Locale data (`en`, `fa`) and display formatting.                  |
-| `@jalali-js/nlp`      | Natural language date parsing, in English, Farsi, and Finglish.   |
+| `@jalali-js/i18n`     | Locale data (`en`, `fa`, `ps`) and display formatting.            |
+| `@jalali-js/nlp`      | Natural language parsing: English, Farsi, Finglish, and Pashto.   |
 | `@jalali-js/react`    | React bindings: `useCalendar`, headless `Calendar`, `DatePicker`. |
 | `@jalali-js/vue`      | The same, for Vue.                                                |
 | `@jalali-js/web`      | The same, as plain Web Components. No framework required.         |

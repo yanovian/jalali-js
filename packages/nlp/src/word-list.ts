@@ -1,11 +1,12 @@
-import { en, fa } from '@jalali-js/i18n';
+import { en, fa, ps } from '@jalali-js/i18n';
 
 /**
- * The three input styles v1 supports (see architecture.md's "Natural language date parsing").
- * `'fa-Latn'` is Finglish: Farsi words written with Latin letters. The tag follows the BCP 47
- * pattern of language plus script, the same shape a real BCP 47 tag for this would take.
+ * The input styles this parser supports (see architecture.md's "Natural language date
+ * parsing"). `'fa-Latn'` is Finglish: Farsi words written with Latin letters. The tag follows
+ * the BCP 47 pattern of language plus script, the same shape a real BCP 47 tag for this would
+ * take. `'ps'` is Pashto (Phase 12).
  */
-export type NlpLocale = 'en' | 'fa' | 'fa-Latn';
+export type NlpLocale = 'en' | 'fa' | 'fa-Latn' | 'ps';
 
 export interface WordList {
   today: readonly string[];
@@ -62,6 +63,24 @@ export const faLatn_wordList: WordList = {
   monthNames: asVariantList(en.monthNames.jalali.long),
 };
 
+// Every phrase below except 'بله اونۍ' comes straight from CLDR's `ps` relative-time data,
+// read through ICU (`Intl.RelativeTimeFormat('ps')`), the same verifiable source ps.ts's
+// month and weekday names come from. 'بله اونۍ' ("the other/next week") is the common
+// everyday variant, included the way fa's word list includes 'هفته بعد' next to CLDR's
+// 'هفته آینده'. Pashto adjectives come before the noun (CLDR: 'راتلونکې اونۍ'), so the
+// "next <month>" order is prefix, like English and unlike Farsi. Both gender forms of the
+// "next" adjective are accepted, so a writer never has to know a month name's grammatical
+// gender to be understood.
+export const ps_wordList: WordList = {
+  today: ['نن', 'نن ورځ'],
+  tomorrow: ['سبا'],
+  yesterday: ['پرون'],
+  nextWeek: ['راتلونکې اونۍ', 'بله اونۍ'],
+  nextMonthMarkers: ['راتلونکی', 'راتلونکې', 'بل', 'بله'],
+  nextMonthOrder: 'prefix',
+  monthNames: asVariantList(ps.monthNames.jalali.long),
+};
+
 export function getWordList(locale: NlpLocale): WordList {
   switch (locale) {
     case 'en':
@@ -70,5 +89,7 @@ export function getWordList(locale: NlpLocale): WordList {
       return fa_wordList;
     case 'fa-Latn':
       return faLatn_wordList;
+    case 'ps':
+      return ps_wordList;
   }
 }

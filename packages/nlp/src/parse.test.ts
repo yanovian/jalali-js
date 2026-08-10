@@ -159,6 +159,77 @@ describe('parse: Farsi (Persian script)', () => {
   });
 });
 
+describe('parse: Pashto', () => {
+  it('reads relative terms', () => {
+    for (const word of ['نن', 'نن ورځ']) {
+      expect(parse(word, 'ps')).toEqual({
+        precision: 'date',
+        system: 'jalali',
+        year: 1403,
+        month: 5,
+        day: 15,
+      });
+    }
+    expect(parse('سبا', 'ps')).toEqual({
+      precision: 'date',
+      system: 'jalali',
+      year: 1403,
+      month: 5,
+      day: 16,
+    });
+    expect(parse('پرون', 'ps')).toEqual({
+      precision: 'date',
+      system: 'jalali',
+      year: 1403,
+      month: 5,
+      day: 14,
+    });
+  });
+
+  it('reads both accepted "next week" phrasings', () => {
+    for (const phrase of ['راتلونکې اونۍ', 'بله اونۍ']) {
+      expect(parse(phrase, 'ps')).toEqual({
+        precision: 'date',
+        system: 'jalali',
+        year: 1403,
+        month: 5,
+        day: 22,
+      });
+    }
+  });
+
+  it('reads "راتلونکی <month>" with the Afghan month names, in prefix order', () => {
+    // Today is month 5. وری (month 1) has already passed this year, so "next وری" means next
+    // year's; وږی (month 6) has not started yet, so it stays in this year. Both gender forms
+    // of the "next" adjective are accepted.
+    expect(parse('راتلونکی وری', 'ps')).toEqual({
+      precision: 'date',
+      system: 'jalali',
+      year: 1404,
+      month: 1,
+      day: 1,
+    });
+    expect(parse('راتلونکې وږی', 'ps')).toEqual({
+      precision: 'date',
+      system: 'jalali',
+      year: 1403,
+      month: 6,
+      day: 1,
+    });
+    expect(parse('بل کب', 'ps')).toEqual({
+      precision: 'date',
+      system: 'jalali',
+      year: 1403,
+      month: 12,
+      day: 1,
+    });
+  });
+
+  it('returns null for unrecognized Pashto input', () => {
+    expect(parse('کيله', 'ps')).toBeNull();
+  });
+});
+
 describe('parse: Finglish (fa-Latn)', () => {
   it('accepts common spelling variants for each relative term', () => {
     for (const word of ['emrooz', 'emruz', 'emrouz']) {

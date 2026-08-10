@@ -1,6 +1,6 @@
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
-import { localePackFor, type LocaleCode } from '@jalali-js/web';
+import { localePackFor, parseLocaleAttribute, type LocaleCode } from '@jalali-js/web';
 import type { CalendarDate, CalendarSystem, StorageValue, ValueFormat } from 'jalali-js';
 import {
   buildCalendarGrid,
@@ -130,7 +130,7 @@ export class JalaliRangePickerElement extends HTMLElement {
 
   attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
     if (name === 'system') this.#system = value === 'gregorian' ? 'gregorian' : 'jalali';
-    else if (name === 'locale') this.#locale = value === 'fa' ? 'fa' : 'en';
+    else if (name === 'locale') this.#locale = parseLocaleAttribute(value);
     else if (name === 'value-format' && value) this.#valueFormat = value as ValueFormat;
     else if (name === 'placeholder') this.#placeholder = value ?? undefined;
     if (this.#connected) this.render();

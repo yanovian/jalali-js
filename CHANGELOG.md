@@ -11,6 +11,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- Pashto (`ps`) support: a locale pack with Afghanistan's own month names,
+  sourced from CLDR, wired into the React, Vue, and Web Components
+  bindings, plus Pashto phrase parsing in `@jalali-js/nlp`.
+- An "Adding a locale" contribution walkthrough in the i18n guide.
 - LLM-friendly docs on the docs site: `llms.txt` (index) and
   `llms-full.txt` (full guide bundle).
 - A bundle-size badge in the readme.

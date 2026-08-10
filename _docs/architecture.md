@@ -258,17 +258,23 @@ in `core`.
 
 ## Internationalization
 
-- Locales at launch: `en` and `fa`.
+- Locales at launch: `en` and `fa`. Phase 12 added `ps` (Pashto),
+  Afghanistan's other official language alongside Dari (Afghanistan being
+  the other country that uses the Jalali/Solar Hijri calendar officially,
+  besides Iran); Dari itself is a national standard of Persian, close
+  enough to `fa` that a dedicated pack is lower priority.
 - Locale data covers: month names, weekday names in full and short form,
-  Persian digits (۰ to ۹) against Latin digits, and text direction (`ltr` or
-  `rtl`), so a consumer can set the `dir` attribute correctly.
-- The locale pack format lets the team add a third locale later as a data
-  file, with no code change. Scheduled as Phase 12, not speculative:
-  proposed next is Pashto (`ps`), Afghanistan's other official language
-  alongside Dari (Afghanistan being the other country that uses the
-  Jalali/Solar Hijri calendar officially, besides Iran); Dari itself is a
-  national standard of Persian, close enough to `fa` that a dedicated pack
-  is lower priority than Pashto.
+  native digits against Latin digits, and text direction (`ltr` or `rtl`),
+  so a consumer can set the `dir` attribute correctly.
+- The locale pack format lets the team add another locale as a data file,
+  with no code change: `ps.ts` proved this for real, landing as one data
+  file plus a `LocaleCode` union entry per binding. Its names and digits
+  come from CLDR's own `ps` data, read through ICU (Node's `Intl`), the
+  same verification source Phase 1 used for the calendar arithmetic.
+  Afghanistan names the Solar Hijri months after the zodiac signs, so
+  `ps`'s Jalali month names share nothing with `fa`'s Persian ones.
+- The docs site's i18n guide has the step-by-step "Adding a locale"
+  walkthrough for contributors.
 
 ## Natural language date parsing
 
@@ -277,7 +283,9 @@ in `core`.
 - v1 supports three input styles: English words (`today`, `tomorrow`, `next
 Farvardin`), Farsi words in Persian script (`امروز`, `فردا`), and Finglish,
   Farsi words written with Latin letters (`emrooz`, `farda`). Finglish
-  support covers common spelling variants for each word.
+  support covers common spelling variants for each word. Phase 12 added a
+  fourth: Pashto (`نن`, `سبا`, `راتلونکې اونۍ`), with the relative terms
+  sourced from CLDR's `ps` relative-time data through ICU.
 - The parser covers a fixed, testable set of relative terms and explicit
   day, month, and year phrases. It is not a general natural language engine.
 - Each supported word list lives in `packages/nlp`, next to the locale data

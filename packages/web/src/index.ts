@@ -11,7 +11,7 @@ export {
   defineDropdownDateFieldsElement,
 } from './DropdownDateFields.js';
 export type { DropdownDateFieldsChangeEventDetail } from './DropdownDateFields.js';
-export { localePackFor } from './locale.js';
+export { localePackFor, parseLocaleAttribute } from './locale.js';
 export type { LocaleCode } from './locale.js';
 
 // package.json sets "sideEffects": true so a bundler never tree-shakes these calls away: unlike

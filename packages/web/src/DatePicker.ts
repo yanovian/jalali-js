@@ -4,7 +4,7 @@ import { createCalendar, toStorageValue } from 'jalali-js';
 import { JalaliCalendarElement, type CalendarSelectEventDetail } from './Calendar.js';
 import { JalaliDropdownDateFieldsElement } from './DropdownDateFields.js';
 import { el } from './dom.js';
-import { localePackFor, type LocaleCode } from './locale.js';
+import { localePackFor, parseLocaleAttribute, type LocaleCode } from './locale.js';
 
 export interface DatePickerChangeEventDetail {
   value: StorageValue;
@@ -137,7 +137,7 @@ export class JalaliDatePickerElement extends HTMLElement {
 
   attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
     if (name === 'system') this.#system = value === 'gregorian' ? 'gregorian' : 'jalali';
-    else if (name === 'locale') this.#locale = value === 'fa' ? 'fa' : 'en';
+    else if (name === 'locale') this.#locale = parseLocaleAttribute(value);
     else if (name === 'variant') this.#variant = value === 'dropdown' ? 'dropdown' : 'grid';
     else if (name === 'value-format' && value) this.#valueFormat = value as ValueFormat;
     else if (name === 'placeholder') this.#placeholder = value ?? undefined;

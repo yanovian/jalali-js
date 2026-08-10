@@ -6,6 +6,7 @@ import { expect, test } from '@playwright/test';
 const SECTIONS = [
   { testId: 'grid-en-jalali', name: 'grid-en-jalali.png' },
   { testId: 'grid-fa-jalali', name: 'grid-fa-jalali.png' },
+  { testId: 'grid-ps-jalali', name: 'grid-ps-jalali.png' },
   { testId: 'dropdown', name: 'dropdown.png' },
   { testId: 'gregorian', name: 'gregorian.png' },
   { testId: 'inline-calendar', name: 'inline-calendar.png' },

@@ -4,10 +4,10 @@ See [alternatives.md](./alternatives.md) for the vision and the goals. See
 [architecture.md](./architecture.md) for the design behind these decisions.
 This file shows only the status of each phase.
 
-Phases 0-11 are done, and the first releases are published (v0.0.1 through
+Phases 0-12 are done, and the first releases are published (v0.0.1 through
 v0.1.0; see `CHANGELOG.md`). v0.1.0 also shipped the Web Components bindings
 (`packages/web`, `packages/ui-web`), which landed outside the phase list.
-Phases 12-24 are scheduled but not started. Phases 14-18 add the features
+Phases 13-24 are scheduled but not started. Phases 14-18 add the features
 real apps ask for first, so they can land before Phase 13. What's left after
 those is listed under "Later, not yet scheduled" below. Change an item to
 `[x]` as it lands.
@@ -670,32 +670,58 @@ actually passed CI ever gets baselined.
 
 ## Phase 12: Additional locales (`packages/i18n`, `packages/nlp`)
 
-- [ ] Confirm the next locale to add (proposed: Pashto, `ps`). Afghanistan
+- [x] Confirm the next locale to add (proposed: Pashto, `ps`). Afghanistan
       is the other country that uses the Jalali/Solar Hijri calendar
       officially, alongside Iran, and Pashto is one of its two official
       languages; Dari, its other official language, is a national standard
       of Persian itself and already close enough to `fa` that a dedicated
-      pack is lower priority. The team confirms this at the start of the
-      phase.
-- [ ] Add the new `LocalePack`: month names for both calendar systems,
+      pack is lower priority. Built as proposed: Pashto (`ps`).
+- [x] Add the new `LocalePack`: month names for both calendar systems,
       weekday names, native digits, and text direction. Follow `fa.ts`'s
       existing pattern (see architecture.md's "Internationalization").
-- [ ] Add unit tests for the new locale pack, mirroring `en`/`fa`'s
+      `src/ps.ts`. Every name and digit comes from CLDR's `ps` locale data,
+      read through ICU (Node's `Intl`), not from memory, the same
+      verification source Phase 1 used for the calendar arithmetic.
+      Afghanistan names the Solar Hijri months after the zodiac signs
+      (وری through کب), so `ps`'s Jalali month names share nothing with
+      `fa`'s Persian ones. CLDR has no abbreviated Pashto month or weekday
+      forms, so `short` reuses `long`, the same choice `fa.ts` makes for
+      its month names.
+- [x] Add unit tests for the new locale pack, mirroring `en`/`fa`'s
       existing coverage (`format()` across styles, the weekday prefix,
-      numeral rendering).
-- [ ] Wire the new locale into `@jalali-js/react` and `@jalali-js/vue`'s
-      `LocaleCode` type and `localePackFor()`.
-- [ ] Optional, separate from the i18n locale pack itself: add
+      numeral rendering). `format.test.ts`'s Pashto suite and a
+      `numerals.test.ts` case for the `ps` digits.
+- [x] Wire the new locale into `@jalali-js/react` and `@jalali-js/vue`'s
+      `LocaleCode` type and `localePackFor()`. Also `@jalali-js/web`,
+      which landed after this item was written and carries the same
+      `LocaleCode`. The four web elements each parsed their `locale`
+      attribute with a hardcoded `'fa' : 'en'` ternary; those now share
+      one `parseLocaleAttribute()` in `packages/web/src/locale.ts`, so
+      the next locale changes one table, not four call sites.
+- [x] Optional, separate from the i18n locale pack itself: add
       `@jalali-js/nlp` phrase support for the new locale (`NlpLocale`, a
       new `WordList`), if the phrase set is well understood enough to
-      write correctly. A locale pack (display only) ships either way,
-      independent of NLP support.
-- [ ] Add the new locale to the visual e2e matrix (Phase 10) and the docs
-      site's i18n guide.
-- [ ] Write up how to add a locale from scratch, in the i18n guide, as a
+      write correctly. Shipped: the phrase set was verifiable, not just
+      well understood. Every phrase except one everyday variant comes
+      straight from CLDR's `ps` relative-time data
+      (`Intl.RelativeTimeFormat('ps')`): نن، سبا، پرون، راتلونکې اونۍ.
+      Pashto adjectives come before the noun, so "next <month>" uses
+      prefix order like English, unlike Farsi; both gender forms of the
+      "next" adjective are accepted, so a writer never needs to know a
+      month name's grammatical gender.
+- [x] Add the new locale to the visual e2e matrix (Phase 10) and the docs
+      site's i18n guide. A `grid-ps-jalali` section in `playground-react`
+      and `playground-vue`, plus the matching screenshot test in both spec
+      files. The new baselines land on `visual-baselines` automatically
+      after merge (the Phase 10 flow, unchanged).
+- [x] Write up how to add a locale from scratch, in the i18n guide, as a
       real contribution guide: a `LocalePack` is already a plain exported
       interface with no other code to change, but that fact is currently
       only implicit (a sentence in `guide/i18n.md`), not walked through.
+      `guide/i18n.md`'s "Adding a locale" section: the pack fields, the
+      ICU/CLDR sourcing trick, tests, binding wiring, and the optional
+      NLP step, each pointing at the real `ps` files as the worked
+      example.
 
 ## Phase 13: Astronomical conversion engine (`packages/core`)
 

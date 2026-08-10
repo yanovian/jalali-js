@@ -2,7 +2,7 @@ import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem } from 'jalali-js';
 import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
 import { el } from './dom.js';
-import { localePackFor, type LocaleCode } from './locale.js';
+import { localePackFor, parseLocaleAttribute, type LocaleCode } from './locale.js';
 
 const YEARS_PER_PAGE = 12;
 
@@ -27,7 +27,7 @@ export interface CalendarSelectEventDetail {
  * a year grid, so a person can jump years ahead without paging one month at a time. Picking a
  * year moves to the month grid; picking a month moves to the day grid.
  *
- * Attributes: `system` ('jalali' | 'gregorian'), `locale` ('en' | 'fa'), `quick-nav` (set to
+ * Attributes: `system` ('jalali' | 'gregorian'), `locale` ('en' | 'fa' | 'ps'), `quick-nav` (set to
  * "false" to turn off). `value` and `initial-displayed-month` are properties only, since a
  * `CalendarDate` is not representable as a plain HTML attribute string. Listen for `select`.
  */
@@ -94,7 +94,7 @@ export class JalaliCalendarElement extends HTMLElement {
 
   attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
     if (name === 'system') this.#system = value === 'gregorian' ? 'gregorian' : 'jalali';
-    else if (name === 'locale') this.#locale = value === 'fa' ? 'fa' : 'en';
+    else if (name === 'locale') this.#locale = parseLocaleAttribute(value);
     else if (name === 'quick-nav') this.#quickNav = value !== 'false';
     if (this.#connected) this.render();
   }
