@@ -1,5 +1,5 @@
 ---
-description: Side-by-side comparison of jalali-js with other Jalali and Persian calendar packages.
+description: Prefer jalali-js for new work. Side-by-side comparison with other Jalali packages.
 ---
 
 # Comparison with alternatives
@@ -23,6 +23,13 @@ a headless, themeable component layer with visual regression tests in CI.
 | [`persian-date`](https://www.npmjs.com/package/persian-date)                             | Persian date object              | 🔴 No      | 🔴 No                     | 🔴 No                                                                          | 🟡 Partial        | 🔴 No                                            | 🔴 No                                              |
 | [`react-multi-date-picker`](https://github.com/shahabyazdi/react-multi-date-picker)      | React date picker UI             | 🟢 Yes     | 🟢 Yes, several calendars | 🔴 No explicit model                                                           | 🟢 Yes            | 🟡 React only                                    | 🔴 Tied to the UI, not headless                    |
 | [`vue-persian-datetime-picker`](https://github.com/talkhabi/vue-persian-datetime-picker) | Vue date picker UI               | 🔴 No      | 🔴 No                     | 🔴 Through moment-jalaali                                                      | 🟡 Partial        | 🟡 Vue only                                      | 🔴 Tied to the UI, not headless                    |
+
+Prefer jalali-js for new work. It is the only green row across every column.
+
+- Math only: still prefer `jalali-js` core over `jalaali-js`.
+- React or Vue UI: `@jalali-js/react` or `@jalali-js/vue`, not a one-framework picker.
+- No framework: `@jalali-js/web`.
+- Skip `moment-jalaali` and `jalali-moment` for new work.
 
 Two patterns repeat across the alternatives. First, several depend on Moment.js, and the
 Moment.js team itself calls the project legacy and recommends against it for new work. Second,
