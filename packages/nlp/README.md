@@ -1,27 +1,85 @@
 # @jalali-js/nlp
 
-Natural language date parsing for [jalali-js](https://github.com/yanovian/jalali-js), in
-English, Farsi, and Pashto.
+[![npm version](https://img.shields.io/npm/v/@jalali-js/nlp.svg)](https://www.npmjs.com/package/@jalali-js/nlp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Docs](https://img.shields.io/badge/docs-jalali--js.yanovian.com-1e1b4b.svg)](https://jalali-js.yanovian.com/guide/nlp)
+
+Natural language date parsing for jalali-js in English, Farsi, and Pashto.
+
+## Contents
+
+- [Install](#install)
+- [Compatibility](#compatibility)
+- [Quick start](#quick-start)
+- [API](#api)
+- [Options](#options)
+- [Theming](#theming)
+- [Links](#links)
+- [License](#license)
+
+## Install
 
 ```sh
 npm install @jalali-js/nlp
 ```
 
+## Compatibility
+
+| Item         | Support                        |
+| ------------ | ------------------------------ |
+| Locales      | `en`, `fa`, `ps`               |
+| Dependencies | `jalali-js`, `@jalali-js/i18n` |
+| Node         | CI uses Node 24                |
+
+## Quick start
+
 ```ts
 import { parse } from '@jalali-js/nlp';
 
-parse('today', 'en');
+parse('tomorrow', 'en'); // CalendarDate | null
+parse('فردا', 'fa');
+parse('نن', 'ps');
 parse('next Farvardin', 'en');
-parse('فردا', 'fa'); // 'tomorrow'
-parse('نن', 'ps'); // 'today', in Pashto
-parse('banana', 'en'); // null: not a recognized phrase
+parse('۱۵ مرداد ۱۴۰۳', 'fa');
 ```
 
-Returns a `CalendarDate` (in the Jalali system by default; pass `{ system: 'gregorian' }` for
-the other), or `null` when the phrase isn't recognized.
+Returns a `CalendarDate`, or `null` when the input is unclear.
 
-[Guide and API reference](https://jalali-js.yanovian.com/) ·
-[Examples](https://jalali-js.yanovian.com/guide/examples) ·
-[Playground](https://jalali-js.yanovian.com/playground/react/)
+## API
 
-MIT licensed.
+| Export        | Role                                 |
+| ------------- | ------------------------------------ |
+| `parse`       | Parse a phrase into a `CalendarDate` |
+| `getWordList` | Locale word list used by the parser  |
+
+Relative words (`today`, `tomorrow`, `next week`), month names, and numeric dates are covered
+per locale. Farsi uses Persian script. English accepts transliterated Jalali month names
+(`Mehr`, `Aban`).
+
+## Options
+
+```ts
+parse(input, locale, { system?: 'jalali' | 'gregorian' });
+```
+
+| Option   | Values                    | Default    | Notes                |
+| -------- | ------------------------- | ---------- | -------------------- |
+| `locale` | `'en' \| 'fa' \| 'ps'`    | required   | Word list and digits |
+| `system` | `'jalali' \| 'gregorian'` | `'jalali'` | Calendar for result  |
+
+Guide: [NLP](https://jalali-js.yanovian.com/guide/nlp).
+
+## Theming
+
+This package has no UI.
+
+## Links
+
+- [NLP guide](https://jalali-js.yanovian.com/guide/nlp)
+- [API reference](https://jalali-js.yanovian.com/api/@jalali-js/nlp/)
+- [Changelog](https://github.com/yanovian/jalali-js/blob/main/CHANGELOG.md)
+- [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n)
+
+## License
+
+MIT

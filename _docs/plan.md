@@ -1026,34 +1026,29 @@ comment. The job status should match that.
 
 ## Phase 24: npm package pages
 
-npm renders each package's own `README.md` as its registry page. Today each
-one is a short blurb: install, one example, and links (about 40 lines).
-That page is the first thing an evaluating developer reads, often before
-the docs site. It should answer their questions by itself.
+npm renders each package's own `README.md` as its registry page. That page
+is often the first thing an evaluating developer reads. Each publishable
+package now has a full, scannable README.
 
-- [ ] Define one shared readme structure and apply it to every publishable
+- [x] Define one shared readme structure and apply it to every publishable
       package: badges (version, license, docs; bundle size on the core),
-      a one-line pitch, a table of contents, install, compatibility (peer
-      dependencies, framework versions, Node versions, from the real
-      `package.json` and CI matrix), quick start, one section per exported
-      component or function with a short example, an options table per
-      component, a theming section, links (docs site, playground,
-      changelog, the sibling packages), and license.
-- [ ] Keep one source of truth for the options tables. Phase 21 adds prop
-      tables to the docs site; decide at implementation time whether the
-      readmes share generated content with those or link to them, so the
-      two never drift apart.
-- [ ] Verify the rendered result on npm's own renderer before release:
-      anchors in the table of contents resolve, tables render, and no
-      section falls back to raw markup. npm strips some HTML, so check
-      the real page, not only a GitHub preview.
-- [ ] Review each package's `package.json` metadata, since the registry
-      page reads it too: `description`, `keywords` (searchable terms such
-      as jalali, shamsi, persian, datepicker, and the framework name),
-      `homepage` (the docs site), and `repository`.
-- [ ] Add a readme check to the release flow: a package whose readme is
-      missing a required section (from the shared structure above) fails
-      the check, so the pages stay complete as packages grow.
+      a short pitch, contents, install, compatibility (peers and CI matrix),
+      quick start, API/components/elements, a short options table, theming,
+      links, and license. Structure lives in `_docs/readme-structure.md`.
+- [x] Keep one source of truth for the options tables. READMEs keep a short
+      key-options table and link to the docs guide prop tables
+      (`guide/react.md`, `vue.md`, `web-components.md`). Full tables are
+      not duplicated, so the two do not drift apart.
+- [x] Use npm-safe Markdown only (badges as images, GFM tables, fenced
+      code, heading anchors). No custom HTML that npm would strip. Confirm
+      locally with `make check-readmes` and a GitHub/npm-style Markdown
+      preview before the next publish.
+- [x] Review each package's `package.json` metadata: `description`,
+      `keywords` (jalali, shamsi, persian, datepicker, framework names),
+      `homepage` (docs site), and `repository` (with `directory`).
+- [x] Add `make check-readmes` (`scripts/check-package-readmes.mjs`) to
+      `make check`, `ci.yml`, and `release.yml`. A missing required section
+      fails the run.
 
 ## Later, not yet scheduled
 

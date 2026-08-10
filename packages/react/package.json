@@ -9,7 +9,11 @@
     "react",
     "date-picker",
     "calendar",
-    "date"
+    "date",
+    "shamsi",
+    "datepicker",
+    "nextjs",
+    "jalali-calendar"
   ],
   "homepage": "https://jalali-js.yanovian.com/",
   "repository": {

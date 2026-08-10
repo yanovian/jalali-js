@@ -9,7 +9,9 @@
     "holidays",
     "iran",
     "calendar",
-    "date"
+    "date",
+    "shamsi",
+    "iran-holidays"
   ],
   "homepage": "https://jalali-js.yanovian.com/",
   "repository": {

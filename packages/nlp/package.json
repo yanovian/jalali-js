@@ -9,7 +9,8 @@
     "pashto",
     "nlp",
     "date-parsing",
-    "calendar"
+    "calendar",
+    "shamsi"
   ],
   "homepage": "https://jalali-js.yanovian.com/",
   "repository": {

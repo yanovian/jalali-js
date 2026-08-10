@@ -1,39 +1,117 @@
 # @jalali-js/web
 
-Framework-free [jalali-js](https://github.com/yanovian/jalali-js) bindings: a headless
-`<jalali-calendar>` grid and a working default-styled `<jalali-date-picker>`, as plain
-[Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_components). No React, no
-Vue, no build step required: works in plain HTML/JS, and drops into any framework the same way
-any other HTML element does.
+[![npm version](https://img.shields.io/npm/v/@jalali-js/web.svg)](https://www.npmjs.com/package/@jalali-js/web)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Docs](https://img.shields.io/badge/docs-jalali--js.yanovian.com-1e1b4b.svg)](https://jalali-js.yanovian.com/guide/web-components)
+
+Framework-free Web Components for jalali-js: headless calendar and styled date/time pickers.
+Use them from plain HTML, or drop them into any host framework.
+
+## Contents
+
+- [Install](#install)
+- [Compatibility](#compatibility)
+- [Quick start](#quick-start)
+- [Elements](#elements)
+- [Options](#options)
+- [Theming](#theming)
+- [Links](#links)
+- [License](#license)
+
+## Install
 
 ```sh
 npm install @jalali-js/web
 ```
 
-```html
-<jalali-date-picker id="picker" system="jalali" locale="fa"></jalali-date-picker>
-<script type="module">
-  import '@jalali-js/web/date-picker.css';
-  import '@jalali-js/web';
+```ts
+import '@jalali-js/web';
+import '@jalali-js/web/date-picker.css';
+```
 
-  document.getElementById('picker').addEventListener('change', (event) => {
-    // event.detail: { value, date }. value: a Gregorian ISO string by default ('2024-08-05').
+Importing the package registers the custom elements.
+
+## Compatibility
+
+| Item     | Support                                     |
+| -------- | ------------------------------------------- |
+| Runtime  | Modern browsers with Custom Elements        |
+| Peers    | None                                        |
+| Node     | CI uses Node 24                             |
+| Verified | Chromium, Firefox, WebKit in the e2e matrix |
+
+## Quick start
+
+```html
+<script type="module">
+  import '@jalali-js/web';
+  import '@jalali-js/web/date-picker.css';
+</script>
+
+<jalali-date-picker
+  id="picker"
+  system="jalali"
+  locale="fa"
+  value-format="gregorian-iso"
+></jalali-date-picker>
+
+<script type="module">
+  document.getElementById('picker').addEventListener('change', (e) => {
+    console.log(e.detail.value);
   });
 </script>
 ```
 
-`<jalali-calendar>` is the headless primitive underneath `<jalali-date-picker>` (plain markup,
-`data-jalali-*` attributes, no required CSS, no shadow root in the way), for full styling
-control. `variant="dropdown"` swaps the calendar-grid popup for three plain `<select>`s, for
-narrow, known-range entry such as a date of birth. A person can click the month or year in the
-grid popup's header to jump straight to a month grid or a year grid; on by default, turn it off
-with `quick-nav="false"`.
+## Elements
 
-[`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web) adds a
-`<jalali-range-picker>`, a `<jalali-inline-calendar>`, and extra themes on the same primitives.
+| Element                | Role                                     |
+| ---------------------- | ---------------------------------------- |
+| `<jalali-date-picker>` | Styled picker (grid or dropdown variant) |
+| `<jalali-time-picker>` | Hour and minute selection                |
+| `<jalali-calendar>`    | Headless calendar primitive              |
 
-[Guide and API reference](https://jalali-js.yanovian.com/) ·
-[Examples](https://jalali-js.yanovian.com/guide/examples) ·
-[Playground](https://jalali-js.yanovian.com/playground/vanilla/)
+Range, event, and time-range elements ship in
+[`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web).
 
-MIT licensed.
+Attributes use kebab-case (`value-format`, `minute-step`). Properties use camelCase in JS.
+`change` events carry `{ value, date }` (or the matching payload for time).
+
+## Options
+
+Key `<jalali-date-picker>` attributes:
+
+| Attribute       | Values                 | Default         | Notes                    |
+| --------------- | ---------------------- | --------------- | ------------------------ |
+| `system`        | `jalali` / `gregorian` | `jalali`        | Display calendar         |
+| `locale`        | `en` / `fa` / `ps`     | `en`            | UI language              |
+| `value-format`  | `gregorian-iso` / …    | `gregorian-iso` | Stored value shape       |
+| `variant`       | `grid` / `dropdown`    | `grid`          | Popover or Y/M/D selects |
+| `precision`     | `date` / `datetime`    | `date`          | Add a time panel         |
+| `show-holidays` | boolean attribute      | off             | Needs holidays package   |
+
+Full tables: [Web Components guide](https://jalali-js.yanovian.com/guide/web-components#attribute-and-property-tables).
+
+## Theming
+
+```css
+[data-jalali-datepicker-root] {
+  --jalali-primary: #2563eb;
+  --jalali-radius: 8px;
+  --jalali-bg: #ffffff;
+  --jalali-fg: #1a1a1a;
+}
+```
+
+See [Theming](https://jalali-js.yanovian.com/guide/theming).
+
+## Links
+
+- [Web Components guide](https://jalali-js.yanovian.com/guide/web-components)
+- [Playground](https://jalali-js.yanovian.com/playground/vanilla/)
+- [Changelog](https://github.com/yanovian/jalali-js/blob/main/CHANGELOG.md)
+- [`jalali-js`](https://www.npmjs.com/package/jalali-js) ·
+  [`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web)
+
+## License
+
+MIT

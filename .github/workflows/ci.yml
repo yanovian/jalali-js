@@ -35,6 +35,9 @@ jobs:
       - name: Check formatting
         run: make format-check
 
+      - name: Check package READMEs
+        run: make check-readmes
+
       - name: Run tests
         run: make test
 

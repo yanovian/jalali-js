@@ -1,6 +1,6 @@
 .PHONY: help install install-frozen dev build build-packages build-apps build-docs typecheck \
 	lint lint-fix format format-check test test-watch test-e2e test-e2e-project \
-	install-playwright check clean probe-treeshake size tag-release release-patch \
+	install-playwright check check-readmes clean probe-treeshake size tag-release release-patch \
 	release-minor release-major publish-packages app-typecheck app-build app-build-at-base \
 	test-paths docs-dev docs-build docs-preview embed-playgrounds update-holidays
 
@@ -80,7 +80,10 @@ test-e2e-project: ## Playwright visual e2e suite, one browser (e2e.yml): make te
 install-playwright: ## Install Playwright browser binaries: make install-playwright BROWSERS="chromium firefox webkit"
 	$(PNPM) exec playwright install --with-deps $(BROWSERS)
 
-check: typecheck lint format-check test build size ## CI-equivalent: typecheck, lint, format-check, test, build, size
+check-readmes: ## Require package README sections (_docs/readme-structure.md)
+	node scripts/check-package-readmes.mjs
+
+check: typecheck lint format-check test build size check-readmes ## CI-equivalent: typecheck, lint, format-check, test, build, size, readmes
 
 probe-treeshake: ## Confirm packages/core's built output actually tree-shakes
 	$(PNPM) --filter jalali-js build

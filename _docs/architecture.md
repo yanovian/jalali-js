@@ -427,6 +427,11 @@ from memory: `createCalendar()`'s actual overloads, `DatePicker`'s actual props,
 actual supported phrases, and so on. The API reference (`/api/`) is generated, not hand-written,
 so it can never drift from the real public API the way a hand-maintained reference page would.
 
+**npm package pages.** Each publishable package ships its own `README.md`. npm renders that
+file as the registry page. The shared shape is in `_docs/readme-structure.md`. READMEs keep
+short key-options tables and link to the guide prop tables for the full list, so options do
+not drift. `make check-readmes` enforces the required headings in CI and release.
+
 **API reference generation.** `apps/docs/scripts/build-api.mjs` (`pnpm run docs:api`, run
 automatically before both `docs-dev` and `docs-build`) runs TypeDoc twice, not once:
 `jalali-js`, `@jalali-js/i18n`, `@jalali-js/nlp`, `@jalali-js/react`, and `@jalali-js/ui-react`
@@ -615,7 +620,7 @@ Next.js, and Nuxt, and a visual suite across several browser engines, are
 exactly the case a matrix exists for: the work is the same job repeated
 over an axis of inputs, and running it serially would multiply CI
 wall-clock time by the size of that axis for no benefit. The rest of the
-pipeline (`ci.yml`'s install/typecheck/lint/format-check/test/build, and
+pipeline (`ci.yml`'s install/typecheck/lint/format-check/readmes/test/build, and
 the scheduled maintenance workflows) stays single-runner, since none of
 that work is naturally shaped as "the same job, many inputs" the way these
 two checks are.
@@ -1007,12 +1012,13 @@ build-apps           Build only apps/*, the four playground apps (ditto)
 typecheck            TypeScript project-wide check
 lint / lint-fix       ESLint, on its own or with autofix
 format / format-check Prettier, write mode or check mode (the CI gate)
+check-readmes         Require package README sections (_docs/readme-structure.md)
 test / test-watch     Unit and property tests (Vitest)
 test-e2e             Playwright visual e2e suite
 probe-treeshake      Confirm packages/core's built output actually tree-shakes
 update-holidays      Fetch/regen Iran lunar data (`YEARS=next|1426|...`)
 size                 Bundle-size budget check
-check                CI-equivalent: typecheck, lint, format-check, test, build, size
+check                CI-equivalent: typecheck, lint, format-check, test, build, size, readmes
 app-typecheck        Typecheck one app/package by name: make app-typecheck APP=playground-react
 app-build            Build one app/package by name: make app-build APP=playground-react
 test-paths           Run Vitest scoped to specific paths: make test-paths PATHS="packages/react packages/ui-react"

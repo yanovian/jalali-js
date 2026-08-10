@@ -9,7 +9,10 @@
     "i18n",
     "locale",
     "calendar",
-    "date"
+    "date",
+    "shamsi",
+    "pashto",
+    "rtl"
   ],
   "homepage": "https://jalali-js.yanovian.com/",
   "repository": {

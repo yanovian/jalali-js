@@ -17,9 +17,15 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 - Hosted playgrounds are interactive demos: URL-driven controls, live
   value, theme editor, code snippets, and binding links. The visual
   matrix keeps the same `data-testid` cells for e2e.
+- Every publishable package README is a full npm page: badges, contents,
+  install, compatibility, quick start, API surface, key options (with
+  links to the docs prop tables), theming, and links. Keywords in each
+  `package.json` are expanded for registry search.
 
 ### Added
 
+- `make check-readmes` and `_docs/readme-structure.md`, wired into
+  `make check`, CI, and the release workflow.
 - Date and range picker popovers flip and clamp to stay in the viewport.
 - Opt-in astronomical Jalali engine: `engine: 'astronomical'` on
   `createCalendar()`, `toGregorian()`, and `fromGregorian()`. Nowruz uses

@@ -1,12 +1,45 @@
 # @jalali-js/react
 
-React bindings for [jalali-js](https://github.com/yanovian/jalali-js): a `useCalendar` hook, a
-headless `Calendar` grid, a working default-styled `DatePicker`, and SSR-safe timezone
-resolution.
+[![npm version](https://img.shields.io/npm/v/@jalali-js/react.svg)](https://www.npmjs.com/package/@jalali-js/react)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Docs](https://img.shields.io/badge/docs-jalali--js.yanovian.com-1e1b4b.svg)](https://jalali-js.yanovian.com/guide/react)
+
+React bindings for jalali-js: `useCalendar`, headless `Calendar`, styled `DatePicker` and
+`TimePicker`, and SSR-safe timezone resolution.
+
+## Contents
+
+- [Install](#install)
+- [Compatibility](#compatibility)
+- [Quick start](#quick-start)
+- [Components](#components)
+- [Options](#options)
+- [Theming](#theming)
+- [Links](#links)
+- [License](#license)
+
+## Install
 
 ```sh
 npm install @jalali-js/react
 ```
+
+Import the default stylesheet once for the styled pickers:
+
+```ts
+import '@jalali-js/react/date-picker.css';
+```
+
+## Compatibility
+
+| Item    | Support                                      |
+| ------- | -------------------------------------------- |
+| React   | 18 and 19 (CI matrix)                        |
+| Next.js | 15 and 16 (CI matrix). Use client components |
+| Peers   | `react` and `react-dom` `>=18`               |
+| Node    | CI uses Node 24                              |
+
+## Quick start
 
 ```tsx
 import '@jalali-js/react/date-picker.css';
@@ -16,22 +49,76 @@ import { DatePicker } from '@jalali-js/react';
   system="jalali"
   locale="fa"
   onChange={(value, date) => {
-    // value: a Gregorian ISO string by default ('2024-08-05'); date: the raw CalendarDate
+    // value: Gregorian ISO by default; date: CalendarDate
   }}
 />;
 ```
 
-`Calendar` is the headless primitive underneath `DatePicker` (plain markup, `data-jalali-*`
-attributes, no required CSS), for full styling control. `variant="dropdown"` swaps the
-calendar-grid popup for three plain `<select>`s, for narrow, known-range entry such as a date of
-birth. `useResolvedTimeZone()` pairs with a `'zoned-datetime'` calendar under Next.js SSR with no
-hydration mismatch.
+## Components
 
-[`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react) adds a `RangePicker`,
-an `InlineCalendar`, and extra themes on the same primitives.
+### `DatePicker`
 
-[Guide and API reference](https://jalali-js.yanovian.com/) ·
-[Examples](https://jalali-js.yanovian.com/guide/examples) ·
-[Playground](https://jalali-js.yanovian.com/playground/react/)
+Styled input plus popover grid (default), or `variant="dropdown"` year/month/day selects.
+Set `precision="datetime"` for a time panel. Emits a storage value through `onChange`.
 
-MIT licensed.
+### `Calendar`
+
+Headless month grid (`data-jalali-*` attributes, no required CSS). Use it for an always-visible
+calendar or your own chrome around the grid.
+
+### `TimePicker`
+
+Hour and minute lists (`minuteStep`, `disabledHours`).
+
+### `useCalendar` / `useResolvedTimeZone`
+
+- `useCalendar({ system, locale, initialDate? })` for format helpers and today.
+- `useResolvedTimeZone()` with `precision: 'zoned-datetime'` and `timeZone: 'auto'` under
+  Next.js SSR (server and first client render stay `UTC`, then the real zone mounts cleanly).
+
+Range, inline, event, and time-range UIs live in
+[`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react).
+
+## Options
+
+Key `DatePicker` props:
+
+| Prop           | Type                      | Default           | Notes                         |
+| -------------- | ------------------------- | ----------------- | ----------------------------- |
+| `system`       | `'jalali' \| 'gregorian'` | `'jalali'`        | Display calendar              |
+| `locale`       | `'en' \| 'fa' \| 'ps'`    | `'en'`            | UI language                   |
+| `valueFormat`  | `ValueFormat`             | `'gregorian-iso'` | Stored `onChange` value shape |
+| `variant`      | `'grid' \| 'dropdown'`    | `'grid'`          | Popover grid or Y/M/D selects |
+| `precision`    | `'date' \| 'datetime'`    | `'date'`          | Add a time panel              |
+| `rules`        | `SelectionRules`          | -                 | Min/max and blocked days      |
+| `showHolidays` | `boolean`                 | `false`           | Needs `@jalali-js/holidays`   |
+
+Full tables: [React guide](https://jalali-js.yanovian.com/guide/react#prop-tables).
+
+## Theming
+
+Override CSS variables on a parent (or the root):
+
+```css
+[data-jalali-datepicker-root] {
+  --jalali-primary: #2563eb;
+  --jalali-radius: 8px;
+  --jalali-bg: #ffffff;
+  --jalali-fg: #1a1a1a;
+}
+```
+
+See [Theming](https://jalali-js.yanovian.com/guide/theming).
+
+## Links
+
+- [React guide](https://jalali-js.yanovian.com/guide/react)
+- [Recipes](https://jalali-js.yanovian.com/guide/recipes)
+- [Playground](https://jalali-js.yanovian.com/playground/react/)
+- [Changelog](https://github.com/yanovian/jalali-js/blob/main/CHANGELOG.md)
+- [`jalali-js`](https://www.npmjs.com/package/jalali-js) ·
+  [`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react)
+
+## License
+
+MIT
