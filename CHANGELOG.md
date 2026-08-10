@@ -11,6 +11,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- Opt-in astronomical Jalali engine: `engine: 'astronomical'` on
+  `createCalendar()`, `toGregorian()`, and `fromGregorian()`. Nowruz uses
+  the March equinox at the Tehran meridian (52.5°E) from Meeus low-precision
+  solar longitude. The arithmetic engine stays the default.
 - Docs depth: prop tables on the React, Vue, and Web guides, a recipes
   page (including programmatic set/read/clear), and a browser support
   page from the real e2e matrix. `make release-*` promotes

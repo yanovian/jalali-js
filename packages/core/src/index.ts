@@ -41,8 +41,9 @@ export {
   timedBlockStyle,
 } from './event-calendar.js';
 export type { CalendarDateFields, CalendarEngine } from './calendar-engine.js';
-export type { CalendarSystem } from './convert.js';
+export type { CalendarEngineOptions, CalendarSystem, JalaliEngineId } from './convert.js';
 export { fromGregorian, getCalendarEngine, toGregorian } from './convert.js';
+export { jalaliAstronomicalEngine, nowruzJulianDayNumber } from './jalali-astronomical.js';
 export { dayOfWeek } from './day-of-week.js';
 export {
   addDays,

@@ -45,22 +45,16 @@ Jalali to Gregorian conversion has two known approaches.
 **Decision:** the default engine uses a validated arithmetic algorithm. The
 wider ecosystem already uses this approach. It runs fast and needs no runtime
 dependency, and its accuracy is well documented for the range a real
-application hits. The conversion engine sits behind a small internal
-interface, `CalendarEngine`. This interface lets the team add an
-astronomical engine later, as an opt-in for a use case that needs correctness
-across thousands of years, with no change to the public API. This is
-scheduled as Phase 13, not speculative: a real vernal-equinox-at-the-Tehran-meridian
-calculation, from Jean Meeus's low-precision solar position algorithm (a
-full VSOP87 implementation is out of scope for the precision this needs),
-exposed alongside the arithmetic default rather than replacing it. Before
-that real engine, Phase 13 starts with the cheap check first: a minimal
-fake `CalendarEngine` implementation in `packages/core`'s own test suite (a
-calendar with, say, a deliberately irregular month-length rule), confirming
-the interface has no hidden Jalali/Gregorian-shaped assumption before
-investing in the real one. Neither is a second _calendar system_: both
-engines still compute the Jalali calendar, just via two different rules
-(see "Calendar systems in scope" above for why a real second calendar
-system specifically was cut from the plan instead of scheduled).
+application hits. The conversion engine sits behind a small interface,
+`CalendarEngine`. Phase 13 added an opt-in astronomical engine beside that
+default: Nowruz from the March equinox at the Tehran meridian (52.5°E),
+using Jean Meeus's low-precision solar longitude (a full VSOP87
+implementation stays out of scope). Pass `engine: 'astronomical'` on
+`createCalendar()`, `toGregorian()`, or `fromGregorian()`. Phase 13 also
+kept a fake irregular `CalendarEngine` in the core test suite to prove the
+interface is not secretly 12-month-shaped. Neither engine is a second
+calendar system: both still compute Jalali, by two different leap rules
+(see "Calendar systems in scope" above).
 
 The team checks correctness with:
 
@@ -297,6 +291,8 @@ in `core`.
 - Phase 21 added prop tables, a recipes page, a browser support page from
   the e2e matrix, and a changelog promote step on `make release-*`
   (`scripts/prepare-changelog.mjs`).
+- Phase 13 added the opt-in astronomical Jalali engine
+  (`engine: 'astronomical'`) and a fake irregular `CalendarEngine` test.
 
 ## Natural language date parsing
 

@@ -44,13 +44,26 @@ without a hydration mismatch. See the [React](/guide/react) and [Vue](/guide/vue
 ## The conversion engine
 
 Jalali-to-Gregorian conversion goes through a Julian Day Number (a continuous day count with no
-calendar of its own) as the only path between the two systems, behind a small internal
-`CalendarEngine` interface. The default engine uses a validated 33-year-cycle arithmetic
-leap-year rule (Kazimierz M. Borkowski's), not an astronomical (true vernal equinox)
-calculation: it matches the astronomical calendar for the full range any real application
-needs, runs in constant time, and needs no runtime dependency. It's checked against Node's own
-ICU (`Intl.DateTimeFormat` with the Persian calendar) with zero mismatches across a
-multi-thousand-year range, and against an independent, published 121-year reference table.
+calendar of its own) as the only path between the two systems, behind a small
+`CalendarEngine` interface.
+
+The default engine uses a validated 33-year-cycle arithmetic leap-year rule (Kazimierz M.
+Borkowski). It matches the astronomical calendar for the range real apps need, runs in
+constant time, and needs no runtime dependency. It is checked against Node's ICU Persian
+calendar and a published 121-year leap table.
+
+An opt-in astronomical engine is also available. It finds Nowruz from the March equinox at
+the Tehran meridian (52.5°E) using Jean Meeus's low-precision solar longitude. Use it when
+you need equinox-based leaps far outside the arithmetic match range. It is slower than the
+default.
+
+```ts
+createCalendar({ system: 'jalali', engine: 'astronomical' });
+toGregorian({ year: 1403, month: 1, day: 1 }, 'jalali', { engine: 'astronomical' });
+fromGregorian({ year: 2024, month: 3, day: 20 }, 'jalali', { engine: 'astronomical' });
+```
+
+Omit `engine`, or pass `'arithmetic'`, for the default.
 
 ## Date math and queries
 

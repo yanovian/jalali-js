@@ -4,12 +4,17 @@ import type {
   Precision,
   ZonedCalendarDateTime,
 } from './calendar-date.js';
-import type { CalendarSystem } from './convert.js';
+import type { CalendarSystem, JalaliEngineId } from './convert.js';
 import { fromGregorian, getCalendarEngine } from './convert.js';
 import { instantToZonedFields, resolveTimeZone } from './timezone.js';
 
 interface BaseCreateCalendarOptions {
   system: CalendarSystem;
+  /**
+   * Jalali leap-year rule. Ignored for Gregorian. Default: `'arithmetic'`.
+   * Use `'astronomical'` for Nowruz from the Tehran-meridian equinox.
+   */
+  engine?: JalaliEngineId;
 }
 
 export interface CreateDateCalendarOptions extends BaseCreateCalendarOptions {
@@ -73,7 +78,8 @@ export function createCalendar(options: CreateDateTimeCalendarOptions): DateTime
 export function createCalendar(options: CreateZonedDateTimeCalendarOptions): ZonedDateTimeCalendar;
 export function createCalendar(options: CreateDateCalendarOptions): DateCalendar;
 export function createCalendar(options: CreateCalendarOptions): Calendar {
-  const engine = getCalendarEngine(options.system);
+  const engineOptions = options.engine === undefined ? undefined : { engine: options.engine };
+  const engine = getCalendarEngine(options.system, engineOptions);
   const precision = options.precision ?? 'date';
 
   const base = {
@@ -88,7 +94,7 @@ export function createCalendar(options: CreateCalendarOptions): Calendar {
       precision: 'datetime',
       today(): CalendarDateTime {
         const now = localNow();
-        const dateFields = fromGregorian(now, options.system);
+        const dateFields = fromGregorian(now, options.system, engineOptions);
         return {
           ...dateFields,
           hour: now.hour,
@@ -112,7 +118,7 @@ export function createCalendar(options: CreateCalendarOptions): Calendar {
       timeZone,
       today(): ZonedCalendarDateTime {
         const zoned = instantToZonedFields(Date.now(), timeZone);
-        const dateFields = fromGregorian(zoned, options.system);
+        const dateFields = fromGregorian(zoned, options.system, engineOptions);
         return {
           ...dateFields,
           hour: zoned.hour,
@@ -132,7 +138,7 @@ export function createCalendar(options: CreateCalendarOptions): Calendar {
     precision: 'date',
     today(): CalendarDate {
       const now = localNow();
-      const dateFields = fromGregorian(now, options.system);
+      const dateFields = fromGregorian(now, options.system, engineOptions);
       return { ...dateFields, system: options.system, precision: 'date' };
     },
   };

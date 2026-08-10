@@ -4,13 +4,8 @@ See [alternatives.md](./alternatives.md) for the vision and the goals. See
 [architecture.md](./architecture.md) for the design behind these decisions.
 This file shows only the status of each phase.
 
-Phases 0-12 and 14-18 are done, and the first releases are published (v0.0.1
-through v0.1.0; see `CHANGELOG.md`). v0.1.0 also shipped the Web Components
-bindings (`packages/web`, `packages/ui-web`), which landed outside the phase
-list. Phase 13 and Phases 19-24 are scheduled but not started. Phases 14-18
-add the features real apps ask for first, so they land before Phase 13.
-What's left after those is listed under "Later, not yet scheduled" below.
-Change an item to `[x]` as it lands.
+Change an item to `[x]` as it lands. See "Later, not yet scheduled" for
+work that has no phase yet.
 
 ## Phase 0: Repo scaffolding and tooling
 
@@ -741,7 +736,7 @@ actually passed CI ever gets baselined.
 
 ## Phase 13: Astronomical conversion engine (`packages/core`)
 
-- [ ] First, the cheap check: add a minimal fake `CalendarEngine`
+- [x] First, the cheap check: add a minimal fake `CalendarEngine`
       implementation (a calendar with a deliberately irregular
       month-length rule), exercised only in `packages/core`'s own test
       suite, confirming the interface has no hidden Jalali/Gregorian-shaped
@@ -749,23 +744,22 @@ actually passed CI ever gets baselined.
       architecture.md's "Calendar systems in scope" for why this replaces
       a full second calendar system as the interface's generalizability
       proof.
-- [ ] Implement the astronomical engine: the true vernal equinox instant at
+- [x] Implement the astronomical engine: the true vernal equinox instant at
       the Tehran meridian, from a validated solar-position algorithm (Jean
       Meeus's _Astronomical Algorithms_' low-precision solar position
       method is the standard, implementable reference for this; a full
       VSOP87 implementation is out of scope for the precision this needs).
       Nowruz (the Jalali new year) is the Gregorian calendar day the
       equinox instant falls on, at that meridian.
-- [ ] Expose it as an opt-in `CalendarEngine`, alongside the existing
+- [x] Expose it as an opt-in `CalendarEngine`, alongside the existing
       arithmetic default, with no change to the rest of the public API:
-      `createCalendar({ system: 'jalali', engine: 'astronomical' })` (exact
-      option shape TBD at implementation time).
-- [ ] Add tests: agreement with the arithmetic engine across the range
+      `createCalendar({ system: 'jalali', engine: 'astronomical' })`.
+- [x] Add tests: agreement with the arithmetic engine across the range
       where they should already agree (the range the arithmetic rule is
       already validated against, per Phase 1), and explicit checks at the
       edges where they might diverge (far future/past years), against
       published astronomical reference data, not only against each other.
-- [ ] Document the tradeoff (slower, needs real solar-position math, only
+- [x] Document the tradeoff (slower, needs real solar-position math, only
       matters for correctness many centuries out) and when to reach for
       it, in architecture.md and the docs site's core-concepts guide.
 
