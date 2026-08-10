@@ -82,9 +82,7 @@ for (const dir of readdirSync(packagesDir, { withFileTypes: true })) {
   }
 
   if (!/^## (API|Components|Functions|Elements)\b/m.test(readme)) {
-    console.error(
-      `${pkg.name}: missing ## API, ## Components, ## Functions, or ## Elements`,
-    );
+    console.error(`${pkg.name}: missing ## API, ## Components, ## Functions, or ## Elements`);
     failed = true;
   }
 }

@@ -31,9 +31,7 @@ const hasVersionHeading = new RegExp(`^## \\[${escapeRegExp(next)}\\](?:\\s|$)`,
 const unreleased = readUnreleased(changelog);
 
 if (!hasVersionHeading && !unreleased.hasBullets) {
-  console.error(
-    `CHANGELOG.md has no entry for ${next}. Put release notes under ## [Unreleased].`,
-  );
+  console.error(`CHANGELOG.md has no entry for ${next}. Put release notes under ## [Unreleased].`);
   process.exit(1);
 }
 
@@ -50,17 +48,9 @@ if (hasVersionHeading) {
 }
 
 const body = unreleased.body.replace(/^\n+/, '').replace(/\n+$/, '');
-const promoted = [
-  '## [Unreleased]',
-  '',
-  `## [${next}] - ${today}`,
-  '',
-  body,
-  '',
-].join('\n');
+const promoted = ['## [Unreleased]', '', `## [${next}] - ${today}`, '', body, ''].join('\n');
 
-changelog =
-  changelog.slice(0, unreleased.start) + promoted + changelog.slice(unreleased.end);
+changelog = changelog.slice(0, unreleased.start) + promoted + changelog.slice(unreleased.end);
 
 changelog = updateFooterLinks(changelog, current, next);
 

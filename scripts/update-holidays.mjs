@@ -50,7 +50,10 @@ const TITLE_RULES = [
   { id: 'mabas', match: /mab'?ath|mabas/i },
   { id: 'birth-imam-mahdi', match: /mahdi|ghaem|qa'?im/i },
   { id: 'martyrdom-imam-ali', match: /martyrdom of imam ali/i },
-  { id: 'martyrdom-imam-sadegh', match: /martyrdom of imam ja'?far|martyrdom.*sadiq|martyrdom.*sadegh/i },
+  {
+    id: 'martyrdom-imam-sadegh',
+    match: /martyrdom of imam ja'?far|martyrdom.*sadiq|martyrdom.*sadegh/i,
+  },
 ];
 
 /** @param {LunarEntry} a @param {LunarEntry} b */
@@ -220,7 +223,7 @@ async function writeIfChanged(filePath, next, label) {
   try {
     previous = await readFile(filePath, 'utf8');
   } catch {
-    previous = null;
+    // Missing file: write below.
   }
   if (previous === next) {
     console.log(`Unchanged ${label}`);
