@@ -55,6 +55,7 @@
     "build": "tsup"
   },
   "dependencies": {
+    "@jalali-js/holidays": "workspace:*",
     "@jalali-js/i18n": "workspace:*",
     "@jalali-js/web": "workspace:*",
     "jalali-js": "workspace:*"

@@ -231,6 +231,15 @@ button[data-jalali-calendar-title-year]:hover {
   background: none;
 }
 
+[data-jalali-calendar-day][data-holiday] {
+  color: var(--jalali-holiday-fg, #b91c1c);
+  font-weight: 600;
+}
+
+[data-jalali-calendar-day][data-holiday][data-selected] {
+  color: var(--jalali-primary-fg);
+}
+
 [data-jalali-calendar-day][data-today] {
   font-weight: 600;
   box-shadow: inset 0 0 0 1px var(--jalali-primary);

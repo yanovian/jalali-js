@@ -1,3 +1,4 @@
+import { isHolidayRegion, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
 import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
@@ -28,19 +29,32 @@ export interface CalendarSelectEventDetail {
  * year moves to the month grid; picking a month moves to the day grid.
  *
  * Attributes: `system` ('jalali' | 'gregorian'), `locale` ('en' | 'fa' | 'ps'), `quick-nav` (set to
- * "false" to turn off). `value`, `initial-displayed-month`, and `rules` are properties only,
+ * "false" to turn off), `show-holidays`, `block-holidays`, `holiday-region` (`IR` today; `AF`
+ * and `TJ` are planned). `value`, `initial-displayed-month`, and `rules` are properties only,
  * since none of them is representable as a plain HTML attribute string. Listen for `select`.
  *
  * Days blocked by `rules` render as disabled buttons with a `data-disabled` attribute: clicks
- * do nothing and the Tab order skips them.
+ * do nothing and the Tab order skips them. With `show-holidays`, holiday days get
+ * `data-holiday`. With `block-holidays`, those days also become unselectable. The default
+ * holiday list is Iran (`holiday-region="IR"`).
  */
 export class JalaliCalendarElement extends HTMLElement {
-  static observedAttributes = ['system', 'locale', 'quick-nav'];
+  static observedAttributes = [
+    'system',
+    'locale',
+    'quick-nav',
+    'show-holidays',
+    'block-holidays',
+    'holiday-region',
+  ];
 
   #system: CalendarSystem = 'jalali';
   #locale: LocaleCode = 'en';
   #value: CalendarDate | null = null;
   #rules: SelectionRules | undefined;
+  #showHolidays = false;
+  #blockHolidays = false;
+  #holidayRegion: HolidayRegion = 'IR';
   #initialDisplayedMonth: { year: number; month: number } | undefined;
   #quickNav = true;
   #displayed: { year: number; month: number } | undefined;
@@ -89,6 +103,30 @@ export class JalaliCalendarElement extends HTMLElement {
     this.render();
   }
 
+  get showHolidays(): boolean {
+    return this.#showHolidays;
+  }
+  set showHolidays(value: boolean) {
+    this.#showHolidays = value;
+    this.render();
+  }
+
+  get blockHolidays(): boolean {
+    return this.#blockHolidays;
+  }
+  set blockHolidays(value: boolean) {
+    this.#blockHolidays = value;
+    this.render();
+  }
+
+  get holidayRegion(): HolidayRegion {
+    return this.#holidayRegion;
+  }
+  set holidayRegion(value: HolidayRegion) {
+    this.#holidayRegion = value;
+    this.render();
+  }
+
   get initialDisplayedMonth(): { year: number; month: number } | undefined {
     return this.#initialDisplayedMonth;
   }
@@ -108,6 +146,11 @@ export class JalaliCalendarElement extends HTMLElement {
     if (name === 'system') this.#system = value === 'gregorian' ? 'gregorian' : 'jalali';
     else if (name === 'locale') this.#locale = parseLocaleAttribute(value);
     else if (name === 'quick-nav') this.#quickNav = value !== 'false';
+    else if (name === 'show-holidays') this.#showHolidays = value !== null && value !== 'false';
+    else if (name === 'block-holidays') this.#blockHolidays = value !== null && value !== 'false';
+    else if (name === 'holiday-region' && value && isHolidayRegion(value)) {
+      this.#holidayRegion = value;
+    }
     if (this.#connected) this.render();
   }
 
@@ -217,13 +260,20 @@ export class JalaliCalendarElement extends HTMLElement {
   ): DocumentFragment {
     const monthLabel = localePack.monthNames[this.#system].long[displayed.month - 1]!;
     const yearLabel = formatNumber(displayed.year, localePack.defaultNumerals, localePack.digits);
+    const holidayOptions = resolveCalendarHolidays(this.#system, displayed.year, displayed.month, {
+      showHolidays: this.#showHolidays,
+      blockHolidays: this.#blockHolidays,
+      region: this.#holidayRegion,
+      rules: this.#rules,
+    });
     const weeks = buildCalendarGrid(
       this.#system,
       displayed.year,
       displayed.month,
       today,
       this.#value,
-      this.#rules,
+      holidayOptions.rules,
+      holidayOptions.isHolidayDay,
     );
 
     const previousBtn = el(
@@ -284,6 +334,7 @@ export class JalaliCalendarElement extends HTMLElement {
               'data-today': cell.isToday,
               'data-outside-month': !cell.isCurrentMonth,
               'data-disabled': !cell.isSelectable,
+              'data-holiday': cell.isHoliday,
               disabled: !cell.isSelectable,
               'aria-selected': cell.isSelected ? 'true' : 'false',
               'aria-current': cell.isToday ? 'date' : undefined,

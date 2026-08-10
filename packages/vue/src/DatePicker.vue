@@ -13,6 +13,7 @@
  * since inverting every `valueFormat` back to a calendar value is out of scope here; use
  * `defaultDate` to seed the initial selection instead.
  */
+import type { HolidayRegion } from '@jalali-js/holidays';
 import type { FormatOptions, LocalePack } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type {
@@ -55,6 +56,12 @@ const props = withDefaults(
     variant?: 'grid' | 'dropdown';
     /** Limits on what a person can select. Grid variant only; see `Calendar`'s `rules`. */
     rules?: SelectionRules | undefined;
+    /** Mark official holidays with `data-holiday`. Grid variant, Jalali only. Default: Iran. */
+    showHolidays?: boolean;
+    /** Also block holiday days. Grid variant, Jalali only. */
+    blockHolidays?: boolean;
+    /** Whose official holiday list to use. Default: `'IR'` (Iran). */
+    holidayRegion?: HolidayRegion;
     placeholder?: string;
   }>(),
   {
@@ -64,6 +71,9 @@ const props = withDefaults(
     minuteStep: 1,
     valueFormat: 'gregorian-iso',
     variant: 'grid',
+    showHolidays: false,
+    blockHolidays: false,
+    holidayRegion: 'IR',
   },
 );
 
@@ -212,6 +222,9 @@ onBeforeUnmount(() => {
         :value="calendarValue"
         :quick-nav="quickNav"
         :rules="rules"
+        :show-holidays="showHolidays"
+        :block-holidays="blockHolidays"
+        :holiday-region="holidayRegion"
         @select="selectDay"
       />
       <TimePicker

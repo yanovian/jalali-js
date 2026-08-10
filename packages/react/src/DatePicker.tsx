@@ -1,3 +1,4 @@
+import type { HolidayRegion } from '@jalali-js/holidays';
 import type { FormatOptions, LocalePack } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type {
@@ -58,6 +59,12 @@ export interface DatePickerProps {
   variant?: 'grid' | 'dropdown';
   /** Limits on what a person can select. Grid variant only; see `CalendarProps.rules`. */
   rules?: SelectionRules | undefined;
+  /** Mark official holidays with `data-holiday`. Grid variant, Jalali only. Default region: Iran. */
+  showHolidays?: boolean;
+  /** Also block holiday days. Grid variant, Jalali only. */
+  blockHolidays?: boolean;
+  /** Whose official holiday list to use. Default: `'IR'` (Iran). */
+  holidayRegion?: HolidayRegion;
   placeholder?: string;
   className?: string;
 }
@@ -102,6 +109,9 @@ export function DatePicker({
   displayFormat,
   variant = 'grid',
   rules,
+  showHolidays = false,
+  blockHolidays = false,
+  holidayRegion = 'IR',
   placeholder,
   className,
 }: DatePickerProps) {
@@ -219,6 +229,9 @@ export function DatePicker({
             }
             quickNav={quickNav}
             rules={rules}
+            showHolidays={showHolidays}
+            blockHolidays={blockHolidays}
+            holidayRegion={holidayRegion}
             onSelect={selectDay}
           />
           {precision === 'datetime' && (

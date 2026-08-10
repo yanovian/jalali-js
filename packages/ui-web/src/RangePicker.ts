@@ -1,3 +1,4 @@
+import { isHolidayRegion, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import { localePackFor, parseLocaleAttribute, type LocaleCode } from '@jalali-js/web';
@@ -44,15 +45,25 @@ export interface RangePickerChangeEventDetail {
  * an end earlier than the current start restarts the range from there instead). A light hover
  * preview shows the range that would result from completing it at the hovered day.
  *
- * Attributes: `system`, `locale`, `value-format`, `placeholder`. `.defaultRange` and `.rules`
- * are properties only. Listen for `change`.
+ * Attributes: `system`, `locale`, `value-format`, `placeholder`, `show-holidays`,
+ * `block-holidays`, `holiday-region` (`IR` today; `AF` and `TJ` are planned).
+ * `.defaultRange` and `.rules` are properties only. Listen for `change`. Default
+ * holiday list is Iran (`holiday-region="IR"`).
  *
  * With `.rules`, blocked days render disabled, and a candidate range that crosses a blocked
  * day does not complete: the second click starts a new range instead (see
  * `isRangeSelectable()` in `jalali-js`).
  */
 export class JalaliRangePickerElement extends HTMLElement {
-  static observedAttributes = ['system', 'locale', 'value-format', 'placeholder'];
+  static observedAttributes = [
+    'system',
+    'locale',
+    'value-format',
+    'placeholder',
+    'show-holidays',
+    'block-holidays',
+    'holiday-region',
+  ];
 
   #system: CalendarSystem = 'jalali';
   #locale: LocaleCode = 'en';
@@ -61,6 +72,9 @@ export class JalaliRangePickerElement extends HTMLElement {
   #placeholder: string | undefined;
   #defaultRange: DateRange | undefined;
   #rules: SelectionRules | undefined;
+  #showHolidays = false;
+  #blockHolidays = false;
+  #holidayRegion: HolidayRegion = 'IR';
   #start: CalendarDate | null = null;
   #end: CalendarDate | null = null;
   #hoverDate: CalendarDate | null = null;
@@ -137,6 +151,30 @@ export class JalaliRangePickerElement extends HTMLElement {
     this.render();
   }
 
+  get showHolidays(): boolean {
+    return this.#showHolidays;
+  }
+  set showHolidays(value: boolean) {
+    this.#showHolidays = value;
+    this.render();
+  }
+
+  get blockHolidays(): boolean {
+    return this.#blockHolidays;
+  }
+  set blockHolidays(value: boolean) {
+    this.#blockHolidays = value;
+    this.render();
+  }
+
+  get holidayRegion(): HolidayRegion {
+    return this.#holidayRegion;
+  }
+  set holidayRegion(value: HolidayRegion) {
+    this.#holidayRegion = value;
+    this.render();
+  }
+
   connectedCallback(): void {
     this.#connected = true;
     this.setAttribute('data-jalali-datepicker-root', '');
@@ -153,6 +191,11 @@ export class JalaliRangePickerElement extends HTMLElement {
     else if (name === 'locale') this.#locale = parseLocaleAttribute(value);
     else if (name === 'value-format' && value) this.#valueFormat = value as ValueFormat;
     else if (name === 'placeholder') this.#placeholder = value ?? undefined;
+    else if (name === 'show-holidays') this.#showHolidays = value !== null && value !== 'false';
+    else if (name === 'block-holidays') this.#blockHolidays = value !== null && value !== 'false';
+    else if (name === 'holiday-region' && value && isHolidayRegion(value)) {
+      this.#holidayRegion = value;
+    }
     if (this.#connected) this.render();
   }
 
@@ -182,11 +225,18 @@ export class JalaliRangePickerElement extends HTMLElement {
   }
 
   #selectDay(date: CalendarDate): void {
+    const displayed = this.#ensureDisplayed();
+    const { rules } = resolveCalendarHolidays(this.#system, displayed.year, displayed.month, {
+      showHolidays: this.#showHolidays,
+      blockHolidays: this.#blockHolidays,
+      region: this.#holidayRegion,
+      rules: this.#rules,
+    });
     if (
       !this.#start ||
       this.#end ||
       compareDates(date, this.#start) < 0 ||
-      !isRangeSelectable(this.#start, date, this.#rules)
+      !isRangeSelectable(this.#start, date, rules)
     ) {
       this.#start = date;
       this.#end = null;
@@ -263,13 +313,20 @@ export class JalaliRangePickerElement extends HTMLElement {
     today: CalendarDate,
     displayed: { year: number; month: number },
   ): HTMLElement {
+    const holidayOptions = resolveCalendarHolidays(this.#system, displayed.year, displayed.month, {
+      showHolidays: this.#showHolidays,
+      blockHolidays: this.#blockHolidays,
+      region: this.#holidayRegion,
+      rules: this.#rules,
+    });
     const weeks = buildCalendarGrid(
       this.#system,
       displayed.year,
       displayed.month,
       today,
       null,
-      this.#rules,
+      holidayOptions.rules,
+      holidayOptions.isHolidayDay,
     );
     const monthLabel = localePack.monthNames[this.#system].long[displayed.month - 1]!;
     const yearLabel = formatNumber(displayed.year, localePack.defaultNumerals, localePack.digits);
@@ -345,6 +402,7 @@ export class JalaliRangePickerElement extends HTMLElement {
           day.setAttribute('data-disabled', '');
           day.disabled = true;
         }
+        if (cell.isHoliday) day.setAttribute('data-holiday', '');
         if (isRangeStart) day.setAttribute('data-range-start', '');
         if (isRangeEnd) day.setAttribute('data-range-end', '');
         if (isInRange) day.setAttribute('data-in-range', '');

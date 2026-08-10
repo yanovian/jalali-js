@@ -1,3 +1,4 @@
+import { isHolidayRegion, type HolidayRegion } from '@jalali-js/holidays';
 import type { LocalePack } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type {
@@ -48,8 +49,9 @@ function asDateOnly(date: CalendarDate | CalendarDateTime): CalendarDate {
  * sits under the grid. Import `@jalali-js/web/date-picker.css` for its default appearance.
  *
  * Attributes: `system`, `locale`, `variant`, `precision` ('date' | 'datetime'), `minute-step`,
- * `disabled-hours` (comma-separated), `value-format`, `placeholder`, `quick-nav`. `.rules` and
- * `.defaultDate` are properties only.
+ * `disabled-hours` (comma-separated), `value-format`, `placeholder`, `quick-nav`,
+ * `show-holidays`, `block-holidays`, `holiday-region` (`IR` today; `AF` and `TJ` are
+ * planned). `.rules` and `.defaultDate` are properties only. Default holiday list is Iran.
  */
 export class JalaliDatePickerElement extends HTMLElement {
   static observedAttributes = [
@@ -62,6 +64,9 @@ export class JalaliDatePickerElement extends HTMLElement {
     'value-format',
     'placeholder',
     'quick-nav',
+    'show-holidays',
+    'block-holidays',
+    'holiday-region',
   ];
 
   #system: CalendarSystem = 'jalali';
@@ -75,6 +80,9 @@ export class JalaliDatePickerElement extends HTMLElement {
   #quickNav = true;
   #defaultDate: CalendarDate | CalendarDateTime | null | undefined;
   #rules: SelectionRules | undefined;
+  #showHolidays = false;
+  #blockHolidays = false;
+  #holidayRegion: HolidayRegion = 'IR';
   #date: CalendarDate | CalendarDateTime | null = null;
   #dateInitialized = false;
   #open = false;
@@ -177,6 +185,30 @@ export class JalaliDatePickerElement extends HTMLElement {
     this.render();
   }
 
+  get showHolidays(): boolean {
+    return this.#showHolidays;
+  }
+  set showHolidays(value: boolean) {
+    this.#showHolidays = value;
+    this.render();
+  }
+
+  get blockHolidays(): boolean {
+    return this.#blockHolidays;
+  }
+  set blockHolidays(value: boolean) {
+    this.#blockHolidays = value;
+    this.render();
+  }
+
+  get holidayRegion(): HolidayRegion {
+    return this.#holidayRegion;
+  }
+  set holidayRegion(value: HolidayRegion) {
+    this.#holidayRegion = value;
+    this.render();
+  }
+
   /** The current selection, or `null`. Setting it does not emit `change`. */
   get value(): CalendarDate | CalendarDateTime | null {
     this.#ensureDateInitialized();
@@ -217,6 +249,11 @@ export class JalaliDatePickerElement extends HTMLElement {
     } else if (name === 'value-format' && value) this.#valueFormat = value as ValueFormat;
     else if (name === 'placeholder') this.#placeholder = value ?? undefined;
     else if (name === 'quick-nav') this.#quickNav = value !== 'false';
+    else if (name === 'show-holidays') this.#showHolidays = value !== null && value !== 'false';
+    else if (name === 'block-holidays') this.#blockHolidays = value !== null && value !== 'false';
+    else if (name === 'holiday-region' && value && isHolidayRegion(value)) {
+      this.#holidayRegion = value;
+    }
     if (this.#connected) this.render();
   }
 
@@ -324,6 +361,9 @@ export class JalaliDatePickerElement extends HTMLElement {
       calendar.quickNav = this.#quickNav;
       calendar.value = this.#date ? asDateOnly(this.#date) : null;
       calendar.rules = this.#rules;
+      calendar.showHolidays = this.#showHolidays;
+      calendar.blockHolidays = this.#blockHolidays;
+      calendar.holidayRegion = this.#holidayRegion;
       calendar.addEventListener('select', (event) => {
         this.#selectDay((event as CustomEvent<CalendarSelectEventDetail>).detail.date);
       });

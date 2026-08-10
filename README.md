@@ -128,6 +128,7 @@ linked above.
 | `jalali-js`           | The conversion core. Zero runtime dependencies.                   |
 | `@jalali-js/i18n`     | Locale data (`en`, `fa`, `ps`), formatting, and format templates. |
 | `@jalali-js/nlp`      | Natural language date parsing: English, Farsi, and Pashto.        |
+| `@jalali-js/holidays` | Official Iran public holidays (`IR`). Offline, zero runtime deps. |
 | `@jalali-js/react`    | React bindings: `useCalendar`, headless `Calendar`, `DatePicker`. |
 | `@jalali-js/vue`      | The same, for Vue.                                                |
 | `@jalali-js/web`      | The same, as plain Web Components. No framework required.         |

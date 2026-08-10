@@ -1,0 +1,91 @@
+{
+  "year": 1402,
+  "source": "University of Tehran Calendar Centre / official Iran holiday list (via emrooz.app). Martyrdom of Imam Reza is 30 Safar, two Jalali days after Demise of the Prophet.",
+  "entries": [
+    {
+      "month": 1,
+      "day": 23,
+      "id": "martyrdom-imam-ali"
+    },
+    {
+      "month": 2,
+      "day": 2,
+      "id": "eyd-fetr"
+    },
+    {
+      "month": 2,
+      "day": 3,
+      "id": "eyd-fetr-holiday"
+    },
+    {
+      "month": 2,
+      "day": 26,
+      "id": "martyrdom-imam-sadegh"
+    },
+    {
+      "month": 4,
+      "day": 8,
+      "id": "eyd-qorban"
+    },
+    {
+      "month": 4,
+      "day": 16,
+      "id": "eyd-ghadir"
+    },
+    {
+      "month": 5,
+      "day": 5,
+      "id": "tasua"
+    },
+    {
+      "month": 5,
+      "day": 6,
+      "id": "ashura"
+    },
+    {
+      "month": 6,
+      "day": 15,
+      "id": "arbain"
+    },
+    {
+      "month": 6,
+      "day": 23,
+      "id": "demise-prophet"
+    },
+    {
+      "month": 6,
+      "day": 25,
+      "id": "martyrdom-imam-reza"
+    },
+    {
+      "month": 7,
+      "day": 2,
+      "id": "martyrdom-imam-askari"
+    },
+    {
+      "month": 7,
+      "day": 11,
+      "id": "birth-prophet"
+    },
+    {
+      "month": 9,
+      "day": 26,
+      "id": "martyrdom-fatemeh"
+    },
+    {
+      "month": 11,
+      "day": 5,
+      "id": "birth-imam-ali"
+    },
+    {
+      "month": 11,
+      "day": 19,
+      "id": "mabas"
+    },
+    {
+      "month": 12,
+      "day": 6,
+      "id": "birth-imam-mahdi"
+    }
+  ]
+}

@@ -14,6 +14,7 @@ const SECTIONS = [
   { testId: 'datetime-picker', name: 'datetime-picker.png' },
   { testId: 'time-range-picker', name: 'time-range-picker.png' },
   { testId: 'selection-rules', name: 'selection-rules.png' },
+  { testId: 'holidays', name: 'holidays.png' },
   { testId: 'custom-theme', name: 'custom-theme.png' },
 ] as const;
 

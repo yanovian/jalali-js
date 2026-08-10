@@ -58,6 +58,7 @@
     "vue": ">=3.4"
   },
   "dependencies": {
+    "@jalali-js/holidays": "workspace:*",
     "@jalali-js/i18n": "workspace:*",
     "jalali-js": "workspace:*"
   },

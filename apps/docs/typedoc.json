@@ -5,6 +5,7 @@
     "../../packages/core",
     "../../packages/i18n",
     "../../packages/nlp",
+    "../../packages/holidays",
     "../../packages/react",
     "../../packages/ui-react",
     "../../packages/web",

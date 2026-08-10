@@ -1,18 +1,20 @@
 <script setup lang="ts">
 /**
  * A headless month grid: it renders plain markup with data attributes (`data-selected`,
- * `data-today`, `data-outside-month`, `data-disabled`) and no required CSS, so a consumer can
- * restyle it completely. A `day` scoped slot lets a consumer replace the cell markup outright
- * while keeping the grid and header structure. `DatePicker` is this same component with a
- * default stylesheet and a popover wrapped around it.
+ * `data-today`, `data-outside-month`, `data-disabled`, `data-holiday`) and no required CSS, so a
+ * consumer can restyle it completely. A `day` scoped slot lets a consumer replace the cell
+ * markup outright while keeping the grid and header structure. `DatePicker` is this same
+ * component with a default stylesheet and a popover wrapped around it.
  *
  * Days blocked by `rules` render as disabled buttons: clicks do nothing and the Tab order
- * skips them, so keyboard navigation skips blocked days.
+ * skips them, so keyboard navigation skips blocked days. With `showHolidays`, holiday days
+ * get `data-holiday`. With `blockHolidays`, those days also become unselectable.
  *
  * With `quickNav` (default on), clicking the month or year in the header opens a month grid or
  * a year grid, so a person can jump years ahead without paging one month at a time. Picking a
  * year moves to the month grid; picking a month moves to the day grid.
  */
+import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarGridDay, CalendarSystem, SelectionRules } from 'jalali-js';
 import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
@@ -37,12 +39,21 @@ const props = withDefaults(
     /** Limits on what a person can select (see `isDateSelectable()` in `jalali-js`). Blocked
      * days render disabled, with a `data-disabled` attribute, and reject selection. */
     rules?: SelectionRules | undefined;
+    /** Mark official holidays with a `data-holiday` attribute. Jalali system only. Default: Iran. */
+    showHolidays?: boolean;
+    /** Also block holiday days through selection rules. Jalali system only. */
+    blockHolidays?: boolean;
+    /** Whose official holiday list to use. Default: `'IR'` (Iran). */
+    holidayRegion?: HolidayRegion;
   }>(),
   {
     system: 'jalali',
     locale: 'en',
     value: null,
     quickNav: true,
+    showHolidays: false,
+    blockHolidays: false,
+    holidayRegion: 'IR',
   },
 );
 
@@ -59,6 +70,15 @@ const displayed = ref(
 const view = ref<'day' | 'month' | 'year'>('day');
 const yearPage = ref(yearPageStart(displayed.value.year));
 
+const holidayOptions = computed(() =>
+  resolveCalendarHolidays(props.system, displayed.value.year, displayed.value.month, {
+    showHolidays: props.showHolidays,
+    blockHolidays: props.blockHolidays,
+    region: props.holidayRegion,
+    rules: props.rules,
+  }),
+);
+
 const weeks = computed<CalendarGridDay[][]>(() =>
   buildCalendarGrid(
     props.system,
@@ -66,7 +86,8 @@ const weeks = computed<CalendarGridDay[][]>(() =>
     displayed.value.month,
     today.value,
     props.value,
-    props.rules,
+    holidayOptions.value.rules,
+    holidayOptions.value.isHolidayDay,
   ),
 );
 
@@ -229,6 +250,7 @@ function dayNumber(cell: CalendarGridDay): string {
               :data-today="cell.isToday ? '' : undefined"
               :data-outside-month="cell.isCurrentMonth ? undefined : ''"
               :data-disabled="cell.isSelectable ? undefined : ''"
+              :data-holiday="cell.isHoliday ? '' : undefined"
               :disabled="!cell.isSelectable"
               :aria-selected="cell.isSelected"
               :aria-current="cell.isToday ? 'date' : undefined"

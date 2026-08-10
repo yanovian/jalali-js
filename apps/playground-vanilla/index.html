@@ -140,6 +140,21 @@
         ></jalali-inline-calendar>
       </section>
 
+      <section data-testid="holidays">
+        <h2>Official holidays (showHolidays)</h2>
+        <p>
+          Farvardin 1403 with <code>show-holidays</code>. Official holidays render with
+          <code>data-holiday</code>. Nowruz, Jomhoori Eslami, Sizdah Bedar, and Eyd-e Fetr all fall
+          in this month.
+        </p>
+        <jalali-inline-calendar
+          id="holidays-calendar"
+          system="jalali"
+          show-holidays
+          class="locale-follows"
+        ></jalali-inline-calendar>
+      </section>
+
       <section data-testid="custom-theme">
         <h2>Custom CSS override (consumer-configured, not a shipped theme file)</h2>
         <p>

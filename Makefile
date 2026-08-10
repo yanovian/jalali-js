@@ -2,7 +2,7 @@
 	lint lint-fix format format-check test test-watch test-e2e test-e2e-project \
 	install-playwright check clean probe-treeshake size tag-release release-patch \
 	release-minor release-major publish-packages app-typecheck app-build app-build-at-base \
-	test-paths docs-dev docs-build docs-preview embed-playgrounds
+	test-paths docs-dev docs-build docs-preview embed-playgrounds update-holidays
 
 PNPM ?= pnpm
 
@@ -86,6 +86,9 @@ check: typecheck lint format-check test build size ## CI-equivalent: typecheck, 
 probe-treeshake: ## Confirm packages/core's built output actually tree-shakes
 	$(PNPM) --filter jalali-js build
 	$(PNPM) probe:treeshake
+
+update-holidays: ## Rebuild regions/ir/lunar-table.ts from data/ir/lunar/*.json
+	node scripts/update-holidays.mjs
 
 size: ## Check packages/core's bundle-size budget (size-limit)
 	$(PNPM) --filter jalali-js build

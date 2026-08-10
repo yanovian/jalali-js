@@ -116,3 +116,8 @@ rulesCalendar.rules = {
   disabledDates: [{ year: 1403, month: 5, day: 12 }],
   disabledWeekdays: [4, 5],
 };
+
+const holidaysCalendar = document.getElementById(
+  'holidays-calendar',
+) as JalaliInlineCalendarElement;
+holidaysCalendar.initialDisplayedMonth = { year: 1403, month: 1 };

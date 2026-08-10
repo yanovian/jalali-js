@@ -19,6 +19,7 @@
  * day does not complete: the second click starts a new range instead (see
  * `isRangeSelectable()` in `jalali-js`).
  */
+import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type {
@@ -60,12 +61,21 @@ const props = withDefaults(
     /** Limits on what a person can select. Blocked days render disabled; a range that
      * crosses a blocked day does not complete. */
     rules?: SelectionRules | undefined;
+    /** Mark official holidays with `data-holiday`. Jalali system only. Default: Iran. */
+    showHolidays?: boolean;
+    /** Also block holiday days through selection rules. Jalali system only. */
+    blockHolidays?: boolean;
+    /** Whose official holiday list to use. Default: `'IR'` (Iran). */
+    holidayRegion?: HolidayRegion;
     placeholder?: string;
   }>(),
   {
     system: 'jalali',
     locale: 'en',
     valueFormat: 'gregorian-iso',
+    showHolidays: false,
+    blockHolidays: false,
+    holidayRegion: 'IR',
   },
 );
 
@@ -85,6 +95,15 @@ const open = ref(false);
 const rootRef = ref<HTMLElement | null>(null);
 const popoverId = useId();
 
+const holidayOptions = computed(() =>
+  resolveCalendarHolidays(props.system, displayed.value.year, displayed.value.month, {
+    showHolidays: props.showHolidays,
+    blockHolidays: props.blockHolidays,
+    region: props.holidayRegion,
+    rules: props.rules,
+  }),
+);
+
 const weeks = computed(() =>
   buildCalendarGrid(
     props.system,
@@ -92,7 +111,8 @@ const weeks = computed(() =>
     displayed.value.month,
     today.value,
     null,
-    props.rules,
+    holidayOptions.value.rules,
+    holidayOptions.value.isHolidayDay,
   ),
 );
 
@@ -124,7 +144,7 @@ function selectDay(date: CalendarDate): void {
     !start.value ||
     end.value ||
     compareDates(date, start.value) < 0 ||
-    !isRangeSelectable(start.value, date, props.rules)
+    !isRangeSelectable(start.value, date, holidayOptions.value.rules)
   ) {
     start.value = date;
     end.value = null;
@@ -250,6 +270,7 @@ onBeforeUnmount(() => {
                   : undefined
               "
               :data-disabled="cell.isSelectable ? undefined : ''"
+              :data-holiday="cell.isHoliday ? '' : undefined"
               :disabled="!cell.isSelectable"
               :aria-current="cell.isToday ? 'date' : undefined"
               :aria-label="dayLabel(cell.date)"

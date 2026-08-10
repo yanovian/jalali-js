@@ -1,0 +1,52 @@
+{
+  "name": "@jalali-js/holidays",
+  "version": "0.1.0",
+  "description": "Official Iran (IR) public holiday data for jalali-js: fixed Jalali rules, lunar year tables, and picker helpers. Offline, zero runtime dependencies. AF and TJ reserved.",
+  "keywords": [
+    "jalali",
+    "persian",
+    "farsi",
+    "holidays",
+    "iran",
+    "calendar",
+    "date"
+  ],
+  "homepage": "https://jalali-js.yanovian.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanovian/jalali-js.git",
+    "directory": "packages/holidays"
+  },
+  "type": "module",
+  "license": "MIT",
+  "author": "Yanovian LLC",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "types": "./src/index.ts",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "types": "./dist/index.d.ts",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsup"
+  }
+}

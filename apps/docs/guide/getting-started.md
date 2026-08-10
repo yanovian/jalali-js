@@ -21,9 +21,10 @@ dependency of its own. `@jalali-js/react`, `@jalali-js/vue`, and `@jalali-js/web
 it. `@jalali-js/web` needs no framework at all: it is plain Web Components, usable from plain
 HTML/JS or dropped into any framework the same way any other HTML element is (see
 [Vanilla / Web Components](/guide/web-components)). `@jalali-js/i18n` (locale data and
-formatting) and `@jalali-js/nlp` (natural language date parsing) are separate packages you
-install only if you need them directly; every binding already depends on `@jalali-js/i18n`
-itself.
+formatting), `@jalali-js/nlp` (natural language date parsing), and `@jalali-js/holidays`
+(official Iran public holidays today) are separate packages you install only if you need them
+directly. Every binding already depends on `@jalali-js/i18n` itself, and the pickers can mark
+Iran holidays through `showHolidays` (see [Holidays](/guide/holidays)).
 
 ## Convert a date
 

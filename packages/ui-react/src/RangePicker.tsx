@@ -1,3 +1,4 @@
+import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { LocaleCode } from '@jalali-js/react';
@@ -51,6 +52,12 @@ export interface RangePickerProps {
    * does not complete: the click starts a new range at the clicked day instead.
    */
   rules?: SelectionRules | undefined;
+  /** Mark official holidays with `data-holiday`. Jalali system only. Default: Iran. */
+  showHolidays?: boolean;
+  /** Also block holiday days through selection rules. Jalali system only. */
+  blockHolidays?: boolean;
+  /** Whose official holiday list to use. Default: `'IR'` (Iran). */
+  holidayRegion?: HolidayRegion;
   placeholder?: string;
   className?: string;
 }
@@ -92,6 +99,9 @@ export function RangePicker({
   valueFormat = 'gregorian-iso',
   displayFormat,
   rules,
+  showHolidays = false,
+  blockHolidays = false,
+  holidayRegion = 'IR',
   placeholder,
   className,
 }: RangePickerProps) {
@@ -124,13 +134,38 @@ export function RangePicker({
     };
   }, [open]);
 
+  const holidayOptions = useMemo(
+    () =>
+      resolveCalendarHolidays(system, displayed.year, displayed.month, {
+        showHolidays,
+        blockHolidays,
+        region: holidayRegion,
+        rules,
+      }),
+    [system, displayed.year, displayed.month, showHolidays, blockHolidays, holidayRegion, rules],
+  );
+
   const weeks = useMemo(
-    () => buildCalendarGrid(system, displayed.year, displayed.month, today, null, rules),
-    [system, displayed.year, displayed.month, today, rules],
+    () =>
+      buildCalendarGrid(
+        system,
+        displayed.year,
+        displayed.month,
+        today,
+        null,
+        holidayOptions.rules,
+        holidayOptions.isHolidayDay,
+      ),
+    [system, displayed.year, displayed.month, today, holidayOptions],
   );
 
   function selectDay(date: CalendarDate): void {
-    if (!start || end || compareDates(date, start) < 0 || !isRangeSelectable(start, date, rules)) {
+    if (
+      !start ||
+      end ||
+      compareDates(date, start) < 0 ||
+      !isRangeSelectable(start, date, holidayOptions.rules)
+    ) {
       setStart(date);
       setEnd(null);
       return;
@@ -224,6 +259,7 @@ export function RangePicker({
                         data-range-end={isRangeEnd ? '' : undefined}
                         data-in-range={isInRange ? '' : undefined}
                         data-disabled={cell.isSelectable ? undefined : ''}
+                        data-holiday={cell.isHoliday ? '' : undefined}
                         disabled={!cell.isSelectable}
                         aria-current={cell.isToday ? 'date' : undefined}
                         aria-label={formatDate(cell.date, localePack, { style: 'long' })}

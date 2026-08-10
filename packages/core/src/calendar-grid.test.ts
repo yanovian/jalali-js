@@ -97,6 +97,30 @@ describe('buildCalendarGrid', () => {
     const weeks = buildCalendarGrid(system, 1403, 5, today(system), null);
     expect(weeks.flat().some((cell) => cell.isSelected)).toBe(false);
   });
+
+  it('marks holiday cells from isHolidayDay, and leaves others false', () => {
+    const system = 'jalali';
+    const weeks = buildCalendarGrid(
+      system,
+      1403,
+      1,
+      today(system),
+      null,
+      undefined,
+      (date) => date.day === 1 || date.day === 12,
+    );
+    const holidayDays = weeks
+      .flat()
+      .filter((cell) => cell.isHoliday && cell.isCurrentMonth)
+      .map((cell) => cell.date.day)
+      .sort((a, b) => a - b);
+    expect(holidayDays).toEqual([1, 12]);
+    expect(
+      weeks
+        .flat()
+        .every((cell) => cell.isHoliday === (cell.date.day === 1 || cell.date.day === 12)),
+    ).toBe(true);
+  });
 });
 
 describe('nextMonth / previousMonth', () => {

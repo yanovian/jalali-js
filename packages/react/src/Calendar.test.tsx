@@ -188,4 +188,48 @@ describe('Calendar', () => {
       expect(screen.getByRole('gridcell', { name: '9 Mordad 1403' })).toBeEnabled();
     });
   });
+
+  describe('holidays', () => {
+    it('marks official holidays with data-holiday when showHolidays is on', () => {
+      render(
+        <Calendar
+          system="jalali"
+          locale="en"
+          initialDisplayedMonth={{ year: 1403, month: 1 }}
+          showHolidays
+        />,
+      );
+      const nowruz = screen.getByRole('gridcell', { name: '1 Farvardin 1403' });
+      expect(nowruz).toHaveAttribute('data-holiday');
+      expect(nowruz).toBeEnabled();
+      expect(screen.getByRole('gridcell', { name: '5 Farvardin 1403' })).not.toHaveAttribute(
+        'data-holiday',
+      );
+    });
+
+    it('blocks holidays when blockHolidays is on', async () => {
+      const user = userEvent.setup({ delay: null });
+      const onSelect = vi.fn();
+      render(
+        <Calendar
+          system="jalali"
+          locale="en"
+          initialDisplayedMonth={{ year: 1403, month: 1 }}
+          showHolidays
+          blockHolidays
+          onSelect={onSelect}
+        />,
+      );
+      const nowruz = screen.getByRole('gridcell', { name: '1 Farvardin 1403' });
+      expect(nowruz).toBeDisabled();
+      expect(nowruz).toHaveAttribute('data-disabled');
+      await user.click(nowruz);
+      expect(onSelect).not.toHaveBeenCalled();
+
+      const openDay = screen.getByRole('gridcell', { name: '5 Farvardin 1403' });
+      expect(openDay).toBeEnabled();
+      await user.click(openDay);
+      expect(onSelect).toHaveBeenCalledTimes(1);
+    });
+  });
 });

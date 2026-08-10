@@ -1,3 +1,4 @@
+import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
 import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
@@ -28,6 +29,21 @@ export interface CalendarProps {
    * days render disabled, with a `data-disabled` attribute, and reject selection.
    */
   rules?: SelectionRules | undefined;
+  /**
+   * Mark official holidays with a `data-holiday` attribute. Jalali system only.
+   * Uses `@jalali-js/holidays`. Default list is Iran (`holidayRegion: 'IR'`).
+   */
+  showHolidays?: boolean;
+  /**
+   * Also block holiday days through Phase 16 selection rules. Jalali system only.
+   * Uses `@jalali-js/holidays`.
+   */
+  blockHolidays?: boolean;
+  /**
+   * Whose official holiday list to use. Default: `'IR'` (Iran). Afghanistan and
+   * Tajikistan are planned region codes; they are not shipped yet.
+   */
+  holidayRegion?: HolidayRegion;
   className?: string;
 }
 
@@ -62,12 +78,13 @@ function TitlePart({
 
 /**
  * A headless month grid: it renders plain markup with data attributes (`data-selected`,
- * `data-today`, `data-outside-month`, `data-disabled`) and no required CSS, so a consumer can
- * restyle it completely. `DatePicker` is this same component with a default stylesheet and a
- * popover wrapped around it.
+ * `data-today`, `data-outside-month`, `data-disabled`, `data-holiday`) and no required CSS, so a
+ * consumer can restyle it completely. `DatePicker` is this same component with a default
+ * stylesheet and a popover wrapped around it.
  *
  * Days blocked by `rules` render as disabled buttons: clicks do nothing and the Tab order
- * skips them, so keyboard navigation skips blocked days.
+ * skips them, so keyboard navigation skips blocked days. With `showHolidays`, holiday days
+ * get `data-holiday`. With `blockHolidays`, those days also become unselectable.
  *
  * With `quickNav` (default on), clicking the month or year in the header opens a month grid or
  * a year grid, so a person can jump years ahead without paging one month at a time. Picking a
@@ -81,6 +98,9 @@ export function Calendar({
   initialDisplayedMonth,
   quickNav = true,
   rules,
+  showHolidays = false,
+  blockHolidays = false,
+  holidayRegion = 'IR',
   className,
 }: CalendarProps) {
   const localePack = useMemo(() => localePackFor(locale), [locale]);
@@ -93,9 +113,29 @@ export function Calendar({
   const [view, setView] = useState<CalendarView>('day');
   const [yearPage, setYearPage] = useState(() => yearPageStart(displayed.year));
 
+  const holidayOptions = useMemo(
+    () =>
+      resolveCalendarHolidays(system, displayed.year, displayed.month, {
+        showHolidays,
+        blockHolidays,
+        region: holidayRegion,
+        rules,
+      }),
+    [system, displayed.year, displayed.month, showHolidays, blockHolidays, holidayRegion, rules],
+  );
+
   const weeks = useMemo(
-    () => buildCalendarGrid(system, displayed.year, displayed.month, today, value, rules),
-    [system, displayed.year, displayed.month, today, value, rules],
+    () =>
+      buildCalendarGrid(
+        system,
+        displayed.year,
+        displayed.month,
+        today,
+        value,
+        holidayOptions.rules,
+        holidayOptions.isHolidayDay,
+      ),
+    [system, displayed.year, displayed.month, today, value, holidayOptions],
   );
 
   const monthLabel = localePack.monthNames[system].long[displayed.month - 1];
@@ -185,6 +225,7 @@ export function Calendar({
                     data-today={cell.isToday ? '' : undefined}
                     data-outside-month={cell.isCurrentMonth ? undefined : ''}
                     data-disabled={cell.isSelectable ? undefined : ''}
+                    data-holiday={cell.isHoliday ? '' : undefined}
                     disabled={!cell.isSelectable}
                     aria-selected={cell.isSelected}
                     aria-current={cell.isToday ? 'date' : undefined}

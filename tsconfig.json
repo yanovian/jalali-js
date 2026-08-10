@@ -13,6 +13,7 @@
     { "path": "packages/core" },
     { "path": "packages/i18n" },
     { "path": "packages/nlp" },
+    { "path": "packages/holidays" },
     { "path": "packages/react" },
     { "path": "packages/vue" },
     { "path": "packages/ui-react" },

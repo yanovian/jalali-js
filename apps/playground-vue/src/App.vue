@@ -199,6 +199,24 @@ watchEffect(() => {
       />
     </section>
 
+    <section data-testid="holidays">
+      <h2>Iran official holidays (showHolidays)</h2>
+      <p>
+        Farvardin 1403 with <code>showHolidays</code> and the default
+        <code>holiday-region=&quot;IR&quot;</code>. Iran official holidays render with
+        <code>data-holiday</code>. Nowruz, Jomhoori Eslami, Sizdah Bedar, and Eyd-e Fetr all fall in
+        this month. Afghanistan and Tajikistan may use different lists; those regions are not
+        shipped yet.
+      </p>
+      <InlineCalendar
+        system="jalali"
+        :locale="locale"
+        :initial-displayed-month="{ year: 1403, month: 1 }"
+        show-holidays
+        holiday-region="IR"
+      />
+    </section>
+
     <section data-testid="custom-theme">
       <h2>Custom CSS override (consumer-configured, not a shipped theme file)</h2>
       <p>

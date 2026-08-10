@@ -12,6 +12,12 @@ export interface CalendarGridDay {
   isSelected: boolean;
   /** False when the grid's `SelectionRules` block this day. True without rules. */
   isSelectable: boolean;
+  /**
+   * True when `isHolidayDay` marks this cell. Bindings render a `data-holiday`
+   * attribute from this flag. The predicate itself lives outside core (see
+   * `@jalali-js/holidays`).
+   */
+  isHoliday: boolean;
 }
 
 /**
@@ -20,6 +26,8 @@ export interface CalendarGridDay {
  * week. `today` and `selected` mark the matching cells via `isToday`/`isSelected`, for a
  * consumer to style. `rules` marks blocked cells via `isSelectable` (see
  * `isDateSelectable()`), so every binding gets the same behavior from this one place.
+ * Optional `isHolidayDay` marks holiday cells via `isHoliday` without pulling holiday data
+ * into core.
  *
  * Framework-agnostic on purpose: the `react` and `vue` bindings both need this exact
  * computation, and `core` is the one package both already depend on, so it lives here instead
@@ -32,6 +40,7 @@ export function buildCalendarGrid(
   today: CalendarDate,
   selected: CalendarDate | null,
   rules?: SelectionRules,
+  isHolidayDay?: (date: CalendarDate) => boolean,
 ): CalendarGridDay[][] {
   const engine = getCalendarEngine(system);
   const daysInThisMonth = engine.daysInMonth(year, month);
@@ -53,6 +62,7 @@ export function buildCalendarGrid(
         isToday: isSameDay(date, today),
         isSelected: selected !== null && isSameDay(date, selected),
         isSelectable: isDateSelectable(date, rules),
+        isHoliday: isHolidayDay?.(date) ?? false,
       });
     }
     weeks.push(days);

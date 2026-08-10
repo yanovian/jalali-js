@@ -4,10 +4,10 @@ See [alternatives.md](./alternatives.md) for the vision and the goals. See
 [architecture.md](./architecture.md) for the design behind these decisions.
 This file shows only the status of each phase.
 
-Phases 0-12 and 14-17 are done, and the first releases are published (v0.0.1
+Phases 0-12 and 14-18 are done, and the first releases are published (v0.0.1
 through v0.1.0; see `CHANGELOG.md`). v0.1.0 also shipped the Web Components
 bindings (`packages/web`, `packages/ui-web`), which landed outside the phase
-list. Phase 13 and Phases 18-24 are scheduled but not started. Phases 14-18
+list. Phase 13 and Phases 19-24 are scheduled but not started. Phases 14-18
 add the features real apps ask for first, so they land before Phase 13.
 What's left after those is listed under "Later, not yet scheduled" below.
 Change an item to `[x]` as it lands.
@@ -896,26 +896,46 @@ The core already models `date + time` and `date + time + timezone`
 
 ## Phase 18: Holiday data (`packages/holidays`)
 
-Iranian apps mark official holidays in almost every calendar UI. This
-package ships the holiday data bundled and versioned, with zero network
-calls at runtime. It works offline, adds no latency, and sends no user
-traffic anywhere.
+Apps mark official holidays in almost every calendar UI. This package
+ships holiday data bundled and versioned, with zero network calls at
+runtime. It works offline, adds no latency, and sends no user traffic
+anywhere.
 
-- [ ] Add `@jalali-js/holidays`, a data-only package with zero runtime
-      dependencies. Fixed Jalali holidays (Nowruz, and so on) come from a
-      rule. Lunar-based observed holidays come from a per-year data table
-      with a stated, documented year range, sourced from the published
-      official calendar.
-- [ ] Add the API: `isHoliday(date)`, `holidaysOn(date)`, and
-      `holidaysInMonth(year, month)`, with holiday names in `en` and `fa`.
-- [ ] Wire a `showHolidays` option into the pickers: holidays render with a
-      `data-holiday` attribute and a default style, plus an option that
-      also blocks selection (through Phase 16's rule model).
-- [ ] Add a maintained update path: a documented script that refreshes the
+**Scope today: Iran (`IR`) only.** Afghanistan (`AF`) and Tajikistan
+(`TJ`) are reserved region codes. Their official lists differ and are not
+shipped yet. Each region gets its own pack under `src/regions/<code>/`.
+
+- [x] Add `@jalali-js/holidays`, a data-only package with zero runtime
+      dependencies. Iran's official list combines fixed solar (Jalali)
+      national days (Nowruz, and so on) and lunar Islamic observances.
+      Fixed days come from rules. Lunar days come from a per-year data
+      table with a stated, documented year range, sourced from the
+      published official calendar. Jalali years 1402-1425 today
+      (`HOLIDAY_YEAR_RANGE`), from the University of Tehran Calendar
+      Centre. Iran JSON sources live under
+      `packages/holidays/data/ir/lunar/`.
+- [x] Add the API: `isHoliday(date, { region })`, `holidaysOn(date)`, and
+      `holidaysInMonth(year, month)`, default region `'IR'`. Holiday names
+      live in per-language files (`regions/ir/names/{en,fa,ps}.ts`), the
+      same pattern as `@jalali-js/i18n`. Also `holidaysInYear()`,
+      `holidayDatesAround()`, `holidayName()`, and picker helpers
+      `resolveCalendarHolidays()` / `withHolidaysBlocked()`.
+- [x] Wire `showHolidays`, `blockHolidays`, and `holidayRegion` into the
+      pickers: holidays render with a `data-holiday` attribute and a
+      default style, plus an option that also blocks selection (through
+      Phase 16's rule model). Done on `Calendar`, `DatePicker`, and
+      `RangePicker` in React, Vue, Web, and the `ui-*` packages.
+      `buildCalendarGrid()` takes an optional `isHolidayDay` predicate so
+      core stays free of holiday data.
+- [x] Add a maintained update path: a documented script that refreshes the
       per-year table, so a yearly data update is one small pull request.
-- [ ] Add unit tests against known official dates, playground and e2e
-      coverage, and a docs guide page that states the offline guarantee
-      and the covered year range.
+      `scripts/update-holidays.mjs` / `make update-holidays`.
+- [x] Add unit tests against known official Iran dates, playground and e2e
+      coverage, and a docs guide page that states the Iran scope, the
+      offline guarantee, and the covered year range. Done:
+      `holidays.test.ts`, React Calendar tests, a Farvardin 1403
+      `holidays` playground section, e2e entries, and
+      `apps/docs/guide/holidays.md`.
 
 ## Phase 19: Relative time output (`packages/i18n`)
 

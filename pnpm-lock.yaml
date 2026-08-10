@@ -247,6 +247,8 @@ importers:
         specifier: ^4.9.0
         version: 4.9.0
 
+  packages/holidays: {}
+
   packages/i18n:
     dependencies:
       jalali-js:
@@ -272,6 +274,9 @@ importers:
 
   packages/react:
     dependencies:
+      '@jalali-js/holidays':
+        specifier: workspace:*
+        version: link:../holidays
       '@jalali-js/i18n':
         specifier: workspace:*
         version: link:../i18n
@@ -309,6 +314,9 @@ importers:
 
   packages/ui-react:
     dependencies:
+      '@jalali-js/holidays':
+        specifier: workspace:*
+        version: link:../holidays
       '@jalali-js/i18n':
         specifier: workspace:*
         version: link:../i18n
@@ -349,6 +357,9 @@ importers:
 
   packages/ui-vue:
     dependencies:
+      '@jalali-js/holidays':
+        specifier: workspace:*
+        version: link:../holidays
       '@jalali-js/i18n':
         specifier: workspace:*
         version: link:../i18n
@@ -383,6 +394,9 @@ importers:
 
   packages/ui-web:
     dependencies:
+      '@jalali-js/holidays':
+        specifier: workspace:*
+        version: link:../holidays
       '@jalali-js/i18n':
         specifier: workspace:*
         version: link:../i18n
@@ -411,6 +425,9 @@ importers:
 
   packages/vue:
     dependencies:
+      '@jalali-js/holidays':
+        specifier: workspace:*
+        version: link:../holidays
       '@jalali-js/i18n':
         specifier: workspace:*
         version: link:../i18n
@@ -442,6 +459,9 @@ importers:
 
   packages/web:
     dependencies:
+      '@jalali-js/holidays':
+        specifier: workspace:*
+        version: link:../holidays
       '@jalali-js/i18n':
         specifier: workspace:*
         version: link:../i18n

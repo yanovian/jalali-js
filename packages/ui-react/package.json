@@ -59,6 +59,7 @@
     "react-dom": ">=18"
   },
   "dependencies": {
+    "@jalali-js/holidays": "workspace:*",
     "@jalali-js/i18n": "workspace:*",
     "@jalali-js/react": "workspace:*",
     "jalali-js": "workspace:*"

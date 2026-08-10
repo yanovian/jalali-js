@@ -182,6 +182,7 @@ packages/
   core/               # jalali-js core. Zero runtime dependencies.
   i18n/                # Locale data: en, fa, ps. Names, numerals, direction.
   nlp/                 # Natural language date parsing: en, fa, ps.
+  holidays/            # Official holiday data by region (Iran shipped). Zero runtime dependencies.
   react/               # React hooks and headless components. Works in Next.js.
   vue/                 # Vue composables and headless components. Works in Nuxt.
   web/                 # Framework-free Web Components. No hooks or composables: plain custom elements.
@@ -203,11 +204,13 @@ _docs/
   alternatives.md       # Vision, goals, and comparison with other libraries.
 ```
 
-`core` has zero runtime dependencies. Every other package depends on it.
-`react` and `vue` depend on `core` and `i18n` only. Neither depends on the
-other. This lets a Node backend, or a framework outside React and Vue, use
-`core` directly, with no framework weight added.
-
+`core` has zero runtime dependencies. `@jalali-js/holidays` is the other
+data package with zero runtime dependencies: it takes plain
+`{ year, month, day }` fields and does not import `jalali-js`. Every other
+package depends on `core`. `react` and `vue` depend on `core`, `i18n`, and
+`holidays`. Neither depends on the other. This lets a Node backend, or a
+framework outside React and Vue, use `core` directly, with no framework
+weight added.
 `ui-react` and `ui-vue` (Phase 7), not a single `ui` package, despite the
 "optional `ui` package" phrasing this document used before that phase
 started: a range picker or an inline calendar is a real UI component, and a
@@ -364,6 +367,7 @@ variables.
 | `--jalali-input-padding`   | Padding inside the text input                              |
 | `--jalali-popover-padding` | Padding inside the popover                                 |
 | `--jalali-day-min-size`    | Minimum width/height of a day cell                         |
+| `--jalali-holiday-fg`      | Text color for days marked with `data-holiday`             |
 
 Because CSS custom properties inherit, a theme applies to every picker on
 the page once its stylesheet is imported: theming is a whole-app choice
@@ -968,6 +972,18 @@ publish` rewrites to the real published version automatically, the
   emits a `CalendarDateTime` through the existing storage-value contract.
   `TimeRangePicker` in the `ui-*` packages is two `TimePicker`s side by
   side.
+- **Holiday data (Phase 18) stays out of core.** `@jalali-js/holidays` is
+  a data package with zero runtime dependencies. Today it ships Iran
+  (`IR`) only. Afghanistan (`AF`) and Tajikistan (`TJ`) are reserved
+  region codes. Each region pack lives under `src/regions/<code>/`, with
+  per-language name files under `names/{en,fa,ps}.ts`. Fixed solar
+  holidays are rules. Lunar holidays are a per-year table refreshed by
+  `make update-holidays`. `buildCalendarGrid()` takes an optional
+  `isHolidayDay` predicate and marks `isHoliday` on each cell. Bindings
+  pass that predicate through `resolveCalendarHolidays()` when
+  `showHolidays` is on, and merge holiday dates into `disabledDates`
+  when `blockHolidays` is on, so blocking reuses the Phase 16 rule model.
+  Pickers take `holidayRegion` (default `'IR'`).
 
 ## Makefile
 
@@ -1011,6 +1027,7 @@ format / format-check Prettier, write mode or check mode (the CI gate)
 test / test-watch     Unit and property tests (Vitest)
 test-e2e             Playwright visual e2e suite
 probe-treeshake      Confirm packages/core's built output actually tree-shakes
+update-holidays      Rebuild the Iran lunar holiday table from packages/holidays/data/ir/lunar/*.json
 size                 Bundle-size budget check
 check                CI-equivalent: typecheck, lint, format-check, test, build, size
 app-typecheck        Typecheck one app/package by name: make app-typecheck APP=playground-react
