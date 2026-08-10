@@ -2,12 +2,10 @@ import { expect, test } from '@playwright/test';
 
 import { expectScreenshot } from './expect-screenshot.js';
 
-// Each section is its own named baseline, so a diff in one config (say, RTL Farsi) never masks
-// or gets masked by a diff in another; see architecture.md's "Visual regression and PR
-// screenshots" for how these baselines are reviewed and updated.
 const SECTIONS = [
   { testId: 'grid-en-jalali', name: 'grid-en-jalali.png' },
   { testId: 'grid-fa-jalali', name: 'grid-fa-jalali.png' },
+  { testId: 'grid-ps-jalali', name: 'grid-ps-jalali.png' },
   { testId: 'dropdown', name: 'dropdown.png' },
   { testId: 'gregorian', name: 'gregorian.png' },
   { testId: 'inline-calendar', name: 'inline-calendar.png' },
@@ -23,9 +21,20 @@ const SECTIONS = [
   { testId: 'custom-theme', name: 'custom-theme.png' },
 ] as const;
 
+const BASE = 'http://localhost:4005/?dark=1&locale=fa&compact=1';
+
 test.describe('playground-vanilla', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:4005/');
+    await page.goto(BASE);
+  });
+
+  test('demo shell default', async ({ page }) => {
+    await expectScreenshot(page.getByTestId('demo-shell'), 'demo-shell.png');
+  });
+
+  test('demo shell alt controls', async ({ page }) => {
+    await page.goto('http://localhost:4005/?tab=date-picker&locale=en&dark=0&compact=0');
+    await expectScreenshot(page.getByTestId('demo-shell'), 'demo-shell-alt.png');
   });
 
   for (const { testId, name } of SECTIONS) {
@@ -35,9 +44,6 @@ test.describe('playground-vanilla', () => {
   }
 
   test('calendar grid, opened', async ({ page }) => {
-    // Screenshot the popover itself, not the section it opens from: the popover is
-    // `position: absolute` and pokes outside the section's own box, so a section-scoped
-    // screenshot clips it (same as playground-react.spec.ts's own version of this test).
     const section = page.getByTestId('grid-en-jalali');
     await section.getByRole('combobox').click();
     const popover = section.getByRole('dialog');
@@ -46,8 +52,6 @@ test.describe('playground-vanilla', () => {
   });
 
   test('custom CSS override actually applies, not just looks unchanged', async ({ page }) => {
-    // A screenshot diff only proves the render changed from its baseline; it does not prove a
-    // specific configured value took effect. This asserts on the real computed styles instead.
     const root = page.getByTestId('custom-theme').locator('[data-jalali-datepicker-root]');
     const input = page.getByTestId('custom-theme').locator('[data-jalali-datepicker-input]');
 

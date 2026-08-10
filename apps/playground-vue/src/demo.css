@@ -1,0 +1,279 @@
+html,
+body {
+  margin: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.demo-page {
+  font-family: system-ui, sans-serif;
+  padding: 1rem;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  line-height: 1.4;
+}
+
+.demo-page *,
+.demo-page *::before,
+.demo-page *::after {
+  box-sizing: border-box;
+}
+
+.demo-shell {
+  display: grid;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-radius: 12px;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.demo-shell > * {
+  min-width: 0;
+}
+
+.demo-shell h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.5rem;
+}
+
+.demo-bindings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 0.5rem;
+}
+
+.demo-bindings a {
+  color: #93c5fd;
+}
+
+.demo-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.demo-tabs button {
+  min-height: 40px;
+  padding: 0.4rem 0.7rem;
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 8px;
+}
+
+.demo-tabs button[aria-selected='true'] {
+  font-weight: 700;
+  color: #0b1020;
+  background: #e8eaf6;
+  border-color: #e8eaf6;
+}
+
+.demo-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.demo-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.demo-controls label > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+}
+
+.demo-controls select,
+.demo-controls input[type='text'],
+.demo-controls input[type='number'] {
+  min-height: 40px;
+  width: 100%;
+  max-width: 100%;
+  font: inherit;
+  color: inherit;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+.demo-controls input[type='color'] {
+  min-height: 40px;
+  width: 100%;
+  max-width: 100%;
+  padding: 0.2rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+.demo-controls input[type='checkbox'] {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* Hug the live control. Wide views opt into full width below. */
+.demo-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed color-mix(in srgb, currentColor 40%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  overflow: auto;
+}
+
+.demo-stage:has(.demo-position-frame),
+.demo-stage:has(jalali-event-calendar),
+.demo-stage:has(jalali-inline-calendar),
+.demo-stage:has(jalali-range-picker),
+.demo-stage:has(jalali-time-range-picker) {
+  width: 100%;
+}
+
+.demo-stage > * {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.demo-stage:has(.demo-position-frame) > *,
+.demo-stage:has(jalali-event-calendar) > *,
+.demo-stage:has(jalali-inline-calendar) > *,
+.demo-stage:has(jalali-range-picker) > *,
+.demo-stage:has(jalali-time-range-picker) > * {
+  width: 100%;
+}
+
+.demo-value {
+  margin: 0;
+  padding: 0.75rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.demo-snippet-section {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.demo-snippet-block {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.demo-snippet {
+  margin: 0;
+  padding: 0.75rem;
+  padding-inline-end: 5.5rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  min-width: 0;
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.demo-snippet-copy {
+  position: absolute;
+  top: 0.5rem;
+  inset-inline-end: 0.5rem;
+  z-index: 1;
+  min-height: 32px;
+  padding: 0.25rem 0.65rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: inherit;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  background: color-mix(in srgb, Canvas 88%, transparent);
+}
+
+.demo-position-frame {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 320px;
+  border: 1px dashed color-mix(in srgb, currentColor 40%, transparent);
+  border-radius: 8px;
+}
+
+.demo-position-frame .corner {
+  position: absolute;
+}
+
+.demo-position-frame .corner-tl {
+  top: 0.5rem;
+  left: 0.5rem;
+}
+
+.demo-position-frame .corner-tr {
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.demo-position-frame .corner-bl {
+  bottom: 0.5rem;
+  left: 0.5rem;
+}
+
+.demo-position-frame .corner-br {
+  bottom: 0.5rem;
+  right: 0.5rem;
+}
+
+.demo-gallery {
+  display: grid;
+  gap: 2rem;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.demo-gallery section {
+  scroll-margin-top: 1rem;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .demo-page {
+    padding: 0.75rem;
+  }
+
+  .demo-controls {
+    grid-template-columns: 1fr;
+  }
+}

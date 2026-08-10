@@ -106,8 +106,6 @@ const title = computed(() => {
   return `${start} – ${end}`;
 });
 
-const previousGlyph = computed(() => (localePack.value.direction === 'rtl' ? '›' : '‹'));
-const nextGlyph = computed(() => (localePack.value.direction === 'rtl' ? '‹' : '›'));
 const navLabel = computed(() =>
   props.view === 'month' ? 'month' : props.view === 'week' ? 'week' : 'day',
 );
@@ -134,7 +132,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
         :aria-label="`Previous ${navLabel}`"
         @click="anchor = shiftEventViewAnchor(system, view, anchor, -1)"
       >
-        {{ previousGlyph }}
+        ‹
       </button>
       <span data-jalali-calendar-title>{{ title }}</span>
       <button
@@ -143,7 +141,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
         :aria-label="`Next ${navLabel}`"
         @click="anchor = shiftEventViewAnchor(system, view, anchor, 1)"
       >
-        {{ nextGlyph }}
+        ›
       </button>
     </div>
 

@@ -19,7 +19,8 @@ import {
   previousMonth,
   toStorageValue,
 } from 'jalali-js';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { positionPopover } from './position-popover.js';
 
 export interface DateRange {
   start: CalendarDate;
@@ -116,6 +117,8 @@ export function RangePicker({
   });
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const popoverId = useId();
 
   useEffect(() => {
@@ -133,6 +136,20 @@ export function RangePicker({
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [open]);
+
+  useLayoutEffect(() => {
+    if (!open || !inputRef.current || !popoverRef.current) return;
+    const anchor = inputRef.current;
+    const popover = popoverRef.current;
+    const update = () => positionPopover(anchor, popover);
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, true);
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+    };
+  }, [open, displayed]);
 
   const holidayOptions = useMemo(
     () =>
@@ -188,6 +205,7 @@ export function RangePicker({
   return (
     <div className={className} dir={localePack.direction} data-jalali-datepicker-root ref={rootRef}>
       <input
+        ref={inputRef}
         type="text"
         readOnly
         role="combobox"
@@ -201,6 +219,7 @@ export function RangePicker({
       />
       {open && (
         <div
+          ref={popoverRef}
           id={popoverId}
           data-jalali-datepicker-popover
           role="dialog"
@@ -214,7 +233,7 @@ export function RangePicker({
                 aria-label="Previous month"
                 onClick={() => setDisplayed(previousMonth(system, displayed.year, displayed.month))}
               >
-                {localePack.direction === 'rtl' ? '›' : '‹'}
+                ‹
               </button>
               <span data-jalali-calendar-title>
                 {monthLabel} {yearLabel}
@@ -225,7 +244,7 @@ export function RangePicker({
                 aria-label="Next month"
                 onClick={() => setDisplayed(nextMonth(system, displayed.year, displayed.month))}
               >
-                {localePack.direction === 'rtl' ? '‹' : '›'}
+                ›
               </button>
             </div>
             <div role="grid" data-jalali-calendar-grid>

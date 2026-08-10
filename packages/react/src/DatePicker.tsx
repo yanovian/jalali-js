@@ -11,9 +11,10 @@ import type {
   ValueFormat,
 } from 'jalali-js';
 import { createCalendar, timeOfDay, toStorageValue, withTime } from 'jalali-js';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Calendar } from './Calendar.js';
 import { DropdownDateFields } from './DropdownDateFields.js';
+import { positionPopover } from './position-popover.js';
 import { TimePicker } from './TimePicker.js';
 import type { LocaleCode } from './use-calendar.js';
 import { localePackFor } from './use-calendar.js';
@@ -133,6 +134,8 @@ export function DatePicker({
   });
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const popoverId = useId();
 
   useEffect(() => {
@@ -150,6 +153,20 @@ export function DatePicker({
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [open]);
+
+  useLayoutEffect(() => {
+    if (!open || !inputRef.current || !popoverRef.current) return;
+    const anchor = inputRef.current;
+    const popover = popoverRef.current;
+    const update = () => positionPopover(anchor, popover);
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, true);
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+    };
+  }, [open, date, precision]);
 
   function emit(next: CalendarDate | CalendarDateTime) {
     setDate(next);
@@ -195,6 +212,7 @@ export function DatePicker({
   return (
     <div className={className} dir={localePack.direction} data-jalali-datepicker-root ref={rootRef}>
       <input
+        ref={inputRef}
         type="text"
         readOnly
         role="combobox"
@@ -208,6 +226,7 @@ export function DatePicker({
       />
       {open && (
         <div
+          ref={popoverRef}
           id={popoverId}
           data-jalali-datepicker-popover
           role="dialog"

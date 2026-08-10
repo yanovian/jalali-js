@@ -1,3 +1,5 @@
+import type { IranHolidayId } from './regions/ir/ids.js';
+
 /** Plain Jalali year/month/day fields. Duck-typed to match `jalali-js` date shapes. */
 export interface HolidayDateFields {
   year: number;
@@ -18,7 +20,7 @@ export interface HolidayNames {
 }
 
 /** Holiday id for a shipped region. Today this is Iran's id set. */
-export type HolidayId = import('./regions/ir/ids.js').IranHolidayId;
+export type HolidayId = IranHolidayId;
 
 export interface Holiday {
   id: HolidayId;

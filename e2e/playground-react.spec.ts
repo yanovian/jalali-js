@@ -2,9 +2,8 @@ import { expect, test } from '@playwright/test';
 
 import { expectScreenshot } from './expect-screenshot.js';
 
-// Each section is its own named baseline, so a diff in one config (say, RTL Farsi) never masks
-// or gets masked by a diff in another; see architecture.md's "Visual regression and PR
-// screenshots" for how these baselines are reviewed and updated.
+// Each section is its own named baseline. URL state pins dark + compact + fa so live shell
+// controls cannot drift a cell (see playground-shared E2E_DEFAULT_SEARCH).
 const SECTIONS = [
   { testId: 'grid-en-jalali', name: 'grid-en-jalali.png' },
   { testId: 'grid-fa-jalali', name: 'grid-fa-jalali.png' },
@@ -24,9 +23,20 @@ const SECTIONS = [
   { testId: 'custom-theme', name: 'custom-theme.png' },
 ] as const;
 
+const BASE = 'http://localhost:4001/?dark=1&locale=fa&compact=1';
+
 test.describe('playground-react', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:4001/');
+    await page.goto(BASE);
+  });
+
+  test('demo shell default', async ({ page }) => {
+    await expectScreenshot(page.getByTestId('demo-shell'), 'demo-shell.png');
+  });
+
+  test('demo shell alt controls', async ({ page }) => {
+    await page.goto('http://localhost:4001/?tab=date-picker&locale=en&dark=0&compact=0');
+    await expectScreenshot(page.getByTestId('demo-shell'), 'demo-shell-alt.png');
   });
 
   for (const { testId, name } of SECTIONS) {
@@ -36,11 +46,6 @@ test.describe('playground-react', () => {
   }
 
   test('calendar grid, opened', async ({ page }) => {
-    // The sections above capture each config's closed, default appearance; this one confirms
-    // the actual calendar grid itself (month header, weekday row, RTL/LTR, dark+compact theme)
-    // still renders correctly, the highest-value single screenshot in this file. Screenshot the
-    // popover itself, not the section it opens from: the popover is `position: absolute` and
-    // pokes outside the section's own box, so a section-scoped screenshot clips it.
     const section = page.getByTestId('grid-en-jalali');
     await section.getByRole('combobox').click();
     const popover = section.getByRole('dialog');
@@ -49,20 +54,12 @@ test.describe('playground-react', () => {
   });
 
   test('custom CSS override actually applies, not just looks unchanged', async ({ page }) => {
-    // A screenshot diff only proves the render changed from its baseline; it does not prove a
-    // specific configured value took effect. This asserts on the real computed styles instead,
-    // so a broken override (say, a CSS specificity regression that lets the default value win)
-    // fails with a clear "expected X, got Y" instead of a pixel diff that could be misread as
-    // an unrelated visual regression.
     const root = page.getByTestId('custom-theme').locator('[data-jalali-datepicker-root]');
     const input = page.getByTestId('custom-theme').locator('[data-jalali-datepicker-input]');
 
     await expect(root).toHaveCSS('--jalali-primary', '#c026d3');
     await expect(root).toHaveCSS('--jalali-bg', '#fdf4ff');
     await expect(root).toHaveCSS('--jalali-radius', '20px');
-
-    // The custom property is only half the proof; confirm a rule that consumes it actually
-    // resolved to the overridden value, not the library's own default.
     await expect(input).toHaveCSS('border-radius', '20px');
   });
 });

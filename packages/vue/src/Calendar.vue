@@ -97,8 +97,6 @@ const monthLabel = computed(
 const yearLabel = computed(() =>
   formatNumber(displayed.value.year, localePack.value.defaultNumerals, localePack.value.digits),
 );
-const previousGlyph = computed(() => (localePack.value.direction === 'rtl' ? '›' : '‹'));
-const nextGlyph = computed(() => (localePack.value.direction === 'rtl' ? '‹' : '›'));
 const titleTag = computed(() => (props.quickNav ? 'button' : 'span'));
 const yearPageLabel = computed(() => {
   const start = formatNumber(
@@ -187,7 +185,7 @@ function dayNumber(cell: CalendarGridDay): string {
           aria-label="Previous month"
           @click="goPrevious"
         >
-          {{ previousGlyph }}
+          ‹
         </button>
         <div data-jalali-calendar-title>
           <component
@@ -215,7 +213,7 @@ function dayNumber(cell: CalendarGridDay): string {
           aria-label="Next month"
           @click="goNext"
         >
-          {{ nextGlyph }}
+          ›
         </button>
       </div>
       <div role="grid" data-jalali-calendar-grid>
@@ -272,7 +270,7 @@ function dayNumber(cell: CalendarGridDay): string {
           aria-label="Previous year"
           @click="goPreviousYearInMonthView"
         >
-          {{ previousGlyph }}
+          ‹
         </button>
         <div data-jalali-calendar-title>
           <component
@@ -291,7 +289,7 @@ function dayNumber(cell: CalendarGridDay): string {
           aria-label="Next year"
           @click="goNextYearInMonthView"
         >
-          {{ nextGlyph }}
+          ›
         </button>
       </div>
       <div role="listbox" aria-label="Month" data-jalali-calendar-months>
@@ -320,7 +318,7 @@ function dayNumber(cell: CalendarGridDay): string {
           aria-label="Previous years"
           @click="goPreviousYearPage"
         >
-          {{ previousGlyph }}
+          ‹
         </button>
         <span data-jalali-calendar-title>{{ yearPageLabel }}</span>
         <button
@@ -329,7 +327,7 @@ function dayNumber(cell: CalendarGridDay): string {
           aria-label="Next years"
           @click="goNextYearPage"
         >
-          {{ nextGlyph }}
+          ›
         </button>
       </div>
       <div role="listbox" aria-label="Year" data-jalali-calendar-years>

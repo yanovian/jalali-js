@@ -97,7 +97,13 @@ button[data-jalali-calendar-title-year]:focus-visible,
   overflow-x: auto;
 }
 
+[data-jalali-datepicker-popover][data-positioned] {
+  position: fixed;
+  margin-top: 0;
+}
+
 [data-jalali-calendar-header] {
+  direction: ltr; /* nav chrome stays LTR; grid keeps locale dir from the root */
   display: flex;
   align-items: center;
   justify-content: space-between;

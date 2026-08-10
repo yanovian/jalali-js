@@ -16,8 +16,8 @@ install: ## Install workspace dependencies
 install-frozen: ## Install workspace dependencies without updating the lockfile (CI)
 	$(PNPM) install --frozen-lockfile
 
-dev: ## Run the playground apps in dev mode
-	$(PNPM) dev
+dev: ## Run docs + playgrounds in dev mode (Live demo at /playground/* proxies to the Vite apps)
+	JALALI_PLAYGROUND_DEV=1 $(PNPM) dev
 
 build: ## Build all packages and apps
 	$(PNPM) build
@@ -31,10 +31,9 @@ build-apps: ## Build only the playground apps (not docs), its own target for the
 build-docs: ## Build the docs site (API reference generation runs first automatically)
 	$(PNPM) --filter docs build
 
-# VitePress's dev server intercepts /playground/react/-style URLs for its own routing before
-# checking public/, so the playground 404-likes under docs-dev specifically; use docs-preview to
-# actually click around it. Both still embed it, via apps/docs/public/.
-docs-dev: embed-playgrounds ## Run the docs site in dev mode (fast reload; playground URLs don't resolve here, see docs-preview)
+# docs-dev embeds playground builds into public/ and serves them at /playground/*.
+# make dev instead proxies those paths to the live Vite playgrounds (JALALI_PLAYGROUND_DEV=1).
+docs-dev: embed-playgrounds ## Run the docs site in dev mode, with embedded playgrounds at /playground/*
 	$(PNPM) --filter docs dev
 
 docs-build: build-docs ## Alias for build-docs, matching architecture.md's documented Makefile listing

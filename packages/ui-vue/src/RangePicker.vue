@@ -38,8 +38,9 @@ import {
   previousMonth,
   toStorageValue,
 } from 'jalali-js';
-import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
 import { localePackFor, type LocaleCode } from '@jalali-js/vue';
+import { positionPopover } from './position-popover.js';
 
 export interface DateRange {
   start: CalendarDate;
@@ -93,6 +94,8 @@ const displayAnchor = props.defaultRange?.start ?? today.value;
 const displayed = ref({ year: displayAnchor.year, month: displayAnchor.month });
 const open = ref(false);
 const rootRef = ref<HTMLElement | null>(null);
+const inputRef = ref<HTMLInputElement | null>(null);
+const popoverRef = ref<HTMLElement | null>(null);
 const popoverId = useId();
 
 const holidayOptions = computed(() =>
@@ -182,6 +185,26 @@ watch(open, (isOpen) => {
   }
 });
 
+watch(
+  [open, displayed],
+  async ([isOpen], _old, onCleanup) => {
+    if (!isOpen) return;
+    await nextTick();
+    const anchor = inputRef.value;
+    const popover = popoverRef.value;
+    if (!anchor || !popover) return;
+    const update = () => positionPopover(anchor, popover);
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, true);
+    onCleanup(() => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+    });
+  },
+  { flush: 'post' },
+);
+
 onMounted(() => {
   if (open.value) document.addEventListener('pointerdown', onPointerDown);
 });
@@ -194,6 +217,7 @@ onBeforeUnmount(() => {
 <template>
   <div ref="rootRef" :dir="localePack.direction" data-jalali-datepicker-root>
     <input
+      ref="inputRef"
       type="text"
       readonly
       role="combobox"
@@ -207,6 +231,7 @@ onBeforeUnmount(() => {
     />
     <div
       v-if="open"
+      ref="popoverRef"
       :id="popoverId"
       data-jalali-datepicker-popover
       role="dialog"
@@ -220,7 +245,7 @@ onBeforeUnmount(() => {
             aria-label="Previous month"
             @click="goPrevious"
           >
-            {{ localePack.direction === 'rtl' ? '›' : '‹' }}
+            ‹
           </button>
           <span data-jalali-calendar-title>{{ monthLabel }} {{ yearLabel }}</span>
           <button
@@ -229,7 +254,7 @@ onBeforeUnmount(() => {
             aria-label="Next month"
             @click="goNext"
           >
-            {{ localePack.direction === 'rtl' ? '‹' : '›' }}
+            ›
           </button>
         </div>
         <div role="grid" data-jalali-calendar-grid>

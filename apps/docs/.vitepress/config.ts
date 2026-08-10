@@ -1,5 +1,9 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitepress';
 import llmstxt from 'vitepress-plugin-llms';
+import { playgroundDevProxy, playgroundPublicPlugin } from './playground-dev.js';
+
+const docsRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // GitHub Pages serves this project site at the custom domain root
 // (https://jalali-js.yanovian.com/). Keep SITE_URL and `base` aligned with that root.
@@ -28,7 +32,11 @@ export default defineConfig({
   cleanUrls: true,
   srcExclude: ['**/README.md'],
   vite: {
+    server: {
+      proxy: playgroundDevProxy(),
+    },
     plugins: [
+      playgroundPublicPlugin(docsRoot),
       llmstxt({
         // Domain only. The plugin already prepends VitePress `base` (`/`).
         domain: 'https://jalali-js.yanovian.com',

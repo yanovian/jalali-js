@@ -140,8 +140,6 @@ export function Calendar({
 
   const monthLabel = localePack.monthNames[system].long[displayed.month - 1];
   const yearLabel = formatNumber(displayed.year, localePack.defaultNumerals, localePack.digits);
-  const previousGlyph = localePack.direction === 'rtl' ? '›' : '‹';
-  const nextGlyph = localePack.direction === 'rtl' ? '‹' : '›';
   const titleAs = quickNav ? 'button' : 'span';
 
   function openMonthView(): void {
@@ -176,7 +174,7 @@ export function Calendar({
               aria-label="Previous month"
               onClick={() => setDisplayed(previousMonth(system, displayed.year, displayed.month))}
             >
-              {previousGlyph}
+              ‹
             </button>
             <div data-jalali-calendar-title>
               <TitlePart
@@ -202,7 +200,7 @@ export function Calendar({
               aria-label="Next month"
               onClick={() => setDisplayed(nextMonth(system, displayed.year, displayed.month))}
             >
-              {nextGlyph}
+              ›
             </button>
           </div>
           <div role="grid" data-jalali-calendar-grid>
@@ -250,7 +248,7 @@ export function Calendar({
               aria-label="Previous year"
               onClick={() => setDisplayed((current) => ({ ...current, year: current.year - 1 }))}
             >
-              {previousGlyph}
+              ‹
             </button>
             <div data-jalali-calendar-title>
               <TitlePart
@@ -268,7 +266,7 @@ export function Calendar({
               aria-label="Next year"
               onClick={() => setDisplayed((current) => ({ ...current, year: current.year + 1 }))}
             >
-              {nextGlyph}
+              ›
             </button>
           </div>
           <div role="listbox" aria-label="Month" data-jalali-calendar-months>
@@ -305,7 +303,7 @@ export function Calendar({
               aria-label="Previous years"
               onClick={() => setYearPage((current) => current - YEARS_PER_PAGE)}
             >
-              {previousGlyph}
+              ‹
             </button>
             <span data-jalali-calendar-title>
               {formatNumber(yearPage, localePack.defaultNumerals, localePack.digits)}
@@ -322,7 +320,7 @@ export function Calendar({
               aria-label="Next years"
               onClick={() => setYearPage((current) => current + YEARS_PER_PAGE)}
             >
-              {nextGlyph}
+              ›
             </button>
           </div>
           <div role="listbox" aria-label="Year" data-jalali-calendar-years>

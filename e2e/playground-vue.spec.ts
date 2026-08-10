@@ -2,9 +2,6 @@ import { expect, test } from '@playwright/test';
 
 import { expectScreenshot } from './expect-screenshot.js';
 
-// Mirrors playground-react.spec.ts's section list and naming, on purpose: both bindings render
-// the same configs, so a reviewer comparing the two PR screenshot grids side by side sees
-// matching filenames.
 const SECTIONS = [
   { testId: 'grid-en-jalali', name: 'grid-en-jalali.png' },
   { testId: 'grid-fa-jalali', name: 'grid-fa-jalali.png' },
@@ -24,9 +21,20 @@ const SECTIONS = [
   { testId: 'custom-theme', name: 'custom-theme.png' },
 ] as const;
 
+const BASE = 'http://localhost:4002/?dark=1&locale=fa&compact=1';
+
 test.describe('playground-vue', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:4002/');
+    await page.goto(BASE);
+  });
+
+  test('demo shell default', async ({ page }) => {
+    await expectScreenshot(page.getByTestId('demo-shell'), 'demo-shell.png');
+  });
+
+  test('demo shell alt controls', async ({ page }) => {
+    await page.goto('http://localhost:4002/?tab=date-picker&locale=en&dark=0&compact=0');
+    await expectScreenshot(page.getByTestId('demo-shell'), 'demo-shell-alt.png');
   });
 
   for (const { testId, name } of SECTIONS) {
@@ -36,8 +44,6 @@ test.describe('playground-vue', () => {
   }
 
   test('calendar grid, opened', async ({ page }) => {
-    // Screenshot the popover itself, not the section it opens from: see the matching comment
-    // in playground-react.spec.ts.
     const section = page.getByTestId('grid-en-jalali');
     await section.getByRole('combobox').click();
     const popover = section.getByRole('dialog');
@@ -46,8 +52,6 @@ test.describe('playground-vue', () => {
   });
 
   test('custom CSS override actually applies, not just looks unchanged', async ({ page }) => {
-    // See the matching comment in playground-react.spec.ts: a screenshot diff only proves the
-    // render changed, not that a specific configured value took effect.
     const root = page.getByTestId('custom-theme').locator('[data-jalali-datepicker-root]');
     const input = page.getByTestId('custom-theme').locator('[data-jalali-datepicker-input]');
 

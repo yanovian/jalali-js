@@ -28,3 +28,6 @@ export type {
   HolidaySelectionRules,
   RegionHolidayPack,
 } from './types.js';
+// Public so TypeDoc can resolve `HolidayId` (an alias of these ids).
+export { IRAN_FIXED_HOLIDAY_IDS, IRAN_LUNAR_HOLIDAY_IDS } from './regions/ir/ids.js';
+export type { IranFixedHolidayId, IranHolidayId, IranLunarHolidayId } from './regions/ir/ids.js';

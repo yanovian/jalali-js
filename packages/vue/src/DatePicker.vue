@@ -26,9 +26,10 @@ import type {
   ValueFormat,
 } from 'jalali-js';
 import { createCalendar, timeOfDay, toStorageValue, withTime } from 'jalali-js';
-import { computed, onBeforeUnmount, onMounted, ref, useId, watch, type Ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch, type Ref } from 'vue';
 import Calendar from './Calendar.vue';
 import DropdownDateFields from './DropdownDateFields.vue';
+import { positionPopover } from './position-popover.js';
 import TimePicker from './TimePicker.vue';
 import { localePackFor, type LocaleCode } from './use-calendar.js';
 
@@ -104,6 +105,8 @@ date.value = (() => {
 
 const open = ref(false);
 const rootRef = ref<HTMLElement | null>(null);
+const inputRef = ref<HTMLInputElement | null>(null);
+const popoverRef = ref<HTMLElement | null>(null);
 const popoverId = useId();
 
 const calendarValue = computed<CalendarDate | null>(() =>
@@ -170,6 +173,26 @@ watch(open, (isOpen) => {
   }
 });
 
+watch(
+  [open, date, () => props.precision],
+  async ([isOpen], _old, onCleanup) => {
+    if (!isOpen) return;
+    await nextTick();
+    const anchor = inputRef.value;
+    const popover = popoverRef.value;
+    if (!anchor || !popover) return;
+    const update = () => positionPopover(anchor, popover);
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, true);
+    onCleanup(() => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+    });
+  },
+  { flush: 'post' },
+);
+
 onMounted(() => {
   if (open.value) document.addEventListener('pointerdown', onPointerDown);
 });
@@ -198,6 +221,7 @@ onBeforeUnmount(() => {
   </div>
   <div v-else ref="rootRef" :dir="localePack.direction" data-jalali-datepicker-root>
     <input
+      ref="inputRef"
       type="text"
       readonly
       role="combobox"
@@ -211,6 +235,7 @@ onBeforeUnmount(() => {
     />
     <div
       v-if="open"
+      ref="popoverRef"
       :id="popoverId"
       data-jalali-datepicker-popover
       role="dialog"

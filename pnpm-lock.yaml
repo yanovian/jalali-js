@@ -162,6 +162,9 @@ importers:
       jalali-js:
         specifier: workspace:*
         version: link:../../packages/core
+      playground-shared:
+        specifier: workspace:*
+        version: link:../playground-shared
       react:
         specifier: ^19.2.8
         version: 19.2.8
@@ -185,6 +188,12 @@ importers:
         specifier: 8.2.0
         version: 8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.2)(yaml@2.9.0)
 
+  apps/playground-shared:
+    devDependencies:
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   apps/playground-vanilla:
     dependencies:
       '@jalali-js/i18n':
@@ -199,6 +208,9 @@ importers:
       jalali-js:
         specifier: workspace:*
         version: link:../../packages/core
+      playground-shared:
+        specifier: workspace:*
+        version: link:../playground-shared
     devDependencies:
       '@types/node':
         specifier: ^26.2.0
@@ -221,6 +233,9 @@ importers:
       jalali-js:
         specifier: workspace:*
         version: link:../../packages/core
+      playground-shared:
+        specifier: workspace:*
+        version: link:../playground-shared
       vue:
         specifier: ^3.5.41
         version: 3.5.41(typescript@6.0.3)

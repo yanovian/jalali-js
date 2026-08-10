@@ -18,6 +18,7 @@ import {
   previousMonth,
   toStorageValue,
 } from 'jalali-js';
+import { positionPopover } from './position-popover.js';
 
 export interface DateRange {
   start: CalendarDate;
@@ -92,6 +93,14 @@ export class JalaliRangePickerElement extends HTMLElement {
   #onKeyDown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape') this.#setOpen(false);
   };
+  #positionUpdate: (() => void) | null = null;
+
+  #clearPositionListeners(): void {
+    if (!this.#positionUpdate) return;
+    window.removeEventListener('resize', this.#positionUpdate);
+    window.removeEventListener('scroll', this.#positionUpdate, true);
+    this.#positionUpdate = null;
+  }
 
   get system(): CalendarSystem {
     return this.#system;
@@ -184,6 +193,7 @@ export class JalaliRangePickerElement extends HTMLElement {
   disconnectedCallback(): void {
     document.removeEventListener('pointerdown', this.#onPointerDown);
     document.removeEventListener('keydown', this.#onKeyDown);
+    this.#clearPositionListeners();
   }
 
   attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
@@ -301,9 +311,19 @@ export class JalaliRangePickerElement extends HTMLElement {
     input.setAttribute('aria-expanded', this.#open ? 'true' : 'false');
     input.addEventListener('click', () => this.#setOpen(!this.#open));
 
+    this.#clearPositionListeners();
+
     const children: (Node | string)[] = [input];
     if (this.#open) {
-      children.push(this.#renderPopover(localePack, today, displayed));
+      const popover = this.#renderPopover(localePack, today, displayed);
+      input.setAttribute('aria-controls', 'jalali-range-picker-popover');
+      popover.id = 'jalali-range-picker-popover';
+      children.push(popover);
+      positionPopover(input, popover);
+      const update = () => positionPopover(input, popover);
+      this.#positionUpdate = update;
+      window.addEventListener('resize', update);
+      window.addEventListener('scroll', update, true);
     }
     this.replaceChildren(...children);
   }
@@ -330,15 +350,13 @@ export class JalaliRangePickerElement extends HTMLElement {
     );
     const monthLabel = localePack.monthNames[this.#system].long[displayed.month - 1]!;
     const yearLabel = formatNumber(displayed.year, localePack.defaultNumerals, localePack.digits);
-    const previousGlyph = localePack.direction === 'rtl' ? '›' : '‹';
-    const nextGlyph = localePack.direction === 'rtl' ? '‹' : '›';
     const previewEnd = this.#end ?? this.#hoverDate;
 
     const previousBtn = document.createElement('button');
     previousBtn.type = 'button';
     previousBtn.setAttribute('data-jalali-calendar-nav', 'previous');
     previousBtn.setAttribute('aria-label', 'Previous month');
-    previousBtn.textContent = previousGlyph;
+    previousBtn.textContent = '‹';
     previousBtn.addEventListener('click', () => {
       this.#displayed = previousMonth(this.#system, displayed.year, displayed.month);
       this.render();
@@ -348,7 +366,7 @@ export class JalaliRangePickerElement extends HTMLElement {
     nextBtn.type = 'button';
     nextBtn.setAttribute('data-jalali-calendar-nav', 'next');
     nextBtn.setAttribute('aria-label', 'Next month');
-    nextBtn.textContent = nextGlyph;
+    nextBtn.textContent = '›';
     nextBtn.addEventListener('click', () => {
       this.#displayed = nextMonth(this.#system, displayed.year, displayed.month);
       this.render();

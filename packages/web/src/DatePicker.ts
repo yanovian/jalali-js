@@ -16,6 +16,7 @@ import { JalaliDropdownDateFieldsElement } from './DropdownDateFields.js';
 import { JalaliTimePickerElement, type TimePickerChangeEventDetail } from './TimePicker.js';
 import { el } from './dom.js';
 import { localePackFor, parseLocaleAttribute, type LocaleCode } from './locale.js';
+import { positionPopover } from './position-popover.js';
 
 export interface DatePickerChangeEventDetail {
   value: StorageValue;
@@ -94,6 +95,14 @@ export class JalaliDatePickerElement extends HTMLElement {
   #onKeyDown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape') this.#setOpen(false);
   };
+  #positionUpdate: (() => void) | null = null;
+
+  #clearPositionListeners(): void {
+    if (!this.#positionUpdate) return;
+    window.removeEventListener('resize', this.#positionUpdate);
+    window.removeEventListener('scroll', this.#positionUpdate, true);
+    this.#positionUpdate = null;
+  }
 
   get system(): CalendarSystem {
     return this.#system;
@@ -229,6 +238,7 @@ export class JalaliDatePickerElement extends HTMLElement {
   disconnectedCallback(): void {
     document.removeEventListener('pointerdown', this.#onPointerDown);
     document.removeEventListener('keydown', this.#onKeyDown);
+    this.#clearPositionListeners();
   }
 
   attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
@@ -352,6 +362,8 @@ export class JalaliDatePickerElement extends HTMLElement {
     input.value = this.#date ? displayValue(this.#date, localePack) : '';
     input.addEventListener('click', () => this.#setOpen(!this.#open));
 
+    this.#clearPositionListeners();
+
     const children: (Node | string)[] = [input];
 
     if (this.#open) {
@@ -381,6 +393,11 @@ export class JalaliDatePickerElement extends HTMLElement {
       input.setAttribute('aria-controls', 'jalali-datepicker-popover');
       popover.id = 'jalali-datepicker-popover';
       children.push(popover);
+      positionPopover(input, popover);
+      const update = () => positionPopover(input, popover);
+      this.#positionUpdate = update;
+      window.addEventListener('resize', update);
+      window.addEventListener('scroll', update, true);
     }
 
     this.replaceChildren(...children);

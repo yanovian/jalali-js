@@ -100,8 +100,6 @@ export function EventCalendar({
     return `${start} – ${end}`;
   }, [view, system, anchor, localePack, periodDays, displayFormat]);
 
-  const previousGlyph = localePack.direction === 'rtl' ? '›' : '‹';
-  const nextGlyph = localePack.direction === 'rtl' ? '‹' : '›';
   const navLabel = view === 'month' ? 'month' : view === 'week' ? 'week' : 'day';
   const hours = listHours();
 
@@ -126,7 +124,7 @@ export function EventCalendar({
           aria-label={`Previous ${navLabel}`}
           onClick={() => setAnchor(shiftEventViewAnchor(system, view, anchor, -1))}
         >
-          {previousGlyph}
+          ‹
         </button>
         <span data-jalali-calendar-title>{title}</span>
         <button
@@ -135,7 +133,7 @@ export function EventCalendar({
           aria-label={`Next ${navLabel}`}
           onClick={() => setAnchor(shiftEventViewAnchor(system, view, anchor, 1))}
         >
-          {nextGlyph}
+          ›
         </button>
       </div>
 

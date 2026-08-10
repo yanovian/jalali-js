@@ -14,9 +14,13 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 - Visual e2e screenshot mismatches are advisory. They report baseline /
   new / diff in the PR comment and do not fail the e2e job. Functional
   assertions still fail the job.
+- Hosted playgrounds are interactive demos: URL-driven controls, live
+  value, theme editor, code snippets, and binding links. The visual
+  matrix keeps the same `data-testid` cells for e2e.
 
 ### Added
 
+- Date and range picker popovers flip and clamp to stay in the viewport.
 - Opt-in astronomical Jalali engine: `engine: 'astronomical'` on
   `createCalendar()`, `toGregorian()`, and `fromGregorian()`. Nowruz uses
   the March equinox at the Tehran meridian (52.5°E) from Meeus low-precision

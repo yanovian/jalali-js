@@ -21,11 +21,13 @@
 <p align="center">
   <a href="https://jalali-js.yanovian.com/guide/getting-started">Guide</a>
   ·
-  <a href="https://jalali-js.yanovian.com/guide/examples">Examples</a>
-  ·
   <a href="https://jalali-js.yanovian.com/api/jalali-js/">API reference</a>
   ·
-  <a href="https://jalali-js.yanovian.com/playground/react/">Playground</a>
+  <a href="https://jalali-js.yanovian.com/playground/react/"><b>Live demo</b></a>
+  ·
+  <a href="https://jalali-js.yanovian.com/playground/vue/">Vue</a>
+  ·
+  <a href="https://jalali-js.yanovian.com/playground/vanilla/">Web Components</a>
 </p>
 
 ## Why this exists

@@ -1,319 +1,549 @@
 import '@jalali-js/react/date-picker.css';
 import '@jalali-js/ui-react/themes/compact.css';
-// Loaded as a string, not a global side-effect import, so the dark theme can be toggled: it
-// only overrides --jalali-* custom properties on [data-jalali-*] elements (see dark.css's own
-// comment), so injecting/removing it as a <style> tag turns the picker theme on and off cleanly.
 import darkThemeCss from '@jalali-js/ui-react/themes/dark.css?inline';
 import type { LocaleCode } from '@jalali-js/react';
 import { DatePicker, TimePicker, useCalendar } from '@jalali-js/react';
 import { EventCalendar, InlineCalendar, RangePicker, TimeRangePicker } from '@jalali-js/ui-react';
 import type { RangeStorageValue } from '@jalali-js/ui-react';
 import type { CalendarDate, CalendarEvent, StorageValue, TimeOfDay } from 'jalali-js';
-import { useState } from 'react';
+import {
+  DEMO_DAY,
+  DEMO_EVENTS,
+  DEMO_MONTH,
+  parseDemoState,
+  reactSnippet,
+  themeStyleFromState,
+  writeDemoStateToUrl,
+  type DemoState,
+  type DemoTab,
+} from 'playground-shared';
+import { useEffect, useMemo, useState } from 'react';
+import './demo.css';
 
-const DEMO_EVENTS: CalendarEvent[] = [
-  {
-    id: 'workshop',
-    title: 'Workshop',
-    start: { year: 1403, month: 5, day: 10 },
-    end: { year: 1403, month: 5, day: 12 },
-  },
-  {
-    id: 'offsite',
-    title: 'Offsite',
-    start: { year: 1403, month: 5, day: 14 },
-    end: { year: 1403, month: 5, day: 16 },
-  },
-  {
-    id: 'meeting',
-    title: 'Meeting',
-    start: { year: 1403, month: 5, day: 15 },
-    end: { year: 1403, month: 5, day: 15 },
-    allDay: false,
-    startTime: { hour: 14, minute: 0 },
-    endTime: { hour: 15, minute: 0 },
-  },
-  {
-    id: 'call',
-    title: 'Call',
-    start: { year: 1403, month: 5, day: 15 },
-    end: { year: 1403, month: 5, day: 15 },
-    allDay: false,
-    startTime: { hour: 14, minute: 30 },
-    endTime: { hour: 15, minute: 30 },
-  },
-  {
-    id: 'standup',
-    title: 'Standup',
-    start: { year: 1403, month: 5, day: 16 },
-    end: { year: 1403, month: 5, day: 16 },
-    allDay: false,
-    startTime: { hour: 9, minute: 0 },
-    endTime: { hour: 9, minute: 30 },
-  },
+const TABS: { id: DemoTab; label: string }[] = [
+  { id: 'date-picker', label: 'DatePicker' },
+  { id: 'range-picker', label: 'RangePicker' },
+  { id: 'inline-calendar', label: 'InlineCalendar' },
+  { id: 'event-calendar', label: 'EventCalendar' },
+  { id: 'time-picker', label: 'TimePicker' },
+  { id: 'datetime-picker', label: 'DateTime' },
+  { id: 'time-range-picker', label: 'TimeRange' },
+  { id: 'position', label: 'Position' },
 ];
+
+const demoEvents = DEMO_EVENTS as unknown as CalendarEvent[];
 
 function CalendarSummary() {
   const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
   return <p>امروز: {jalali.format(jalali.today(), { style: 'long', weekday: true })}</p>;
 }
 
+function useDemoState(): [DemoState, (patch: Partial<DemoState>) => void] {
+  const [state, setState] = useState(() => parseDemoState(window.location.search));
+  useEffect(() => {
+    writeDemoStateToUrl(state);
+  }, [state]);
+  useEffect(() => {
+    document.documentElement.style.colorScheme = state.dark ? 'dark' : 'light';
+  }, [state.dark]);
+  const patch = (next: Partial<DemoState>) => setState((prev) => ({ ...prev, ...next }));
+  return [state, patch];
+}
+
 export default function App() {
+  const [state, patch] = useDemoState();
   const [stored, setStored] = useState<StorageValue | null>(null);
   const [storedRange, setStoredRange] = useState<RangeStorageValue | null>(null);
-  const [storedDatetime, setStoredDatetime] = useState<StorageValue | null>(null);
   const [time, setTime] = useState<TimeOfDay>({ hour: 14, minute: 30 });
   const [timeRange, setTimeRange] = useState<{ start: TimeOfDay; end: TimeOfDay } | null>(null);
   const [inlineSelected, setInlineSelected] = useState<CalendarDate | null>(null);
-  const [eventClickLog, setEventClickLog] = useState<string>('none');
-  const [isDark, setIsDark] = useState(true);
-  const [locale, setLocale] = useState<LocaleCode>('fa');
+  const [eventClickLog, setEventClickLog] = useState('none');
+  const [copyLabel, setCopyLabel] = useState('Copy');
+
+  const snippet = useMemo(() => reactSnippet(state), [state]);
+  const themeStyle = themeStyleFromState(state.theme);
+  // Host chrome stays LTR. Page direction only wraps the live stage.
+  // Pickers keep locale direction on their own roots, not from this value.
+  const stageDir = state.dir === 'auto' ? 'ltr' : state.dir;
+
+  async function copySnippet() {
+    await navigator.clipboard.writeText(snippet);
+    setCopyLabel('Copied');
+    window.setTimeout(() => setCopyLabel('Copy'), 1200);
+  }
 
   return (
     <main
+      className="demo-page"
+      dir="ltr"
       style={{
-        fontFamily: 'system-ui, sans-serif',
-        padding: '2rem',
-        maxWidth: 900,
-        background: isDark ? '#141414' : '#ffffff',
-        color: isDark ? '#ededed' : '#1a1a1a',
-        minHeight: '100vh',
+        background: state.dark ? '#141414' : '#ffffff',
+        color: state.dark ? '#ededed' : '#1a1a1a',
       }}
     >
-      {isDark && <style>{darkThemeCss}</style>}
-      <h1>jalali-js playground</h1>
-      <p style={{ margin: '-0.5rem 0 1rem' }}>
-        React playground · <a href="../vue/">Vue playground</a> ·{' '}
-        <a href="../vanilla/">Vanilla playground</a>
-      </p>
-      <p style={{ margin: '0 0 1rem' }}>
-        <label>
-          <input type="checkbox" checked={isDark} onChange={(e) => setIsDark(e.target.checked)} />{' '}
-          Dark mode
-        </label>
-        {'  '}
-        <label>
-          <input
-            type="checkbox"
-            checked={locale === 'en'}
-            onChange={(e) => setLocale(e.target.checked ? 'en' : 'fa')}
-          />{' '}
-          English (unchecked: Farsi)
-        </label>
-      </p>
-      <p>
-        The <code>compact</code> theme from <code>@jalali-js/ui-react/themes</code> is always on
-        below, for spacing. The <code>dark</code> theme (colors) is what the dark mode toggle
-        controls, applied to both the pickers and this page&rsquo;s own background: composing
-        multiple theme files works by importing more than one (see the CSS imports at the top of
-        this file). Every component below shares one page-wide theme, since the theming contract is
-        CSS custom properties on each picker&rsquo;s root element, the same design a whole-app theme
-        switch relies on. The language toggle controls every component below except the explicit
-        fixed-locale comparison sections (English, Farsi, and Pashto), which always show their own
-        locale.
-      </p>
-      <CalendarSummary />
-
-      <section data-testid="grid-en-jalali">
-        <h2>Grid variant, English, Jalali system</h2>
-        <DatePicker system="jalali" locale="en" onChange={(value) => setStored(value)} />
-        <p>Stored value (Gregorian by default): {JSON.stringify(stored)}</p>
-      </section>
-
-      <section data-testid="grid-fa-jalali">
-        <h2>Grid variant, Farsi</h2>
-        <DatePicker system="jalali" locale="fa" />
-      </section>
-
-      <section data-testid="grid-ps-jalali">
-        <h2>Grid variant, Pashto (Afghan month names)</h2>
-        <DatePicker system="jalali" locale="ps" />
-      </section>
-
-      <section data-testid="quick-nav">
-        <h2>Quick year/month navigation (default on)</h2>
-        <p>Click the month or year in the header to jump straight to a month grid or year grid.</p>
-        <DatePicker system="jalali" locale={locale} />
-      </section>
-
-      <section data-testid="quick-nav-off">
-        <h2>Quick navigation turned off (quickNav: false)</h2>
-        <p>The month and year in the header are plain text; only the prev/next arrows page.</p>
-        <DatePicker system="jalali" locale={locale} quickNav={false} />
-      </section>
-
-      <section data-testid="no-initial-selection">
-        <h2>No initial selection (defaultDate: null)</h2>
-        <p>Opens with nothing picked, showing the placeholder until a person picks a date.</p>
-        <DatePicker system="jalali" locale={locale} defaultDate={null} />
-      </section>
-
-      <section data-testid="dropdown">
-        <h2>Dropdown variant (date-of-birth style entry)</h2>
-        <DatePicker system="jalali" locale={locale} variant="dropdown" />
-      </section>
-
-      <section data-testid="gregorian">
-        <h2>Gregorian system</h2>
-        <DatePicker system="gregorian" locale={locale} />
-      </section>
-
-      <section data-testid="inline-calendar">
-        <h2>Inline calendar (@jalali-js/ui-react)</h2>
-        <InlineCalendar
-          system="jalali"
-          locale={locale}
-          value={inlineSelected}
-          onSelect={setInlineSelected}
-        />
-        <p>Selected: {inlineSelected ? JSON.stringify(inlineSelected) : 'none'}</p>
-      </section>
-
-      <section data-testid="range-picker">
-        <h2>Range picker (@jalali-js/ui-react)</h2>
-        <RangePicker system="jalali" locale={locale} onChange={(value) => setStoredRange(value)} />
-        <p>Stored range (Gregorian by default): {JSON.stringify(storedRange)}</p>
-      </section>
-
-      <section data-testid="time-picker">
-        <h2>Time picker</h2>
-        <p>Hour and minute selects, with a 15-minute step.</p>
-        <TimePicker locale={locale} value={time} minuteStep={15} onChange={setTime} />
-        <p>Selected time: {JSON.stringify(time)}</p>
-      </section>
-
-      <section data-testid="datetime-picker">
-        <h2>Date and time (precision: datetime)</h2>
-        <DatePicker
-          system="jalali"
-          locale={locale}
-          precision="datetime"
-          minuteStep={15}
-          defaultDate={{
-            precision: 'datetime',
-            system: 'jalali',
-            year: 1403,
-            month: 5,
-            day: 15,
-            hour: 14,
-            minute: 30,
-            second: 0,
-            millisecond: 0,
-          }}
-          onChange={(value) => setStoredDatetime(value)}
-        />
-        <p>Stored value (Gregorian by default): {JSON.stringify(storedDatetime)}</p>
-      </section>
-
-      <section data-testid="time-range-picker">
-        <h2>Time range picker (@jalali-js/ui-react)</h2>
-        <TimeRangePicker locale={locale} minuteStep={15} onChange={setTimeRange} />
-        <p>Selected range: {JSON.stringify(timeRange)}</p>
-      </section>
-
-      <section data-testid="event-calendar">
-        <h2>Event calendar month (@jalali-js/ui-react)</h2>
-        <p>
-          Mordad 1403. Multi-day all-day chips plus timed events. The consumer owns the list. Clicks
-          only fire callbacks.
-        </p>
-        <EventCalendar
-          system="jalali"
-          locale={locale}
-          view="month"
-          initialDisplayedMonth={{ year: 1403, month: 5 }}
-          events={DEMO_EVENTS}
-          onEventClick={(event) => setEventClickLog(event.title)}
-        />
-        <p>Last event click: {eventClickLog}</p>
-      </section>
-
-      <section data-testid="event-calendar-week">
-        <h2>Event calendar week</h2>
-        <p>
-          Week of 15 Mordad 1403. All-day row on top. Timed grid below. Overlapping Meeting and Call
-          share side-by-side lanes.
-        </p>
-        <EventCalendar
-          system="jalali"
-          locale={locale}
-          view="week"
-          initialDate={{ year: 1403, month: 5, day: 15 }}
-          events={DEMO_EVENTS}
-        />
-      </section>
-
-      <section data-testid="event-calendar-day">
-        <h2>Event calendar day</h2>
-        <p>15 Mordad 1403. Same seed events, one day column with a timed grid.</p>
-        <EventCalendar
-          system="jalali"
-          locale={locale}
-          view="day"
-          initialDate={{ year: 1403, month: 5, day: 15 }}
-          events={DEMO_EVENTS}
-        />
-      </section>
-
-      <section data-testid="selection-rules">
-        <h2>Selection rules (min/max, blocked dates, blocked weekdays)</h2>
-        <p>
-          Mordad 1403 with rules: selectable from the 5th to the 28th, the 12th is blocked, and the
-          Thursday/Friday weekend is blocked. Blocked days render disabled (
-          <code>data-disabled</code>) and reject clicks, and the Tab order skips them.
-        </p>
-        <InlineCalendar
-          system="jalali"
-          locale={locale}
-          initialDisplayedMonth={{ year: 1403, month: 5 }}
-          rules={{
-            minDate: { year: 1403, month: 5, day: 5 },
-            maxDate: { year: 1403, month: 5, day: 28 },
-            disabledDates: [{ year: 1403, month: 5, day: 12 }],
-            disabledWeekdays: [4, 5],
-          }}
-        />
-      </section>
-
-      <section data-testid="holidays">
-        <h2>Iran holidays (showHolidays)</h2>
-        <p>
-          Farvardin 1403, <code>holidayRegion=&quot;IR&quot;</code>. Holiday days get{' '}
-          <code>data-holiday</code>.
-        </p>
-        <InlineCalendar
-          system="jalali"
-          locale={locale}
-          initialDisplayedMonth={{ year: 1403, month: 1 }}
-          showHolidays
-          holidayRegion="IR"
-        />
-      </section>
-
-      <section data-testid="custom-theme">
-        <h2>Custom CSS override (consumer-configured, not a shipped theme file)</h2>
-        <p>
-          A consumer can retheme a picker by overriding the <code>--jalali-*</code> custom
-          properties, with no theme file at all. The theme imports above already set some of those
-          properties directly on every picker&rsquo;s root element, and since custom properties
-          inherit rather than cascade by specificity, an ancestor&rsquo;s inline style cannot win
-          against a value set directly on the root itself. This section instead follows
-          architecture.md&rsquo;s own documented pattern: a scoped selector under a parent class
-          (see the &quot;Theming contract&quot; section there).
-        </p>
+      {state.dark && <style>{darkThemeCss}</style>}
+      {!state.compact && (
         <style>{`
-          .custom-theme-scope [data-jalali-datepicker-root] {
-            --jalali-primary: #c026d3;
-            --jalali-primary-fg: #ffffff;
-            --jalali-bg: #fdf4ff;
-            --jalali-fg: #581c87;
-            --jalali-radius: 20px;
+          [data-jalali-datepicker-root], [data-jalali-calendar-root], [data-jalali-event-calendar] {
+            --jalali-font-size: 1rem;
+            --jalali-gap: 0.5em;
+            --jalali-day-min-size: 2.5em;
           }
         `}</style>
-        <div className="custom-theme-scope">
-          <DatePicker system="jalali" locale={locale} />
+      )}
+
+      <div className="demo-shell" data-testid="demo-shell">
+        <div>
+          <h1>jalali-js playground</h1>
+          <p className="demo-bindings">
+            <strong>React</strong>
+            <a href="../vue/">Vue</a>
+            <a href="../vanilla/">Web Components</a>
+          </p>
+          <CalendarSummary />
         </div>
-      </section>
+
+        <div className="demo-tabs" role="tablist" aria-label="Component">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={state.tab === tab.id}
+              onClick={() => patch({ tab: tab.id })}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="demo-controls">
+          <label>
+            Locale
+            <select
+              value={state.locale}
+              onChange={(e) => patch({ locale: e.target.value as DemoState['locale'] })}
+            >
+              <option value="en">en</option>
+              <option value="fa">fa</option>
+              <option value="ps">ps</option>
+            </select>
+          </label>
+          <label>
+            System
+            <select
+              value={state.system}
+              onChange={(e) => patch({ system: e.target.value as DemoState['system'] })}
+            >
+              <option value="jalali">jalali</option>
+              <option value="gregorian">gregorian</option>
+            </select>
+          </label>
+          <label>
+            Variant
+            <select
+              value={state.variant}
+              onChange={(e) => patch({ variant: e.target.value as DemoState['variant'] })}
+            >
+              <option value="grid">grid</option>
+              <option value="dropdown">dropdown</option>
+            </select>
+          </label>
+          <label>
+            valueFormat
+            <select
+              value={state.valueFormat}
+              onChange={(e) => patch({ valueFormat: e.target.value as DemoState['valueFormat'] })}
+            >
+              <option value="gregorian-iso">gregorian-iso</option>
+              <option value="jalali-object">jalali-object</option>
+            </select>
+          </label>
+          <label>
+            Display style
+            <select
+              value={state.displayStyle}
+              onChange={(e) => patch({ displayStyle: e.target.value as DemoState['displayStyle'] })}
+            >
+              <option value="short">short</option>
+              <option value="long">long</option>
+            </select>
+          </label>
+          <label>
+            Event view
+            <select
+              value={state.eventView}
+              onChange={(e) => patch({ eventView: e.target.value as DemoState['eventView'] })}
+            >
+              <option value="month">month</option>
+              <option value="week">week</option>
+              <option value="day">day</option>
+            </select>
+          </label>
+          <label>
+            Minute step
+            <input
+              type="number"
+              min={1}
+              max={30}
+              value={state.minuteStep}
+              onChange={(e) => patch({ minuteStep: Number(e.target.value) || 15 })}
+            />
+          </label>
+          <label>
+            Page direction
+            <select
+              value={state.dir}
+              onChange={(e) => patch({ dir: e.target.value as DemoState['dir'] })}
+            >
+              <option value="auto">auto</option>
+              <option value="ltr">ltr</option>
+              <option value="rtl">rtl</option>
+            </select>
+          </label>
+          <label>
+            Primary
+            <input
+              type="color"
+              value={state.theme.primary || '#2563eb'}
+              onChange={(e) => patch({ theme: { ...state.theme, primary: e.target.value } })}
+            />
+          </label>
+          <label>
+            Background
+            <input
+              type="color"
+              value={state.theme.bg || (state.dark ? '#1f1f1f' : '#ffffff')}
+              onChange={(e) => patch({ theme: { ...state.theme, bg: e.target.value } })}
+            />
+          </label>
+          <label>
+            Radius
+            <input
+              type="text"
+              placeholder="e.g. 12px"
+              value={state.theme.radius}
+              onChange={(e) => patch({ theme: { ...state.theme, radius: e.target.value } })}
+            />
+          </label>
+          <label>
+            Gap
+            <input
+              type="text"
+              placeholder="e.g. 0.5em"
+              value={state.theme.gap}
+              onChange={(e) => patch({ theme: { ...state.theme, gap: e.target.value } })}
+            />
+          </label>
+          <label>
+            <span>
+              <input
+                type="checkbox"
+                checked={state.dark}
+                onChange={(e) => patch({ dark: e.target.checked })}
+              />{' '}
+              Dark
+            </span>
+          </label>
+          <label>
+            <span>
+              <input
+                type="checkbox"
+                checked={state.compact}
+                onChange={(e) => patch({ compact: e.target.checked })}
+              />{' '}
+              Compact
+            </span>
+          </label>
+          <label>
+            <span>
+              <input
+                type="checkbox"
+                checked={state.showHolidays}
+                onChange={(e) => patch({ showHolidays: e.target.checked })}
+              />{' '}
+              Show holidays
+            </span>
+          </label>
+        </div>
+
+        <div className="demo-stage" dir={stageDir} style={themeStyle}>
+          {state.tab === 'date-picker' && (
+            <DatePicker
+              system={state.system}
+              locale={state.locale}
+              variant={state.variant}
+              valueFormat={state.valueFormat}
+              displayFormat={{ style: state.displayStyle }}
+              showHolidays={state.showHolidays}
+              onChange={(value) => setStored(value)}
+            />
+          )}
+          {state.tab === 'range-picker' && (
+            <RangePicker
+              system={state.system}
+              locale={state.locale}
+              valueFormat={state.valueFormat}
+              showHolidays={state.showHolidays}
+              onChange={(value) => setStoredRange(value)}
+            />
+          )}
+          {state.tab === 'inline-calendar' && (
+            <InlineCalendar
+              system={state.system}
+              locale={state.locale}
+              value={inlineSelected}
+              showHolidays={state.showHolidays}
+              onSelect={setInlineSelected}
+            />
+          )}
+          {state.tab === 'event-calendar' && (
+            <EventCalendar
+              system={state.system}
+              locale={state.locale}
+              view={state.eventView}
+              initialDisplayedMonth={DEMO_MONTH}
+              initialDate={DEMO_DAY}
+              events={demoEvents}
+              onEventClick={(event) => setEventClickLog(event.title)}
+            />
+          )}
+          {state.tab === 'time-picker' && (
+            <TimePicker
+              locale={state.locale}
+              value={time}
+              minuteStep={state.minuteStep}
+              onChange={setTime}
+            />
+          )}
+          {state.tab === 'datetime-picker' && (
+            <DatePicker
+              system={state.system}
+              locale={state.locale}
+              variant={state.variant}
+              precision="datetime"
+              minuteStep={state.minuteStep}
+              valueFormat={state.valueFormat}
+              defaultDate={{
+                precision: 'datetime',
+                system: 'jalali',
+                year: 1403,
+                month: 5,
+                day: 15,
+                hour: 14,
+                minute: 30,
+                second: 0,
+                millisecond: 0,
+              }}
+              onChange={(value) => setStored(value)}
+            />
+          )}
+          {state.tab === 'time-range-picker' && (
+            <TimeRangePicker
+              locale={state.locale}
+              minuteStep={state.minuteStep}
+              onChange={setTimeRange}
+            />
+          )}
+          {state.tab === 'position' && (
+            <div className="demo-position-frame" data-testid="viewport-position">
+              <div className="corner corner-tl">
+                <DatePicker system={state.system} locale={state.locale} />
+              </div>
+              <div className="corner corner-tr">
+                <DatePicker system={state.system} locale={state.locale} />
+              </div>
+              <div className="corner corner-bl">
+                <DatePicker system={state.system} locale={state.locale} />
+              </div>
+              <div className="corner corner-br">
+                <DatePicker system={state.system} locale={state.locale} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <p className="demo-value">
+          Emitted value (storage):{' '}
+          {JSON.stringify(
+            state.tab === 'range-picker'
+              ? storedRange
+              : state.tab === 'time-picker'
+                ? time
+                : state.tab === 'time-range-picker'
+                  ? timeRange
+                  : state.tab === 'inline-calendar'
+                    ? inlineSelected
+                    : state.tab === 'event-calendar'
+                      ? { lastEventClick: eventClickLog }
+                      : stored,
+          )}
+        </p>
+
+        <div className="demo-snippet-section">
+          <strong>Code</strong>
+          <div className="demo-snippet-block">
+            <button type="button" className="demo-snippet-copy" onClick={() => void copySnippet()}>
+              {copyLabel}
+            </button>
+            <pre className="demo-snippet">{snippet}</pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Visual matrix</h2>
+      <p>
+        Stable cells for visual e2e. Page defaults match dark + compact + fa unless the URL
+        overrides them.
+      </p>
+      <div className="demo-gallery">
+        <section data-testid="grid-en-jalali">
+          <h3>Grid, English, Jalali</h3>
+          <DatePicker system="jalali" locale="en" onChange={(value) => setStored(value)} />
+          <p>Stored value: {JSON.stringify(stored)}</p>
+        </section>
+        <section data-testid="grid-fa-jalali">
+          <h3>Grid, Farsi</h3>
+          <DatePicker system="jalali" locale="fa" />
+        </section>
+        <section data-testid="grid-ps-jalali">
+          <h3>Grid, Pashto</h3>
+          <DatePicker system="jalali" locale="ps" />
+        </section>
+        <section data-testid="dropdown">
+          <h3>Dropdown</h3>
+          <DatePicker system="jalali" locale={state.locale as LocaleCode} variant="dropdown" />
+        </section>
+        <section data-testid="gregorian">
+          <h3>Gregorian</h3>
+          <DatePicker system="gregorian" locale={state.locale as LocaleCode} />
+        </section>
+        <section data-testid="inline-calendar">
+          <h3>Inline calendar</h3>
+          <InlineCalendar
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            value={inlineSelected}
+            onSelect={setInlineSelected}
+          />
+        </section>
+        <section data-testid="range-picker">
+          <h3>Range picker</h3>
+          <RangePicker
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            onChange={(value) => setStoredRange(value)}
+          />
+        </section>
+        <section data-testid="time-picker">
+          <h3>Time picker</h3>
+          <TimePicker
+            locale={state.locale as LocaleCode}
+            value={time}
+            minuteStep={15}
+            onChange={setTime}
+          />
+        </section>
+        <section data-testid="datetime-picker">
+          <h3>Date and time</h3>
+          <DatePicker
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            precision="datetime"
+            minuteStep={15}
+            defaultDate={{
+              precision: 'datetime',
+              system: 'jalali',
+              year: 1403,
+              month: 5,
+              day: 15,
+              hour: 14,
+              minute: 30,
+              second: 0,
+              millisecond: 0,
+            }}
+            onChange={(value) => setStored(value)}
+          />
+        </section>
+        <section data-testid="time-range-picker">
+          <h3>Time range</h3>
+          <TimeRangePicker
+            locale={state.locale as LocaleCode}
+            minuteStep={15}
+            onChange={setTimeRange}
+          />
+        </section>
+        <section data-testid="event-calendar">
+          <h3>Event calendar month</h3>
+          <EventCalendar
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            view="month"
+            initialDisplayedMonth={DEMO_MONTH}
+            events={demoEvents}
+            onEventClick={(event) => setEventClickLog(event.title)}
+          />
+        </section>
+        <section data-testid="event-calendar-week">
+          <h3>Event calendar week</h3>
+          <EventCalendar
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            view="week"
+            initialDate={DEMO_DAY}
+            events={demoEvents}
+          />
+        </section>
+        <section data-testid="event-calendar-day">
+          <h3>Event calendar day</h3>
+          <EventCalendar
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            view="day"
+            initialDate={DEMO_DAY}
+            events={demoEvents}
+          />
+        </section>
+        <section data-testid="selection-rules">
+          <h3>Selection rules</h3>
+          <InlineCalendar
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            initialDisplayedMonth={DEMO_MONTH}
+            rules={{
+              minDate: { year: 1403, month: 5, day: 5 },
+              maxDate: { year: 1403, month: 5, day: 28 },
+              disabledDates: [{ year: 1403, month: 5, day: 12 }],
+              disabledWeekdays: [4, 5],
+            }}
+          />
+        </section>
+        <section data-testid="holidays">
+          <h3>Iran holidays</h3>
+          <InlineCalendar
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            initialDisplayedMonth={{ year: 1403, month: 1 }}
+            showHolidays
+            holidayRegion="IR"
+          />
+        </section>
+        <section data-testid="custom-theme">
+          <h3>Custom theme</h3>
+          <style>{`
+            .custom-theme-scope [data-jalali-datepicker-root] {
+              --jalali-primary: #c026d3;
+              --jalali-primary-fg: #ffffff;
+              --jalali-bg: #fdf4ff;
+              --jalali-fg: #581c87;
+              --jalali-radius: 20px;
+            }
+          `}</style>
+          <div className="custom-theme-scope">
+            <DatePicker system="jalali" locale={state.locale as LocaleCode} />
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

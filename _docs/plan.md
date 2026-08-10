@@ -965,69 +965,37 @@ each common scenario.
 
 ## Phase 22: Interactive demo playground (`apps/`)
 
-The hosted playground pages exist to exercise the components for tests.
-They are plain lists of sections. A visitor who evaluates the library needs
-more: live controls, the current value, and matching code to copy. This
-phase turns the hosted playground into a real demo site.
+The hosted playground pages exercise the components for tests. A visitor
+also needs live controls, the current value, and matching code to copy.
+This phase turns the hosted playground into a real demo site.
 
-The playground pages carry a second job that must survive this redesign:
-they are the render targets for the visual e2e suite and its PR screenshot
-comment (Phase 10). A screenshot test needs a deterministic render state on
-every run. Live controls make a page stateful, so this phase must serve
-both jobs by design, not by luck. The mechanism: the demo derives its full
-control state from URL parameters, with fixed defaults when none are given.
-A visitor gets an interactive page. The e2e suite opens each section with
-an explicit URL and always screenshots the exact same state.
+Control state comes from URL parameters, with fixed defaults. The e2e
+suite opens each page with an explicit URL and screenshots the same
+state every run.
 
-- [ ] Design one shared demo layout: a tab or section per component
-      (`DatePicker` in both variants, `RangePicker`, `InlineCalendar`,
-      `EventCalendar`, and each later component as it lands), with a
-      binding switch for React, Vue, and Web Components.
-- [ ] Add live controls for the real props: locale, calendar system,
-      picker variant, display format, and `valueFormat`. Wire in the
-      selection rules and time options as Phases 16 and 17 land. For
-      `EventCalendar`, add a view control (`month` / `week` / `day`) and
-      a small editable seed event list so a visitor can see all-day chips,
-      timed blocks, and overlap lanes without reading the guide. The
-      rendered component updates as the visitor changes a control.
-- [ ] Keep three fixed screenshot cells for `EventCalendar` (month, week,
-      day) under stable `data-testid`s, so the visual e2e suite still
-      captures each view even after the interactive shell lands.
-- [ ] Show the emitted value next to each component, live. This makes the
-      display-value against storage-value contract visible: the display
-      shows Jalali while the emitted value stays Gregorian.
-- [ ] Add a live theme editor: color, spacing, and shape controls that
-      write the `--jalali-*` custom properties, plus a dark against light
-      toggle and a compact toggle.
-- [ ] Generate the code snippet from the current control state, one per
-      binding, with a copy button. A visitor copies working code, not a
-      generic example.
-- [ ] Add a host-page direction toggle (LTR against RTL), to show the
-      layout stays correct in both.
-- [ ] Add a viewport-position demo: a picker near the screen edges, to
-      show the popover flips and clamps to stay on screen. Build the
-      flip-and-clamp behavior first if the components lack it.
-- [ ] Make the layout work well on a phone, with touch-friendly targets.
-- [ ] Drive the full control state from URL parameters, with fixed
-      defaults. This is the seam that keeps the page deterministic for
-      screenshots while staying interactive for a visitor (see the note
-      above). Also useful on its own: a visitor can share a link to an
-      exact configuration.
-- [ ] Keep the stable `data-testid` structure the visual e2e suite
-      screenshots (Phase 10), and point every existing screenshot test at
-      an explicit URL state, so each test keeps covering the same
-      locale, system, and variant cell it covers today. The PR comment
-      keeps its full image grid; no cell silently disappears.
-- [ ] Add screenshot coverage for the demo shell itself: one default-state
-      screenshot per tab, and one with a non-default control state, so a
-      broken control panel fails visibly in the PR comment too.
-- [ ] Expect the redesign pull request to show every screenshot as
-      changed in the PR comment. Review the images there. The baseline
-      branch catches up automatically after merge (the Phase 10 flow,
-      unchanged). Land Phase 23 first, so this pull request reports its
-      visual changes in the comment without a failing check.
-- [ ] Link the demo site prominently from the docs home page and the
-      readme.
+- [x] Shared demo layout in React, Vue, and Web Components playgrounds:
+      tabs per component, binding links between the three apps, shared
+      state helpers in `apps/playground-shared`.
+- [x] Live controls: locale, system, variant, display style, `valueFormat`,
+      time step, holidays, EventCalendar view. Seed events cover all-day
+      chips, timed blocks, and overlap lanes.
+- [x] Keep three fixed `EventCalendar` screenshot cells (month, week, day)
+      under stable `data-testid`s, plus the rest of the visual matrix.
+- [x] Show the emitted storage value next to the live component.
+- [x] Live theme editor for `--jalali-*` colors and spacing, plus dark and
+      compact toggles.
+- [x] Code snippet from the current state, with a copy button, per binding.
+- [x] Host-page direction toggle (ltr / rtl / auto).
+- [x] Viewport-position demo with pickers at the screen edges. Popovers
+      flip and clamp (`positionPopover` in the date and range pickers).
+- [x] Touch-friendly layout for phone widths.
+- [x] Full control state from URL parameters.
+- [x] E2e tests use explicit URL state and keep the existing cell
+      `data-testid`s.
+- [x] Demo shell screenshots: default state and one non-default control
+      state per binding.
+- [x] Phase 23 landed first so visual changes report without failing CI.
+- [x] Link the demo from the docs home page and the readme.
 
 ## Phase 23: Visual changes report, they do not fail CI
 

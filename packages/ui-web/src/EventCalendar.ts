@@ -149,8 +149,6 @@ export class JalaliEventCalendarElement extends HTMLElement {
     const localePack = localePackFor(this.#locale);
     const today = createCalendar({ system: this.#system }).today();
     const anchor = this.#ensureAnchor();
-    const previousGlyph = localePack.direction === 'rtl' ? '›' : '‹';
-    const nextGlyph = localePack.direction === 'rtl' ? '‹' : '›';
     const navLabel = this.#view === 'month' ? 'month' : this.#view === 'week' ? 'week' : 'day';
 
     const title = (() => {
@@ -182,7 +180,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
     prev.type = 'button';
     prev.setAttribute('data-jalali-calendar-nav', 'previous');
     prev.setAttribute('aria-label', `Previous ${navLabel}`);
-    prev.textContent = previousGlyph;
+    prev.textContent = '‹';
     prev.addEventListener('click', () => {
       this.#anchor = shiftEventViewAnchor(this.#system, this.#view, anchor, -1);
       this.render();
@@ -196,7 +194,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
     next.type = 'button';
     next.setAttribute('data-jalali-calendar-nav', 'next');
     next.setAttribute('aria-label', `Next ${navLabel}`);
-    next.textContent = nextGlyph;
+    next.textContent = '›';
     next.addEventListener('click', () => {
       this.#anchor = shiftEventViewAnchor(this.#system, this.#view, anchor, 1);
       this.render();

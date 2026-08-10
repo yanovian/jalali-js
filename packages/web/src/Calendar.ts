@@ -199,9 +199,6 @@ export class JalaliCalendarElement extends HTMLElement {
     this.dir = localePack.direction;
     this.setAttribute('data-jalali-calendar-view', this.#view);
 
-    const previousGlyph = localePack.direction === 'rtl' ? '›' : '‹';
-    const nextGlyph = localePack.direction === 'rtl' ? '‹' : '›';
-
     const openMonthView = (): void => {
       this.#view = 'month';
       this.render();
@@ -224,27 +221,11 @@ export class JalaliCalendarElement extends HTMLElement {
 
     let body: DocumentFragment;
     if (this.#view === 'day') {
-      body = this.#renderDayView(
-        localePack,
-        today,
-        displayed,
-        previousGlyph,
-        nextGlyph,
-        openMonthView,
-        openYearView,
-      );
+      body = this.#renderDayView(localePack, today, displayed, openMonthView, openYearView);
     } else if (this.#view === 'month') {
-      body = this.#renderMonthView(
-        localePack,
-        today,
-        displayed,
-        previousGlyph,
-        nextGlyph,
-        openYearView,
-        pickMonth,
-      );
+      body = this.#renderMonthView(localePack, today, displayed, openYearView, pickMonth);
     } else {
-      body = this.#renderYearView(localePack, today, displayed, previousGlyph, nextGlyph, pickYear);
+      body = this.#renderYearView(localePack, today, displayed, pickYear);
     }
     this.replaceChildren(body);
   }
@@ -253,8 +234,6 @@ export class JalaliCalendarElement extends HTMLElement {
     localePack: ReturnType<typeof localePackFor>,
     today: CalendarDate,
     displayed: { year: number; month: number },
-    previousGlyph: string,
-    nextGlyph: string,
     openMonthView: () => void,
     openYearView: () => void,
   ): DocumentFragment {
@@ -279,7 +258,7 @@ export class JalaliCalendarElement extends HTMLElement {
     const previousBtn = el(
       'button',
       { type: 'button', 'data-jalali-calendar-nav': 'previous', 'aria-label': 'Previous month' },
-      [previousGlyph],
+      ['‹'],
     );
     previousBtn.addEventListener('click', () => {
       this.#displayed = previousMonth(this.#system, displayed.year, displayed.month);
@@ -288,7 +267,7 @@ export class JalaliCalendarElement extends HTMLElement {
     const nextBtn = el(
       'button',
       { type: 'button', 'data-jalali-calendar-nav': 'next', 'aria-label': 'Next month' },
-      [nextGlyph],
+      ['›'],
     );
     nextBtn.addEventListener('click', () => {
       this.#displayed = nextMonth(this.#system, displayed.year, displayed.month);
@@ -362,8 +341,6 @@ export class JalaliCalendarElement extends HTMLElement {
     localePack: ReturnType<typeof localePackFor>,
     today: CalendarDate,
     displayed: { year: number; month: number },
-    previousGlyph: string,
-    nextGlyph: string,
     openYearView: () => void,
     pickMonth: (month: number) => void,
   ): DocumentFragment {
@@ -372,7 +349,7 @@ export class JalaliCalendarElement extends HTMLElement {
     const previousBtn = el(
       'button',
       { type: 'button', 'data-jalali-calendar-nav': 'previous', 'aria-label': 'Previous year' },
-      [previousGlyph],
+      ['‹'],
     );
     previousBtn.addEventListener('click', () => {
       this.#displayed = { ...displayed, year: displayed.year - 1 };
@@ -381,7 +358,7 @@ export class JalaliCalendarElement extends HTMLElement {
     const nextBtn = el(
       'button',
       { type: 'button', 'data-jalali-calendar-nav': 'next', 'aria-label': 'Next year' },
-      [nextGlyph],
+      ['›'],
     );
     nextBtn.addEventListener('click', () => {
       this.#displayed = { ...displayed, year: displayed.year + 1 };
@@ -431,14 +408,12 @@ export class JalaliCalendarElement extends HTMLElement {
     localePack: ReturnType<typeof localePackFor>,
     today: CalendarDate,
     displayed: { year: number; month: number },
-    previousGlyph: string,
-    nextGlyph: string,
     pickYear: (year: number) => void,
   ): DocumentFragment {
     const previousBtn = el(
       'button',
       { type: 'button', 'data-jalali-calendar-nav': 'previous', 'aria-label': 'Previous years' },
-      [previousGlyph],
+      ['‹'],
     );
     previousBtn.addEventListener('click', () => {
       this.#yearPage -= YEARS_PER_PAGE;
@@ -447,7 +422,7 @@ export class JalaliCalendarElement extends HTMLElement {
     const nextBtn = el(
       'button',
       { type: 'button', 'data-jalali-calendar-nav': 'next', 'aria-label': 'Next years' },
-      [nextGlyph],
+      ['›'],
     );
     nextBtn.addEventListener('click', () => {
       this.#yearPage += YEARS_PER_PAGE;

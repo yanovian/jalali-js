@@ -185,9 +185,10 @@ packages/
   ui-web/              # The same, for web.
 apps/
   docs/                # Documentation site and interactive playground.
-  playground-react/    # Vite and React sandbox. An e2e screenshot target.
-  playground-vue/      # Vite and Vue sandbox. An e2e screenshot target.
-  playground-vanilla/  # Vite, no framework. An e2e screenshot target.
+  playground-shared/   # URL state, seed events, and code snippets for demos.
+  playground-react/    # Interactive React demo and e2e screenshot target.
+  playground-vue/      # Interactive Vue demo and e2e screenshot target.
+  playground-vanilla/  # Interactive Web Components demo and e2e target.
   playground-next/     # Real Next.js app. Confirms SSR and hydration behavior.
   playground-nuxt/     # Real Nuxt app. Confirms SSR and hydration behavior.
 e2e/
@@ -456,6 +457,10 @@ to `next Farvardin"-style phrase` instead of using angle-bracket placeholder not
 `typedoc-vitepress-theme` was also added at the same time for its own link-fixup value, but the
 actual fix is the source comment; a plugin was never going to make raw `<placeholder>` notation
 safe in prose that flows through a Vue-template-aware renderer.
+
+**Playground in local docs.** `make dev` sets `JALALI_PLAYGROUND_DEV=1` so the docs
+server proxies `/playground/*` to the live Vite playgrounds. `make docs-dev` embeds
+built playgrounds into `public/` and serves those files instead.
 
 **Playground embeds.** `pages.yml` builds `playground-react` and `playground-vue` with an
 explicit `--base` (`make app-build-at-base`), so their own emitted asset URLs resolve correctly
