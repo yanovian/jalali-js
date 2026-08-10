@@ -14,7 +14,13 @@
  */
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate } from '@jalali-js/i18n';
-import type { CalendarDate, CalendarSystem, StorageValue, ValueFormat } from 'jalali-js';
+import type {
+  CalendarDate,
+  CalendarSystem,
+  SelectionRules,
+  StorageValue,
+  ValueFormat,
+} from 'jalali-js';
 import { createCalendar, toStorageValue } from 'jalali-js';
 import { onBeforeUnmount, onMounted, ref, useId, watch, computed, type Ref } from 'vue';
 import Calendar from './Calendar.vue';
@@ -35,6 +41,8 @@ const props = withDefaults(
     valueFormat?: ValueFormat;
     displayFormat?: FormatOptions;
     variant?: 'grid' | 'dropdown';
+    /** Limits on what a person can select. Grid variant only; see `Calendar`'s `rules`. */
+    rules?: SelectionRules | undefined;
     placeholder?: string;
   }>(),
   {
@@ -123,6 +131,7 @@ onBeforeUnmount(() => {
         :locale="locale"
         :value="date"
         :quick-nav="quickNav"
+        :rules="rules"
         @select="
           (next) => {
             selectDate(next);

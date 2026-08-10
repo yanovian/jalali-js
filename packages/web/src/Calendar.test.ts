@@ -119,4 +119,33 @@ describe('jalali-calendar', () => {
       expect(getByText(document.body, 'Mordad')).toBeInTheDocument();
     });
   });
+
+  describe('selection rules', () => {
+    it('renders blocked days disabled, with data-disabled, and rejects clicks on them', async () => {
+      const user = userEvent.setup({ delay: null });
+      const el = mountCalendar();
+      el.rules = { minDate: { year: 1403, month: 5, day: 10 } };
+      const onSelect = vi.fn();
+      el.addEventListener('select', onSelect);
+
+      const blocked = getByRole(document.body, 'gridcell', { name: '9 Mordad 1403' });
+      expect(blocked).toBeDisabled();
+      expect(blocked).toHaveAttribute('data-disabled');
+      await user.click(blocked).catch(() => {}); // user-event refuses disabled targets
+      expect(onSelect).not.toHaveBeenCalled();
+
+      const allowed = getByRole(document.body, 'gridcell', { name: '10 Mordad 1403' });
+      expect(allowed).toBeEnabled();
+      await user.click(allowed);
+      expect(onSelect).toHaveBeenCalledTimes(1);
+    });
+
+    it('blocks listed weekdays', () => {
+      // 1403-05-15 is a Monday (weekday index 1); so is 1403-05-08.
+      const el = mountCalendar();
+      el.rules = { disabledWeekdays: [1] };
+      expect(getByRole(document.body, 'gridcell', { name: '8 Mordad 1403' })).toBeDisabled();
+      expect(getByRole(document.body, 'gridcell', { name: '9 Mordad 1403' })).toBeEnabled();
+    });
+  });
 });

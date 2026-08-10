@@ -11,7 +11,7 @@ import { format as formatDate } from '@jalali-js/i18n';
 // A bare import for its side effect: registering <jalali-inline-calendar> and
 // <jalali-range-picker>, since only types are imported from it below.
 import '@jalali-js/ui-web';
-import type { RangePickerChangeEventDetail } from '@jalali-js/ui-web';
+import type { JalaliInlineCalendarElement, RangePickerChangeEventDetail } from '@jalali-js/ui-web';
 import type { CalendarDate } from 'jalali-js';
 import { createCalendar } from 'jalali-js';
 
@@ -69,3 +69,14 @@ document
     const { value } = (event as CustomEvent<RangePickerChangeEventDetail>).detail;
     document.getElementById('stored-range')!.textContent = JSON.stringify(value);
   });
+
+// Selection rules are a JS property, not an attribute: the rules object is not representable
+// as a plain HTML attribute string.
+const rulesCalendar = document.getElementById('rules-calendar') as JalaliInlineCalendarElement;
+rulesCalendar.initialDisplayedMonth = { year: 1403, month: 5 };
+rulesCalendar.rules = {
+  minDate: { year: 1403, month: 5, day: 5 },
+  maxDate: { year: 1403, month: 5, day: 28 },
+  disabledDates: [{ year: 1403, month: 5, day: 12 }],
+  disabledWeekdays: [4, 5],
+};

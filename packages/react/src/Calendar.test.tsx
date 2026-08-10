@@ -147,4 +147,45 @@ describe('Calendar', () => {
       expect(screen.queryByRole('button', { name: 'Choose year' })).not.toBeInTheDocument();
     });
   });
+
+  describe('selection rules', () => {
+    it('renders blocked days disabled, with data-disabled, and rejects clicks on them', async () => {
+      const user = userEvent.setup({ delay: null });
+      const onSelect = vi.fn();
+      render(
+        <Calendar
+          system="jalali"
+          locale="en"
+          value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
+          rules={{ minDate: { year: 1403, month: 5, day: 10 } }}
+          onSelect={onSelect}
+        />,
+      );
+      const blocked = screen.getByRole('gridcell', { name: '9 Mordad 1403' });
+      expect(blocked).toBeDisabled();
+      expect(blocked).toHaveAttribute('data-disabled');
+      await user.click(blocked);
+      expect(onSelect).not.toHaveBeenCalled();
+
+      const allowed = screen.getByRole('gridcell', { name: '10 Mordad 1403' });
+      expect(allowed).toBeEnabled();
+      expect(allowed).not.toHaveAttribute('data-disabled');
+      await user.click(allowed);
+      expect(onSelect).toHaveBeenCalledTimes(1);
+    });
+
+    it('blocks listed weekdays', () => {
+      // 1403-05-15 is a Monday (weekday index 1); so is 1403-05-08.
+      render(
+        <Calendar
+          system="jalali"
+          locale="en"
+          value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
+          rules={{ disabledWeekdays: [1] }}
+        />,
+      );
+      expect(screen.getByRole('gridcell', { name: '8 Mordad 1403' })).toBeDisabled();
+      expect(screen.getByRole('gridcell', { name: '9 Mordad 1403' })).toBeEnabled();
+    });
+  });
 });

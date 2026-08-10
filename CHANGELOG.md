@@ -11,6 +11,13 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- Selection rules in every picker: a `SelectionRules` type in the core
+  (`minDate`, `maxDate`, `enabledDates`, `disabledDates`,
+  `disabledWeekdays`), resolved by `isDateSelectable()` and wired through
+  `buildCalendarGrid()`. Blocked days render disabled with a
+  `data-disabled` attribute, reject selection, and drop out of the Tab
+  order. `RangePicker` also refuses a range that crosses a blocked day
+  (`isRangeSelectable()`): the second click starts a new range instead.
 - Format templates and strict parsing in `@jalali-js/i18n`: a `template`
   option on `format()` (`YYYY`, `MM`, `M`, `DD`, `D`, `MMMM`, `MMM`,
   `dddd`, `ddd`) and its reverse, `parseTemplate()`. Parsing accepts

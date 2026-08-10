@@ -111,6 +111,7 @@ export default defineConfig({
             { text: 'Core concepts', link: '/guide/core-concepts' },
             { text: 'Display value vs. storage value', link: '/guide/display-vs-storage' },
             { text: 'Configuration and theming', link: '/guide/theming' },
+            { text: 'Selection rules', link: '/guide/selection-rules' },
             { text: 'React', link: '/guide/react' },
             { text: 'Vue', link: '/guide/vue' },
             { text: 'Vanilla / Web Components', link: '/guide/web-components' },

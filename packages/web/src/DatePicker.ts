@@ -1,5 +1,11 @@
 import { format as formatDate } from '@jalali-js/i18n';
-import type { CalendarDate, CalendarSystem, StorageValue, ValueFormat } from 'jalali-js';
+import type {
+  CalendarDate,
+  CalendarSystem,
+  SelectionRules,
+  StorageValue,
+  ValueFormat,
+} from 'jalali-js';
 import { createCalendar, toStorageValue } from 'jalali-js';
 import { JalaliCalendarElement, type CalendarSelectEventDetail } from './Calendar.js';
 import { JalaliDropdownDateFieldsElement } from './DropdownDateFields.js';
@@ -25,7 +31,9 @@ export type Variant = 'grid' | 'dropdown';
  * today, `null` opens with nothing selected (showing `placeholder`).
  *
  * Attributes: `system`, `locale`, `variant` ('grid' | 'dropdown'), `value-format`,
- * `placeholder`, `quick-nav` (set to "false" to turn off; grid variant only).
+ * `placeholder`, `quick-nav` (set to "false" to turn off; grid variant only). `.rules` is a
+ * property only (a `SelectionRules` object; grid variant only): blocked days render disabled
+ * and reject selection.
  */
 export class JalaliDatePickerElement extends HTMLElement {
   static observedAttributes = [
@@ -44,6 +52,7 @@ export class JalaliDatePickerElement extends HTMLElement {
   #placeholder: string | undefined;
   #quickNav = true;
   #defaultDate: CalendarDate | null | undefined;
+  #rules: SelectionRules | undefined;
   #date: CalendarDate | null = null;
   #dateInitialized = false;
   #open = false;
@@ -110,6 +119,14 @@ export class JalaliDatePickerElement extends HTMLElement {
   set defaultDate(value: CalendarDate | null | undefined) {
     this.#defaultDate = value;
     this.#dateInitialized = false;
+    this.render();
+  }
+
+  get rules(): SelectionRules | undefined {
+    return this.#rules;
+  }
+  set rules(value: SelectionRules | undefined) {
+    this.#rules = value;
     this.render();
   }
 
@@ -217,6 +234,7 @@ export class JalaliDatePickerElement extends HTMLElement {
       calendar.locale = this.#locale;
       calendar.quickNav = this.#quickNav;
       calendar.value = this.#date;
+      calendar.rules = this.#rules;
       calendar.addEventListener('select', (event) => {
         this.#selectDate((event as CustomEvent<CalendarSelectEventDetail>).detail.date);
         this.#setOpen(false);

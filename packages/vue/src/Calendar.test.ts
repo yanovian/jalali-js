@@ -123,4 +123,41 @@ describe('Calendar', () => {
       expect(wrapper.find('button[data-jalali-calendar-title-year]').exists()).toBe(false);
     });
   });
+
+  describe('selection rules', () => {
+    it('renders blocked days disabled, with data-disabled, and rejects clicks on them', async () => {
+      const wrapper = mount(Calendar, {
+        props: {
+          system: 'jalali',
+          locale: 'en',
+          value: selectedDate,
+          rules: { minDate: { year: 1403, month: 5, day: 10 } },
+        },
+      });
+      const blocked = wrapper.get('[aria-label="9 Mordad 1403"]');
+      expect(blocked.attributes('disabled')).toBeDefined();
+      expect(blocked.attributes('data-disabled')).toBe('');
+      await blocked.trigger('click');
+      expect(wrapper.emitted('select')).toBeUndefined();
+
+      const allowed = wrapper.get('[aria-label="10 Mordad 1403"]');
+      expect(allowed.attributes('disabled')).toBeUndefined();
+      await allowed.trigger('click');
+      expect(wrapper.emitted('select')).toHaveLength(1);
+    });
+
+    it('blocks listed weekdays', () => {
+      // 1403-05-15 is a Monday (weekday index 1); so is 1403-05-08.
+      const wrapper = mount(Calendar, {
+        props: {
+          system: 'jalali',
+          locale: 'en',
+          value: selectedDate,
+          rules: { disabledWeekdays: [1] },
+        },
+      });
+      expect(wrapper.get('[aria-label="8 Mordad 1403"]').attributes('disabled')).toBeDefined();
+      expect(wrapper.get('[aria-label="9 Mordad 1403"]').attributes('disabled')).toBeUndefined();
+    });
+  });
 });

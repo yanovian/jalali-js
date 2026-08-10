@@ -92,6 +92,21 @@
         <p>Stored range (Gregorian by default): <span id="stored-range">null</span></p>
       </section>
 
+      <section data-testid="selection-rules">
+        <h2>Selection rules (min/max, blocked dates, blocked weekdays)</h2>
+        <p>
+          Mordad 1403 with rules: selectable from the 5th to the 28th, the 12th is blocked, and the
+          Thursday/Friday weekend is blocked. Blocked days render disabled
+          (<code>data-disabled</code>) and reject clicks, and the Tab order skips them. The
+          <code>rules</code> object is a JS property (see <code>main.ts</code>), not an attribute.
+        </p>
+        <jalali-inline-calendar
+          id="rules-calendar"
+          system="jalali"
+          class="locale-follows"
+        ></jalali-inline-calendar>
+      </section>
+
       <section data-testid="custom-theme">
         <h2>Custom CSS override (consumer-configured, not a shipped theme file)</h2>
         <p>

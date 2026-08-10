@@ -121,4 +121,37 @@ describe('jalali-range-picker', () => {
     await user.keyboard('{Escape}');
     expect(queryByRole(document.body, 'dialog')).not.toBeInTheDocument();
   });
+
+  describe('selection rules', () => {
+    const rules = { disabledDates: [{ year: 1403, month: 5, day: 12 }] };
+
+    it('renders blocked days disabled with data-disabled', async () => {
+      const user = userEvent.setup();
+      const el = mount();
+      el.rules = rules;
+      await user.click(getByRole(document.body, 'combobox'));
+      const blocked = getByRole(document.body, 'gridcell', { name: '12 Mordad 1403' });
+      expect(blocked).toBeDisabled();
+      expect(blocked).toHaveAttribute('data-disabled');
+    });
+
+    it('does not complete a range across a blocked day: the second click restarts instead', async () => {
+      const user = userEvent.setup();
+      const el = mount();
+      el.rules = rules;
+      const onChange = vi.fn();
+      el.addEventListener('change', onChange);
+      await user.click(getByRole(document.body, 'combobox'));
+      await user.click(getByRole(document.body, 'gridcell', { name: '10 Mordad 1403' }));
+      await user.click(getByRole(document.body, 'gridcell', { name: '15 Mordad 1403' }));
+      // The blocked 12 Mordad sits inside 10..15, so the range restarts at 15 instead.
+      expect(onChange).not.toHaveBeenCalled();
+      expect(getByRole(document.body, 'gridcell', { name: '15 Mordad 1403' })).toHaveAttribute(
+        'data-range-start',
+      );
+
+      await user.click(getByRole(document.body, 'gridcell', { name: '20 Mordad 1403' }));
+      expect(onChange).toHaveBeenCalledTimes(1);
+    });
+  });
 });

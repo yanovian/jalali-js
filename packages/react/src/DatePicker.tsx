@@ -1,6 +1,12 @@
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate } from '@jalali-js/i18n';
-import type { CalendarDate, CalendarSystem, StorageValue, ValueFormat } from 'jalali-js';
+import type {
+  CalendarDate,
+  CalendarSystem,
+  SelectionRules,
+  StorageValue,
+  ValueFormat,
+} from 'jalali-js';
 import { createCalendar, toStorageValue } from 'jalali-js';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Calendar } from './Calendar.js';
@@ -36,6 +42,8 @@ export interface DatePickerProps {
   /** 'grid': a calendar-grid popup (default). 'dropdown': three year/month/day `<select>`s,
    * better suited to narrow, known-range entry such as a date of birth. */
   variant?: 'grid' | 'dropdown';
+  /** Limits on what a person can select. Grid variant only; see `CalendarProps.rules`. */
+  rules?: SelectionRules | undefined;
   placeholder?: string;
   className?: string;
 }
@@ -63,6 +71,7 @@ export function DatePicker({
   valueFormat = 'gregorian-iso',
   displayFormat,
   variant = 'grid',
+  rules,
   placeholder,
   className,
 }: DatePickerProps) {
@@ -129,6 +138,7 @@ export function DatePicker({
             locale={locale}
             value={date}
             quickNav={quickNav}
+            rules={rules}
             onSelect={(next) => {
               selectDate(next);
               setOpen(false);

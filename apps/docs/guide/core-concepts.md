@@ -97,6 +97,20 @@ Three rules to know:
   on Saturday and Gregorian weeks commonly start on Sunday or Monday. The default is the
   system's own convention (`WEEK_START_DAY`).
 
+## Selection rules
+
+`SelectionRules` limits what a date picker may select. `isDateSelectable(date, rules)`
+resolves one priority order:
+
+1. `enabledDates`, when set, decides alone.
+2. `disabledDates` blocks a listed date.
+3. `disabledWeekdays` blocks a listed weekday (0 is Sunday, 6 is Saturday).
+4. `minDate` and `maxDate` block dates outside the bounds (bounds included).
+
+Rule dates are plain `{ year, month, day }` fields, read in the date's own calendar system.
+Every picker takes a `rules` prop and reads it through `buildCalendarGrid()`. See
+[Selection rules](/guide/selection-rules).
+
 ## Locale packs
 
 `@jalali-js/i18n` exports `en`, `fa`, and `ps` (Pashto, with Afghanistan's own zodiac-based

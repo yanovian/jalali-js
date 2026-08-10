@@ -14,14 +14,25 @@
  * popover. Clicking before the current start restarts the range from the new point rather than
  * erroring, so a consumer never gets stuck. Hovering after a start is picked previews the range
  * that would result from completing the selection at the hovered day.
+ *
+ * With `rules`, blocked days render disabled, and a candidate range that crosses a blocked
+ * day does not complete: the second click starts a new range instead (see
+ * `isRangeSelectable()` in `jalali-js`).
  */
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
-import type { CalendarDate, CalendarSystem, StorageValue, ValueFormat } from 'jalali-js';
+import type {
+  CalendarDate,
+  CalendarSystem,
+  SelectionRules,
+  StorageValue,
+  ValueFormat,
+} from 'jalali-js';
 import {
   buildCalendarGrid,
   compareDates,
   createCalendar,
+  isRangeSelectable,
   nextMonth,
   previousMonth,
   toStorageValue,
@@ -46,6 +57,9 @@ const props = withDefaults(
     defaultRange?: DateRange;
     valueFormat?: ValueFormat;
     displayFormat?: FormatOptions;
+    /** Limits on what a person can select. Blocked days render disabled; a range that
+     * crosses a blocked day does not complete. */
+    rules?: SelectionRules | undefined;
     placeholder?: string;
   }>(),
   {
@@ -72,7 +86,14 @@ const rootRef = ref<HTMLElement | null>(null);
 const popoverId = useId();
 
 const weeks = computed(() =>
-  buildCalendarGrid(props.system, displayed.value.year, displayed.value.month, today.value, null),
+  buildCalendarGrid(
+    props.system,
+    displayed.value.year,
+    displayed.value.month,
+    today.value,
+    null,
+    props.rules,
+  ),
 );
 
 const previewEnd = computed(() => end.value ?? hoverDate.value);
@@ -99,12 +120,12 @@ function goPrevious(): void {
 }
 
 function selectDay(date: CalendarDate): void {
-  if (!start.value || end.value) {
-    start.value = date;
-    end.value = null;
-    return;
-  }
-  if (compareDates(date, start.value) < 0) {
+  if (
+    !start.value ||
+    end.value ||
+    compareDates(date, start.value) < 0 ||
+    !isRangeSelectable(start.value, date, props.rules)
+  ) {
     start.value = date;
     end.value = null;
     return;
@@ -228,6 +249,8 @@ onBeforeUnmount(() => {
                   ? ''
                   : undefined
               "
+              :data-disabled="cell.isSelectable ? undefined : ''"
+              :disabled="!cell.isSelectable"
               :aria-current="cell.isToday ? 'date' : undefined"
               :aria-label="dayLabel(cell.date)"
               @click="selectDay(cell.date)"

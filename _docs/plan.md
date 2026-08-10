@@ -4,10 +4,10 @@ See [alternatives.md](./alternatives.md) for the vision and the goals. See
 [architecture.md](./architecture.md) for the design behind these decisions.
 This file shows only the status of each phase.
 
-Phases 0-12 and 14-15 are done, and the first releases are published (v0.0.1
+Phases 0-12 and 14-16 are done, and the first releases are published (v0.0.1
 through v0.1.0; see `CHANGELOG.md`). v0.1.0 also shipped the Web Components
 bindings (`packages/web`, `packages/ui-web`), which landed outside the phase
-list. Phase 13 and Phases 16-24 are scheduled but not started. Phases 14-18
+list. Phase 13 and Phases 17-24 are scheduled but not started. Phases 14-18
 add the features real apps ask for first, so they land before Phase 13.
 What's left after those is listed under "Later, not yet scheduled" below.
 Change an item to `[x]` as it lands.
@@ -839,24 +839,37 @@ No picker can restrict what a user picks. Booking, scheduling, and form
 apps all need this. This phase adds one shared rule model, wired into every
 binding at once.
 
-- [ ] Add a `SelectionRules` type to `packages/core`: `minDate`, `maxDate`,
+- [x] Add a `SelectionRules` type to `packages/core`: `minDate`, `maxDate`,
       `enabledDates`, `disabledDates`, and `disabledWeekdays`. Add one
       resolver, `isDateSelectable(date, rules)`, with a documented priority
       order: the whitelist wins, then the blacklist, then weekdays, then
-      the min/max bounds.
-- [ ] Wire the rules into `buildCalendarGrid()`, so every binding gets the
+      the min/max bounds. Done in `selection-rules.ts`. Rule dates are
+      plain `{ year, month, day }` fields, read in the date's own system.
+- [x] Wire the rules into `buildCalendarGrid()`, so every binding gets the
       same behavior from one implementation. Blocked days render with a
-      `data-disabled` attribute and reject selection.
-- [ ] Expose the rule props on `Calendar`, `DatePicker`, and `RangePicker`
-      in `react`, `vue`, `web`, and the `ui-*` packages.
-- [ ] Make keyboard navigation skip blocked days.
-- [ ] Decide the range-picker behavior when a blocked day falls inside a
-      candidate range (block the range, or split it). Decide at
-      implementation time and document the choice.
-- [ ] Add unit tests per binding, playground sections, and visual e2e
-      coverage for the blocked-day rendering.
-- [ ] Add a guide page with copy-paste examples: min/max bounds, weekend
-      blocking (Thursday and Friday), and a whitelist of open dates.
+      `data-disabled` attribute and reject selection. Done: the grid takes
+      an optional `rules` argument and each cell gets `isSelectable`.
+- [x] Expose the rule props on `Calendar`, `DatePicker`, and `RangePicker`
+      in `react`, `vue`, `web`, and the `ui-*` packages. Done as a `rules`
+      prop (a JS property on the Web Components). On `DatePicker`, the
+      rules apply to the grid variant; the dropdown variant does not use
+      the grid.
+- [x] Make keyboard navigation skip blocked days. Done: blocked days
+      render as natively disabled buttons, so they drop out of the Tab
+      order and cannot be activated.
+- [x] Decide the range-picker behavior when a blocked day falls inside a
+      candidate range (block the range, or split it). Decided: block. A
+      candidate range that crosses a blocked day does not complete; the
+      second click starts a new range instead. One shared resolver,
+      `isRangeSelectable(start, end, rules)` in `packages/core`, keeps
+      the three range pickers identical.
+- [x] Add unit tests per binding, playground sections, and visual e2e
+      coverage for the blocked-day rendering. Done: a `selection-rules`
+      section in the React, Vue, and vanilla playgrounds, pinned to
+      Mordad 1403 so the screenshot is date-stable, plus e2e baselines.
+- [x] Add a guide page with copy-paste examples: min/max bounds, weekend
+      blocking (Thursday and Friday), and a whitelist of open dates. Done:
+      `apps/docs/guide/selection-rules.md`.
 
 ## Phase 17: Time selection
 

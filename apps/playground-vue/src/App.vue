@@ -15,6 +15,12 @@ import { ref, watchEffect } from 'vue';
 const stored = ref<StorageValue>();
 const storedRange = ref<RangeStorageValue>();
 const inlineSelected = ref<CalendarDate | null>(null);
+const selectionRules = {
+  minDate: { year: 1403, month: 5, day: 5 },
+  maxDate: { year: 1403, month: 5, day: 28 },
+  disabledDates: [{ year: 1403, month: 5, day: 12 }],
+  disabledWeekdays: [4, 5],
+};
 const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
 const isDark = ref(true);
 const locale = ref<LocaleCode>('fa');
@@ -131,6 +137,21 @@ watchEffect(() => {
       <h2>Range picker (@jalali-js/ui-vue)</h2>
       <RangePicker v-model="storedRange" system="jalali" :locale="locale" />
       <p>Stored range (Gregorian by default): {{ JSON.stringify(storedRange) }}</p>
+    </section>
+
+    <section data-testid="selection-rules">
+      <h2>Selection rules (min/max, blocked dates, blocked weekdays)</h2>
+      <p>
+        Mordad 1403 with rules: selectable from the 5th to the 28th, the 12th is blocked, and the
+        Thursday/Friday weekend is blocked. Blocked days render disabled
+        (<code>data-disabled</code>) and reject clicks, and the Tab order skips them.
+      </p>
+      <InlineCalendar
+        system="jalali"
+        :locale="locale"
+        :initial-displayed-month="{ year: 1403, month: 5 }"
+        :rules="selectionRules"
+      />
     </section>
 
     <section data-testid="custom-theme">

@@ -120,4 +120,29 @@ describe('RangePicker', () => {
     expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
     wrapper.unmount();
   });
+
+  describe('selection rules', () => {
+    const rules = { disabledDates: [{ year: 1403, month: 5, day: 12 }] };
+
+    it('renders blocked days disabled with data-disabled', async () => {
+      const wrapper = mount(RangePicker, { props: { locale: 'en', rules } });
+      await wrapper.get('[role="combobox"]').trigger('click');
+      const blocked = wrapper.get('[aria-label="12 Mordad 1403"]');
+      expect(blocked.attributes('disabled')).toBeDefined();
+      expect(blocked.attributes('data-disabled')).toBe('');
+    });
+
+    it('does not complete a range across a blocked day: the second click restarts instead', async () => {
+      const wrapper = mount(RangePicker, { props: { locale: 'en', rules } });
+      await wrapper.get('[role="combobox"]').trigger('click');
+      await wrapper.get('[aria-label="10 Mordad 1403"]').trigger('click');
+      await wrapper.get('[aria-label="15 Mordad 1403"]').trigger('click');
+      // The blocked 12 Mordad sits inside 10..15, so the range restarts at 15 instead.
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+      expect(wrapper.get('[aria-label="15 Mordad 1403"]').attributes('data-range-start')).toBe('');
+
+      await wrapper.get('[aria-label="20 Mordad 1403"]').trigger('click');
+      expect(wrapper.emitted('update:modelValue')).toHaveLength(1);
+    });
+  });
 });

@@ -1,25 +1,25 @@
 import type { CalendarDate } from './calendar-date.js';
 import type { CalendarSystem } from './convert.js';
 import { getCalendarEngine } from './convert.js';
-import { addDays, WEEK_START_DAY } from './date-math.js';
+import { addDays, isSameDay, WEEK_START_DAY } from './date-math.js';
 import { dayOfWeek } from './day-of-week.js';
+import { isDateSelectable, type SelectionRules } from './selection-rules.js';
 
 export interface CalendarGridDay {
   date: CalendarDate;
   isCurrentMonth: boolean;
   isToday: boolean;
   isSelected: boolean;
-}
-
-function isSameDate(a: CalendarDate, b: CalendarDate): boolean {
-  return a.system === b.system && a.year === b.year && a.month === b.month && a.day === b.day;
+  /** False when the grid's `SelectionRules` block this day. True without rules. */
+  isSelectable: boolean;
 }
 
 /**
  * The full weeks of grid cells needed to display `year`/`month`, padded with the trailing days
  * of the previous month and the leading days of the next month so every row is a complete
  * week. `today` and `selected` mark the matching cells via `isToday`/`isSelected`, for a
- * consumer to style.
+ * consumer to style. `rules` marks blocked cells via `isSelectable` (see
+ * `isDateSelectable()`), so every binding gets the same behavior from this one place.
  *
  * Framework-agnostic on purpose: the `react` and `vue` bindings both need this exact
  * computation, and `core` is the one package both already depend on, so it lives here instead
@@ -31,6 +31,7 @@ export function buildCalendarGrid(
   month: number,
   today: CalendarDate,
   selected: CalendarDate | null,
+  rules?: SelectionRules,
 ): CalendarGridDay[][] {
   const engine = getCalendarEngine(system);
   const daysInThisMonth = engine.daysInMonth(year, month);
@@ -49,8 +50,9 @@ export function buildCalendarGrid(
       days.push({
         date,
         isCurrentMonth: date.year === year && date.month === month,
-        isToday: isSameDate(date, today),
-        isSelected: selected !== null && isSameDate(date, selected),
+        isToday: isSameDay(date, today),
+        isSelected: selected !== null && isSameDay(date, selected),
+        isSelectable: isDateSelectable(date, rules),
       });
     }
     weeks.push(days);

@@ -954,6 +954,15 @@ publish` rewrites to the real published version automatically, the
   than keeping two copies in sync, and let Phase 6 add real property-based
   tests for logic that Phase 5 had only exercised indirectly, through
   React component tests.
+- **Selection rules (Phase 16) follow the same pattern.** `SelectionRules`
+  and its two resolvers, `isDateSelectable()` and `isRangeSelectable()`,
+  live in `packages/core`. `buildCalendarGrid()` applies them and marks
+  each cell with `isSelectable`, so every binding renders blocked days the
+  same way (`data-disabled`, natively disabled buttons) without its own
+  rule logic. Disabled buttons drop out of the Tab order, which is how
+  keyboard navigation skips blocked days. Range pickers block a candidate
+  range that crosses a blocked day: the second click starts a new range
+  instead of completing one.
 
 ## Makefile
 

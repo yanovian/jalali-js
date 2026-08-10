@@ -1,11 +1,18 @@
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import { localePackFor, parseLocaleAttribute, type LocaleCode } from '@jalali-js/web';
-import type { CalendarDate, CalendarSystem, StorageValue, ValueFormat } from 'jalali-js';
+import type {
+  CalendarDate,
+  CalendarSystem,
+  SelectionRules,
+  StorageValue,
+  ValueFormat,
+} from 'jalali-js';
 import {
   buildCalendarGrid,
   compareDates,
   createCalendar,
+  isRangeSelectable,
   nextMonth,
   previousMonth,
   toStorageValue,
@@ -37,8 +44,12 @@ export interface RangePickerChangeEventDetail {
  * an end earlier than the current start restarts the range from there instead). A light hover
  * preview shows the range that would result from completing it at the hovered day.
  *
- * Attributes: `system`, `locale`, `value-format`, `placeholder`. `.defaultRange` is a property
- * only. Listen for `change`.
+ * Attributes: `system`, `locale`, `value-format`, `placeholder`. `.defaultRange` and `.rules`
+ * are properties only. Listen for `change`.
+ *
+ * With `.rules`, blocked days render disabled, and a candidate range that crosses a blocked
+ * day does not complete: the second click starts a new range instead (see
+ * `isRangeSelectable()` in `jalali-js`).
  */
 export class JalaliRangePickerElement extends HTMLElement {
   static observedAttributes = ['system', 'locale', 'value-format', 'placeholder'];
@@ -49,6 +60,7 @@ export class JalaliRangePickerElement extends HTMLElement {
   #displayFormat: FormatOptions | undefined;
   #placeholder: string | undefined;
   #defaultRange: DateRange | undefined;
+  #rules: SelectionRules | undefined;
   #start: CalendarDate | null = null;
   #end: CalendarDate | null = null;
   #hoverDate: CalendarDate | null = null;
@@ -117,6 +129,14 @@ export class JalaliRangePickerElement extends HTMLElement {
     this.render();
   }
 
+  get rules(): SelectionRules | undefined {
+    return this.#rules;
+  }
+  set rules(value: SelectionRules | undefined) {
+    this.#rules = value;
+    this.render();
+  }
+
   connectedCallback(): void {
     this.#connected = true;
     this.setAttribute('data-jalali-datepicker-root', '');
@@ -162,13 +182,12 @@ export class JalaliRangePickerElement extends HTMLElement {
   }
 
   #selectDay(date: CalendarDate): void {
-    if (!this.#start || this.#end) {
-      this.#start = date;
-      this.#end = null;
-      this.#updateRangeAttributes();
-      return;
-    }
-    if (compareDates(date, this.#start) < 0) {
+    if (
+      !this.#start ||
+      this.#end ||
+      compareDates(date, this.#start) < 0 ||
+      !isRangeSelectable(this.#start, date, this.#rules)
+    ) {
       this.#start = date;
       this.#end = null;
       this.#updateRangeAttributes();
@@ -244,7 +263,14 @@ export class JalaliRangePickerElement extends HTMLElement {
     today: CalendarDate,
     displayed: { year: number; month: number },
   ): HTMLElement {
-    const weeks = buildCalendarGrid(this.#system, displayed.year, displayed.month, today, null);
+    const weeks = buildCalendarGrid(
+      this.#system,
+      displayed.year,
+      displayed.month,
+      today,
+      null,
+      this.#rules,
+    );
     const monthLabel = localePack.monthNames[this.#system].long[displayed.month - 1]!;
     const yearLabel = formatNumber(displayed.year, localePack.defaultNumerals, localePack.digits);
     const previousGlyph = localePack.direction === 'rtl' ? '›' : '‹';
@@ -315,6 +341,10 @@ export class JalaliRangePickerElement extends HTMLElement {
         day.setAttribute('data-jalali-calendar-day', '');
         if (cell.isToday) day.setAttribute('data-today', '');
         if (!cell.isCurrentMonth) day.setAttribute('data-outside-month', '');
+        if (!cell.isSelectable) {
+          day.setAttribute('data-disabled', '');
+          day.disabled = true;
+        }
         if (isRangeStart) day.setAttribute('data-range-start', '');
         if (isRangeEnd) day.setAttribute('data-range-end', '');
         if (isInRange) day.setAttribute('data-in-range', '');

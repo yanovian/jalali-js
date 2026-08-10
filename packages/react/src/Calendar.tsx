@@ -1,5 +1,5 @@
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
-import type { CalendarDate, CalendarSystem } from 'jalali-js';
+import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
 import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
@@ -23,6 +23,11 @@ export interface CalendarProps {
    * year grid, instead of paging one month at a time. Default: true.
    */
   quickNav?: boolean | undefined;
+  /**
+   * Limits on what a person can select (see `isDateSelectable()` in `jalali-js`). Blocked
+   * days render disabled, with a `data-disabled` attribute, and reject selection.
+   */
+  rules?: SelectionRules | undefined;
   className?: string;
 }
 
@@ -57,9 +62,12 @@ function TitlePart({
 
 /**
  * A headless month grid: it renders plain markup with data attributes (`data-selected`,
- * `data-today`, `data-outside-month`) and no required CSS, so a consumer can restyle it
- * completely. `DatePicker` is this same component with a default stylesheet and a popover
- * wrapped around it.
+ * `data-today`, `data-outside-month`, `data-disabled`) and no required CSS, so a consumer can
+ * restyle it completely. `DatePicker` is this same component with a default stylesheet and a
+ * popover wrapped around it.
+ *
+ * Days blocked by `rules` render as disabled buttons: clicks do nothing and the Tab order
+ * skips them, so keyboard navigation skips blocked days.
  *
  * With `quickNav` (default on), clicking the month or year in the header opens a month grid or
  * a year grid, so a person can jump years ahead without paging one month at a time. Picking a
@@ -72,6 +80,7 @@ export function Calendar({
   onSelect,
   initialDisplayedMonth,
   quickNav = true,
+  rules,
   className,
 }: CalendarProps) {
   const localePack = useMemo(() => localePackFor(locale), [locale]);
@@ -85,8 +94,8 @@ export function Calendar({
   const [yearPage, setYearPage] = useState(() => yearPageStart(displayed.year));
 
   const weeks = useMemo(
-    () => buildCalendarGrid(system, displayed.year, displayed.month, today, value),
-    [system, displayed.year, displayed.month, today, value],
+    () => buildCalendarGrid(system, displayed.year, displayed.month, today, value, rules),
+    [system, displayed.year, displayed.month, today, value, rules],
   );
 
   const monthLabel = localePack.monthNames[system].long[displayed.month - 1];
@@ -175,6 +184,8 @@ export function Calendar({
                     data-selected={cell.isSelected ? '' : undefined}
                     data-today={cell.isToday ? '' : undefined}
                     data-outside-month={cell.isCurrentMonth ? undefined : ''}
+                    data-disabled={cell.isSelectable ? undefined : ''}
+                    disabled={!cell.isSelectable}
                     aria-selected={cell.isSelected}
                     aria-current={cell.isToday ? 'date' : undefined}
                     aria-label={formatDate(cell.date, localePack, { style: 'long' })}

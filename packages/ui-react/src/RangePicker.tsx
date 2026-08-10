@@ -2,11 +2,18 @@ import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { LocaleCode } from '@jalali-js/react';
 import { localePackFor } from '@jalali-js/react';
-import type { CalendarDate, CalendarSystem, StorageValue, ValueFormat } from 'jalali-js';
+import type {
+  CalendarDate,
+  CalendarSystem,
+  SelectionRules,
+  StorageValue,
+  ValueFormat,
+} from 'jalali-js';
 import {
   buildCalendarGrid,
   compareDates,
   createCalendar,
+  isRangeSelectable,
   nextMonth,
   previousMonth,
   toStorageValue,
@@ -38,6 +45,12 @@ export interface RangePickerProps {
   onChange?: (value: RangeStorageValue, range: DateRange) => void;
   valueFormat?: ValueFormat;
   displayFormat?: FormatOptions;
+  /**
+   * Limits on what a person can select (see `isDateSelectable()` in `jalali-js`). Blocked
+   * days render disabled and reject selection. A candidate range that crosses a blocked day
+   * does not complete: the click starts a new range at the clicked day instead.
+   */
+  rules?: SelectionRules | undefined;
   placeholder?: string;
   className?: string;
 }
@@ -66,6 +79,10 @@ function emitChange(
  * Selection is two clicks: the first sets the range's start, the second sets its end (picking
  * an end earlier than the current start restarts the range from there instead). A light hover
  * preview shows the range that would result from completing it at the hovered day.
+ *
+ * With `rules`, blocked days render disabled, and a candidate range that crosses a blocked
+ * day does not complete: the second click starts a new range instead (see
+ * `isRangeSelectable()` in `jalali-js`).
  */
 export function RangePicker({
   system = 'jalali',
@@ -74,6 +91,7 @@ export function RangePicker({
   onChange,
   valueFormat = 'gregorian-iso',
   displayFormat,
+  rules,
   placeholder,
   className,
 }: RangePickerProps) {
@@ -107,17 +125,12 @@ export function RangePicker({
   }, [open]);
 
   const weeks = useMemo(
-    () => buildCalendarGrid(system, displayed.year, displayed.month, today, null),
-    [system, displayed.year, displayed.month, today],
+    () => buildCalendarGrid(system, displayed.year, displayed.month, today, null, rules),
+    [system, displayed.year, displayed.month, today, rules],
   );
 
   function selectDay(date: CalendarDate): void {
-    if (!start || end) {
-      setStart(date);
-      setEnd(null);
-      return;
-    }
-    if (compareDates(date, start) < 0) {
+    if (!start || end || compareDates(date, start) < 0 || !isRangeSelectable(start, date, rules)) {
       setStart(date);
       setEnd(null);
       return;
@@ -210,6 +223,8 @@ export function RangePicker({
                         data-range-start={isRangeStart ? '' : undefined}
                         data-range-end={isRangeEnd ? '' : undefined}
                         data-in-range={isInRange ? '' : undefined}
+                        data-disabled={cell.isSelectable ? undefined : ''}
+                        disabled={!cell.isSelectable}
                         aria-current={cell.isToday ? 'date' : undefined}
                         aria-label={formatDate(cell.date, localePack, { style: 'long' })}
                         onClick={() => selectDay(cell.date)}

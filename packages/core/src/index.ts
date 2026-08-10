@@ -40,6 +40,8 @@ export {
 export type { DiffUnit, PeriodUnit } from './date-math.js';
 export { gregorianEngine } from './gregorian.js';
 export { jalaliEngine } from './jalali.js';
+export type { SelectionRules } from './selection-rules.js';
+export { isDateSelectable, isRangeSelectable } from './selection-rules.js';
 export type { NativeCalendarObject, StorageValue, ValueFormat } from './storage-value.js';
 export { toStorageValue } from './storage-value.js';
 export {

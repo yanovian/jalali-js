@@ -11,6 +11,7 @@ const SECTIONS = [
   { testId: 'gregorian', name: 'gregorian.png' },
   { testId: 'inline-calendar', name: 'inline-calendar.png' },
   { testId: 'range-picker', name: 'range-picker.png' },
+  { testId: 'selection-rules', name: 'selection-rules.png' },
   { testId: 'custom-theme', name: 'custom-theme.png' },
 ] as const;
 

@@ -1,17 +1,20 @@
 <script setup lang="ts">
 /**
  * A headless month grid: it renders plain markup with data attributes (`data-selected`,
- * `data-today`, `data-outside-month`) and no required CSS, so a consumer can restyle it
- * completely. A `day` scoped slot lets a consumer replace the cell markup outright while
- * keeping the grid and header structure. `DatePicker` is this same component with a default
- * stylesheet and a popover wrapped around it.
+ * `data-today`, `data-outside-month`, `data-disabled`) and no required CSS, so a consumer can
+ * restyle it completely. A `day` scoped slot lets a consumer replace the cell markup outright
+ * while keeping the grid and header structure. `DatePicker` is this same component with a
+ * default stylesheet and a popover wrapped around it.
+ *
+ * Days blocked by `rules` render as disabled buttons: clicks do nothing and the Tab order
+ * skips them, so keyboard navigation skips blocked days.
  *
  * With `quickNav` (default on), clicking the month or year in the header opens a month grid or
  * a year grid, so a person can jump years ahead without paging one month at a time. Picking a
  * year moves to the month grid; picking a month moves to the day grid.
  */
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
-import type { CalendarDate, CalendarGridDay, CalendarSystem } from 'jalali-js';
+import type { CalendarDate, CalendarGridDay, CalendarSystem, SelectionRules } from 'jalali-js';
 import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
 import { computed, ref } from 'vue';
 import { localePackFor, type LocaleCode } from './use-calendar.js';
@@ -31,6 +34,9 @@ const props = withDefaults(
     /** Let a person click the month or year in the header to jump straight to a month grid or
      * a year grid, instead of paging one month at a time. Default: true. */
     quickNav?: boolean;
+    /** Limits on what a person can select (see `isDateSelectable()` in `jalali-js`). Blocked
+     * days render disabled, with a `data-disabled` attribute, and reject selection. */
+    rules?: SelectionRules | undefined;
   }>(),
   {
     system: 'jalali',
@@ -60,6 +66,7 @@ const weeks = computed<CalendarGridDay[][]>(() =>
     displayed.value.month,
     today.value,
     props.value,
+    props.rules,
   ),
 );
 
@@ -221,6 +228,8 @@ function dayNumber(cell: CalendarGridDay): string {
               :data-selected="cell.isSelected ? '' : undefined"
               :data-today="cell.isToday ? '' : undefined"
               :data-outside-month="cell.isCurrentMonth ? undefined : ''"
+              :data-disabled="cell.isSelectable ? undefined : ''"
+              :disabled="!cell.isSelectable"
               :aria-selected="cell.isSelected"
               :aria-current="cell.isToday ? 'date' : undefined"
               :aria-label="dayLabel(cell)"

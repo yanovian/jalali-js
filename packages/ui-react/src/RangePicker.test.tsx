@@ -143,4 +143,40 @@ describe('RangePicker', () => {
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
+
+  describe('selection rules', () => {
+    it('renders blocked days disabled with data-disabled', async () => {
+      const user = userEvent.setup();
+      render(
+        <RangePicker locale="en" rules={{ disabledDates: [{ year: 1403, month: 5, day: 12 }] }} />,
+      );
+      await user.click(screen.getByRole('combobox'));
+      const blocked = screen.getByRole('gridcell', { name: '12 Mordad 1403' });
+      expect(blocked).toBeDisabled();
+      expect(blocked).toHaveAttribute('data-disabled');
+    });
+
+    it('does not complete a range across a blocked day: the second click restarts instead', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(
+        <RangePicker
+          locale="en"
+          rules={{ disabledDates: [{ year: 1403, month: 5, day: 12 }] }}
+          onChange={onChange}
+        />,
+      );
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByRole('gridcell', { name: '10 Mordad 1403' }));
+      await user.click(screen.getByRole('gridcell', { name: '15 Mordad 1403' }));
+      // The blocked 12 Mordad sits inside 10..15, so the range restarts at 15 instead.
+      expect(onChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('gridcell', { name: '15 Mordad 1403' })).toHaveAttribute(
+        'data-range-start',
+      );
+
+      await user.click(screen.getByRole('gridcell', { name: '20 Mordad 1403' }));
+      expect(onChange).toHaveBeenCalledTimes(1);
+    });
+  });
 });

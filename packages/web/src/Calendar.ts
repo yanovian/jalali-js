@@ -1,5 +1,5 @@
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
-import type { CalendarDate, CalendarSystem } from 'jalali-js';
+import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
 import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
 import { el } from './dom.js';
 import { localePackFor, parseLocaleAttribute, type LocaleCode } from './locale.js';
@@ -28,8 +28,11 @@ export interface CalendarSelectEventDetail {
  * year moves to the month grid; picking a month moves to the day grid.
  *
  * Attributes: `system` ('jalali' | 'gregorian'), `locale` ('en' | 'fa' | 'ps'), `quick-nav` (set to
- * "false" to turn off). `value` and `initial-displayed-month` are properties only, since a
- * `CalendarDate` is not representable as a plain HTML attribute string. Listen for `select`.
+ * "false" to turn off). `value`, `initial-displayed-month`, and `rules` are properties only,
+ * since none of them is representable as a plain HTML attribute string. Listen for `select`.
+ *
+ * Days blocked by `rules` render as disabled buttons with a `data-disabled` attribute: clicks
+ * do nothing and the Tab order skips them.
  */
 export class JalaliCalendarElement extends HTMLElement {
   static observedAttributes = ['system', 'locale', 'quick-nav'];
@@ -37,6 +40,7 @@ export class JalaliCalendarElement extends HTMLElement {
   #system: CalendarSystem = 'jalali';
   #locale: LocaleCode = 'en';
   #value: CalendarDate | null = null;
+  #rules: SelectionRules | undefined;
   #initialDisplayedMonth: { year: number; month: number } | undefined;
   #quickNav = true;
   #displayed: { year: number; month: number } | undefined;
@@ -74,6 +78,14 @@ export class JalaliCalendarElement extends HTMLElement {
   }
   set value(value: CalendarDate | null) {
     this.#value = value;
+    this.render();
+  }
+
+  get rules(): SelectionRules | undefined {
+    return this.#rules;
+  }
+  set rules(value: SelectionRules | undefined) {
+    this.#rules = value;
     this.render();
   }
 
@@ -211,6 +223,7 @@ export class JalaliCalendarElement extends HTMLElement {
       displayed.month,
       today,
       this.#value,
+      this.#rules,
     );
 
     const previousBtn = el(
@@ -270,6 +283,8 @@ export class JalaliCalendarElement extends HTMLElement {
               'data-selected': cell.isSelected,
               'data-today': cell.isToday,
               'data-outside-month': !cell.isCurrentMonth,
+              'data-disabled': !cell.isSelectable,
+              disabled: !cell.isSelectable,
               'aria-selected': cell.isSelected ? 'true' : 'false',
               'aria-current': cell.isToday ? 'date' : undefined,
               'aria-label': formatDate(cell.date, localePack, { style: 'long' }),
