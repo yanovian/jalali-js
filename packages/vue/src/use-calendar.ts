@@ -1,16 +1,13 @@
-import type { FormatOptions, LocalePack } from '@jalali-js/i18n';
-import { en, fa, ps, format as formatDate } from '@jalali-js/i18n';
+import type { FormatOptions, LocaleCode, LocalePack } from '@jalali-js/i18n';
+import { format as formatDate, localePackFor } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem } from 'jalali-js';
 import { createCalendar } from 'jalali-js';
 import { computed, ref, type Ref } from 'vue';
 
-export type LocaleCode = 'en' | 'fa' | 'ps';
-
-const localePacks: Record<LocaleCode, LocalePack> = { en, fa, ps };
-
-export function localePackFor(locale: LocaleCode): LocalePack {
-  return localePacks[locale];
-}
+// Re-exported so a consumer of this binding never needs to import @jalali-js/i18n directly.
+// The locale table itself lives there, once, shared by every binding.
+export type { LocaleCode } from '@jalali-js/i18n';
+export { localePackFor } from '@jalali-js/i18n';
 
 export interface UseCalendarOptions {
   /** Which calendar system the composable's date is expressed in. Default: 'jalali'. */

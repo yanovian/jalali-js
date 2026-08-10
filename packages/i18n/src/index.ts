@@ -4,5 +4,7 @@ export { ps } from './ps.js';
 export { format } from './format.js';
 export type { FormatOptions } from './format.js';
 export type { LocalePack, MonthNames, WeekdayNames } from './locale.js';
+export { isLocaleCode, localePackFor } from './locale-packs.js';
+export type { LocaleCode } from './locale-packs.js';
 export { formatNumber } from './numerals.js';
 export type { NumeralStyle } from './numerals.js';
