@@ -115,7 +115,7 @@ See [Theming](https://jalali-js.yanovian.com/guide/theming).
 - [React guide](https://jalali-js.yanovian.com/guide/react)
 - [Recipes](https://jalali-js.yanovian.com/guide/recipes)
 - [Playground](https://jalali-js.yanovian.com/playground/react/)
-- [Changelog](https://github.com/yanovian/jalali-js/blob/main/CHANGELOG.md)
+- [Changelog](https://github.com/yanovian/jalali-js/blob/master/CHANGELOG.md)
 - [`jalali-js`](https://www.npmjs.com/package/jalali-js) ·
   [`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react)
 

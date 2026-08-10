@@ -77,7 +77,7 @@ This package has no UI.
 
 - [NLP guide](https://jalali-js.yanovian.com/guide/nlp)
 - [API reference](https://jalali-js.yanovian.com/api/@jalali-js/nlp/)
-- [Changelog](https://github.com/yanovian/jalali-js/blob/main/CHANGELOG.md)
+- [Changelog](https://github.com/yanovian/jalali-js/blob/master/CHANGELOG.md)
 - [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n)
 
 ## License

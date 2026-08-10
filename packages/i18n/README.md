@@ -90,7 +90,7 @@ This package has no UI. Theme pickers in the binding packages with `--jalali-*` 
 
 - [i18n guide](https://jalali-js.yanovian.com/guide/i18n)
 - [API reference](https://jalali-js.yanovian.com/api/@jalali-js/i18n/)
-- [Changelog](https://github.com/yanovian/jalali-js/blob/main/CHANGELOG.md)
+- [Changelog](https://github.com/yanovian/jalali-js/blob/master/CHANGELOG.md)
 - [`jalali-js`](https://www.npmjs.com/package/jalali-js) ·
   [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp)
 

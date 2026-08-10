@@ -94,7 +94,7 @@ See [Theming](https://jalali-js.yanovian.com/guide/theming).
 - [Vue guide](https://jalali-js.yanovian.com/guide/vue)
 - [Event calendar](https://jalali-js.yanovian.com/guide/event-calendar)
 - [Playground](https://jalali-js.yanovian.com/playground/vue/)
-- [Changelog](https://github.com/yanovian/jalali-js/blob/main/CHANGELOG.md)
+- [Changelog](https://github.com/yanovian/jalali-js/blob/master/CHANGELOG.md)
 - [`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue)
 
 ## License

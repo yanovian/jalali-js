@@ -94,7 +94,7 @@ See [Theming](https://jalali-js.yanovian.com/guide/theming).
 - [React guide](https://jalali-js.yanovian.com/guide/react)
 - [Event calendar](https://jalali-js.yanovian.com/guide/event-calendar)
 - [Playground](https://jalali-js.yanovian.com/playground/react/)
-- [Changelog](https://github.com/yanovian/jalali-js/blob/main/CHANGELOG.md)
+- [Changelog](https://github.com/yanovian/jalali-js/blob/master/CHANGELOG.md)
 - [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react)
 
 ## License

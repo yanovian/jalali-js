@@ -97,7 +97,7 @@ This package has no UI. Theme pickers through CSS variables in
 
 - [Docs](https://jalali-js.yanovian.com/guide/getting-started)
 - [Playground](https://jalali-js.yanovian.com/playground/react/)
-- [Changelog](https://github.com/yanovian/jalali-js/blob/main/CHANGELOG.md)
+- [Changelog](https://github.com/yanovian/jalali-js/blob/master/CHANGELOG.md)
 - Bindings: [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) ·
   [`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) ·
   [`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web)

@@ -90,7 +90,7 @@ See [Theming](https://jalali-js.yanovian.com/guide/theming).
 
 - [Web Components guide](https://jalali-js.yanovian.com/guide/web-components)
 - [Playground](https://jalali-js.yanovian.com/playground/vanilla/)
-- [Changelog](https://github.com/yanovian/jalali-js/blob/main/CHANGELOG.md)
+- [Changelog](https://github.com/yanovian/jalali-js/blob/master/CHANGELOG.md)
 - [`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web)
 
 ## License
