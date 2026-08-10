@@ -15,7 +15,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   outputDir: 'test-results',
   // The JSON reporter is what e2e.yml's PR comment bot reads (scripts/visual-comment.mjs):
-  // per-test attachment paths and pass/fail status, not directory-name scanning.
+  // per-test attachments and visual-change annotations, not directory-name scanning.
   reporter: [
     ['list'],
     ['html', { open: 'never', outputFolder: 'playwright-report' }],

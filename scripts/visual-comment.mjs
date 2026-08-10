@@ -1,30 +1,24 @@
 #!/usr/bin/env node
 // Used only by e2e.yml's "publish and comment" job. Reads each browser's Playwright JSON
-// report (one per browser matrix job, downloaded as a separate artifact) and writes:
-//   - a flat directory of clearly-named images for every CHANGED screenshot (new baseline vs.
-//     current render, plus the pixel diff), ready to publish to the `visual-snapshots` orphan
-//     branch (see architecture.md's "Visual regression and PR screenshots")
-//   - manifest.json describing each image's caption and a pass/fail count per browser, so the
-//     PR comment step never has to guess what an image is a screenshot of.
+// report and writes:
+//   - images for every advisory visual change (baseline / new / diff)
+//   - manifest.json with captions and per-browser counts
 //
-// A passing screenshot test has no image to show (Playwright's JSON reporter attaches nothing
-// when nothing changed), so only failed/changed tests get images here; passing ones only add to
-// the summary count. This also keeps the comment itself readable: a reviewer cares about what's
-// different, not a wall of unchanged images.
+// Screenshot mismatches are advisory (see e2e/expect-screenshot.ts). Selection uses the
+// `visual-change` annotation on a passed test, not a failed test status. Functional
+// failures still fail the job and have no visual-change annotation.
 //
 // Usage: node scripts/visual-comment.mjs <outDir> <browser>=<resultsJsonPath> [...]
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
+
+const VISUAL_CHANGE_ANNOTATION = 'visual-change';
 
 const [outDir, ...pairs] = process.argv.slice(2);
 if (!outDir || pairs.length === 0) {
   throw new Error('Usage: visual-comment.mjs <outDir> <browser>=<resultsJsonPath> [...]');
 }
 
-// Walks one spec file's suite tree. A `test.describe(name, ...)` block becomes a nested suite
-// named `name` (playground-react.spec.ts, playground-vue.spec.ts); a bare `test(...)` with no
-// describe block leaves its spec directly on the file-level suite (playground-next.spec.ts,
-// playground-nuxt.spec.ts), so its "app name" falls back to the spec file's own basename.
 function collectTests(fileSuite, tests) {
   const fallbackApp = basename(fileSuite.file).replace(/\.spec\.ts$/, '');
   function walk(suite, appName) {
@@ -34,6 +28,7 @@ function collectTests(fileSuite, tests) {
           appName,
           specTitle: spec.title,
           projectName: t.projectName,
+          annotations: [...(t.annotations ?? []), ...(t.results[0]?.annotations ?? [])],
           result: t.results[0],
         });
       }
@@ -43,6 +38,10 @@ function collectTests(fileSuite, tests) {
     }
   }
   walk(fileSuite, fallbackApp);
+}
+
+function hasVisualChange(annotations) {
+  return annotations.some((a) => a.type === VISUAL_CHANGE_ANNOTATION);
 }
 
 const manifest = { changed: [], counts: {} };
@@ -63,18 +62,23 @@ for (const pair of pairs) {
     collectTests(fileSuite, tests);
   }
 
-  const counts = { passed: 0, failed: 0 };
+  const counts = { passed: 0, failed: 0, changed: 0 };
   manifest.counts[browser] = counts;
 
-  for (const { appName, specTitle, projectName, result } of tests) {
+  for (const { appName, specTitle, projectName, annotations, result } of tests) {
     if (projectName !== browser) continue;
+    if (!result) continue;
+
     const passed = result.status === 'passed';
     counts[passed ? 'passed' : 'failed'] += 1;
-    if (passed) continue;
+
+    if (!hasVisualChange(annotations)) continue;
 
     const attachments = result.attachments ?? [];
     const actual = attachments.find((a) => a.name.endsWith('-actual.png'));
-    if (!actual || !existsSync(actual.path)) continue; // a non-screenshot failure
+    if (!actual || !existsSync(actual.path)) continue;
+
+    counts.changed += 1;
 
     const screenshotName = actual.name.replace(/-actual\.png$/, '');
     const safeApp = appName.replace(/[^a-z0-9-]+/gi, '-');
@@ -102,7 +106,7 @@ for (const pair of pairs) {
       test: specTitle,
       screenshot: screenshotName,
       browser,
-      hasBaseline: Boolean(baselineFileName), // false only on a brand-new screenshot test
+      hasBaseline: Boolean(baselineFileName),
       newFileName: actualFileName,
       baselineFileName,
       diffFileName,

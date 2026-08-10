@@ -293,6 +293,8 @@ in `core`.
   (`scripts/prepare-changelog.mjs`).
 - Phase 13 added the opt-in astronomical Jalali engine
   (`engine: 'astronomical'`) and a fake irregular `CalendarEngine` test.
+- Phase 23 made screenshot comparisons advisory: pixel mismatches report
+  in the PR comment and do not fail the e2e job.
 
 ## Natural language date parsing
 
@@ -546,10 +548,10 @@ principle to baselines too, on a **second** orphan branch,
 - **`visual-baselines`** holds only the currently accepted baseline PNGs.
   `e2e.yml` fetches it and extracts straight into `e2e/**/*-snapshots/`
   before running tests (`git archive origin/visual-baselines | tar -x -C
-e2e/`); a repo with no `visual-baselines` branch yet fails every
-  screenshot test until one is created. Force-pushed, single commit, no
-  history kept: only the current baseline is ever meaningful for diffing,
-  so keeping old ones around only costs storage.
+e2e/`); a repo with no `visual-baselines` branch yet reports every
+  screenshot as an advisory change until one is created. Force-pushed,
+  single commit, no history kept: only the current baseline is ever
+  meaningful for diffing, so keeping old ones around only costs storage.
 - **`visual-snapshots`** holds per-PR screenshots for human review,
   accumulating under `pr-<number>/` (`e2e.yml`'s own changed screenshots
   under `pr-<number>/`, `compat-matrix.yml`'s smoke screenshots under
@@ -576,52 +578,23 @@ browsers) and force-replaces `visual-baselines` with the result. A
 bootstrap on a repo with no `visual-baselines` branch yet, or to force a
 re-baseline with no code change.
 
-This means a PR that intentionally changes rendering keeps showing
-"changed" screenshots in its `e2e.yml` comment for as long as it stays
-open: the baseline only catches up after merge, not before. That is by
-design, not a gap to close. A changed screenshot is not the same claim as
-a broken build; it means "a human should look at this," the same role a
-code diff plays in review. The reviewer looks at the baseline, new, and
-diff images in the PR comment and decides whether the change is
-intentional, then approves and merges on that judgment. `e2e.yml` is not
-wired up as a required, merge-blocking status check for this reason: a
-PR that touches no rendering-affecting code still gets a clean pass,
-since the baseline already matches, but a PR that does change rendering
-is expected to show a diff until it merges.
+Screenshot comparisons are advisory (Phase 23). Specs call
+`expectScreenshot()` in `e2e/expect-screenshot.ts`, which catches a pixel
+mismatch or a missing baseline, keeps Playwright's image attachments, adds a
+`visual-change` annotation, and lets the test pass. Functional assertions
+(`toHaveCSS`, visibility, and so on) still fail the job. A screenshot that
+cannot be captured at all still fails the job.
 
-**The PR comment itself** (`e2e.yml`'s `comment` job) does not show every
-screenshot on every run: `scripts/visual-comment.mjs` reads each browser
-job's Playwright JSON report (`reporter: [..., ['json', { outputFile:
-'test-results/results.json' }]]`), the only reporter that gives
-structured, per-test attachment paths and pass/fail status; scanning
-`test-results/`'s directory-naming convention directly was considered and
-rejected as more fragile. A **passing** screenshot test has no attachment
-at all in that JSON (nothing changed, nothing to report), so only
-**changed** screenshots get images in the comment; everything else is a
-`{passed, failed}` count per browser. Every image in the comment is
-captioned with `{app}, {test name}, {browser}` directly above it (not a
-bare filename or an uncaptioned grid), and a changed screenshot shows
-baseline/new/diff side by side in one table row. `compat-matrix.yml`'s
-smoke screenshots get their own, separate PR comment (`<!--
-compat-matrix-comment -->` marker, distinct from `e2e.yml`'s `<!--
-visual-e2e-comment -->`): the two workflows cannot easily merge into one
-comment across separate workflow runs without cross-workflow artifact
-lookups, and a maintainer reading two clearly-titled comments ("Visual e2e
-results" vs. "Compatibility matrix smoke screenshots") loses nothing
-compared to one merged comment.
+A PR that changes rendering stays green on the e2e check. The reviewer
+judges baseline / new / diff images in the PR comment. The baseline catches
+up after merge (`update-visual-baselines.yml`), not before.
 
-Verified the whole mechanism locally, including the parts that only
-matter once a screenshot actually changes: forced a genuine pixel diff
-(copied a different baseline over `dropdown`'s), confirmed
-`toHaveScreenshot()` failed with real `-actual.png`/`-diff.png`/
-`-expected.png` attachments, ran `scripts/visual-comment.mjs` against
-that real `results.json`, and confirmed it produced correctly captioned,
-correctly copied images and manifest, before restoring the baseline. Also
-caught and fixed a real bug this way: an opened calendar popover is
-`position: absolute` and pokes outside its parent section's own box, so a
-section-scoped screenshot silently clipped it to a two-line sliver; fixed
-by screenshotting the popover element itself (`page.getByRole('dialog')`)
-instead of its ancestor section.
+**The PR comment** (`e2e.yml`'s `comment` job) reads each browser's
+Playwright JSON report. `scripts/visual-comment.mjs` selects images by the
+`visual-change` annotation, not by test failure. Unchanged screenshots add
+only to the pass count. Changed rows show baseline / new / diff, captioned
+`{app}, {test name}, {browser}`. `compat-matrix.yml` keeps its own comment
+(`<!-- compat-matrix-comment -->`).
 
 ## CI/CD pipeline
 

@@ -5,8 +5,8 @@ name: E2E visual tests
 # `visual-baselines` branch and get restored into place before each run.
 # update-visual-baselines.yml keeps that branch current automatically, once ci.yml passes on
 # master, so no maintainer has to remember to run it. A repo with no `visual-baselines` branch
-# yet (before that workflow's first-ever run) fails every screenshot test until it has run at
-# least once.
+# yet (before that workflow's first-ever run) marks every screenshot as an advisory change
+# until it has run at least once.
 
 on:
   pull_request:
@@ -53,7 +53,7 @@ jobs:
             git archive origin/visual-baselines | tar -x -C e2e/
             echo "Restored baselines from origin/visual-baselines."
           else
-            echo "::warning::No visual-baselines branch found; every screenshot test will fail until ci.yml next passes on master, or a manual run of update-visual-baselines.yml."
+            echo "::warning::No visual-baselines branch found; every screenshot is an advisory change until ci.yml next passes on master, or a manual run of update-visual-baselines.yml."
           fi
 
       - name: Run Playwright
@@ -151,10 +151,10 @@ jobs:
             if (browsers.length === 0) {
               body += '_No results were collected (the browser jobs may have failed before producing a report)._\n';
             } else {
-              body += '| Browser | Passed | Changed |\n| --- | --- | --- |\n';
+              body += '| Browser | Passed | Changed | Failed |\n| --- | --- | --- | --- |\n';
               for (const browser of browsers) {
                 const c = manifest.counts[browser];
-                body += `| ${browser} | ${c.passed} | ${c.failed} |\n`;
+                body += `| ${browser} | ${c.passed} | ${c.changed ?? 0} | ${c.failed} |\n`;
               }
             }
 

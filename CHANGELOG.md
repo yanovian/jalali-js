@@ -9,6 +9,12 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Changed
+
+- Visual e2e screenshot mismatches are advisory. They report baseline /
+  new / diff in the PR comment and do not fail the e2e job. Functional
+  assertions still fail the job.
+
 ### Added
 
 - Opt-in astronomical Jalali engine: `engine: 'astronomical'` on

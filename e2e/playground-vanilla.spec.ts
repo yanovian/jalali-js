@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { expectScreenshot } from './expect-screenshot.js';
+
 // Each section is its own named baseline, so a diff in one config (say, RTL Farsi) never masks
 // or gets masked by a diff in another; see architecture.md's "Visual regression and PR
 // screenshots" for how these baselines are reviewed and updated.
@@ -28,7 +30,7 @@ test.describe('playground-vanilla', () => {
 
   for (const { testId, name } of SECTIONS) {
     test(`section: ${testId}`, async ({ page }) => {
-      await expect(page.getByTestId(testId)).toHaveScreenshot(name);
+      await expectScreenshot(page.getByTestId(testId), name);
     });
   }
 
@@ -40,7 +42,7 @@ test.describe('playground-vanilla', () => {
     await section.getByRole('combobox').click();
     const popover = section.getByRole('dialog');
     await expect(popover).toBeVisible();
-    await expect(popover).toHaveScreenshot('calendar-grid-open.png');
+    await expectScreenshot(popover, 'calendar-grid-open.png');
   });
 
   test('custom CSS override actually applies, not just looks unchanged', async ({ page }) => {

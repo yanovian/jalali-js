@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { expectScreenshot } from './expect-screenshot.js';
+
 // Mirrors playground-react.spec.ts's section list and naming, on purpose: both bindings render
 // the same configs, so a reviewer comparing the two PR screenshot grids side by side sees
 // matching filenames.
@@ -29,7 +31,7 @@ test.describe('playground-vue', () => {
 
   for (const { testId, name } of SECTIONS) {
     test(`section: ${testId}`, async ({ page }) => {
-      await expect(page.getByTestId(testId)).toHaveScreenshot(name);
+      await expectScreenshot(page.getByTestId(testId), name);
     });
   }
 
@@ -40,7 +42,7 @@ test.describe('playground-vue', () => {
     await section.getByRole('combobox').click();
     const popover = section.getByRole('dialog');
     await expect(popover).toBeVisible();
-    await expect(popover).toHaveScreenshot('calendar-grid-open.png');
+    await expectScreenshot(popover, 'calendar-grid-open.png');
   });
 
   test('custom CSS override actually applies, not just looks unchanged', async ({ page }) => {

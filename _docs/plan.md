@@ -1031,38 +1031,30 @@ an explicit URL and always screenshots the exact same state.
 
 ## Phase 23: Visual changes report, they do not fail CI
 
-Today a changed screenshot fails the e2e job, and the PR comment then shows
-the diff images. The red check reads like a defect, but a visual change is
-often the point of the pull request. Phase 10 already states the design:
-the reviewer judges the diff images in the PR comment, not a green check.
-The job status should match that design. A visual change should report,
-not block.
+A changed screenshot used to fail the e2e job while the PR comment showed
+the diff. The red check read like a defect, but a visual change is often
+the point of the pull request. The reviewer judges the images in the
+comment. The job status should match that.
 
-- [ ] Split the e2e assertions into two classes. Functional assertions
+- [x] Split the e2e assertions into two classes. Functional assertions
       (interaction, emitted values, computed styles) keep failing the job.
-      Screenshot comparisons become advisory: they report, they do not
-      fail.
-- [ ] Implement the advisory comparison: wrap the screenshot assertion so
-      a pixel mismatch is caught, attaches three images to the test report
-      (the baseline as "what it was", the new capture as "what it is now",
-      and the diff), records an annotation, and lets the test pass. A
-      missing baseline (a first run) is also advisory, and attaches the
-      new capture alone.
-- [ ] Update `scripts/visual-comment.mjs` to select images by that
-      annotation, not by test failure. The comment shows "was" against
-      "now", with the diff, per test and per browser, and states plainly
-      when nothing changed.
-- [ ] Keep the job red for real errors: a crashed app, a failed functional
+      Screenshot comparisons are advisory: they report, they do not fail.
+- [x] Implement the advisory comparison in `e2e/expect-screenshot.ts`:
+      catch a pixel mismatch or a missing baseline, keep Playwright's
+      baseline / new / diff attachments, record a `visual-change`
+      annotation, and let the test pass.
+- [x] Update `scripts/visual-comment.mjs` to select images by that
+      annotation, not by test failure. The comment shows baseline against
+      new, with the diff, per test and per browser, and states when
+      nothing changed.
+- [x] Keep the job red for real errors: a crashed app, a failed functional
       assertion, or a screenshot that cannot be captured at all still
       fails the run.
-- [ ] Verify both directions for real, the same way Phase 10 verified the
-      comment bot: force a pixel change and confirm the job stays green
-      while the comment shows "was" against "now"; force a functional
-      failure and confirm the job goes red.
-- [ ] Update architecture.md's CI/CD section and Phase 10's description of
-      the flow: the check gates functional correctness only, the reviewer
-      judges visuals in the comment, and the baseline branch flow stays
-      unchanged.
+- [x] Verify both directions: a forced pixel change stays green and
+      appears in the comment manifest; a functional failure stays red.
+- [x] Update architecture.md: the check gates functional correctness, the
+      reviewer judges visuals in the comment, and the baseline branch flow
+      stays unchanged.
 
 ## Phase 24: npm package pages
 
