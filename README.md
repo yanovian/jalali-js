@@ -143,6 +143,7 @@ linked above.
   existing Jalali and Persian calendar libraries.
 - Docs for agents: [`llms.txt`](https://yanovian.github.io/jalali-js/llms.txt) (index) and
   [`llms-full.txt`](https://yanovian.github.io/jalali-js/llms-full.txt) (full guide bundle).
+- [`CHANGELOG.md`](CHANGELOG.md): what changed in each release.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): setup, the branch and PR workflow, and the checks a
   change must pass.
 - [`_docs/release-checklist.md`](_docs/release-checklist.md): the release readiness checklist.
