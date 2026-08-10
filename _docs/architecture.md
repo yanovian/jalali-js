@@ -736,8 +736,7 @@ publish-packages` (skipping any already published at that version, so a
   `actions/configure-pages` / `actions/upload-pages-artifact` /
   `actions/deploy-pages` flow. Needs GitHub Pages enabled with "GitHub
   Actions" as the source in this repo's own Settings, an operational
-  prerequisite this workflow cannot turn on itself (see
-  `_docs/release-checklist.md`).
+  prerequisite this workflow cannot turn on itself.
 
 The dependency-update, license-audit, and action-pruning Actions above are
 the org's own (`yanovian/update-dependencies-action`,

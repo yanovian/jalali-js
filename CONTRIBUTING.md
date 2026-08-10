@@ -5,7 +5,7 @@ and PR workflow, and the checks a change must pass.
 
 See [`_docs/plan.md`](_docs/plan.md) for the current phase status,
 [`_docs/architecture.md`](_docs/architecture.md) for the technical design,
-[`_docs/release-checklist.md`](_docs/release-checklist.md) for what "ready to release" means, and
+[`CHANGELOG.md`](CHANGELOG.md) for what each release shipped, and
 [`AGENTS.md`](AGENTS.md) for the writing style used in this repo's docs and
 comments.
 

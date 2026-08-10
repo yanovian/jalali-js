@@ -146,7 +146,6 @@ linked above.
 - [`CHANGELOG.md`](CHANGELOG.md): what changed in each release.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): setup, the branch and PR workflow, and the checks a
   change must pass.
-- [`_docs/release-checklist.md`](_docs/release-checklist.md): the release readiness checklist.
 - [`_docs/plan.md`](_docs/plan.md): the phase-by-phase status checklist.
 
 ## Used by

@@ -652,7 +652,9 @@ actually passed CI ever gets baselined.
       (`/jalali-js/...`), confirmed every route and asset resolves, and
       screenshotted the embedded playground to confirm it actually renders,
       correctly themed, not only that the files exist.
-- [x] Run the release checklist. `_docs/release-checklist.md`: engineering
+- [x] Run the release checklist (`_docs/release-checklist.md`, a one-time
+      gate for the first release; deleted after v0.0.1 shipped, as the
+      document itself instructed, so it could not go stale): engineering
       readiness, package readiness, documentation readiness, and the
       operational prerequisites (`NPM_TOKEN`, `PAT_TOKEN`, GitHub Pages
       enabled) nothing in this repo can verify or set up by itself. Two
