@@ -279,6 +279,12 @@ in `core`.
   for the direct ICU verification).
 - The docs site's i18n guide has the step-by-step "Adding a locale"
   walkthrough for contributors.
+- Phase 15 added token templates. `format()` takes a `template` option
+  (`YYYY/MM/DD`, `D MMMM YYYY`, and so on), and `parseTemplate()` is the
+  strict reverse: it returns a `CalendarDate` or `null`, accepts Latin
+  and native digits, and rejects dates that do not exist. One tokenizer
+  in `template.ts` serves both directions. Free-form input stays in
+  `packages/nlp`.
 
 ## Natural language date parsing
 

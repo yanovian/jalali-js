@@ -2,6 +2,7 @@ import type { AnyCalendarDate } from 'jalali-js';
 import { dayOfWeek } from 'jalali-js';
 import type { LocalePack } from './locale.js';
 import { formatNumber, type NumeralStyle } from './numerals.js';
+import { formatTemplate } from './template.js';
 
 export interface FormatOptions {
   /** Long month/weekday names ("Mordad", "Monday") or short ones ("Mor", "Mon"). Default: 'long'. */
@@ -10,6 +11,8 @@ export interface FormatOptions {
   weekday?: boolean;
   /** Latin digits or the locale's own native digits. Default: the locale's `defaultNumerals`. */
   numerals?: NumeralStyle;
+  /** A token template, e.g. `'YYYY/MM/DD'`. When set, `style` and `weekday` are ignored. */
+  template?: string;
 }
 
 /**
@@ -24,6 +27,7 @@ export function format(
 ): string {
   const style = options.style ?? 'long';
   const numerals = options.numerals ?? locale.defaultNumerals;
+  if (options.template) return formatTemplate(date, locale, options.template, numerals);
 
   const monthNames = locale.monthNames[date.system][style];
   const monthName = monthNames[date.month - 1] ?? '';

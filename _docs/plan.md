@@ -4,10 +4,10 @@ See [alternatives.md](./alternatives.md) for the vision and the goals. See
 [architecture.md](./architecture.md) for the design behind these decisions.
 This file shows only the status of each phase.
 
-Phases 0-12 and 14 are done, and the first releases are published (v0.0.1
+Phases 0-12 and 14-15 are done, and the first releases are published (v0.0.1
 through v0.1.0; see `CHANGELOG.md`). v0.1.0 also shipped the Web Components
 bindings (`packages/web`, `packages/ui-web`), which landed outside the phase
-list. Phase 13 and Phases 15-24 are scheduled but not started. Phases 14-18
+list. Phase 13 and Phases 16-24 are scheduled but not started. Phases 14-18
 add the features real apps ask for first, so they land before Phase 13.
 What's left after those is listed under "Later, not yet scheduled" below.
 Change an item to `[x]` as it lands.
@@ -814,15 +814,24 @@ dates. This phase completes the set, still with zero runtime dependencies.
 token templates, and the reverse: strict parsing of a known shape (the NLP
 package stays the home for free-form input).
 
-- [ ] Add template support to `format()`: year, month, day, weekday, and
+- [x] Add template support to `format()`: year, month, day, weekday, and
       month-name tokens, locale-aware, for both calendar systems. Presets
-      stay; templates are additive.
-- [ ] Add `parseTemplate(input, template, options)`. Return a
+      stay; templates are additive. Done as a `template` option on
+      `FormatOptions`. Tokens: `YYYY`, `MM`, `M`, `DD`, `D`, `MMMM`,
+      `MMM`, `dddd`, `ddd`. One tokenizer in
+      `packages/i18n/src/template.ts` serves both directions.
+- [x] Add `parseTemplate(input, template, options)`. Return a
       `CalendarDate`, or `null` when the input does not match. Accept both
-      Latin and Persian digits.
-- [ ] Add round-trip tests: format with a template, parse it back, get the
-      same date, across locales and calendar systems.
-- [ ] Document the token table in the docs site's i18n guide.
+      Latin and Persian digits. Done as
+      `parseTemplate(input, template, localePack, options)`, mirroring
+      `format()`'s argument order. It accepts Latin digits and the pack's
+      native digits, rejects dates that do not exist, and checks a weekday
+      name against the parsed date.
+- [x] Add round-trip tests: format with a template, parse it back, get the
+      same date, across locales and calendar systems. Done as a
+      `fast-check` property over all three locales, both systems, both
+      digit styles, and six templates, plus direct rejection tests.
+- [x] Document the token table in the docs site's i18n guide.
 
 ## Phase 16: Selection rules for every picker
 

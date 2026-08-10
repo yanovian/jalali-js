@@ -11,6 +11,11 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- Format templates and strict parsing in `@jalali-js/i18n`: a `template`
+  option on `format()` (`YYYY`, `MM`, `M`, `DD`, `D`, `MMMM`, `MMM`,
+  `dddd`, `ddd`) and its reverse, `parseTemplate()`. Parsing accepts
+  Latin and native digits and returns `null` when the input does not
+  match the template or the date does not exist.
 - Date math and query helpers in the core: `addMonths`, `addYears`,
   `diffDates`, `startOf`, `endOf`, `isBefore`, `isAfter`, `isSameDay`,
   `isBetween`, and `isToday`. All work per calendar system and clamp

@@ -8,3 +8,5 @@ export { isLocaleCode, localePackFor } from './locale-packs.js';
 export type { LocaleCode } from './locale-packs.js';
 export { formatNumber } from './numerals.js';
 export type { NumeralStyle } from './numerals.js';
+export { parseTemplate } from './template.js';
+export type { ParseTemplateOptions } from './template.js';

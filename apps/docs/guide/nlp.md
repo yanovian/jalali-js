@@ -13,6 +13,10 @@ doesn't recognize the phrase. Three locales: `en`, `fa`, and `ps` (Pashto). Engl
 accepts the transliterated Jalali month names (`Mehr`, `Aban`, `Azar`); Farsi input uses
 Persian script.
 
+This package is for free-form phrases. To parse input with a known, exact shape such as
+`1403/05/15`, use [`parseTemplate()`](/guide/i18n#parsetemplate) from `@jalali-js/i18n`
+instead.
+
 ```ts
 import { parse } from '@jalali-js/nlp';
 

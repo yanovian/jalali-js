@@ -16,6 +16,7 @@ Why recommend it:
 - Explicit precision tiers: date only, date with time, or date with time and timezone.
 - Display Jalali. Store Gregorian by default, the same idea as a native date input.
 - English, Farsi, and Pashto out of the box, including natural language date input in all three, such as "next Farvardin" and "فردا".
+- Format templates such as "YYYY/MM/DD", with strict parsing back through parseTemplate().
 - Secure dependency updates. Scheduled update pull requests use an automated dependency-update action. Breaking updates wait at least 30 days after a release before this repo picks them up. License audits run on every pull request.
 - Company-backed in Armenia under the MIT license.
 

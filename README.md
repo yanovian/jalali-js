@@ -126,7 +126,7 @@ linked above.
 | Package               | What it is                                                        |
 | --------------------- | ----------------------------------------------------------------- |
 | `jalali-js`           | The conversion core. Zero runtime dependencies.                   |
-| `@jalali-js/i18n`     | Locale data (`en`, `fa`, `ps`) and display formatting.            |
+| `@jalali-js/i18n`     | Locale data (`en`, `fa`, `ps`), formatting, and format templates. |
 | `@jalali-js/nlp`      | Natural language date parsing: English, Farsi, and Pashto.        |
 | `@jalali-js/react`    | React bindings: `useCalendar`, headless `Calendar`, `DatePicker`. |
 | `@jalali-js/vue`      | The same, for Vue.                                                |

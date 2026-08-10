@@ -1,7 +1,7 @@
 {
   "name": "@jalali-js/i18n",
   "version": "0.1.0",
-  "description": "Locale data and display formatting for jalali-js: English and Farsi, month/weekday names, numerals, and RTL.",
+  "description": "Locale data and display formatting for jalali-js: English, Farsi, and Pashto, format templates, strict parsing, numerals, and RTL.",
   "keywords": [
     "jalali",
     "persian",
@@ -52,5 +52,7 @@
   "dependencies": {
     "jalali-js": "workspace:*"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "fast-check": "^4.9.0"
+  }
 }

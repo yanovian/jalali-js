@@ -105,3 +105,7 @@ calendar systems, so `en` includes English transliterations of the Jalali months
 includes Persian transliterations of the Gregorian ones), weekday names, digit style, and text
 direction. `format()` takes a date plus a locale pack and renders it; the React, Vue, and Web
 Components bindings' `locale` prop picks which pack a component uses.
+
+`format()` also takes a `template` option (`'YYYY/MM/DD'`, `'D MMMM YYYY'`) for an exact
+output shape, and `parseTemplate()` parses such a shape back into a `CalendarDate`. See
+[Templates](/guide/i18n#templates) in the i18n guide.
