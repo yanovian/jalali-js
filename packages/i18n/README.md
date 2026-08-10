@@ -35,8 +35,8 @@ direction.
 and wire it up through a `locale` prop or attribute; reach for it directly only when formatting
 a date outside a component.
 
-[Guide and API reference](https://yanovian.github.io/jalali-js/) ·
-[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
-[Playground](https://yanovian.github.io/jalali-js/playground/react/)
+[Guide and API reference](https://jalali-js.yanovian.com/) ·
+[Examples](https://jalali-js.yanovian.com/guide/examples) ·
+[Playground](https://jalali-js.yanovian.com/playground/react/)
 
 MIT licensed.

@@ -32,9 +32,9 @@ known-range entry such as a date of birth. `useResolvedTimeZone()` pairs with a
 [`@jalali-js/ui-vue`](https://www.npmjs.com/package/@jalali-js/ui-vue) adds a `RangePicker`, an
 `InlineCalendar`, and extra themes on the same primitives.
 
-[Guide](https://yanovian.github.io/jalali-js/) ·
-[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
-[Playground](https://yanovian.github.io/jalali-js/playground/vue/)
+[Guide](https://jalali-js.yanovian.com/) ·
+[Examples](https://jalali-js.yanovian.com/guide/examples) ·
+[Playground](https://jalali-js.yanovian.com/playground/vue/)
 
 The generated API reference covers this package's plain-TypeScript composables only. `.vue`
 component props are documented on the guide's Vue page instead, since TypeDoc has no `.vue` SFC

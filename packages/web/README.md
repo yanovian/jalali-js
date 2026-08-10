@@ -32,8 +32,8 @@ with `quick-nav="false"`.
 [`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web) adds a
 `<jalali-range-picker>`, a `<jalali-inline-calendar>`, and extra themes on the same primitives.
 
-[Guide and API reference](https://yanovian.github.io/jalali-js/) ·
-[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
-[Playground](https://yanovian.github.io/jalali-js/playground/vanilla/)
+[Guide and API reference](https://jalali-js.yanovian.com/) ·
+[Examples](https://jalali-js.yanovian.com/guide/examples) ·
+[Playground](https://jalali-js.yanovian.com/playground/vanilla/)
 
 MIT licensed.

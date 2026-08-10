@@ -30,8 +30,8 @@ hydration mismatch.
 [`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react) adds a `RangePicker`,
 an `InlineCalendar`, and extra themes on the same primitives.
 
-[Guide and API reference](https://yanovian.github.io/jalali-js/) ·
-[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
-[Playground](https://yanovian.github.io/jalali-js/playground/react/)
+[Guide and API reference](https://jalali-js.yanovian.com/) ·
+[Examples](https://jalali-js.yanovian.com/guide/examples) ·
+[Playground](https://jalali-js.yanovian.com/playground/react/)
 
 MIT licensed.

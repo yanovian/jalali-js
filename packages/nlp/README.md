@@ -20,8 +20,8 @@ parse('banana', 'en'); // null: not a recognized phrase
 Returns a `CalendarDate` (in the Jalali system by default; pass `{ system: 'gregorian' }` for
 the other), or `null` when the phrase isn't recognized.
 
-[Guide and API reference](https://yanovian.github.io/jalali-js/) ·
-[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
-[Playground](https://yanovian.github.io/jalali-js/playground/react/)
+[Guide and API reference](https://jalali-js.yanovian.com/) ·
+[Examples](https://jalali-js.yanovian.com/guide/examples) ·
+[Playground](https://jalali-js.yanovian.com/playground/react/)
 
 MIT licensed.

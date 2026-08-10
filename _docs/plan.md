@@ -655,10 +655,11 @@ actually passed CI ever gets baselined.
       `playground-next`/`playground-nuxt` stay CI-only (GitHub Pages is
       static-only; they're SSR apps, already covered by `ci.yml`,
       `compat-matrix.yml`, and `e2e.yml`). Verified directly, not just
-      built: served the merged output locally at the real deployment path
-      (`/jalali-js/...`), confirmed every route and asset resolves, and
-      screenshotted the embedded playground to confirm it actually renders,
-      correctly themed, not only that the files exist.
+      built: served the merged output locally at the real deployment path,
+      confirmed every route and asset resolves, and screenshotted the
+      embedded playground to confirm it actually renders, correctly themed,
+      not only that the files exist. The docs site now uses the custom
+      domain root at `https://jalali-js.yanovian.com/` (`base: '/'`).
 - [x] Run the release checklist (`_docs/release-checklist.md`, a one-time
       gate for the first release; deleted after v0.0.1 shipped, as the
       document itself instructed, so it could not go stale): engineering

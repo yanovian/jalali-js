@@ -449,15 +449,13 @@ safe in prose that flows through a Vue-template-aware renderer.
 **Playground embeds.** `pages.yml` builds `playground-react` and `playground-vue` with an
 explicit `--base` (`make app-build-at-base`), so their own emitted asset URLs resolve correctly
 once copied into the docs site's own build output at `/playground/react/` and `/playground/vue/`
-(verified directly: served the merged output locally at the real deployment path,
-`/jalali-js/...`, confirmed every route and asset 200s, and screenshotted the embedded
-playground to confirm it actually renders, themed correctly, not just that the files exist).
+(verified directly: served the merged output locally at the real deployment path, confirmed
+every route and asset 200s, and screenshotted the embedded playground to confirm it actually
+renders, themed correctly, not just that the files exist).
 `playground-next` and `playground-nuxt` are SSR apps; GitHub Pages is static-only, so they stay
 CI-only verification apps (already covered by `ci.yml`, `compat-matrix.yml`, and `e2e.yml`)
-rather than customer-facing demos here. VitePress's own `base` config is `/jalali-js/`, matching
-where GitHub Pages actually serves a project site (not a custom domain, not a
-`<org>.github.io` user page) by default; this would need to become `/` if a custom domain (a
-`CNAME` file) is ever added.
+rather than customer-facing demos here. VitePress's own `base` config is `/`, matching the
+custom domain root at `https://jalali-js.yanovian.com/`.
 
 ## Testing strategy
 

@@ -29,8 +29,8 @@ discoverable tag name, for an always-visible grid with no popover. `themes/dark.
 `themes/compact.css` each override a disjoint set of the shared `--jalali-*` custom properties,
 so they compose by importing both.
 
-[Guide and API reference](https://yanovian.github.io/jalali-js/) ·
-[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
-[Playground](https://yanovian.github.io/jalali-js/playground/vanilla/)
+[Guide and API reference](https://jalali-js.yanovian.com/) ·
+[Examples](https://jalali-js.yanovian.com/guide/examples) ·
+[Playground](https://jalali-js.yanovian.com/playground/vanilla/)
 
 MIT licensed.

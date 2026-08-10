@@ -43,9 +43,9 @@ docs-preview: embed-playgrounds build-docs ## Build and preview the docs site lo
 	$(PNPM) --filter docs preview
 
 embed-playgrounds: ## Build playground-react/vue/vanilla at their embedded subpaths and copy them into apps/docs/public/ (pages.yml; docs-dev/docs-preview already depend on this)
-	$(MAKE) app-build-at-base APP=playground-react BASE=/jalali-js/playground/react/
-	$(MAKE) app-build-at-base APP=playground-vue BASE=/jalali-js/playground/vue/
-	$(MAKE) app-build-at-base APP=playground-vanilla BASE=/jalali-js/playground/vanilla/
+	$(MAKE) app-build-at-base APP=playground-react BASE=/playground/react/
+	$(MAKE) app-build-at-base APP=playground-vue BASE=/playground/vue/
+	$(MAKE) app-build-at-base APP=playground-vanilla BASE=/playground/vanilla/
 	mkdir -p apps/docs/public/playground/react apps/docs/public/playground/vue apps/docs/public/playground/vanilla
 	cp -r apps/playground-react/dist/. apps/docs/public/playground/react/
 	cp -r apps/playground-vue/dist/. apps/docs/public/playground/vue/
@@ -138,7 +138,7 @@ publish-packages: ## Publish every package/* to npm, skipping any already publis
 app-typecheck: ## Typecheck one app/package by name (compat-matrix.yml): make app-typecheck APP=playground-react
 	$(PNPM) --filter $(APP) typecheck
 
-app-build-at-base: ## Build one Vite app under a URL subpath (pages.yml, embedding a playground into the docs site): make app-build-at-base APP=playground-react BASE=/jalali-js/playground/react/
+app-build-at-base: ## Build one Vite app under a URL subpath (pages.yml, embedding a playground into the docs site): make app-build-at-base APP=playground-react BASE=/playground/react/
 	$(PNPM) --filter $(APP) exec vite build --base $(BASE)
 
 app-build: ## Build one app/package by name (compat-matrix.yml): make app-build APP=playground-react

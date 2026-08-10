@@ -20,9 +20,9 @@ Three precision tiers (`CalendarDate`, `CalendarDateTime`, `ZonedCalendarDateTim
 `Temporal`'s own tiers), and a `valueFormat` option for opting a stored value into the Jalali
 calendar instead of the Gregorian default.
 
-[Guide and API reference](https://yanovian.github.io/jalali-js/) ·
-[Examples](https://yanovian.github.io/jalali-js/guide/examples) ·
-[Playground](https://yanovian.github.io/jalali-js/playground/react/)
+[Guide and API reference](https://jalali-js.yanovian.com/) ·
+[Examples](https://jalali-js.yanovian.com/guide/examples) ·
+[Playground](https://jalali-js.yanovian.com/playground/react/)
 
 Part of the [jalali-js](https://github.com/yanovian/jalali-js) toolkit:
 [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react),

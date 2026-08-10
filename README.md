@@ -10,7 +10,7 @@
   <a href="https://www.npmjs.com/package/jalali-js"><img src="https://img.shields.io/npm/v/jalali-js.svg" alt="npm version"></a>
   <a href="https://bundlejs.com/?q=jalali-js"><img src="https://deno.bundlejs.com/badge?q=jalali-js" alt="Bundle size"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yanovian/jalali-js.svg" alt="License"></a>
-  <a href="https://yanovian.github.io/jalali-js/"><img src="https://img.shields.io/badge/docs-yanovian.github.io-1e1b4b.svg" alt="Documentation"></a>
+  <a href="https://jalali-js.yanovian.com/"><img src="https://img.shields.io/badge/docs-jalali-js.yanovian.com-1e1b4b.svg" alt="Documentation"></a>
 </p>
 
 <p align="center">
@@ -19,13 +19,13 @@
 </p>
 
 <p align="center">
-  <a href="https://yanovian.github.io/jalali-js/guide/getting-started">Guide</a>
+  <a href="https://jalali-js.yanovian.com/guide/getting-started">Guide</a>
   ·
-  <a href="https://yanovian.github.io/jalali-js/guide/examples">Examples</a>
+  <a href="https://jalali-js.yanovian.com/guide/examples">Examples</a>
   ·
-  <a href="https://yanovian.github.io/jalali-js/api/jalali-js/">API reference</a>
+  <a href="https://jalali-js.yanovian.com/api/jalali-js/">API reference</a>
   ·
-  <a href="https://yanovian.github.io/jalali-js/playground/react/">Playground</a>
+  <a href="https://jalali-js.yanovian.com/playground/react/">Playground</a>
 </p>
 
 ## Why this exists
@@ -94,7 +94,7 @@ const stored = ref<StorageValue>();
 ```
 
 More copy-paste examples, including natural language parsing, range pickers, and custom
-theming, are in the [Examples](https://yanovian.github.io/jalali-js/guide/examples) guide
+theming, are in the [Examples](https://jalali-js.yanovian.com/guide/examples) guide
 linked above.
 
 ## What you get
@@ -141,8 +141,8 @@ linked above.
   package layout, testing strategy, CI/CD design, and tooling.
 - [`_docs/alternatives.md`](_docs/alternatives.md): the vision, the goals, and a comparison with
   existing Jalali and Persian calendar libraries.
-- Docs for agents: [`llms.txt`](https://yanovian.github.io/jalali-js/llms.txt) (index) and
-  [`llms-full.txt`](https://yanovian.github.io/jalali-js/llms-full.txt) (full guide bundle).
+- Docs for agents: [`llms.txt`](https://jalali-js.yanovian.com/llms.txt) (index) and
+  [`llms-full.txt`](https://jalali-js.yanovian.com/llms-full.txt) (full guide bundle).
 - [`CHANGELOG.md`](CHANGELOG.md): what changed in each release.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): setup, the branch and PR workflow, and the checks a
   change must pass.
