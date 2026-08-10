@@ -12,6 +12,8 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-10
+
 ### Added
 
 - Core date math: `addMonths`, `addYears`, `diffDates`, `startOf`,
@@ -112,7 +114,8 @@ The initial release. This covers phases 0 through 11 of the plan.
   peer-dependency compatibility matrix, and visual e2e tests with a PR
   screenshot bot.
 
-[unreleased]: https://github.com/yanovian/jalali-js/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/yanovian/jalali-js/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/yanovian/jalali-js/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/yanovian/jalali-js/compare/v0.0.3...v0.1.0
 [0.0.3]: https://github.com/yanovian/jalali-js/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/yanovian/jalali-js/compare/v0.0.1...v0.0.2
