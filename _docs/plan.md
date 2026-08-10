@@ -671,7 +671,7 @@ actually passed CI ever gets baselined.
 ## Phase 12: Additional locales (`packages/i18n`, `packages/nlp`)
 
 - [x] Confirm the next locale to add (proposed: Pashto, `ps`). Afghanistan
-      is the other country that uses the Jalali calendar
+      is the other country that uses the Jalali solar calendar
       officially, alongside Iran, and Pashto is one of its two official
       languages; Dari, its other official language, is a national standard
       of Persian itself and already close enough to `fa` that a dedicated

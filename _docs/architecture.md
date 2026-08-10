@@ -260,9 +260,9 @@ in `core`.
 
 - Locales at launch: `en` and `fa`. Phase 12 added `ps` (Pashto),
   Afghanistan's other official language alongside Dari (Afghanistan being
-  the other country that uses the Jalali calendar officially, besides
-  Iran); Dari itself is a national standard of Persian, close enough to
-  `fa` that a dedicated pack is lower priority.
+  the other country that uses the Jalali solar calendar officially,
+  besides Iran); Dari itself is a national standard of Persian, close
+  enough to `fa` that a dedicated pack is lower priority.
 - Locale data covers: month names, weekday names in full and short form,
   native digits against Latin digits, and text direction (`ltr` or `rtl`),
   so a consumer can set the `dir` attribute correctly.
