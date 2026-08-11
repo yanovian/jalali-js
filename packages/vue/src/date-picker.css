@@ -292,9 +292,12 @@ button[data-jalali-calendar-title-year]:hover {
   background: color-mix(in srgb, var(--jalali-holiday-fg) 12%, transparent);
 }
 
-/* Holiday tip lives under the grid so it never clips at week edges. */
+/* Holiday tip overlays the calendar bottom. Absolute so the calendar size does not change. */
 [data-jalali-calendar-tip] {
-  margin-top: 0.45em;
+  position: absolute;
+  z-index: 6;
+  inset-inline: 0;
+  bottom: 0;
   padding: 0.35em 0.55em;
   border-radius: var(--jalali-radius);
   border: 1px solid var(--jalali-border);
@@ -306,6 +309,8 @@ button[data-jalali-calendar-title-year]:hover {
   text-align: start;
   box-sizing: border-box;
   max-width: 100%;
+  pointer-events: none;
+  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--jalali-fg) 16%, transparent);
 }
 
 [data-jalali-calendar-tip]:empty {
