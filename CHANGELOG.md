@@ -26,6 +26,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 - EventCalendar works on phone widths, with keyboard-focusable scroll panes.
 - Calendar themes raise contrast for light and dark modes, with phone layout and high-contrast CSS support.
 - Default calendar density is tighter and more coherent, with density tokens and a denser `compact` theme.
+- Day cells use the same soft corner radius as the calendar shell, not full circles.
 
 ## [0.2.1] - 2026-08-10
 

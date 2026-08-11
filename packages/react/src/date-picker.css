@@ -25,7 +25,8 @@
   --jalali-muted-fg: #595959;
   --jalali-border: #737373;
   --jalali-radius: 0.5rem;
-  --jalali-day-radius: 999px;
+  /* Match the calendar shell: soft rounded squares, not circles. */
+  --jalali-day-radius: var(--jalali-radius);
   --jalali-primary: #2563eb;
   --jalali-primary-fg: #ffffff;
   --jalali-shadow: 0 4px 16px color-mix(in srgb, var(--jalali-fg) 14%, transparent);
@@ -616,7 +617,7 @@ button[data-jalali-calendar-title-year]:hover {
   display: grid;
   place-items: center;
   border: 2px solid var(--jalali-bg);
-  border-radius: var(--jalali-day-radius);
+  border-radius: 999px;
   background: var(--jalali-timeline-accent);
   box-shadow: 0 1px 2px color-mix(in srgb, var(--jalali-fg) 18%, transparent);
   color: var(--jalali-timeline-marker-fg);

@@ -370,7 +370,7 @@ variables.
 | `--jalali-muted-fg`        | Secondary text color (weekday headers, outside-month days) |
 | `--jalali-border`          | Border color                                               |
 | `--jalali-radius`          | Corner radius (input, popover, month/year cells)           |
-| `--jalali-day-radius`      | Corner radius for day cells and circular controls          |
+| `--jalali-day-radius`      | Corner radius for day cells and nav controls               |
 | `--jalali-primary`         | Accent color: today's ring, selected/range-endpoint fill   |
 | `--jalali-primary-fg`      | Text color on top of `--jalali-primary`                    |
 | `--jalali-shadow`          | Popover drop shadow                                        |
