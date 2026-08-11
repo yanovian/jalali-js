@@ -43,18 +43,6 @@ jobs:
         with:
           ref: master
 
-      # workflow_run uses the deploy workflow from master. Until this PR merges,
-      # that file is absent and this job never runs. After merge, the first runs
-      # may still need the helper script from the triggering PR head.
-      - name: Ensure pr-previews helper script
-        if: github.event_name == 'workflow_run'
-        run: |
-          if [ -f scripts/pr-previews.mjs ]; then
-            exit 0
-          fi
-          git fetch --depth=1 origin "${{ github.event.workflow_run.head_sha }}"
-          git checkout FETCH_HEAD -- scripts/pr-previews.mjs
-
       - name: Resolve PR context
         id: pr
         uses: actions/github-script@v9
