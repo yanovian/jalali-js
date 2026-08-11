@@ -12,6 +12,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Fixed
+
+- PR playground close job no longer fails.
+
 ## [0.4.0] - 2026-08-11
 
 ### Added

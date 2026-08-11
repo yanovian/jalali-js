@@ -97,4 +97,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Record closed PR number
-        run: echo "PR #${{ github.event.pull_request.number }} closed; deploy workflow will drop /pr-${{ github.event.pull_request.number }}/."
+        run: |
+          echo "PR ${{ github.event.pull_request.number }} closed; deploy workflow will drop /pr-${{ github.event.pull_request.number }}/."
