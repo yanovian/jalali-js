@@ -1050,6 +1050,49 @@ package now has a full, scannable README.
       `make check`, `ci.yml`, and `release.yml`. A missing required section
       fails the run.
 
+## Phase 25: Calendar UX, week start, timeline, and discoverability
+
+Fix week headers for Iran and Persian locales. Make every calendar usable
+on a phone. Improve light and dark theme colors. Add a timeline event
+view. Put live demo, docs, and ecosystem package links where visitors see
+them first. Land each item with a matching `CHANGELOG.md` bullet under
+`## [Unreleased]`.
+
+- [ ] **Discoverability links.** Put live demo, documentation, and links to
+      the other packages in this ecosystem among the first few links on the
+      root README, the docs home page, and each package README. A visitor
+      should reach the demo, the guide, and sibling packages without
+      scrolling past install or API detail.
+- [ ] **Week start (Shanbe / Saturday).** Core `WEEK_START_DAY.jalali` is
+      already `6` (Saturday). Weekday header rows in Calendar,
+      RangePicker, and EventCalendar still list locale names in Sunday-first
+      array order. Rotate headers to `WEEK_START_DAY[system]` so the first
+      column matches the grid (شنبه first for Jalali / `fa`). Cover React,
+      Vue, and Web Components. Add tests that the first weekday label is
+      Saturday for Jalali and Sunday for Gregorian.
+- [ ] **Event calendar mobile layout.** Month, week, and day EventCalendar
+      views must work on narrow viewports: readable day cells, scrollable
+      week and day lanes, touch-friendly event chips, and no horizontal
+      overflow that clips content. Apply across `ui-react`, `ui-vue`, and
+      `ui-web`. Add playground and e2e coverage at a phone width.
+- [ ] **Timeline calendar.** Add a vertical timeline EventCalendar
+      alternative (or sibling view) in the `ui-*` packages. Support Persian
+      locale text, native digits, and date formats from `@jalali-js/i18n`.
+      Expose configuration close to the attached design: direction
+      (vertical first), marker shape, show icons, alternating layout,
+      Persian numbers, and marker size. Document props and add a
+      playground demo with seed milestones.
+- [ ] **Mobile and theme polish for all calendars.** Audit Calendar,
+      DatePicker, RangePicker, InlineCalendar, and EventCalendar (including
+      the new timeline) at phone widths and in light and dark themes. Fix
+      contrast, accent, surface, and border token use so dark mode does not
+      wash out or clash. Keep the same `--jalali-*` theme surface.
+- [ ] **Size, density, and elegance.** Review default calendar size, spacing,
+      radius, and type scale so the default look is clean and compact while
+      still configurable through theme CSS variables (and timeline marker
+      size where that API exists). Prefer one coherent visual system across
+      bindings.
+
 ## Later, not yet scheduled
 
 - Any other calendar system (ISO week-date, Hebrew, or otherwise), added
