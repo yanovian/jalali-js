@@ -11,6 +11,8 @@
  */
 [data-jalali-datepicker-root],
 [data-jalali-datepicker-dropdown],
+[data-jalali-timepicker-root],
+[data-jalali-timerangepicker-root],
 [data-jalali-calendar-root] {
   --jalali-font-size: 0.875rem;
   --jalali-gap: 1px;

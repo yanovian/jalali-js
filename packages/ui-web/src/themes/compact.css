@@ -1,17 +1,18 @@
 /*
- * A denser layout for @jalali-js/web's DatePicker/Calendar/RangePicker: smaller text, tighter
- * padding, and a smaller minimum cell size. Import this *after* @jalali-js/web/date-picker.css:
- * like dark.css, it only overrides the same --jalali-* custom properties that stylesheet
- * defines (see architecture.md's "Theming contract"), it does not redefine any selector or
- * rule of its own. Combine with dark.css by importing both, in either order: they override
- * disjoint sets of variables.
+ * A denser layout for @jalali-js/web's DatePicker/Calendar/RangePicker: smaller text,
+ * tighter padding, and a smaller minimum cell size. Import this *after*
+ * @jalali-js/web/date-picker.css: like dark.css, it only overrides the same --jalali-*
+ * custom properties that stylesheet defines (see architecture.md's "Theming contract"), it
+ * does not redefine any selector or rule of its own. Combine with dark.css by importing both,
+ * in either order: they override disjoint sets of variables.
  *
- * Identical to @jalali-js/ui-react's and @jalali-js/ui-vue's theme of the same name, on
- * purpose: every binding uses the same [data-jalali-*] attribute names, so a team can reuse one
- * theme across all three.
+ * Identical to the React and Vue themes of the same name, on purpose: all bindings use the
+ * same [data-jalali-*] attribute names, so a team can reuse one theme across them.
  */
 [data-jalali-datepicker-root],
 [data-jalali-datepicker-dropdown],
+[data-jalali-timepicker-root],
+[data-jalali-timerangepicker-root],
 [data-jalali-calendar-root] {
   --jalali-font-size: 0.875rem;
   --jalali-gap: 1px;

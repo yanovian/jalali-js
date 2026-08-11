@@ -352,6 +352,7 @@ in `core`.
 `react`'s and `vue`'s `date-picker.css` each define the same set of
 `--jalali-*` custom properties on every component's root element
 (`[data-jalali-datepicker-root]`, `[data-jalali-datepicker-dropdown]`,
+`[data-jalali-timepicker-root]`, `[data-jalali-timerangepicker-root]`,
 `[data-jalali-calendar-root]`), and every rule in that stylesheet reads a
 variable rather than a literal value. A theme is a stylesheet that
 overrides some subset of these variables on the same selectors; it does not
@@ -375,7 +376,16 @@ variables.
 | `--jalali-input-padding`   | Padding inside the text input                              |
 | `--jalali-popover-padding` | Padding inside the popover                                 |
 | `--jalali-day-min-size`    | Minimum width/height of a day cell                         |
+| `--jalali-event-bg`        | Event chip background                                      |
+| `--jalali-event-fg`        | Event chip text                                            |
 | `--jalali-holiday-fg`      | Text color for days marked with `data-holiday`             |
+| `--jalali-hover-bg`        | Hover fill for days and nav                                |
+| `--jalali-range-bg`        | In-range day fill for `RangePicker`                        |
+| `--jalali-focus-ring`      | `:focus-visible` outline color                             |
+
+Default and `dark` theme tokens aim for WCAG 2.2 AA text contrast and about
+3:1 for borders. The stylesheet also responds to `prefers-contrast: more`
+and `forced-colors: active`.
 
 Because CSS custom properties inherit, a theme applies to every picker on
 the page once its stylesheet is imported: theming is a whole-app choice

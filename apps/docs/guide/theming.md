@@ -33,6 +33,7 @@ requires the stylesheet to function.
 `date-picker.css` expresses every rule through `--jalali-*` custom properties, not literal
 values. A theme is a stylesheet that overrides some subset of these on the same selectors
 (`[data-jalali-datepicker-root]`, `[data-jalali-datepicker-dropdown]`,
+`[data-jalali-timepicker-root]`, `[data-jalali-timerangepicker-root]`,
 `[data-jalali-calendar-root]`); it never redefines a rule.
 
 | Variable                   | Controls                                                   |
@@ -51,6 +52,16 @@ values. A theme is a stylesheet that overrides some subset of these on the same 
 | `--jalali-input-padding`   | Padding inside the text input                              |
 | `--jalali-popover-padding` | Padding inside the popover                                 |
 | `--jalali-day-min-size`    | Minimum width/height of a day cell                         |
+| `--jalali-event-bg`        | Event chip background                                      |
+| `--jalali-event-fg`        | Event chip text                                            |
+| `--jalali-holiday-fg`      | Holiday day text                                           |
+| `--jalali-hover-bg`        | Hover fill for days and nav                                |
+| `--jalali-range-bg`        | In-range day fill for `RangePicker`                        |
+| `--jalali-focus-ring`      | `:focus-visible` outline color                             |
+
+Default and `dark` theme tokens aim for WCAG 2.2 AA text contrast and about
+3:1 for borders. The stylesheet also responds to `prefers-contrast: more`
+and `forced-colors: active`.
 
 Because CSS custom properties inherit, a theme applies to every picker on the page once its
 stylesheet is imported: theming is a whole-app choice, not a per-instance prop. For a single

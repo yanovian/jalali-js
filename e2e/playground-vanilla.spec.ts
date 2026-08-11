@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { expectEventCalendarPhoneLayout } from './event-calendar-phone.js';
+import { expectCalendarsPhoneAndTheme } from './calendars-phone-theme.js';
 import { expectScreenshot } from './expect-screenshot.js';
 
 const SECTIONS = [
@@ -75,5 +76,13 @@ test.describe('playground-vanilla', () => {
 
   test('event calendar phone layout', async ({ page }) => {
     await expectEventCalendarPhoneLayout(page, BASE);
+  });
+
+  test('calendars phone layout and theme contrast', async ({ page }) => {
+    await expectCalendarsPhoneAndTheme(
+      page,
+      BASE,
+      'http://localhost:4005/?tab=date-picker&locale=en&dark=0&compact=0',
+    );
   });
 });

@@ -1082,7 +1082,7 @@ them first. Land each item with a matching `CHANGELOG.md` bullet under
       (vertical first), marker shape, show icons, alternating layout,
       Persian numbers, and marker size. Document props and add a
       playground demo with seed milestones.
-- [ ] **Mobile and theme polish for all calendars.** Audit Calendar,
+- [x] **Mobile and theme polish for all calendars.** Audit Calendar,
       DatePicker, RangePicker, InlineCalendar, and EventCalendar (including
       the new timeline) at phone widths and in light and dark themes. Fix
       contrast, accent, surface, and border token use so dark mode does not
