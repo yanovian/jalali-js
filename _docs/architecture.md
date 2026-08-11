@@ -591,6 +591,13 @@ e2e/`); a repo with no `visual-baselines` branch yet reports every
   grow. Pruning merged/closed PRs' subdirectories is a reasonable future
   addition, not built here.
 
+- **`pages-previews`** holds only short-lived PR playground builds under
+  `pr-<number>/playground/{react,vue,vanilla}/` for GitHub Pages. Master
+  `pages.yml` merges those folders into the live site so a docs deploy does
+  not wipe open previews. `pr-playground.yml` writes the folder, comments
+  the links, deletes on PR close, and sweeps orphans weekly. Same orphan-
+  branch pattern as `visual-snapshots`, scoped to static playground files.
+
 **Accepting a visual change.** `update-visual-baselines.yml` runs
 automatically once `ci.yml` succeeds on `master`, so no maintainer ever
 has to run it by hand. It is chained via `workflow_run`, not its own
@@ -771,7 +778,17 @@ publish-packages` (skipping any already published at that version, so a
   `actions/configure-pages` / `actions/upload-pages-artifact` /
   `actions/deploy-pages` flow. Needs GitHub Pages enabled with "GitHub
   Actions" as the source in this repo's own Settings, an operational
-  prerequisite this workflow cannot turn on itself.
+  prerequisite this workflow cannot turn on itself. After Phase 27 it also
+  merges short-lived `/pr-<n>/` playground trees from the orphan
+  `pages-previews` branch so master deploys do not wipe open PR previews.
+
+- **`pr-playground.yml` (Phase 27).** On each same-repo pull request, builds
+  the three static playgrounds at `/pr-<n>/playground/{react,vue,vanilla}/`,
+  stores them on `pages-previews`, deploys a site shell built from `master`
+  plus those preview folders, and comments the live links on the PR. On PR
+  close it deletes only that `/pr-<n>/` tree and redeploys. A weekly job
+  sweeps `/pr-*` folders with no open PR. Preview content is playgrounds
+  only (not the full docs rewrite from the PR, and not Next/Nuxt).
 
 The dependency-update, license-audit, and action-pruning Actions above are
 the org's own (`yanovian/update-dependencies-action`,

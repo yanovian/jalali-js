@@ -1,0 +1,221 @@
+name: PR playground previews
+
+# Publishes short-lived playgrounds under /pr-<n>/ on GitHub Pages.
+# Preview trees live on the orphan `pages-previews` branch. The publish job
+# builds the live site shell from master, merges those trees, and deploys.
+# pages.yml also merges the same trees on master pushes so previews survive
+# normal docs deploys. Remove and sweep update the branch, then ask pages.yml
+# to redeploy.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  schedule:
+    # Weekly orphan sweep for /pr-* folders with no open PR.
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+# Serialize preview branch writes. Do not share the `pages` group with the
+# deploy job below in a way that waits on itself.
+concurrency:
+  group: pages-previews
+  cancel-in-progress: false
+
+permissions:
+  actions: write
+  contents: write
+  pages: write
+  id-token: write
+  pull-requests: write
+
+env:
+  SITE_URL: https://jalali-js.yanovian.com
+
+jobs:
+  publish:
+    name: Publish PR playgrounds
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: make install-frozen
+
+      - name: Build PR playgrounds
+        run: make embed-pr-playgrounds PR=${{ github.event.pull_request.number }} PR_PREVIEW_OUT=dist-pr
+
+      - name: Store preview on pages-previews
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node scripts/pages-previews.mjs publish \
+            "${{ github.event.pull_request.number }}" \
+            "dist-pr/pr-${{ github.event.pull_request.number }}"
+
+      - name: Checkout master for the live site shell
+        uses: actions/checkout@v7
+        with:
+          ref: master
+          path: site-master
+
+      - name: Install and build master site
+        working-directory: site-master
+        run: |
+          make install-frozen
+          make embed-playgrounds
+          make build-docs
+
+      - name: Merge PR playground previews into master dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          # Use the script from this PR so the first landing PR can merge too.
+          node "$GITHUB_WORKSPACE/scripts/pages-previews.mjs" merge \
+            site-master/apps/docs/.vitepress/dist
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site-master/apps/docs/.vitepress/dist
+
+  deploy-publish:
+    name: Deploy PR playgrounds
+    needs: publish
+    runs-on: ubuntu-latest
+    # Queue with master Pages deploys so only one site tree goes live at a time.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+  comment:
+    name: Comment preview links
+    needs: [publish, deploy-publish]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment preview links on the PR
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SITE_URL: ${{ env.SITE_URL }}
+        with:
+          script: |
+            const prNumber = process.env.PR_NUMBER;
+            const site = process.env.SITE_URL.replace(/\/$/, '');
+            const marker = '<!-- pr-playground-preview -->';
+            let body = `${marker}\n## Playground previews\n\n`;
+            body += 'Temporary builds from this PR. GitHub Pages removes them when the PR closes.\n\n';
+            body += `- [React](${site}/pr-${prNumber}/playground/react/)\n`;
+            body += `- [Vue](${site}/pr-${prNumber}/playground/vue/)\n`;
+            body += `- [Web Components](${site}/pr-${prNumber}/playground/vanilla/)\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(prNumber),
+            });
+            const existing = comments.find((c) => c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: Number(prNumber),
+                body,
+              });
+            }
+
+  remove:
+    name: Remove PR playgrounds
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Use the PR head so remove still works when master does not have
+          # the preview scripts yet (the landing PR for this workflow).
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Remove preview from pages-previews
+        id: remove
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          node scripts/pages-previews.mjs remove "${{ github.event.pull_request.number }}" \
+            | tee /tmp/pages-previews-out.txt
+          tail -n 1 /tmp/pages-previews-out.txt >> "$GITHUB_OUTPUT"
+
+      - name: Redeploy Pages from master
+        if: steps.remove.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/redeploy-pages.sh
+
+  sweep:
+    name: Sweep orphan PR playgrounds
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: master
+
+      - name: List open pull requests
+        id: open
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          nums=$(gh api "repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" \
+            --jq 'map(.number|tostring) | join(",")')
+          echo "prs=$nums" >> "$GITHUB_OUTPUT"
+
+      - name: Sweep pages-previews
+        id: sweep
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          node scripts/pages-previews.mjs sweep "${{ steps.open.outputs.prs }}" \
+            | tee /tmp/pages-previews-out.txt
+          tail -n 1 /tmp/pages-previews-out.txt >> "$GITHUB_OUTPUT"
+
+      - name: Redeploy Pages from master
+        if: steps.sweep.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/redeploy-pages.sh

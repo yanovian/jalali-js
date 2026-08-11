@@ -10,8 +10,11 @@ on:
       - 'apps/playground-vanilla/**'
       - 'packages/**'
       - '.github/workflows/pages.yml'
+      - '.github/actions/build-pages-dist/**'
+      - 'scripts/pages-previews.mjs'
   workflow_dispatch:
 
+# Serialize with pr-playground.yml so preview paths and master docs do not race.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -28,26 +31,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
+      - name: Build Pages dist
+        uses: ./.github/actions/build-pages-dist
         with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: make install-frozen
-
-      - name: Build and embed the playgrounds
-        # Must run before "Build docs": places all three apps under apps/docs/public/, which
-        # VitePress's own build copies into dist/. playground-next/-nuxt are SSR, so they stay
-        # CI-only (ci.yml, compat-matrix.yml, e2e.yml), not deployed here.
-        run: make embed-playgrounds
-
-      - name: Build docs (API reference generation runs first automatically)
-        run: make build-docs
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6

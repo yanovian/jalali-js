@@ -1,0 +1,38 @@
+name: Build Pages dist
+description: Build the docs site with embedded playgrounds, then merge PR preview folders from pages-previews.
+
+inputs:
+  token:
+    description: GitHub token that can read the pages-previews branch
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v6
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: 24
+        cache: pnpm
+
+    - name: Install dependencies
+      shell: bash
+      run: make install-frozen
+
+    - name: Build and embed the playgrounds
+      shell: bash
+      run: make embed-playgrounds
+
+    - name: Build docs
+      shell: bash
+      run: make build-docs
+
+    - name: Merge PR playground previews
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+      run: node scripts/pages-previews.mjs merge apps/docs/.vitepress/dist
