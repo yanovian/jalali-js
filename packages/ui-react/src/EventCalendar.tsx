@@ -25,6 +25,7 @@ import {
   layoutWeekEvents,
   listHours,
   resolveTimelineLayout,
+  roadmapTrackPath,
   shiftEventViewAnchor,
   timedBlockStyle,
   timelineAccentFor,
@@ -147,8 +148,13 @@ export function EventCalendar({
   const markerShape = timeline?.markerShape ?? 'circular';
   const showIcons = timeline?.showIcons ?? true;
   const layout = resolveTimelineLayout(timeline);
-  const effectiveLayout = direction === 'horizontal' && layout === 'road' ? 'alternating' : layout;
+  const effectiveLayout =
+    direction === 'horizontal' && layout === 'roadmap' ? 'alternating' : layout;
   const markerSize = timeline?.markerSize;
+  const roadmapTrack =
+    view === 'timeline' && effectiveLayout === 'roadmap' && timelineEvents
+      ? roadmapTrackPath(timelineEvents.length)
+      : null;
 
   function clickEvent(eventId: string, click: MouseEvent): void {
     click.stopPropagation();
@@ -374,13 +380,33 @@ export function EventCalendar({
                 : undefined
             }
           >
+            {roadmapTrack ? (
+              <svg
+                data-jalali-roadmap-track=""
+                viewBox={roadmapTrack.viewBox}
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <path data-jalali-roadmap-edge="" d={roadmapTrack.d} />
+                <path data-jalali-roadmap-asphalt="" d={roadmapTrack.d} />
+                <path data-jalali-roadmap-dash="" d={roadmapTrack.d} />
+              </svg>
+            ) : null}
             {timelineEvents.map((event, index) => {
               const side = effectiveLayout === 'single' ? 'end' : index % 2 === 0 ? 'end' : 'start';
+              const roadSide =
+                effectiveLayout === 'roadmap' ? (index % 2 === 0 ? 'left' : 'right') : undefined;
               const itemStyle = {
                 ['--jalali-timeline-accent' as string]: timelineAccentFor(index, event.color),
               } satisfies CSSProperties;
               return (
-                <li key={event.id} data-jalali-timeline-item data-side={side} style={itemStyle}>
+                <li
+                  key={event.id}
+                  data-jalali-timeline-item
+                  data-side={effectiveLayout === 'roadmap' ? undefined : side}
+                  data-road-side={roadSide}
+                  style={itemStyle}
+                >
                   <div data-jalali-timeline-marker aria-hidden="true">
                     {showIcons && event.icon ? (
                       <span data-jalali-timeline-icon>{event.icon}</span>

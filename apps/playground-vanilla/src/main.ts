@@ -215,7 +215,7 @@ function renderControls(): void {
     checkboxControl('Show icons', state.timelineShowIcons, (checked) =>
       patch({ timelineShowIcons: checked }),
     );
-    selectControl('Layout', state.timelineLayout, ['single', 'alternating', 'road'], (value) =>
+    selectControl('Layout', state.timelineLayout, ['single', 'alternating', 'roadmap'], (value) =>
       patch({ timelineLayout: value as DemoState['timelineLayout'] }),
     );
     checkboxControl('Native digits', state.nativeDigits, (checked) =>
@@ -573,10 +573,14 @@ galleryEventTimelineAlt.timeline = {
 };
 
 const galleryEventTimelineRoad = document.getElementById(
-  'gallery-event-calendar-timeline-road',
+  'gallery-event-calendar-timeline-roadmap',
 ) as JalaliEventCalendarElement;
 galleryEventTimelineRoad.events = demoTimelineEvents;
-galleryEventTimelineRoad.timeline = { direction: 'vertical', showIcons: true, layout: 'road' };
+galleryEventTimelineRoad.timeline = {
+  direction: 'vertical',
+  showIcons: true,
+  layout: 'roadmap',
+};
 
 const rulesCalendar = document.getElementById('rules-calendar') as JalaliInlineCalendarElement;
 rulesCalendar.initialDisplayedMonth = { ...DEMO_MONTH };

@@ -24,6 +24,7 @@ import {
   layoutWeekEvents,
   listHours,
   resolveTimelineLayout,
+  roadmapTrackPath,
   shiftEventViewAnchor,
   timedBlockStyle,
   timelineAccentFor,
@@ -243,7 +244,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
     const showIcons = this.#timeline?.showIcons ?? true;
     const resolvedLayout = resolveTimelineLayout(this.#timeline);
     const layout =
-      direction === 'horizontal' && resolvedLayout === 'road' ? 'alternating' : resolvedLayout;
+      direction === 'horizontal' && resolvedLayout === 'roadmap' ? 'alternating' : resolvedLayout;
     const markerSize = this.#timeline?.markerSize;
 
     this.dir = localePack.direction;
@@ -288,13 +289,33 @@ export class JalaliEventCalendarElement extends HTMLElement {
         list.style.setProperty('--jalali-timeline-marker-size', `${markerSize}px`);
       }
 
+      if (layout === 'roadmap' && timelineEvents.length > 0) {
+        const track = roadmapTrackPath(timelineEvents.length);
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('data-jalali-roadmap-track', '');
+        svg.setAttribute('viewBox', track.viewBox);
+        svg.setAttribute('preserveAspectRatio', 'none');
+        svg.setAttribute('aria-hidden', 'true');
+        for (const kind of ['edge', 'asphalt', 'dash'] as const) {
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute(`data-jalali-roadmap-${kind}`, '');
+          path.setAttribute('d', track.d);
+          svg.append(path);
+        }
+        list.append(svg);
+      }
+
       timelineEvents.forEach((event, index) => {
         const item = document.createElement('li');
         item.setAttribute('data-jalali-timeline-item', '');
-        item.setAttribute(
-          'data-side',
-          layout === 'single' ? 'end' : index % 2 === 0 ? 'end' : 'start',
-        );
+        if (layout === 'roadmap') {
+          item.setAttribute('data-road-side', index % 2 === 0 ? 'left' : 'right');
+        } else {
+          item.setAttribute(
+            'data-side',
+            layout === 'single' ? 'end' : index % 2 === 0 ? 'end' : 'start',
+          );
+        }
         item.style.setProperty('--jalali-timeline-accent', timelineAccentFor(index, event.color));
 
         const marker = document.createElement('div');

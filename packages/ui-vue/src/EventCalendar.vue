@@ -25,6 +25,7 @@ import {
   layoutWeekEvents,
   listHours,
   resolveTimelineLayout,
+  roadmapTrackPath,
   shiftEventViewAnchor,
   timedBlockStyle,
   timelineAccentFor,
@@ -155,9 +156,15 @@ const markerShape = computed(() => props.timeline?.markerShape ?? 'circular');
 const showIcons = computed(() => props.timeline?.showIcons ?? true);
 const layout = computed(() => {
   const resolved = resolveTimelineLayout(props.timeline);
-  return direction.value === 'horizontal' && resolved === 'road' ? 'alternating' : resolved;
+  return direction.value === 'horizontal' && resolved === 'roadmap' ? 'alternating' : resolved;
 });
 const markerSize = computed(() => props.timeline?.markerSize);
+const roadmapTrack = computed(() => {
+  if (props.view !== 'timeline' || layout.value !== 'roadmap' || !timelineEvents.value) {
+    return null;
+  }
+  return roadmapTrackPath(timelineEvents.value.length);
+});
 
 function onEventClick(eventId: string, click: MouseEvent): void {
   click.stopPropagation();
@@ -367,11 +374,31 @@ function onEventClick(eventId: string, click: MouseEvent): void {
           markerSize != null ? { '--jalali-timeline-marker-size': `${markerSize}px` } : undefined
         "
       >
+        <svg
+          v-if="roadmapTrack"
+          data-jalali-roadmap-track=""
+          :viewBox="roadmapTrack.viewBox"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path data-jalali-roadmap-edge="" :d="roadmapTrack.d" />
+          <path data-jalali-roadmap-asphalt="" :d="roadmapTrack.d" />
+          <path data-jalali-roadmap-dash="" :d="roadmapTrack.d" />
+        </svg>
         <li
           v-for="(event, index) in timelineEvents"
           :key="event.id"
           data-jalali-timeline-item
-          :data-side="layout === 'single' ? 'end' : index % 2 === 0 ? 'end' : 'start'"
+          :data-side="
+            layout === 'roadmap'
+              ? undefined
+              : layout === 'single'
+                ? 'end'
+                : index % 2 === 0
+                  ? 'end'
+                  : 'start'
+          "
+          :data-road-side="layout === 'roadmap' ? (index % 2 === 0 ? 'left' : 'right') : undefined"
           :style="{ '--jalali-timeline-accent': timelineAccentFor(index, event.color) }"
         >
           <div data-jalali-timeline-marker aria-hidden="true">

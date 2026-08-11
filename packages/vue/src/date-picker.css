@@ -433,7 +433,7 @@ button[data-jalali-calendar-title-year]:hover {
 
 [data-jalali-eventcalendar-root][data-view='timeline']:has(
     [data-jalali-timeline][data-layout='alternating'],
-    [data-jalali-timeline][data-layout='road']
+    [data-jalali-timeline][data-layout='roadmap']
   ) {
   width: min(100%, 48em);
 }
@@ -607,10 +607,10 @@ button[data-jalali-calendar-title-year]:hover {
   --jalali-timeline-marker-fg: #ffffff;
   --jalali-timeline-gap: 1.45em;
   --jalali-timeline-card-gap: 1.2em;
-  --jalali-timeline-road-track: 0.72em;
-  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 32%, var(--jalali-bg));
-  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 48%, transparent);
-  --jalali-timeline-road-dash: color-mix(in srgb, var(--jalali-fg) 72%, #ffffff);
+  --jalali-timeline-road-track: 1.05em;
+  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 28%, var(--jalali-bg));
+  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 52%, transparent);
+  --jalali-timeline-road-dash: color-mix(in srgb, var(--jalali-fg) 78%, #ffffff);
 }
 
 [data-jalali-timeline-header] {
@@ -624,10 +624,9 @@ button[data-jalali-calendar-title-year]:hover {
   gap: var(--jalali-timeline-gap);
 }
 
-/* Straight center spine for alternating and road. */
+/* Straight center spine for single and alternating. */
 [data-jalali-timeline][data-direction='vertical'][data-layout='single']::before,
-[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before,
-[data-jalali-timeline][data-direction='vertical'][data-layout='road']::before {
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before {
   content: '';
   position: absolute;
   z-index: 0;
@@ -644,25 +643,45 @@ button[data-jalali-calendar-title-year]:hover {
   );
 }
 
-[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before,
-[data-jalali-timeline][data-direction='vertical'][data-layout='road']::before {
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before {
   inset-inline-start: calc(50% - var(--jalali-timeline-rail-width) / 2);
 }
 
-/* Road: thicker dashed asphalt track on the same center spine. */
-[data-jalali-timeline][data-direction='vertical'][data-layout='road']::before {
-  width: var(--jalali-timeline-road-track);
-  inset-inline-start: calc(50% - var(--jalali-timeline-road-track) / 2);
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0 0.38em,
-      var(--jalali-timeline-road-dash) 0.38em 0.62em
-    ),
-    var(--jalali-timeline-road-color);
-  box-shadow:
-    inset 0 0 0 1px var(--jalali-timeline-road-edge),
-    0 0 0 1px color-mix(in srgb, var(--jalali-timeline-road-edge) 55%, transparent);
+/* Serpentine roadmap track (SVG). */
+[data-jalali-roadmap-track] {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+[data-jalali-roadmap-asphalt] {
+  fill: none;
+  stroke: var(--jalali-timeline-road-color);
+  stroke-width: var(--jalali-timeline-road-track);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+[data-jalali-roadmap-dash] {
+  fill: none;
+  stroke: var(--jalali-timeline-road-dash);
+  stroke-width: 0.12em;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 0.42em 0.55em;
+}
+
+[data-jalali-roadmap-edge] {
+  fill: none;
+  stroke: var(--jalali-timeline-road-edge);
+  stroke-width: calc(var(--jalali-timeline-road-track) + 0.16em);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.55;
 }
 
 [data-jalali-timeline][data-direction='horizontal'] {
@@ -713,16 +732,21 @@ button[data-jalali-calendar-title-year]:hover {
   scroll-snap-align: start;
 }
 
-/* Both-sides layouts: shared 3-column grid (card | marker | card). */
+/* Both-sides layouts share a 3-column grid (card | marker | card). */
 [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
-  [data-jalali-timeline-item],
-[data-jalali-timeline][data-direction='vertical'][data-layout='road'] [data-jalali-timeline-item] {
+  [data-jalali-timeline-item] {
   grid-template-columns: minmax(0, 1fr) var(--jalali-timeline-marker-size) minmax(0, 1fr);
 }
 
+/* Keep marker and card on one row when the card sits in column 1. */
 [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
   [data-jalali-timeline-marker],
-[data-jalali-timeline][data-direction='vertical'][data-layout='road']
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+  [data-jalali-timeline-card] {
+  grid-row: 1;
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
   [data-jalali-timeline-marker] {
   grid-column: 2;
   justify-self: center;
@@ -733,17 +757,11 @@ button[data-jalali-calendar-title-year]:hover {
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
   [data-jalali-timeline-item][data-side='end']
-  [data-jalali-timeline-card],
-[data-jalali-timeline][data-direction='vertical'][data-layout='road']
-  [data-jalali-timeline-item][data-side='end']
   [data-jalali-timeline-card] {
   grid-column: 3;
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
-  [data-jalali-timeline-item][data-side='start']
-  [data-jalali-timeline-card],
-[data-jalali-timeline][data-direction='vertical'][data-layout='road']
   [data-jalali-timeline-item][data-side='start']
   [data-jalali-timeline-card] {
   grid-column: 1;
@@ -752,36 +770,80 @@ button[data-jalali-calendar-title-year]:hover {
   text-align: end;
 }
 
-/* Road markers sit on the asphalt track. */
-[data-jalali-timeline][data-direction='vertical'][data-layout='road']
+/* Roadmap: equal rows so the SVG path peaks match markers.
+   Geometry is physical left/right. Card text keeps the calendar direction. */
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap'] {
+  direction: ltr;
+  display: grid;
+  gap: 0;
+  grid-auto-rows: 7.25em;
+  padding-block: 0.35em;
+}
+
+[data-jalali-eventcalendar-root][dir='rtl']
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-card] {
+  direction: rtl;
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item] {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-marker] {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
   background: color-mix(in srgb, var(--jalali-bg) 82%, #ffffff);
   color: var(--jalali-timeline-accent);
   border: 3px solid var(--jalali-timeline-accent);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--jalali-timeline-accent) 28%, transparent),
+    0 2px 8px color-mix(in srgb, var(--jalali-fg) 18%, transparent);
 }
 
-/* Stem from road marker to card. */
-[data-jalali-timeline][data-direction='vertical'][data-layout='road']
-  [data-jalali-timeline-item]::after {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  top: 50%;
-  width: var(--jalali-timeline-card-gap);
-  height: 1px;
-  margin-block-start: -0.5px;
-  background: color-mix(in srgb, var(--jalali-timeline-accent) 55%, var(--jalali-timeline-line));
-  pointer-events: none;
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item][data-road-side='left']
+  [data-jalali-timeline-marker] {
+  left: 28%;
 }
 
-[data-jalali-timeline][data-direction='vertical'][data-layout='road']
-  [data-jalali-timeline-item][data-side='end']::after {
-  inset-inline-start: calc(50% + var(--jalali-timeline-marker-size) / 2);
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item][data-road-side='right']
+  [data-jalali-timeline-marker] {
+  left: 72%;
 }
 
-[data-jalali-timeline][data-direction='vertical'][data-layout='road']
-  [data-jalali-timeline-item][data-side='start']::after {
-  inset-inline-end: calc(50% + var(--jalali-timeline-marker-size) / 2);
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-card] {
+  width: min(17.5em, calc(28% - 1.35em));
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item][data-road-side='left']
+  [data-jalali-timeline-card] {
+  margin-left: 0;
+  margin-right: auto;
+  border-inline-start: 0;
+  border-right: 4px solid var(--jalali-timeline-accent);
+  border-left: 0;
+  text-align: end;
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item][data-road-side='right']
+  [data-jalali-timeline-card] {
+  margin-left: auto;
+  margin-right: 0;
+  border-inline-start: 0;
+  border-left: 4px solid var(--jalali-timeline-accent);
+  border-right: 0;
+  text-align: start;
 }
 
 [data-jalali-timeline-marker] {
@@ -941,49 +1003,72 @@ button[data-jalali-calendar-title-year]:hover {
   /* Narrow screens: both-sides layouts collapse to one column. */
   [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
     [data-jalali-timeline-item],
-  [data-jalali-timeline][data-direction='vertical'][data-layout='road']
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
     [data-jalali-timeline-item] {
+    display: grid;
     grid-template-columns: var(--jalali-timeline-marker-size) minmax(0, 1fr);
+    column-gap: var(--jalali-timeline-card-gap);
   }
 
-  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before,
-  [data-jalali-timeline][data-direction='vertical'][data-layout='road']::before {
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before {
     inset-inline-start: calc(
       var(--jalali-timeline-marker-size) / 2 - var(--jalali-timeline-rail-width) / 2
     );
   }
 
-  [data-jalali-timeline][data-direction='vertical'][data-layout='road']::before {
-    inset-inline-start: calc(
-      var(--jalali-timeline-marker-size) / 2 - var(--jalali-timeline-road-track) / 2
-    );
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap'] {
+    direction: inherit;
+    grid-auto-rows: auto;
+    gap: var(--jalali-timeline-gap);
+  }
+
+  [data-jalali-roadmap-track] {
+    display: none;
   }
 
   [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
     [data-jalali-timeline-marker],
   [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
     [data-jalali-timeline-card],
-  [data-jalali-timeline][data-direction='vertical'][data-layout='road']
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
     [data-jalali-timeline-marker],
-  [data-jalali-timeline][data-direction='vertical'][data-layout='road']
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
     [data-jalali-timeline-card] {
     grid-column: auto;
+    grid-row: auto;
+    position: relative;
+    inset: auto;
+    top: auto;
+    left: auto;
+    width: auto;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    margin-inline: 0;
+    transform: none;
   }
 
   [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
     [data-jalali-timeline-item][data-side='start']
     [data-jalali-timeline-card],
-  [data-jalali-timeline][data-direction='vertical'][data-layout='road']
-    [data-jalali-timeline-item][data-side='start']
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-item][data-road-side='left']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-item][data-road-side='right']
     [data-jalali-timeline-card] {
-    border-inline-end-width: 1px;
+    border-inline-end-width: 0;
+    border-right: 0;
+    border-left: 0;
     border-inline-start: 4px solid var(--jalali-timeline-accent);
     text-align: start;
   }
 
-  [data-jalali-timeline][data-direction='vertical'][data-layout='road']
-    [data-jalali-timeline-item]::after {
-    display: none;
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-marker] {
+    background: var(--jalali-timeline-accent);
+    color: var(--jalali-timeline-marker-fg);
+    border: 0;
   }
 
   [data-jalali-timerangepicker-root] {

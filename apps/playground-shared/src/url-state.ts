@@ -15,7 +15,7 @@ export type DemoEventView = 'month' | 'week' | 'day' | 'timeline';
 export type DemoValueFormat = 'gregorian-iso' | 'jalali-object';
 export type DemoTimelineDirection = 'vertical' | 'horizontal';
 export type DemoTimelineMarkerShape = 'circular' | 'square';
-export type DemoTimelineLayout = 'single' | 'alternating' | 'road';
+export type DemoTimelineLayout = 'single' | 'alternating' | 'roadmap';
 
 export interface DemoThemeVars {
   primary: string;
@@ -93,7 +93,7 @@ export const GALLERY_CELLS = [
   'event-calendar-day',
   'event-calendar-timeline',
   'event-calendar-timeline-alternating',
-  'event-calendar-timeline-road',
+  'event-calendar-timeline-roadmap',
   'selection-rules',
   'holidays',
   'holidays-and-rules',
@@ -160,7 +160,7 @@ export function parseDemoState(search: string): DemoState {
     timelineLayout: (() => {
       const layout = oneOf(
         params.get('timelineLayout'),
-        ['single', 'alternating', 'road'] as const,
+        ['single', 'alternating', 'roadmap'] as const,
         d.timelineLayout,
       );
       if (params.has('timelineLayout')) return layout;

@@ -239,7 +239,7 @@ export default function App() {
                 >
                   <option value="single">Single side</option>
                   <option value="alternating">Both sides</option>
-                  <option value="road">Road curves</option>
+                  <option value="roadmap">Roadmap curves</option>
                 </select>
               </label>
               <label>
@@ -611,14 +611,14 @@ export default function App() {
             onEventClick={(event) => setEventClickLog(event.title)}
           />
         </section>
-        <section data-testid="event-calendar-timeline-road">
-          <h3>Event calendar timeline road</h3>
+        <section data-testid="event-calendar-timeline-roadmap">
+          <h3>Event calendar timeline roadmap</h3>
           <EventCalendar
             system="jalali"
             locale={state.locale as LocaleCode}
             view="timeline"
             events={demoTimelineEvents}
-            timeline={{ direction: 'vertical', showIcons: true, layout: 'road' }}
+            timeline={{ direction: 'vertical', showIcons: true, layout: 'roadmap' }}
             onEventClick={(event) => setEventClickLog(event.title)}
           />
         </section>
