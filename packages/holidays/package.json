@@ -1,6 +1,6 @@
 {
   "name": "@jalali-js/holidays",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Official Iran (IR) public holiday data for jalali-js: fixed Jalali rules, lunar year tables, and picker helpers. Offline, zero runtime dependencies. AF and TJ reserved.",
   "keywords": [
     "jalali",
