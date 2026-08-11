@@ -459,6 +459,10 @@ export class JalaliEventCalendarElement extends HTMLElement {
 
     const days = document.createElement('div');
     days.setAttribute('data-jalali-eventcalendar-days', '');
+    const daysGutter = document.createElement('span');
+    daysGutter.setAttribute('data-jalali-eventcalendar-gutter', '');
+    daysGutter.setAttribute('aria-hidden', 'true');
+    days.append(daysGutter);
     for (const day of periodDays) {
       const button = document.createElement('button');
       button.type = 'button';
@@ -488,6 +492,13 @@ export class JalaliEventCalendarElement extends HTMLElement {
     allday.setAttribute('data-jalali-eventcalendar-lanes', '');
     allday.setAttribute('data-jalali-eventcalendar-allday', '');
     if (allDayLaneCount > 0) allday.style.gridTemplateRows = `repeat(${allDayLaneCount}, auto)`;
+    const allDayGutter = document.createElement('span');
+    allDayGutter.setAttribute('data-jalali-eventcalendar-gutter', '');
+    allDayGutter.setAttribute('aria-hidden', 'true');
+    if (allDayLaneCount > 0) {
+      allDayGutter.style.gridRow = `1 / ${allDayLaneCount + 1}`;
+    }
+    allday.append(allDayGutter);
     for (const segment of allDaySegments) {
       const button = document.createElement('button');
       button.type = 'button';
@@ -495,7 +506,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
       button.setAttribute('data-all-day', '');
       if (segment.continuesBefore) button.setAttribute('data-continues-before', '');
       if (segment.continuesAfter) button.setAttribute('data-continues-after', '');
-      button.style.gridColumn = `${segment.startWeekday + 1} / ${segment.endWeekday + 2}`;
+      button.style.gridColumn = `${segment.startWeekday + 2} / ${segment.endWeekday + 3}`;
       button.style.gridRow = `${segment.lane + 1}`;
       button.textContent = segment.title;
       button.addEventListener('click', (click) => {

@@ -275,6 +275,7 @@ export function EventCalendar({
           style={{ ['--jalali-event-cols' as string]: periodDays.length }}
         >
           <div data-jalali-eventcalendar-days>
+            <span data-jalali-eventcalendar-gutter aria-hidden="true" />
             {periodDays.map((day) => (
               <button
                 key={`${day.year}-${day.month}-${day.day}`}
@@ -300,6 +301,11 @@ export function EventCalendar({
                 allDayLaneCount > 0 ? `repeat(${allDayLaneCount}, auto)` : undefined,
             }}
           >
+            <span
+              data-jalali-eventcalendar-gutter
+              aria-hidden="true"
+              style={{ gridRow: allDayLaneCount > 0 ? `1 / ${allDayLaneCount + 1}` : undefined }}
+            />
             {allDaySegments.map((segment) => (
               <button
                 key={`${segment.eventId}-${segment.startWeekday}-${segment.lane}`}
@@ -309,7 +315,7 @@ export function EventCalendar({
                 data-continues-after={segment.continuesAfter ? '' : undefined}
                 data-all-day=""
                 style={{
-                  gridColumn: `${segment.startWeekday + 1} / ${segment.endWeekday + 2}`,
+                  gridColumn: `${segment.startWeekday + 2} / ${segment.endWeekday + 3}`,
                   gridRow: segment.lane + 1,
                 }}
                 onClick={(event) => clickEvent(segment.eventId, event)}

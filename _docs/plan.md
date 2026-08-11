@@ -1164,17 +1164,18 @@ Use Phase 27 preview links when reviewing this work.
       from the reference timeline (accent edge, marker disc, muted line).
 - [x] **Week and day hour grid.** Show hour lines across day columns, not
       only on the hours label column. Align day headers and all-day lanes
-      with the timed columns (hours gutter width). Soften the hours column
-      so it does not look like a broken ladder of boxes.
+      with the timed columns through one shared hours-plus-day grid.
+      Soften the hours column so it does not look like a broken ladder of
+      boxes.
 - [x] **Library-grade alignment.** Use shared column tracks and a fixed
       `--jalali-event-hour-row` so hour labels, grid lines, and minute
       placement stay aligned. Remove the marker background ring that cut the
       rail. Space overlapping timed events with lane-gap tokens. Keep
       density and color configurable through `--jalali-*` variables.
 - [x] **Timeline layouts.** Support `layout: 'single' | 'alternating' |
-'road'`. Single matches a one-side rail and cards. Alternating puts
-      cards on both sides. Road draws a curved path with cards on both
-      sides. Show all three in the playground gallery.
+    'road'`. Single matches a one-side rail and cards. Alternating puts
+      cards on both sides. Road is a serpentine roadmap with markers on the
+      curve peaks. Show all three in the playground gallery.
 
 ## Later, not yet scheduled
 
