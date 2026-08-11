@@ -45,7 +45,8 @@ button[data-jalali-calendar-title-month],
 button[data-jalali-calendar-title-year],
 [data-jalali-calendar-day],
 [data-jalali-calendar-month],
-[data-jalali-calendar-year] {
+[data-jalali-calendar-year],
+[data-jalali-eventcalendar-event] {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -57,7 +58,10 @@ button[data-jalali-calendar-title-month]:focus-visible,
 button[data-jalali-calendar-title-year]:focus-visible,
 [data-jalali-calendar-day]:focus-visible,
 [data-jalali-calendar-month]:focus-visible,
-[data-jalali-calendar-year]:focus-visible {
+[data-jalali-calendar-year]:focus-visible,
+[data-jalali-eventcalendar-event]:focus-visible,
+[data-jalali-eventcalendar-period]:focus-visible,
+[data-jalali-eventcalendar-timed]:focus-visible {
   outline: 2px solid var(--jalali-primary);
   outline-offset: 1px;
 }
@@ -330,7 +334,10 @@ button[data-jalali-calendar-title-year]:hover {
 
 [data-jalali-eventcalendar-root] {
   display: block;
+  box-sizing: border-box;
   width: min(100%, 36em);
+  max-width: 100%;
+  --jalali-event-col-min: 3.25em;
   background: var(--jalali-bg);
   border: 1px solid var(--jalali-border);
   border-radius: var(--jalali-radius);
@@ -350,7 +357,10 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-eventcalendar-days],
 [data-jalali-eventcalendar-lanes] {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(
+    var(--jalali-event-cols, 7),
+    minmax(var(--jalali-event-col-min), 1fr)
+  );
   gap: var(--jalali-gap);
 }
 
@@ -365,10 +375,13 @@ button[data-jalali-calendar-title-year]:hover {
   font-size: 0.75em;
 }
 
+/* Week/day panes scroll instead of crushing columns. tabindex + role come from the markup. */
 [data-jalali-eventcalendar-period] {
   display: grid;
   gap: 0.35em;
   margin-top: 0.35em;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
 }
 
 [data-jalali-eventcalendar-allday] {
@@ -377,9 +390,14 @@ button[data-jalali-calendar-title-year]:hover {
 
 [data-jalali-eventcalendar-timed] {
   display: grid;
+  grid-template-columns: auto repeat(
+      var(--jalali-event-cols, 7),
+      minmax(var(--jalali-event-col-min), 1fr)
+    );
   gap: var(--jalali-gap);
   max-height: 28em;
   overflow: auto;
+  overscroll-behavior: contain;
 }
 
 [data-jalali-eventcalendar-hours],
@@ -404,6 +422,7 @@ button[data-jalali-calendar-title-year]:hover {
 }
 
 [data-jalali-eventcalendar-event] {
+  box-sizing: border-box;
   min-width: 0;
   margin: 0;
   padding: 0.1em 0.35em;
@@ -418,12 +437,12 @@ button[data-jalali-calendar-title-year]:hover {
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 [data-jalali-eventcalendar-event][data-timed] {
   position: absolute;
   z-index: 1;
-  box-sizing: border-box;
   white-space: normal;
 }
 
@@ -434,6 +453,28 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-eventcalendar-event][data-continues-after] {
   border-start-end-radius: 0;
   border-end-end-radius: 0;
+}
+
+/* Narrow viewports: fill the width and keep columns readable via horizontal scroll. */
+@media (max-width: 40em) {
+  [data-jalali-eventcalendar-root],
+  [data-jalali-eventcalendar-root][data-view='week'] {
+    width: 100%;
+    --jalali-event-col-min: 4em;
+  }
+
+  [data-jalali-eventcalendar-event]:not([data-timed]) {
+    white-space: normal;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  [data-jalali-eventcalendar-timed] {
+    max-height: min(28em, 70vh);
+  }
 }
 
 [data-jalali-timerangepicker-root] {
@@ -473,5 +514,10 @@ button[data-jalali-calendar-title-year]:hover {
   [data-jalali-calendar-day] {
     aspect-ratio: auto;
     min-height: 2.75em;
+  }
+
+  [data-jalali-eventcalendar-event] {
+    min-height: 2.75em;
+    padding-block: 0.35em;
   }
 }

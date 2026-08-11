@@ -26,7 +26,7 @@ import {
   timedBlockStyle,
   weekdayLabelsForGrid,
 } from 'jalali-js';
-import { computed, ref } from 'vue';
+import { computed, ref, useId } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -111,6 +111,7 @@ const navLabel = computed(() =>
   props.view === 'month' ? 'month' : props.view === 'week' ? 'week' : 'day',
 );
 const hours = listHours();
+const titleId = useId();
 
 function onEventClick(eventId: string, click: MouseEvent): void {
   click.stopPropagation();
@@ -122,6 +123,8 @@ function onEventClick(eventId: string, click: MouseEvent): void {
 <template>
   <div
     :dir="localePack.direction"
+    role="region"
+    :aria-labelledby="titleId"
     data-jalali-calendar-root
     data-jalali-eventcalendar-root
     :data-view="view"
@@ -135,7 +138,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
       >
         ‹
       </button>
-      <span data-jalali-calendar-title>{{ title }}</span>
+      <span :id="titleId" data-jalali-calendar-title>{{ title }}</span>
       <button
         type="button"
         data-jalali-calendar-nav="next"
@@ -149,6 +152,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
     <div
       v-if="view === 'month' && weeks && monthLayouts"
       role="grid"
+      :aria-labelledby="titleId"
       data-jalali-calendar-grid
       data-jalali-eventcalendar-grid
     >
@@ -212,11 +216,15 @@ function onEventClick(eventId: string, click: MouseEvent): void {
       </div>
     </div>
 
-    <div v-else-if="periodDays" data-jalali-eventcalendar-period>
-      <div
-        data-jalali-eventcalendar-days
-        :style="{ gridTemplateColumns: `repeat(${periodDays.length}, minmax(0, 1fr))` }"
-      >
+    <div
+      v-else-if="periodDays"
+      role="region"
+      tabindex="0"
+      :aria-labelledby="titleId"
+      data-jalali-eventcalendar-period
+      :style="{ '--jalali-event-cols': periodDays.length }"
+    >
+      <div data-jalali-eventcalendar-days>
         <button
           v-for="day in periodDays"
           :key="`${day.year}-${day.month}-${day.day}`"
@@ -237,7 +245,6 @@ function onEventClick(eventId: string, click: MouseEvent): void {
         data-jalali-eventcalendar-lanes
         data-jalali-eventcalendar-allday
         :style="{
-          gridTemplateColumns: `repeat(${periodDays.length}, minmax(0, 1fr))`,
           gridTemplateRows: allDayLaneCount > 0 ? `repeat(${allDayLaneCount}, auto)` : undefined,
         }"
       >
@@ -258,10 +265,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
           {{ segment.title }}
         </button>
       </div>
-      <div
-        data-jalali-eventcalendar-timed
-        :style="{ gridTemplateColumns: `auto repeat(${periodDays.length}, minmax(0, 1fr))` }"
-      >
+      <div role="region" tabindex="0" :aria-labelledby="titleId" data-jalali-eventcalendar-timed>
         <div data-jalali-eventcalendar-hours>
           <span v-for="hour in hours" :key="hour" data-jalali-eventcalendar-hour>
             {{ formatNumber(hour, localePack.defaultNumerals, localePack.digits) }}

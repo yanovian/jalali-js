@@ -1070,7 +1070,7 @@ them first. Land each item with a matching `CHANGELOG.md` bullet under
       column matches the grid (شنبه first for Jalali / `fa`). Cover React,
       Vue, and Web Components. Add tests that the first weekday label is
       Saturday for Jalali and Sunday for Gregorian.
-- [ ] **Event calendar mobile layout.** Month, week, and day EventCalendar
+- [x] **Event calendar mobile layout.** Month, week, and day EventCalendar
       views must work on narrow viewports: readable day cells, scrollable
       week and day lanes, touch-friendly event chips, and no horizontal
       overflow that clips content. Apply across `ui-react`, `ui-vue`, and

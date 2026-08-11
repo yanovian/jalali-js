@@ -93,6 +93,24 @@ describe('EventCalendar', () => {
     expect(parts[1]! - parts[0]!).toBeGreaterThanOrEqual(2);
   });
 
+  it('exposes a labeled region and a keyboard-focusable week pane', () => {
+    render(
+      <EventCalendar
+        locale="en"
+        view="week"
+        initialDate={{ year: 1403, month: 5, day: 15 }}
+        events={demoEvents}
+      />,
+    );
+    const root = document.querySelector('[data-jalali-eventcalendar-root]');
+    expect(root).toHaveAttribute('role', 'region');
+    expect(root).toHaveAttribute('aria-labelledby');
+    const period = document.querySelector('[data-jalali-eventcalendar-period]');
+    expect(period).toHaveAttribute('tabindex', '0');
+    expect(period).toHaveAttribute('role', 'region');
+    expect(period?.style.getPropertyValue('--jalali-event-cols')).toBe('7');
+  });
+
   it('renders week and day views with timed placement', () => {
     const { rerender } = render(
       <EventCalendar
@@ -105,6 +123,11 @@ describe('EventCalendar', () => {
     expect(document.querySelector('[data-view="week"]')).toBeTruthy();
     expect(document.querySelector('[data-jalali-eventcalendar-timed]')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Meeting' })).toHaveAttribute('data-timed');
+    expect(
+      document
+        .querySelector('[data-jalali-eventcalendar-period]')
+        ?.style.getPropertyValue('--jalali-event-cols'),
+    ).toBe('7');
 
     rerender(
       <EventCalendar
@@ -116,5 +139,10 @@ describe('EventCalendar', () => {
     );
     expect(document.querySelector('[data-view="day"]')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Meeting' })).toBeInTheDocument();
+    expect(
+      document
+        .querySelector('[data-jalali-eventcalendar-period]')
+        ?.style.getPropertyValue('--jalali-event-cols'),
+    ).toBe('1');
   });
 });

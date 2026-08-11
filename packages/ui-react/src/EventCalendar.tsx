@@ -26,7 +26,7 @@ import {
   timedBlockStyle,
   weekdayLabelsForGrid,
 } from 'jalali-js';
-import { useMemo, useState, type MouseEvent } from 'react';
+import { useId, useMemo, useState, type MouseEvent } from 'react';
 
 export interface EventCalendarProps {
   system?: CalendarSystem;
@@ -103,6 +103,7 @@ export function EventCalendar({
 
   const navLabel = view === 'month' ? 'month' : view === 'week' ? 'week' : 'day';
   const hours = listHours();
+  const titleId = useId();
 
   function clickEvent(eventId: string, click: MouseEvent): void {
     click.stopPropagation();
@@ -114,6 +115,8 @@ export function EventCalendar({
     <div
       className={className}
       dir={localePack.direction}
+      role="region"
+      aria-labelledby={titleId}
       data-jalali-calendar-root
       data-jalali-eventcalendar-root
       data-view={view}
@@ -127,7 +130,9 @@ export function EventCalendar({
         >
           ‹
         </button>
-        <span data-jalali-calendar-title>{title}</span>
+        <span id={titleId} data-jalali-calendar-title>
+          {title}
+        </span>
         <button
           type="button"
           data-jalali-calendar-nav="next"
@@ -139,7 +144,12 @@ export function EventCalendar({
       </div>
 
       {view === 'month' && weeks && monthLayouts ? (
-        <div role="grid" data-jalali-calendar-grid data-jalali-eventcalendar-grid>
+        <div
+          role="grid"
+          aria-labelledby={titleId}
+          data-jalali-calendar-grid
+          data-jalali-eventcalendar-grid
+        >
           <div role="row" data-jalali-calendar-weekdays>
             {weekdayLabelsForGrid(localePack.weekdayNames.short, system).map((name, index) => (
               <span key={index} role="columnheader" data-jalali-calendar-weekday>
@@ -204,11 +214,14 @@ export function EventCalendar({
       ) : null}
 
       {view !== 'month' && periodDays ? (
-        <div data-jalali-eventcalendar-period>
-          <div
-            data-jalali-eventcalendar-days
-            style={{ gridTemplateColumns: `repeat(${periodDays.length}, minmax(0, 1fr))` }}
-          >
+        <div
+          role="region"
+          tabIndex={0}
+          aria-labelledby={titleId}
+          data-jalali-eventcalendar-period
+          style={{ ['--jalali-event-cols' as string]: periodDays.length }}
+        >
+          <div data-jalali-eventcalendar-days>
             {periodDays.map((day) => (
               <button
                 key={`${day.year}-${day.month}-${day.day}`}
@@ -230,7 +243,6 @@ export function EventCalendar({
             data-jalali-eventcalendar-lanes
             data-jalali-eventcalendar-allday
             style={{
-              gridTemplateColumns: `repeat(${periodDays.length}, minmax(0, 1fr))`,
               gridTemplateRows:
                 allDayLaneCount > 0 ? `repeat(${allDayLaneCount}, auto)` : undefined,
             }}
@@ -253,10 +265,7 @@ export function EventCalendar({
               </button>
             ))}
           </div>
-          <div
-            data-jalali-eventcalendar-timed
-            style={{ gridTemplateColumns: `auto repeat(${periodDays.length}, minmax(0, 1fr))` }}
-          >
+          <div role="region" tabIndex={0} aria-labelledby={titleId} data-jalali-eventcalendar-timed>
             <div data-jalali-eventcalendar-hours>
               {hours.map((hour) => (
                 <span key={hour} data-jalali-eventcalendar-hour>

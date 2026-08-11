@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { expectEventCalendarPhoneLayout } from './event-calendar-phone.js';
 import { expectScreenshot } from './expect-screenshot.js';
 
 const SECTIONS = [
@@ -70,5 +71,9 @@ test.describe('playground-vanilla', () => {
     expect(globals.react).toBe('undefined');
     expect(globals.vue).toBe('undefined');
     expect(globals.customElementDefined).toBe(true);
+  });
+
+  test('event calendar phone layout', async ({ page }) => {
+    await expectEventCalendarPhoneLayout(page, BASE);
   });
 });

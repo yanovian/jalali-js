@@ -36,6 +36,12 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       ...jsxA11y.flatConfigs.recommended.rules,
+      // Scrollable EventCalendar panes use role="region" with tabIndex={0} so keyboard
+      // users can focus and scroll them (WCAG 2.1.1). The default rule blocks that.
+      'jsx-a11y/no-noninteractive-tabindex': [
+        'error',
+        { tags: [], roles: ['tabpanel', 'region'], allowExpressionValues: true },
+      ],
     },
   },
   // "essential" (not "recommended") on purpose: the tiers above it ("strongly-recommended",

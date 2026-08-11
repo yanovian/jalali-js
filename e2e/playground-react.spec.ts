@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { expectEventCalendarPhoneLayout } from './event-calendar-phone.js';
 import { expectScreenshot } from './expect-screenshot.js';
 
 // Each section is its own named baseline. URL state pins dark + compact + fa so live shell
@@ -61,5 +62,9 @@ test.describe('playground-react', () => {
     await expect(root).toHaveCSS('--jalali-bg', '#fdf4ff');
     await expect(root).toHaveCSS('--jalali-radius', '20px');
     await expect(input).toHaveCSS('border-radius', '20px');
+  });
+
+  test('event calendar phone layout', async ({ page }) => {
+    await expectEventCalendarPhoneLayout(page, BASE);
   });
 });

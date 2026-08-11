@@ -19,6 +19,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 ### Changed
 
 - READMEs and the docs home lead with live demo and npm ecosystem links.
+- EventCalendar works on phone widths, with keyboard-focusable scroll panes.
 
 ## [0.2.1] - 2026-08-10
 

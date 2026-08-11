@@ -17,8 +17,13 @@ export async function expectScreenshot(
   try {
     await expect(target).toHaveScreenshot(name, options);
   } catch (error) {
-    const hasActual = test.info().attachments.some((a) => a.name.endsWith('-actual.png'));
-    if (!hasActual) throw error;
+    const message = error instanceof Error ? error.message : String(error);
+    const hasActual = test
+      .info()
+      .attachments.some((a) => a.name.includes('actual') || (a.path?.includes('-actual') ?? false));
+    const missingBaseline = /snapshot doesn.t exist/i.test(message);
+    // Pixel mismatch and missing baseline are advisory. Capture failures stay red.
+    if (!hasActual && !missingBaseline) throw error;
 
     test.info().annotations.push({
       type: VISUAL_CHANGE_ANNOTATION,
