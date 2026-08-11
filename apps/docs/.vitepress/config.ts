@@ -31,6 +31,9 @@ export default defineConfig({
   base: '/',
   cleanUrls: true,
   srcExclude: ['**/README.md'],
+  // Playgrounds are embedded apps under public/playground/, not VitePress pages.
+  // Links in the nav and home page open them in a new tab.
+  ignoreDeadLinks: [/^\/playground\//],
   vite: {
     server: {
       proxy: playgroundDevProxy(),

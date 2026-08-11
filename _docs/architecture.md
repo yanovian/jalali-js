@@ -606,11 +606,10 @@ bootstrap on a repo with no `visual-baselines` branch yet, or to force a
 re-baseline with no code change.
 
 Screenshot comparisons are advisory (Phase 23). Specs call
-`expectScreenshot()` in `e2e/expect-screenshot.ts`, which catches a pixel
-mismatch or a missing baseline, keeps Playwright's image attachments, adds a
-`visual-change` annotation, and lets the test pass. Functional assertions
-(`toHaveCSS`, visibility, and so on) still fail the job. A screenshot that
-cannot be captured at all still fails the job.
+`expectScreenshot()` in `e2e/expect-screenshot.ts`, which turns a pixel
+mismatch or a missing baseline into a `visual-change` annotation and lets the
+test pass. Functional assertions (`toHaveCSS`, visibility, and so on) still
+fail the job. A screenshot that cannot be captured at all still fails the job.
 
 A PR that changes rendering stays green on the e2e check. The reviewer
 judges baseline / new / diff images in the PR comment. The baseline catches
