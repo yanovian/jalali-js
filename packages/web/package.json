@@ -1,6 +1,6 @@
 {
   "name": "@jalali-js/web",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Framework-agnostic Web Components for jalali-js: a headless Calendar grid and a default-styled DatePicker, usable from plain HTML/JS or any framework.",
   "keywords": [
     "jalali",
