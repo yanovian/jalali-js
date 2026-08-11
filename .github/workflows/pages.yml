@@ -10,8 +10,10 @@ on:
       - 'apps/playground-vanilla/**'
       - 'packages/**'
       - '.github/workflows/pages.yml'
+      - 'scripts/pr-previews.mjs'
   workflow_dispatch:
 
+# Serialize with PR preview deploys so only one site tree goes live at a time.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -40,14 +42,13 @@ jobs:
       - name: Install dependencies
         run: make install-frozen
 
-      - name: Build and embed the playgrounds
-        # Must run before "Build docs": places all three apps under apps/docs/public/, which
-        # VitePress's own build copies into dist/. playground-next/-nuxt are SSR, so they stay
-        # CI-only (ci.yml, compat-matrix.yml, e2e.yml), not deployed here.
-        run: make embed-playgrounds
-
-      - name: Build docs (API reference generation runs first automatically)
-        run: make build-docs
+      - name: Build docs and mirror open PR previews
+        # embed-playgrounds + build-docs, then copy live /pr-* trees for open PRs
+        # so a master docs deploy does not wipe preview paths.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SITE_URL: https://jalali-js.yanovian.com
+        run: make pages-dist
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6

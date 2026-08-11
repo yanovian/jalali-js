@@ -12,14 +12,15 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Added
+
+- Temporary PR playground previews under `/pr-<n>/playground/{react,vue,vanilla}/`, with PR comment links, delete on close, and an orphan sweep.
+- Playground gallery cell and e2e screenshot for EventCalendar timeline view.
+
 ### Fixed
 
 - Playground Primary / Background theme controls apply on jalali picker roots.
 - TimePicker and TimeRangePicker keep hour-then-minute order in RTL locales.
-
-### Added
-
-- Playground gallery cell and e2e screenshot for EventCalendar timeline view.
 
 ## [0.3.0] - 2026-08-11
 

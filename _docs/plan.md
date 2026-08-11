@@ -1123,11 +1123,11 @@ Publish short-lived playground URLs on each pull request so reviewers can
 click and try the change. Land this after playground polish so previews
 use the fixed demos. Remove the previews when the PR ends.
 
-- [ ] **PR playground deploy under `/pr-<n>/`.** On each pull request, build
+- [x] **PR playground deploy under `/pr-<n>/`.** On each pull request, build
       the three static playgrounds and publish them under
       `/pr-<n>/playground/{react,vue,vanilla}/` on GitHub Pages. Put those
       live links in the PR comment.
-- [ ] **Delete on close and orphan sweep.** On PR close or merge, delete only
+- [x] **Delete on close and orphan sweep.** On PR close or merge, delete only
       `/pr-<n>/`. Add a periodic orphan sweep for `/pr-*` folders with no
       open PR. Do not deploy the full docs site or Next/Nuxt apps in the
       preview. Keep master Pages deploys isolated from preview paths.
