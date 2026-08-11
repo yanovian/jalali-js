@@ -32,31 +32,36 @@ describe('holidayDayTip', () => {
 });
 
 describe('holidayDayChrome', () => {
-  it('builds tip and aria label for a holiday cell', () => {
-    const chrome = holidayDayChrome(
-      'Saturday, 1 Farvardin 1403',
-      { date: { year: 1403, month: 1, day: 1 }, isHoliday: true, isSelectable: false },
-      { locale: 'en', region: 'IR', closedLabel: 'Closed' },
-    );
-    expect(chrome.tip).toBe('Nowruz · Closed');
-    expect(chrome.ariaLabel).toBe('Saturday, 1 Farvardin 1403. Nowruz · Closed');
-  });
+  const options = { locale: 'en' as const, region: 'IR' as const, closedLabel: 'Closed' };
+  const nowruz = { year: 1403, month: 1, day: 1 };
 
-  it('skips tip when the day is not a holiday', () => {
-    const chrome = holidayDayChrome(
-      'Saturday, 1 Farvardin 1403',
-      { date: { year: 1403, month: 1, day: 1 }, isHoliday: false, isSelectable: true },
-      { locale: 'en', region: 'IR', closedLabel: 'Closed' },
-    );
-    expect(chrome.tip).toBeUndefined();
-    expect(chrome.ariaLabel).toBe('Saturday, 1 Farvardin 1403');
+  it('builds tip and aria for holiday, closed holiday, and plain day', () => {
+    expect(
+      holidayDayChrome(
+        '1 Farvardin 1403',
+        { date: nowruz, isHoliday: true, isSelectable: true },
+        options,
+      ),
+    ).toEqual({ tip: 'Nowruz', ariaLabel: '1 Farvardin 1403. Nowruz' });
+    expect(
+      holidayDayChrome(
+        '1 Farvardin 1403',
+        { date: nowruz, isHoliday: true, isSelectable: false },
+        options,
+      ),
+    ).toEqual({ tip: 'Nowruz · Closed', ariaLabel: '1 Farvardin 1403. Nowruz · Closed' });
+    expect(
+      holidayDayChrome(
+        '1 Farvardin 1403',
+        { date: nowruz, isHoliday: false, isSelectable: true },
+        options,
+      ),
+    ).toEqual({ ariaLabel: '1 Farvardin 1403' });
   });
 });
 
 describe('holidayDayAriaLabel', () => {
   it('keeps the date label when there is no tip', () => {
-    expect(holidayDayAriaLabel('Saturday, 1 Farvardin 1403', undefined)).toBe(
-      'Saturday, 1 Farvardin 1403',
-    );
+    expect(holidayDayAriaLabel('1 Farvardin 1403', undefined)).toBe('1 Farvardin 1403');
   });
 });

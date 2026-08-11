@@ -177,4 +177,45 @@ describe('jalali-calendar', () => {
       expect(getByRole(document.body, 'gridcell', { name: '9 Mordad 1403' })).toBeEnabled();
     });
   });
+
+  describe('holidays', () => {
+    function mountHolidayCalendar(blockHolidays = false): JalaliCalendarElement {
+      const el = document.createElement('jalali-calendar') as JalaliCalendarElement;
+      el.system = 'jalali';
+      el.locale = 'en';
+      el.initialDisplayedMonth = { year: 1403, month: 1 };
+      el.showHolidays = true;
+      el.blockHolidays = blockHolidays;
+      document.body.append(el);
+      return el;
+    }
+
+    it('wires holiday tip and aria name when showHolidays is on', () => {
+      mountHolidayCalendar();
+      const nowruz = getByRole(document.body, 'gridcell', { name: '1 Farvardin 1403. Nowruz' });
+      expect(nowruz).toHaveAttribute('data-holiday');
+      expect(nowruz).toHaveAttribute('data-jalali-day-tip', 'Nowruz');
+      expect(
+        getByRole(document.body, 'gridcell', { name: '5 Farvardin 1403' }),
+      ).not.toHaveAttribute('data-jalali-day-tip');
+    });
+
+    it('marks blocked holidays closed in tip and aria', async () => {
+      const user = userEvent.setup({ delay: null });
+      const el = mountHolidayCalendar(true);
+      const onSelect = vi.fn();
+      el.addEventListener('select', onSelect);
+
+      const nowruz = getByRole(document.body, 'gridcell', {
+        name: '1 Farvardin 1403. Nowruz · Closed',
+      });
+      expect(nowruz).toBeDisabled();
+      expect(nowruz).toHaveAttribute('data-jalali-day-tip', 'Nowruz · Closed');
+      await user.click(nowruz).catch(() => {});
+      expect(onSelect).not.toHaveBeenCalled();
+
+      await user.click(getByRole(document.body, 'gridcell', { name: '5 Farvardin 1403' }));
+      expect(onSelect).toHaveBeenCalledTimes(1);
+    });
+  });
 });

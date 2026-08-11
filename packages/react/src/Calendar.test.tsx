@@ -221,45 +221,41 @@ describe('Calendar', () => {
   });
 
   describe('holidays', () => {
-    it('marks official holidays with data-holiday when showHolidays is on', () => {
+    const farvardin1403 = { year: 1403, month: 1 };
+
+    it('wires holiday tip and aria name when showHolidays is on', () => {
       render(
-        <Calendar
-          system="jalali"
-          locale="en"
-          initialDisplayedMonth={{ year: 1403, month: 1 }}
-          showHolidays
-        />,
+        <Calendar system="jalali" locale="en" initialDisplayedMonth={farvardin1403} showHolidays />,
       );
-      const nowruz = screen.getByRole('gridcell', { name: '1 Farvardin 1403' });
+      const nowruz = screen.getByRole('gridcell', { name: '1 Farvardin 1403. Nowruz' });
       expect(nowruz).toHaveAttribute('data-holiday');
+      expect(nowruz).toHaveAttribute('data-jalali-day-tip', 'Nowruz');
       expect(nowruz).toBeEnabled();
       expect(screen.getByRole('gridcell', { name: '5 Farvardin 1403' })).not.toHaveAttribute(
-        'data-holiday',
+        'data-jalali-day-tip',
       );
     });
 
-    it('blocks holidays when blockHolidays is on', async () => {
+    it('marks blocked holidays closed in tip and aria', async () => {
       const user = userEvent.setup({ delay: null });
       const onSelect = vi.fn();
       render(
         <Calendar
           system="jalali"
           locale="en"
-          initialDisplayedMonth={{ year: 1403, month: 1 }}
+          initialDisplayedMonth={farvardin1403}
           showHolidays
           blockHolidays
           onSelect={onSelect}
         />,
       );
-      const nowruz = screen.getByRole('gridcell', { name: '1 Farvardin 1403' });
+      const nowruz = screen.getByRole('gridcell', { name: '1 Farvardin 1403. Nowruz · Closed' });
       expect(nowruz).toBeDisabled();
-      expect(nowruz).toHaveAttribute('data-disabled');
+      expect(nowruz).toHaveAttribute('data-jalali-day-tip', 'Nowruz · Closed');
       await user.click(nowruz);
       expect(onSelect).not.toHaveBeenCalled();
 
-      const openDay = screen.getByRole('gridcell', { name: '5 Farvardin 1403' });
-      expect(openDay).toBeEnabled();
-      await user.click(openDay);
+      await user.click(screen.getByRole('gridcell', { name: '5 Farvardin 1403' }));
       expect(onSelect).toHaveBeenCalledTimes(1);
     });
   });
