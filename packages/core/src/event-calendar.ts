@@ -58,8 +58,7 @@ export const ROADMAP_RIGHT_X = 58;
 
 /**
  * Build an SVG path for a vertical serpentine roadmap.
- * The road enters and exits on straight vertical runs at the first and
- * last marker X. Curves sit only between markers.
+ * Each marker sits on a left or right curve peak.
  */
 export function roadmapTrackPath(count: number): { d: string; viewBox: string } {
   const step = 100;
@@ -67,17 +66,14 @@ export function roadmapTrackPath(count: number): { d: string; viewBox: string } 
   const height = Math.max(step, count * step);
   const viewBox = `0 0 100 ${height}`;
   if (count <= 0) {
-    return { d: `M ${mid} 0 L ${mid} ${height}`, viewBox };
+    return { d: `M ${mid} 4 L ${mid} ${height - 4}`, viewBox };
   }
 
   const xAt = (index: number): number => (index % 2 === 0 ? ROADMAP_LEFT_X : ROADMAP_RIGHT_X);
   const yAt = (index: number): number => index * step + step / 2;
 
-  const firstX = xAt(0);
-  const lastX = xAt(count - 1);
-
-  let d = `M ${firstX} 0`;
-  d += ` L ${firstX} ${yAt(0)}`;
+  let d = `M ${mid} 4`;
+  d += ` C ${mid} ${yAt(0) * 0.5}, ${xAt(0)} ${yAt(0) * 0.75}, ${xAt(0)} ${yAt(0)}`;
 
   for (let index = 1; index < count; index += 1) {
     const x0 = xAt(index - 1);
@@ -88,7 +84,10 @@ export function roadmapTrackPath(count: number): { d: string; viewBox: string } 
     d += ` C ${x0} ${midY}, ${x1} ${midY}, ${x1} ${y1}`;
   }
 
-  d += ` L ${lastX} ${height}`;
+  const lastX = xAt(count - 1);
+  const lastY = yAt(count - 1);
+  const endY = height - 4;
+  d += ` C ${lastX} ${lastY + step * 0.28}, ${mid} ${endY - step * 0.18}, ${mid} ${endY}`;
 
   return { d, viewBox };
 }
