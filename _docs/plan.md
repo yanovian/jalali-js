@@ -1098,6 +1098,59 @@ them first. Land each item with a matching `CHANGELOG.md` bullet under
       DatePicker, RangePicker, EventCalendar, and related controls to those
       strings for `aria-label` and similar chrome. Keep one key per meaning.
 
+## Phase 26: Playground polish and time order
+
+Fix live playground controls and demos first, so later PR previews and
+holiday work ship against a working playground. Fix RTL time field order
+in the shared picker CSS.
+
+- [ ] **Playground theme color controls.** Live Primary / Background (and
+      related) controls must update the pickers. Apply overrides on the
+      same `[data-jalali-*-root]` selectors the stylesheet uses, not only
+      on `.demo-stage`. Fix once in playground-shared; use it in React,
+      Vue, and vanilla.
+- [ ] **Time picker order in RTL locales.** Keep hour then minute as a
+      left-to-right island for `fa` and `ps` (and any RTL locale). Apply
+      across TimePicker, datetime DatePicker, and TimeRangePicker shared
+      CSS.
+- [ ] **Timeline in the playground.** Add a gallery cell and e2e screenshot
+      for EventCalendar `view: 'timeline'`. Keep the interactive tab
+      controls and seed events. Do not add event CRUD in this phase.
+
+## Phase 27: Temporary PR playground previews
+
+Publish short-lived playground URLs on each pull request so reviewers can
+click and try the change. Land this after playground polish so previews
+use the fixed demos. Remove the previews when the PR ends.
+
+- [ ] **PR playground deploy under `/pr-<n>/`.** On each pull request, build
+      the three static playgrounds and publish them under
+      `/pr-<n>/playground/{react,vue,vanilla}/` on GitHub Pages. Put those
+      live links in the PR comment.
+- [ ] **Delete on close and orphan sweep.** On PR close or merge, delete only
+      `/pr-<n>/`. Add a periodic orphan sweep for `/pr-*` folders with no
+      open PR. Do not deploy the full docs site or Next/Nuxt apps in the
+      preview. Keep master Pages deploys isolated from preview paths.
+
+## Phase 28: Holiday tips and closed days
+
+Make holiday days readable and make blocked holidays clear when selection
+rules and holidays apply together. Use Phase 27 preview links when
+reviewing this work.
+
+- [ ] **Holiday name tip on hover and focus.** On days with `data-holiday`,
+      resolve names through `@jalali-js/holidays` (`holidaysOn`,
+      `holidayName`) for the active locale. Show a small tip on hover and
+      keyboard focus only. Do not open the tip on click or press, so a
+      normal select still works. Include the name in the accessible name.
+      Support more than one holiday on the same day. Wire React, Vue, and
+      Web Calendar (and RangePicker day cells that mark holidays).
+- [ ] **Holiday and closed together.** When a day is both a holiday and
+      blocked (selection rules and/or `blockHolidays`), show both meanings
+      in the tip and in the visual state. Keep the day understandable as
+      holiday and closed at once (explicit combined CSS and copy). Add one
+      playground section that uses holidays and selection rules together.
+
 ## Later, not yet scheduled
 
 - Any other calendar system (ISO week-date, Hebrew, or otherwise), added
