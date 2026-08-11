@@ -23,7 +23,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Fixed
 
-- Holiday day tips stay full-width and above neighboring day cells.
+- Holiday day tips stay readable in the default calendar and DatePicker popover: full text, above neighboring days, pinned inside week edges, and flipped up on the last week.
 - Playground Primary / Background theme controls apply on jalali picker roots.
 - TimePicker and TimeRangePicker keep hour-then-minute order in RTL locales.
 
