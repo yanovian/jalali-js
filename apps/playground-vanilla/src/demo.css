@@ -32,7 +32,8 @@ body {
   border-radius: 12px;
   width: 100%;
   min-width: 0;
-  overflow: hidden;
+  /* Keep tips and focus rings visible outside the card. */
+  overflow: visible;
 }
 
 .demo-shell > * {

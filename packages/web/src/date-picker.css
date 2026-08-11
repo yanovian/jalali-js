@@ -296,16 +296,21 @@ button[data-jalali-calendar-title-year]:hover {
   position: relative;
 }
 
+[data-jalali-calendar-day][data-jalali-day-tip]:hover,
+[data-jalali-calendar-day][data-jalali-day-tip]:focus-visible {
+  z-index: 5;
+}
+
 [data-jalali-calendar-day][data-jalali-day-tip]:hover::after,
 [data-jalali-calendar-day][data-jalali-day-tip]:focus-visible::after {
   content: attr(data-jalali-day-tip);
   position: absolute;
-  z-index: 3;
-  inset-inline: 0;
+  z-index: 1;
+  left: 50%;
   top: calc(100% + 0.25em);
-  margin-inline: auto;
+  transform: translateX(-50%);
   width: max-content;
-  max-width: min(14rem, 70vw);
+  max-width: min(18rem, calc(100vw - 2rem));
   padding: 0.35em 0.55em;
   border-radius: var(--jalali-radius);
   border: 1px solid var(--jalali-border);
