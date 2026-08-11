@@ -56,24 +56,34 @@ export function resolveTimelineLayout(options?: TimelineOptions): TimelineLayout
 export const ROADMAP_LEFT_X = 42;
 export const ROADMAP_RIGHT_X = 58;
 
+/** One marker row and top/bottom caps in path units (match CSS row/cap ratio). */
+const ROADMAP_ROW = 100;
+const ROADMAP_CAP = 48;
+
 /**
  * Build an SVG path for a vertical serpentine roadmap.
- * Each marker sits on a left or right curve peak.
+ * Top and bottom runs are straight. Markers sit on left/right curve peaks.
  */
 export function roadmapTrackPath(count: number): { d: string; viewBox: string } {
-  const step = 100;
   const mid = 50;
-  const height = Math.max(step, count * step);
+  const height = Math.max(ROADMAP_ROW, count * ROADMAP_ROW + ROADMAP_CAP * 2);
   const viewBox = `0 0 100 ${height}`;
   if (count <= 0) {
-    return { d: `M ${mid} 4 L ${mid} ${height - 4}`, viewBox };
+    return { d: `M ${mid} 0 L ${mid} ${height}`, viewBox };
   }
 
   const xAt = (index: number): number => (index % 2 === 0 ? ROADMAP_LEFT_X : ROADMAP_RIGHT_X);
-  const yAt = (index: number): number => index * step + step / 2;
+  const yAt = (index: number): number => ROADMAP_CAP + index * ROADMAP_ROW + ROADMAP_ROW / 2;
+  const bend = ROADMAP_ROW * 0.18;
 
-  let d = `M ${mid} 4`;
-  d += ` C ${mid} ${yAt(0) * 0.5}, ${xAt(0)} ${yAt(0) * 0.75}, ${xAt(0)} ${yAt(0)}`;
+  const firstX = xAt(0);
+  const firstY = yAt(0);
+  const lastX = xAt(count - 1);
+  const lastY = yAt(count - 1);
+
+  let d = `M ${mid} 0`;
+  d += ` L ${mid} ${firstY - bend}`;
+  d += ` C ${mid} ${firstY - bend * 0.35}, ${firstX} ${firstY - bend * 0.35}, ${firstX} ${firstY}`;
 
   for (let index = 1; index < count; index += 1) {
     const x0 = xAt(index - 1);
@@ -84,10 +94,8 @@ export function roadmapTrackPath(count: number): { d: string; viewBox: string } 
     d += ` C ${x0} ${midY}, ${x1} ${midY}, ${x1} ${y1}`;
   }
 
-  const lastX = xAt(count - 1);
-  const lastY = yAt(count - 1);
-  const endY = height - 4;
-  d += ` C ${lastX} ${lastY + step * 0.28}, ${mid} ${endY - step * 0.18}, ${mid} ${endY}`;
+  d += ` C ${lastX} ${lastY + bend * 0.35}, ${mid} ${lastY + bend * 0.35}, ${mid} ${lastY + bend}`;
+  d += ` L ${mid} ${height}`;
 
   return { d, viewBox };
 }

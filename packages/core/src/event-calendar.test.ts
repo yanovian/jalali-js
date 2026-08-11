@@ -101,8 +101,10 @@ describe('event-calendar layout', () => {
 
   it('builds a serpentine roadmap track path', () => {
     const track = roadmapTrackPath(3);
-    expect(track.viewBox).toBe('0 0 100 300');
-    expect(track.d.startsWith('M 50 4')).toBe(true);
+    expect(track.viewBox).toBe('0 0 100 396');
+    expect(track.d.startsWith('M 50 0')).toBe(true);
+    expect(track.d).toContain('L 50 ');
+    expect(track.d.endsWith('L 50 396')).toBe(true);
     expect(track.d).toContain('C');
   });
 
