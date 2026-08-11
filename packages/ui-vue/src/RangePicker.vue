@@ -236,14 +236,14 @@ onBeforeUnmount(() => {
       :id="popoverId"
       data-jalali-datepicker-popover
       role="dialog"
-      aria-label="Choose a date range"
+      :aria-label="localePack.ui.chooseDateRange"
     >
       <div :dir="localePack.direction" data-jalali-calendar-root>
         <div data-jalali-calendar-header>
           <button
             type="button"
             data-jalali-calendar-nav="previous"
-            aria-label="Previous month"
+            :aria-label="localePack.ui.previousMonth"
             @click="goPrevious"
           >
             ‹
@@ -252,7 +252,7 @@ onBeforeUnmount(() => {
           <button
             type="button"
             data-jalali-calendar-nav="next"
-            aria-label="Next month"
+            :aria-label="localePack.ui.nextMonth"
             @click="goNext"
           >
             ›

@@ -1092,7 +1092,7 @@ them first. Land each item with a matching `CHANGELOG.md` bullet under
       still configurable through theme CSS variables (and timeline marker
       size where that API exists). Prefer one coherent visual system across
       bindings.
-- [ ] **Localized UI chrome strings.** Move hard-coded English control labels
+- [x] **Localized UI chrome strings.** Move hard-coded English control labels
       (for example `Previous week`, `Next month`, `Choose year`) into
       `@jalali-js/i18n` locale packs (`en`, `fa`, `ps`). Wire Calendar,
       DatePicker, RangePicker, EventCalendar, and related controls to those

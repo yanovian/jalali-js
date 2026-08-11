@@ -15,6 +15,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 ### Added
 
 - EventCalendar `view: 'timeline'` with locale digits, markers, and layout options.
+- `LocalePack.ui` chrome strings for calendar control `aria-label`s in `en`, `fa`, and `ps`.
 
 ### Fixed
 

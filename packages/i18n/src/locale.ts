@@ -33,6 +33,30 @@ export interface WeekdayNames {
   readonly short: readonly string[];
 }
 
+/** Accessible names for calendar chrome (nav, dialogs, field labels). */
+export interface LocaleUi {
+  readonly previousMonth: string;
+  readonly nextMonth: string;
+  readonly previousYear: string;
+  readonly nextYear: string;
+  readonly previousYears: string;
+  readonly nextYears: string;
+  readonly previousWeek: string;
+  readonly nextWeek: string;
+  readonly previousDay: string;
+  readonly nextDay: string;
+  readonly chooseMonth: string;
+  readonly chooseYear: string;
+  readonly chooseDate: string;
+  readonly chooseDateAndTime: string;
+  readonly chooseDateRange: string;
+  readonly month: string;
+  readonly year: string;
+  readonly day: string;
+  readonly hour: string;
+  readonly minute: string;
+}
+
 /**
  * A complete data file for one language. Adding a locale is adding one more `LocalePack`, with
  * no change to `format()` or any other code (see architecture.md's "Internationalization").
@@ -56,4 +80,6 @@ export interface LocalePack {
   readonly rangePickerPlaceholder: string;
   /** Phrases for `formatRelative()`. */
   readonly relative: RelativeForms;
+  /** `aria-label` and similar chrome for pickers and calendars. */
+  readonly ui: LocaleUi;
 }

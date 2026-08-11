@@ -262,8 +262,11 @@ in `core`.
   besides Iran); Dari itself is a national standard of Persian, close
   enough to `fa` that a dedicated pack is lower priority.
 - Locale data covers: month names, weekday names in full and short form,
-  native digits against Latin digits, and text direction (`ltr` or `rtl`),
-  so a consumer can set the `dir` attribute correctly.
+  native digits against Latin digits, text direction (`ltr` or `rtl`),
+  picker placeholders, and `LocalePack.ui` chrome strings for control
+  `aria-label`s (nav, dialogs, field labels), so a consumer can set the
+  `dir` attribute correctly and keep assistive labels in the same
+  language.
 - The locale pack format lets the team add another locale as a data file,
   with no code change: `ps.ts` proved this for real, landing as one data
   file plus one entry in `@jalali-js/i18n`'s shared locale table

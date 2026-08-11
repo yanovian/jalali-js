@@ -188,7 +188,7 @@ function dayNumber(cell: CalendarGridDay): string {
         <button
           type="button"
           data-jalali-calendar-nav="previous"
-          aria-label="Previous month"
+          :aria-label="localePack.ui.previousMonth"
           @click="goPrevious"
         >
           ‹
@@ -198,7 +198,7 @@ function dayNumber(cell: CalendarGridDay): string {
             :is="titleTag"
             :type="quickNav ? 'button' : undefined"
             data-jalali-calendar-title-month
-            :aria-label="quickNav ? 'Choose month' : undefined"
+            :aria-label="quickNav ? localePack.ui.chooseMonth : undefined"
             @click="openMonthView"
           >
             {{ monthLabel }}
@@ -207,7 +207,7 @@ function dayNumber(cell: CalendarGridDay): string {
             :is="titleTag"
             :type="quickNav ? 'button' : undefined"
             data-jalali-calendar-title-year
-            :aria-label="quickNav ? 'Choose year' : undefined"
+            :aria-label="quickNav ? localePack.ui.chooseYear : undefined"
             @click="openYearView"
           >
             {{ yearLabel }}
@@ -216,7 +216,7 @@ function dayNumber(cell: CalendarGridDay): string {
         <button
           type="button"
           data-jalali-calendar-nav="next"
-          aria-label="Next month"
+          :aria-label="localePack.ui.nextMonth"
           @click="goNext"
         >
           ›
@@ -273,7 +273,7 @@ function dayNumber(cell: CalendarGridDay): string {
         <button
           type="button"
           data-jalali-calendar-nav="previous"
-          aria-label="Previous year"
+          :aria-label="localePack.ui.previousYear"
           @click="goPreviousYearInMonthView"
         >
           ‹
@@ -283,7 +283,7 @@ function dayNumber(cell: CalendarGridDay): string {
             :is="titleTag"
             :type="quickNav ? 'button' : undefined"
             data-jalali-calendar-title-year
-            :aria-label="quickNav ? 'Choose year' : undefined"
+            :aria-label="quickNav ? localePack.ui.chooseYear : undefined"
             @click="openYearView"
           >
             {{ yearLabel }}
@@ -292,13 +292,13 @@ function dayNumber(cell: CalendarGridDay): string {
         <button
           type="button"
           data-jalali-calendar-nav="next"
-          aria-label="Next year"
+          :aria-label="localePack.ui.nextYear"
           @click="goNextYearInMonthView"
         >
           ›
         </button>
       </div>
-      <div role="listbox" aria-label="Month" data-jalali-calendar-months>
+      <div role="listbox" :aria-label="localePack.ui.month" data-jalali-calendar-months>
         <button
           v-for="item in months"
           :key="item.name"
@@ -321,7 +321,7 @@ function dayNumber(cell: CalendarGridDay): string {
         <button
           type="button"
           data-jalali-calendar-nav="previous"
-          aria-label="Previous years"
+          :aria-label="localePack.ui.previousYears"
           @click="goPreviousYearPage"
         >
           ‹
@@ -330,13 +330,13 @@ function dayNumber(cell: CalendarGridDay): string {
         <button
           type="button"
           data-jalali-calendar-nav="next"
-          aria-label="Next years"
+          :aria-label="localePack.ui.nextYears"
           @click="goNextYearPage"
         >
           ›
         </button>
       </div>
-      <div role="listbox" aria-label="Year" data-jalali-calendar-years>
+      <div role="listbox" :aria-label="localePack.ui.year" data-jalali-calendar-years>
         <button
           v-for="item in years"
           :key="item.year"

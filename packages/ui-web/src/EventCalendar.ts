@@ -182,14 +182,19 @@ export class JalaliEventCalendarElement extends HTMLElement {
     return header;
   }
 
-  #renderNavHeader(title: string, anchor: CalendarDateFields, navLabel: string): HTMLElement {
+  #renderNavHeader(
+    title: string,
+    anchor: CalendarDateFields,
+    previousLabel: string,
+    nextLabel: string,
+  ): HTMLElement {
     const header = document.createElement('div');
     header.setAttribute('data-jalali-calendar-header', '');
 
     const prev = document.createElement('button');
     prev.type = 'button';
     prev.setAttribute('data-jalali-calendar-nav', 'previous');
-    prev.setAttribute('aria-label', `Previous ${navLabel}`);
+    prev.setAttribute('aria-label', previousLabel);
     prev.textContent = '‹';
     prev.addEventListener('click', () => {
       this.#anchor = shiftEventViewAnchor(this.#system, this.#view, anchor, -1);
@@ -204,7 +209,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
     const next = document.createElement('button');
     next.type = 'button';
     next.setAttribute('data-jalali-calendar-nav', 'next');
-    next.setAttribute('aria-label', `Next ${navLabel}`);
+    next.setAttribute('aria-label', nextLabel);
     next.textContent = '›';
     next.addEventListener('click', () => {
       this.#anchor = shiftEventViewAnchor(this.#system, this.#view, anchor, 1);
@@ -220,7 +225,18 @@ export class JalaliEventCalendarElement extends HTMLElement {
     const localePack = localePackFor(this.#locale);
     const today = createCalendar({ system: this.#system }).today();
     const anchor = this.#ensureAnchor();
-    const navLabel = this.#view === 'month' ? 'month' : this.#view === 'week' ? 'week' : 'day';
+    const previousLabel =
+      this.#view === 'month'
+        ? localePack.ui.previousMonth
+        : this.#view === 'week'
+          ? localePack.ui.previousWeek
+          : localePack.ui.previousDay;
+    const nextLabel =
+      this.#view === 'month'
+        ? localePack.ui.nextMonth
+        : this.#view === 'week'
+          ? localePack.ui.nextWeek
+          : localePack.ui.nextDay;
     const direction = this.#timeline?.direction ?? 'vertical';
     const markerShape = this.#timeline?.markerShape ?? 'circular';
     const showIcons = this.#timeline?.showIcons ?? true;
@@ -342,7 +358,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
       )}`;
     })();
 
-    const header = this.#renderNavHeader(title, anchor, navLabel);
+    const header = this.#renderNavHeader(title, anchor, previousLabel, nextLabel);
 
     if (this.#view === 'month') {
       const weeks = buildCalendarGrid(this.#system, anchor.year, anchor.month, today, null);

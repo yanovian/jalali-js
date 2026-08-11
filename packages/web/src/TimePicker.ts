@@ -96,7 +96,7 @@ export class JalaliTimePickerElement extends HTMLElement {
     const digit = (n: number) => formatNumber(n, localePack.defaultNumerals, localePack.digits, 2);
 
     const hourSelect = el('select', {
-      'aria-label': 'Hour',
+      'aria-label': localePack.ui.hour,
       'data-jalali-timepicker-field': 'hour',
     });
     for (const hour of listHours(this.#disabledHours)) {
@@ -109,7 +109,7 @@ export class JalaliTimePickerElement extends HTMLElement {
     });
 
     const minuteSelect = el('select', {
-      'aria-label': 'Minute',
+      'aria-label': localePack.ui.minute,
       'data-jalali-timepicker-field': 'minute',
     });
     const selectedMinute = snapMinute(this.#value.minute, this.#minuteStep);

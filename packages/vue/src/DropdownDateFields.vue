@@ -54,7 +54,7 @@ function onDayChange(event: Event): void {
 <template>
   <div :dir="localePack.direction" data-jalali-datepicker-dropdown>
     <select
-      aria-label="Year"
+      :aria-label="localePack.ui.year"
       data-jalali-datepicker-field="year"
       :value="date.year"
       @change="onYearChange"
@@ -64,7 +64,7 @@ function onDayChange(event: Event): void {
       </option>
     </select>
     <select
-      aria-label="Month"
+      :aria-label="localePack.ui.month"
       data-jalali-datepicker-field="month"
       :value="date.month"
       @change="onMonthChange"
@@ -78,7 +78,7 @@ function onDayChange(event: Event): void {
       </option>
     </select>
     <select
-      aria-label="Day"
+      :aria-label="localePack.ui.day"
       data-jalali-datepicker-field="day"
       :value="date.day"
       @change="onDayChange"

@@ -115,8 +115,8 @@ describe('jalali-calendar', () => {
   it('renders Persian month names and digits in the fa locale', () => {
     const el = mountCalendar();
     el.locale = 'fa';
-    expect(getByRole(document.body, 'button', { name: 'Choose month' })).toHaveTextContent('مرداد');
-    expect(getByRole(document.body, 'button', { name: 'Choose year' })).toHaveTextContent('۱۴۰۳');
+    expect(getByRole(document.body, 'button', { name: 'انتخاب ماه' })).toHaveTextContent('مرداد');
+    expect(getByRole(document.body, 'button', { name: 'انتخاب سال' })).toHaveTextContent('۱۴۰۳');
   });
 
   describe('quickNav (default on)', () => {

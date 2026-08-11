@@ -133,8 +133,19 @@ const title = computed(() => {
   return `${start} – ${end}`;
 });
 
-const navLabel = computed(() =>
-  props.view === 'month' ? 'month' : props.view === 'week' ? 'week' : 'day',
+const previousLabel = computed(() =>
+  props.view === 'month'
+    ? localePack.value.ui.previousMonth
+    : props.view === 'week'
+      ? localePack.value.ui.previousWeek
+      : localePack.value.ui.previousDay,
+);
+const nextLabel = computed(() =>
+  props.view === 'month'
+    ? localePack.value.ui.nextMonth
+    : props.view === 'week'
+      ? localePack.value.ui.nextWeek
+      : localePack.value.ui.nextDay,
 );
 const hours = listHours();
 const titleId = useId();
@@ -164,7 +175,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
       <button
         type="button"
         data-jalali-calendar-nav="previous"
-        :aria-label="`Previous ${navLabel}`"
+        :aria-label="previousLabel"
         @click="anchor = shiftEventViewAnchor(system, view, anchor, -1)"
       >
         ‹
@@ -173,7 +184,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
       <button
         type="button"
         data-jalali-calendar-nav="next"
-        :aria-label="`Next ${navLabel}`"
+        :aria-label="nextLabel"
         @click="anchor = shiftEventViewAnchor(system, view, anchor, 1)"
       >
         ›

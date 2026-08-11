@@ -5,6 +5,7 @@ export { format } from './format.js';
 export type { FormatOptions } from './format.js';
 export type {
   LocalePack,
+  LocaleUi,
   MonthNames,
   RelativeForms,
   RelativeUnitForms,

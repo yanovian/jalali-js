@@ -129,8 +129,8 @@ describe('Calendar', () => {
         value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
       />,
     );
-    expect(screen.getByRole('button', { name: 'Choose month' })).toHaveTextContent('مرداد');
-    expect(screen.getByRole('button', { name: 'Choose year' })).toHaveTextContent('۱۴۰۳');
+    expect(screen.getByRole('button', { name: 'انتخاب ماه' })).toHaveTextContent('مرداد');
+    expect(screen.getByRole('button', { name: 'انتخاب سال' })).toHaveTextContent('۱۴۰۳');
   });
 
   describe('quickNav (default on)', () => {

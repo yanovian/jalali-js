@@ -356,7 +356,7 @@ export class JalaliRangePickerElement extends HTMLElement {
     const previousBtn = document.createElement('button');
     previousBtn.type = 'button';
     previousBtn.setAttribute('data-jalali-calendar-nav', 'previous');
-    previousBtn.setAttribute('aria-label', 'Previous month');
+    previousBtn.setAttribute('aria-label', localePack.ui.previousMonth);
     previousBtn.textContent = '‹';
     previousBtn.addEventListener('click', () => {
       this.#displayed = previousMonth(this.#system, displayed.year, displayed.month);
@@ -366,7 +366,7 @@ export class JalaliRangePickerElement extends HTMLElement {
     const nextBtn = document.createElement('button');
     nextBtn.type = 'button';
     nextBtn.setAttribute('data-jalali-calendar-nav', 'next');
-    nextBtn.setAttribute('aria-label', 'Next month');
+    nextBtn.setAttribute('aria-label', localePack.ui.nextMonth);
     nextBtn.textContent = '›';
     nextBtn.addEventListener('click', () => {
       this.#displayed = nextMonth(this.#system, displayed.year, displayed.month);
@@ -455,7 +455,7 @@ export class JalaliRangePickerElement extends HTMLElement {
     const popover = document.createElement('div');
     popover.setAttribute('data-jalali-datepicker-popover', '');
     popover.setAttribute('role', 'dialog');
-    popover.setAttribute('aria-label', 'Choose a date range');
+    popover.setAttribute('aria-label', localePack.ui.chooseDateRange);
     popover.append(calendarRoot);
     return popover;
   }

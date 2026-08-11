@@ -128,7 +128,18 @@ export function EventCalendar({
     return `${start} – ${end}`;
   }, [view, system, anchor, localePack, periodDays, displayFormat, timelineEvents]);
 
-  const navLabel = view === 'month' ? 'month' : view === 'week' ? 'week' : 'day';
+  const previousLabel =
+    view === 'month'
+      ? localePack.ui.previousMonth
+      : view === 'week'
+        ? localePack.ui.previousWeek
+        : localePack.ui.previousDay;
+  const nextLabel =
+    view === 'month'
+      ? localePack.ui.nextMonth
+      : view === 'week'
+        ? localePack.ui.nextWeek
+        : localePack.ui.nextDay;
   const hours = listHours();
   const titleId = useId();
   const direction = timeline?.direction ?? 'vertical';
@@ -158,7 +169,7 @@ export function EventCalendar({
           <button
             type="button"
             data-jalali-calendar-nav="previous"
-            aria-label={`Previous ${navLabel}`}
+            aria-label={previousLabel}
             onClick={() => setAnchor(shiftEventViewAnchor(system, view, anchor, -1))}
           >
             ‹
@@ -169,7 +180,7 @@ export function EventCalendar({
           <button
             type="button"
             data-jalali-calendar-nav="next"
-            aria-label={`Next ${navLabel}`}
+            aria-label={nextLabel}
             onClick={() => setAnchor(shiftEventViewAnchor(system, view, anchor, 1))}
           >
             ›
