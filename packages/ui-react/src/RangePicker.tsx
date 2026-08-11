@@ -1,4 +1,4 @@
-import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import { holidayDayChrome, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { LocaleCode } from '@jalali-js/react';
@@ -267,6 +267,15 @@ export function RangePicker({
                       previewEnd !== null &&
                       compareDates(cell.date, start) > 0 &&
                       compareDates(cell.date, previewEnd) < 0;
+                    const { tip, ariaLabel } = holidayDayChrome(
+                      formatDate(cell.date, localePack, { style: 'long' }),
+                      cell,
+                      {
+                        locale,
+                        region: holidayRegion,
+                        closedLabel: localePack.ui.closedDay,
+                      },
+                    );
                     return (
                       <button
                         key={`${cell.date.year}-${cell.date.month}-${cell.date.day}`}
@@ -280,9 +289,10 @@ export function RangePicker({
                         data-in-range={isInRange ? '' : undefined}
                         data-disabled={cell.isSelectable ? undefined : ''}
                         data-holiday={cell.isHoliday ? '' : undefined}
+                        data-jalali-day-tip={tip}
                         disabled={!cell.isSelectable}
                         aria-current={cell.isToday ? 'date' : undefined}
-                        aria-label={formatDate(cell.date, localePack, { style: 'long' })}
+                        aria-label={ariaLabel}
                         onClick={() => selectDay(cell.date)}
                         onMouseEnter={() => setHoverDate(cell.date)}
                         onMouseLeave={() => setHoverDate(null)}

@@ -1,4 +1,9 @@
-import { isHolidayRegion, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import {
+  holidayDayChrome,
+  isHolidayRegion,
+  resolveCalendarHolidays,
+  type HolidayRegion,
+} from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
 import {
@@ -318,6 +323,15 @@ export class JalaliCalendarElement extends HTMLElement {
         'div',
         { role: 'row', 'data-jalali-calendar-week': true },
         week.map((cell) => {
+          const { tip, ariaLabel } = holidayDayChrome(
+            formatDate(cell.date, localePack, { style: 'long' }),
+            cell,
+            {
+              locale: this.#locale,
+              region: this.#holidayRegion,
+              closedLabel: localePack.ui.closedDay,
+            },
+          );
           const day = el(
             'button',
             {
@@ -329,10 +343,11 @@ export class JalaliCalendarElement extends HTMLElement {
               'data-outside-month': !cell.isCurrentMonth,
               'data-disabled': !cell.isSelectable,
               'data-holiday': cell.isHoliday,
+              'data-jalali-day-tip': tip,
               disabled: !cell.isSelectable,
               'aria-selected': cell.isSelected ? 'true' : 'false',
               'aria-current': cell.isToday ? 'date' : undefined,
-              'aria-label': formatDate(cell.date, localePack, { style: 'long' }),
+              'aria-label': ariaLabel,
             },
             [formatNumber(cell.date.day, localePack.defaultNumerals, localePack.digits)],
           );

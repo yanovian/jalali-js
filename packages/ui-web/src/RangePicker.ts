@@ -1,4 +1,9 @@
-import { isHolidayRegion, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import {
+  holidayDayChrome,
+  isHolidayRegion,
+  resolveCalendarHolidays,
+  type HolidayRegion,
+} from '@jalali-js/holidays';
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import { localePackFor, parseLocaleAttribute, type LocaleCode } from '@jalali-js/web';
@@ -426,7 +431,17 @@ export class JalaliRangePickerElement extends HTMLElement {
         if (isRangeEnd) day.setAttribute('data-range-end', '');
         if (isInRange) day.setAttribute('data-in-range', '');
         if (cell.isToday) day.setAttribute('aria-current', 'date');
-        day.setAttribute('aria-label', formatDate(cell.date, localePack, { style: 'long' }));
+        const { tip, ariaLabel } = holidayDayChrome(
+          formatDate(cell.date, localePack, { style: 'long' }),
+          cell,
+          {
+            locale: this.#locale,
+            region: this.#holidayRegion,
+            closedLabel: localePack.ui.closedDay,
+          },
+        );
+        if (tip) day.setAttribute('data-jalali-day-tip', tip);
+        day.setAttribute('aria-label', ariaLabel);
         day.textContent = formatNumber(
           cell.date.day,
           localePack.defaultNumerals,

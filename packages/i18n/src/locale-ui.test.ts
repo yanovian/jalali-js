@@ -23,6 +23,7 @@ const UI_KEYS = [
   'day',
   'hour',
   'minute',
+  'closedDay',
 ] as const satisfies ReadonlyArray<keyof LocaleUi>;
 
 describe('locale ui chrome', () => {

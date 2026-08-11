@@ -14,7 +14,7 @@
  * a year grid, so a person can jump years ahead without paging one month at a time. Picking a
  * year moves to the month grid; picking a month moves to the day grid.
  */
-import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import { holidayDayChrome, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarGridDay, CalendarSystem, SelectionRules } from 'jalali-js';
 import {
@@ -173,8 +173,17 @@ function pickYear(year: number): void {
 function selectDay(date: CalendarDate): void {
   emit('select', date);
 }
-function dayLabel(cell: CalendarGridDay): string {
-  return formatDate(cell.date, localePack.value, { style: 'long' });
+function dayTipAttrs(cell: CalendarGridDay) {
+  const { tip, ariaLabel } = holidayDayChrome(
+    formatDate(cell.date, localePack.value, { style: 'long' }),
+    cell,
+    {
+      locale: props.locale,
+      region: props.holidayRegion,
+      closedLabel: localePack.value.ui.closedDay,
+    },
+  );
+  return { 'data-jalali-day-tip': tip, 'aria-label': ariaLabel };
 }
 function dayNumber(cell: CalendarGridDay): string {
   return formatNumber(cell.date.day, localePack.value.defaultNumerals, localePack.value.digits);
@@ -258,7 +267,7 @@ function dayNumber(cell: CalendarGridDay): string {
               :disabled="!cell.isSelectable"
               :aria-selected="cell.isSelected"
               :aria-current="cell.isToday ? 'date' : undefined"
-              :aria-label="dayLabel(cell)"
+              v-bind="dayTipAttrs(cell)"
               @click="selectDay(cell.date)"
             >
               {{ dayNumber(cell) }}

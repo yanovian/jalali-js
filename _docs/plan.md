@@ -1138,14 +1138,14 @@ Make holiday days readable and make blocked holidays clear when selection
 rules and holidays apply together. Use Phase 27 preview links when
 reviewing this work.
 
-- [ ] **Holiday name tip on hover and focus.** On days with `data-holiday`,
+- [x] **Holiday name tip on hover and focus.** On days with `data-holiday`,
       resolve names through `@jalali-js/holidays` (`holidaysOn`,
       `holidayName`) for the active locale. Show a small tip on hover and
       keyboard focus only. Do not open the tip on click or press, so a
       normal select still works. Include the name in the accessible name.
       Support more than one holiday on the same day. Wire React, Vue, and
       Web Calendar (and RangePicker day cells that mark holidays).
-- [ ] **Holiday and closed together.** When a day is both a holiday and
+- [x] **Holiday and closed together.** When a day is both a holiday and
       blocked (selection rules and/or `blockHolidays`), show both meanings
       in the tip and in the visual state. Keep the day understandable as
       holiday and closed at once (explicit combined CSS and copy). Add one

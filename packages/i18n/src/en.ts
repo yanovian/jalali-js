@@ -72,6 +72,7 @@ export const en: LocalePack = {
     day: 'Day',
     hour: 'Hour',
     minute: 'Minute',
+    closedDay: 'Closed',
   },
   relative: {
     today: 'today',

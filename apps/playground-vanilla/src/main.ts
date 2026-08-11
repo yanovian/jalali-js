@@ -576,4 +576,14 @@ const holidaysCalendar = document.getElementById(
 ) as JalaliInlineCalendarElement;
 holidaysCalendar.initialDisplayedMonth = { year: 1403, month: 1 };
 
+const holidaysAndRulesCalendar = document.getElementById(
+  'holidays-and-rules-calendar',
+) as JalaliInlineCalendarElement;
+holidaysAndRulesCalendar.initialDisplayedMonth = { year: 1403, month: 1 };
+holidaysAndRulesCalendar.rules = {
+  minDate: { year: 1403, month: 1, day: 1 },
+  maxDate: { year: 1403, month: 1, day: 31 },
+  disabledWeekdays: [5],
+};
+
 renderShell();

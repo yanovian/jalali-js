@@ -287,6 +287,40 @@ button[data-jalali-calendar-title-year]:hover {
   font-weight: 600;
 }
 
+[data-jalali-calendar-day][data-holiday][data-disabled] {
+  color: var(--jalali-holiday-fg);
+  background: color-mix(in srgb, var(--jalali-holiday-fg) 12%, transparent);
+}
+
+[data-jalali-calendar-day][data-jalali-day-tip] {
+  position: relative;
+}
+
+[data-jalali-calendar-day][data-jalali-day-tip]:hover::after,
+[data-jalali-calendar-day][data-jalali-day-tip]:focus-visible::after {
+  content: attr(data-jalali-day-tip);
+  position: absolute;
+  z-index: 3;
+  inset-inline: 0;
+  top: calc(100% + 0.25em);
+  margin-inline: auto;
+  width: max-content;
+  max-width: min(14rem, 70vw);
+  padding: 0.35em 0.55em;
+  border-radius: var(--jalali-radius);
+  border: 1px solid var(--jalali-border);
+  background: var(--jalali-bg);
+  color: var(--jalali-fg);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: normal;
+  text-align: start;
+  text-decoration: none;
+  pointer-events: none;
+  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--jalali-fg) 16%, transparent);
+}
+
 [data-jalali-calendar-day][data-holiday][data-selected],
 [data-jalali-calendar-day][data-holiday][data-range-start],
 [data-jalali-calendar-day][data-holiday][data-range-end] {

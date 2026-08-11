@@ -71,6 +71,7 @@ export const fa: LocalePack = {
     day: 'روز',
     hour: 'ساعت',
     minute: 'دقیقه',
+    closedDay: 'بسته',
   },
   relative: {
     today: 'امروز',

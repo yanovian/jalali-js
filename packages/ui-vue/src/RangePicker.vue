@@ -19,7 +19,7 @@
  * day does not complete: the second click starts a new range instead (see
  * `isRangeSelectable()` in `jalali-js`).
  */
-import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import { holidayDayChrome, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type {
@@ -162,8 +162,17 @@ function selectDay(date: CalendarDate): void {
   open.value = false;
 }
 
-function dayLabel(date: CalendarDate): string {
-  return formatDate(date, localePack.value, { style: 'long' });
+function dayTipAttrs(cell: { date: CalendarDate; isHoliday: boolean; isSelectable: boolean }) {
+  const { tip, ariaLabel } = holidayDayChrome(
+    formatDate(cell.date, localePack.value, { style: 'long' }),
+    cell,
+    {
+      locale: props.locale,
+      region: props.holidayRegion,
+      closedLabel: localePack.value.ui.closedDay,
+    },
+  );
+  return { 'data-jalali-day-tip': tip, 'aria-label': ariaLabel };
 }
 function dayNumber(date: CalendarDate): string {
   return formatNumber(date.day, localePack.value.defaultNumerals, localePack.value.digits);
@@ -299,7 +308,7 @@ onBeforeUnmount(() => {
               :data-holiday="cell.isHoliday ? '' : undefined"
               :disabled="!cell.isSelectable"
               :aria-current="cell.isToday ? 'date' : undefined"
-              :aria-label="dayLabel(cell.date)"
+              v-bind="dayTipAttrs(cell)"
               @click="selectDay(cell.date)"
               @mouseenter="hoverDate = cell.date"
               @mouseleave="hoverDate = null"

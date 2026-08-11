@@ -1,4 +1,4 @@
-import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import { holidayDayChrome, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
 import {
@@ -219,26 +219,38 @@ export function Calendar({
             </div>
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} role="row" data-jalali-calendar-week>
-                {week.map((cell) => (
-                  <button
-                    key={`${cell.date.year}-${cell.date.month}-${cell.date.day}`}
-                    type="button"
-                    role="gridcell"
-                    data-jalali-calendar-day
-                    data-selected={cell.isSelected ? '' : undefined}
-                    data-today={cell.isToday ? '' : undefined}
-                    data-outside-month={cell.isCurrentMonth ? undefined : ''}
-                    data-disabled={cell.isSelectable ? undefined : ''}
-                    data-holiday={cell.isHoliday ? '' : undefined}
-                    disabled={!cell.isSelectable}
-                    aria-selected={cell.isSelected}
-                    aria-current={cell.isToday ? 'date' : undefined}
-                    aria-label={formatDate(cell.date, localePack, { style: 'long' })}
-                    onClick={() => onSelect?.(cell.date)}
-                  >
-                    {formatNumber(cell.date.day, localePack.defaultNumerals, localePack.digits)}
-                  </button>
-                ))}
+                {week.map((cell) => {
+                  const { tip, ariaLabel } = holidayDayChrome(
+                    formatDate(cell.date, localePack, { style: 'long' }),
+                    cell,
+                    {
+                      locale,
+                      region: holidayRegion,
+                      closedLabel: localePack.ui.closedDay,
+                    },
+                  );
+                  return (
+                    <button
+                      key={`${cell.date.year}-${cell.date.month}-${cell.date.day}`}
+                      type="button"
+                      role="gridcell"
+                      data-jalali-calendar-day
+                      data-selected={cell.isSelected ? '' : undefined}
+                      data-today={cell.isToday ? '' : undefined}
+                      data-outside-month={cell.isCurrentMonth ? undefined : ''}
+                      data-disabled={cell.isSelectable ? undefined : ''}
+                      data-holiday={cell.isHoliday ? '' : undefined}
+                      data-jalali-day-tip={tip}
+                      disabled={!cell.isSelectable}
+                      aria-selected={cell.isSelected}
+                      aria-current={cell.isToday ? 'date' : undefined}
+                      aria-label={ariaLabel}
+                      onClick={() => onSelect?.(cell.date)}
+                    >
+                      {formatNumber(cell.date.day, localePack.defaultNumerals, localePack.digits)}
+                    </button>
+                  );
+                })}
               </div>
             ))}
           </div>
