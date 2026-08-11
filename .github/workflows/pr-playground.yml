@@ -14,6 +14,7 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   build:
@@ -47,6 +48,44 @@ jobs:
           name: pr-preview
           path: dist-pr/pr-${{ github.event.pull_request.number }}
           retention-days: 2
+
+      - name: Comment preview links on the PR
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SITE_URL: https://jalali-js.yanovian.com
+        with:
+          script: |
+            const prNumber = process.env.PR_NUMBER;
+            const site = process.env.SITE_URL.replace(/\/$/, '');
+            const marker = '<!-- pr-playground-preview -->';
+            let body = `${marker}\n## Playground previews\n\n`;
+            body += 'Temporary builds from this PR. GitHub Pages removes them when the PR closes.\n\n';
+            body += `- [React](${site}/pr-${prNumber}/playground/react/)\n`;
+            body += `- [Vue](${site}/pr-${prNumber}/playground/vue/)\n`;
+            body += `- [Web Components](${site}/pr-${prNumber}/playground/vanilla/)\n`;
+            body += '\n_Links go live after the Pages deploy on `master` finishes. This landing PR gets live `/pr-*` URLs only after merge; later PRs get them automatically._\n';
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(prNumber),
+            });
+            const existing = comments.find((c) => c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: Number(prNumber),
+                body,
+              });
+            }
 
   # Closed PRs still complete this workflow so the deploy workflow can rebuild
   # the site without that /pr-<n>/ tree (mirror only open PRs from the live site).

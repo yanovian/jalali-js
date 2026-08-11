@@ -22,7 +22,6 @@ permissions:
   contents: read
   pages: write
   id-token: write
-  pull-requests: write
 
 env:
   SITE_URL: https://jalali-js.yanovian.com
@@ -127,41 +126,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
-
-      - name: Comment preview links on the PR
-        if: steps.pr.outputs.open == 'true' && steps.pr.outputs.number != ''
-        uses: actions/github-script@v9
-        env:
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
-          SITE_URL: ${{ env.SITE_URL }}
-        with:
-          script: |
-            const prNumber = process.env.PR_NUMBER;
-            const site = process.env.SITE_URL.replace(/\/$/, '');
-            const marker = '<!-- pr-playground-preview -->';
-            let body = `${marker}\n## Playground previews\n\n`;
-            body += 'Temporary builds from this PR. GitHub Pages removes them when the PR closes.\n\n';
-            body += `- [React](${site}/pr-${prNumber}/playground/react/)\n`;
-            body += `- [Vue](${site}/pr-${prNumber}/playground/vue/)\n`;
-            body += `- [Web Components](${site}/pr-${prNumber}/playground/vanilla/)\n`;
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: Number(prNumber),
-            });
-            const existing = comments.find((c) => c.body?.includes(marker));
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: Number(prNumber),
-                body,
-              });
-            }

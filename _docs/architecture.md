@@ -777,13 +777,13 @@ publish-packages` (skipping any already published at that version, so a
 
 - **`pr-playground.yml` and `pr-playground-deploy.yml` (Phase 27).** The build
   workflow runs on the pull request, builds the three static playgrounds at
-  `/pr-<n>/playground/{react,vue,vanilla}/`, and uploads an artifact. The
-  deploy workflow runs on `master` via `workflow_run` (so the `github-pages`
-  environment can deploy), rebuilds the docs site from `master`, mirrors
-  other open `/pr-*` trees from the live site, overlays this PR's artifact,
-  deploys, and comments the live links. On PR close it redeploys with only
-  still-open previews. A weekly job sweeps orphans the same way. No extra
-  git branch stores preview files.
+  `/pr-<n>/playground/{react,vue,vanilla}/`, uploads an artifact, and comments
+  the preview links on the PR. The deploy workflow runs on `master` via
+  `workflow_run` (so the `github-pages` environment can deploy), rebuilds the
+  docs site from `master`, mirrors other open `/pr-*` trees from the live site,
+  overlays this PR's artifact, and deploys. On PR close it redeploys with only
+  still-open previews. A weekly job sweeps orphans the same way. No extra git
+  branch stores preview files.
 
 The dependency-update, license-audit, and action-pruning Actions above are
 the org's own (`yanovian/update-dependencies-action`,
