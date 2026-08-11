@@ -425,6 +425,12 @@ button[data-jalali-calendar-title-year]:hover {
   width: min(100%, 34em);
 }
 
+[data-jalali-eventcalendar-root][data-view='timeline']:has(
+    [data-jalali-timeline][data-alternating]
+  ) {
+  width: min(100%, 44em);
+}
+
 [data-jalali-eventcalendar-week] {
   display: grid;
   gap: 0.2em;
@@ -439,6 +445,13 @@ button[data-jalali-calendar-title-year]:hover {
     minmax(var(--jalali-event-col-min), 1fr)
   );
   gap: var(--jalali-gap);
+}
+
+/* Match timed columns: leave space for the hours gutter. */
+[data-jalali-eventcalendar-period] > [data-jalali-eventcalendar-days],
+[data-jalali-eventcalendar-period] > [data-jalali-eventcalendar-allday] {
+  padding-inline-start: calc(var(--jalali-event-hours-width, 2.75em) + var(--jalali-gap));
+  box-sizing: border-box;
 }
 
 [data-jalali-eventcalendar-days] [data-jalali-calendar-day] {
@@ -457,6 +470,7 @@ button[data-jalali-calendar-title-year]:hover {
 
 /* Week/day panes scroll instead of crushing columns. tabindex + role come from the markup. */
 [data-jalali-eventcalendar-period] {
+  --jalali-event-hours-width: 2.75em;
   display: grid;
   gap: 0.35em;
   margin-top: 0.35em;
@@ -470,7 +484,7 @@ button[data-jalali-calendar-title-year]:hover {
 
 [data-jalali-eventcalendar-timed] {
   display: grid;
-  grid-template-columns: auto repeat(
+  grid-template-columns: var(--jalali-event-hours-width) repeat(
       var(--jalali-event-cols, 7),
       minmax(var(--jalali-event-col-min), 1fr)
     );
@@ -486,6 +500,14 @@ button[data-jalali-calendar-title-year]:hover {
   display: grid;
   grid-template-rows: repeat(24, minmax(1.5em, 1fr));
   min-height: 36em;
+  /* One shared hour scale across the label column and day columns. */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(100% / 24 - 1px),
+    color-mix(in srgb, var(--jalali-border) 65%, transparent) calc(100% / 24 - 1px),
+    color-mix(in srgb, var(--jalali-border) 65%, transparent) calc(100% / 24)
+  );
 }
 
 [data-jalali-eventcalendar-hour] {
@@ -494,7 +516,6 @@ button[data-jalali-calendar-title-year]:hover {
   line-height: 1.5em;
   padding-inline-end: 0.35em;
   text-align: end;
-  border-block-start: 1px solid var(--jalali-border);
 }
 
 [data-jalali-eventcalendar-daycol] {
@@ -558,16 +579,45 @@ button[data-jalali-calendar-title-year]:hover {
 }
 
 [data-jalali-timeline][data-direction='vertical'] {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--jalali-timeline-gap);
 }
 
+/* One continuous rail behind every marker (not short stubs between items). */
+[data-jalali-timeline][data-direction='vertical']::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset-inline-start: calc(var(--jalali-timeline-marker-size) / 2 - 1px);
+  top: calc(var(--jalali-timeline-marker-size) / 2);
+  bottom: calc(var(--jalali-timeline-marker-size) / 2);
+  width: 2px;
+  background: var(--jalali-timeline-line);
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-alternating]::before {
+  inset-inline-start: calc(50% - 1px);
+}
+
 [data-jalali-timeline][data-direction='horizontal'] {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: stretch;
   gap: var(--jalali-timeline-gap);
+}
+
+[data-jalali-timeline][data-direction='horizontal']::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset-block-start: calc(var(--jalali-timeline-marker-size) / 2 - 1px);
+  inset-inline-start: calc(var(--jalali-timeline-marker-size) / 2);
+  inset-inline-end: calc(var(--jalali-timeline-marker-size) / 2);
+  height: 2px;
+  background: var(--jalali-timeline-line);
 }
 
 [data-jalali-timeline-scroll] {
@@ -614,30 +664,6 @@ button[data-jalali-calendar-title-year]:hover {
   [data-jalali-timeline-item]:nth-child(even)
   [data-jalali-timeline-card] {
   grid-column: 1;
-}
-
-[data-jalali-timeline][data-direction='vertical']
-  [data-jalali-timeline-item]:not(:last-child)
-  [data-jalali-timeline-marker]::after {
-  content: '';
-  position: absolute;
-  inset-inline-start: calc(50% - 1px);
-  top: var(--jalali-timeline-marker-size);
-  bottom: calc(var(--jalali-timeline-gap) * -1 - 2px);
-  width: 2px;
-  background: var(--jalali-timeline-line);
-}
-
-[data-jalali-timeline][data-direction='horizontal']
-  [data-jalali-timeline-item]:not(:last-child)
-  [data-jalali-timeline-marker]::after {
-  content: '';
-  position: absolute;
-  inset-block-start: calc(50% - 1px);
-  inset-inline-start: var(--jalali-timeline-marker-size);
-  inset-inline-end: calc(var(--jalali-timeline-gap) * -1 - 2px);
-  height: 2px;
-  background: var(--jalali-timeline-line);
 }
 
 [data-jalali-timeline-marker] {
@@ -785,6 +811,10 @@ button[data-jalali-calendar-title-year]:hover {
 
   [data-jalali-timeline][data-direction='vertical'][data-alternating] [data-jalali-timeline-item] {
     grid-template-columns: var(--jalali-timeline-marker-size) minmax(0, 1fr);
+  }
+
+  [data-jalali-timeline][data-direction='vertical'][data-alternating]::before {
+    inset-inline-start: calc(var(--jalali-timeline-marker-size) / 2 - 1px);
   }
 
   [data-jalali-timeline][data-direction='vertical'][data-alternating]

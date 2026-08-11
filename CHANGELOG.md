@@ -23,6 +23,8 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Fixed
 
+- EventCalendar timeline draws one continuous rail behind markers.
+- EventCalendar week and day show hour lines across day columns and align headers with the hours gutter.
 - Playground Primary / Background theme controls apply on jalali picker roots.
 - TimePicker and TimeRangePicker keep hour-then-minute order in RTL locales.
 
