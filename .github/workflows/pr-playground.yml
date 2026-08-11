@@ -1,0 +1,61 @@
+name: PR playground build
+
+# Builds static playgrounds for a PR and uploads them as an artifact.
+# Deploy happens on master in pr-playground-deploy.yml (workflow_run), because
+# the github-pages environment only deploys from master.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+concurrency:
+  group: pr-playground-build-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build PR playgrounds
+    if: >
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: make install-frozen
+
+      - name: Build PR playgrounds
+        run: make embed-pr-playgrounds PR=${{ github.event.pull_request.number }} PR_PREVIEW_OUT=dist-pr
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-preview
+          path: dist-pr/pr-${{ github.event.pull_request.number }}
+          retention-days: 2
+
+  # Closed PRs still complete this workflow so the deploy workflow can rebuild
+  # the site without that /pr-<n>/ tree (mirror only open PRs from the live site).
+  closed:
+    name: Mark PR closed
+    if: >
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record closed PR number
+        run: echo "PR #${{ github.event.pull_request.number }} closed; deploy workflow will drop /pr-${{ github.event.pull_request.number }}/."

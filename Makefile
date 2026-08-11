@@ -2,7 +2,8 @@
 	lint lint-fix format format-check test test-watch test-e2e test-e2e-project \
 	install-playwright check check-readmes clean probe-treeshake size tag-release release-patch \
 	release-minor release-major publish-packages app-typecheck app-build app-build-at-base \
-	test-paths docs-dev docs-build docs-preview embed-playgrounds update-holidays
+	test-paths docs-dev docs-build docs-preview embed-playgrounds embed-pr-playgrounds \
+	pages-dist update-holidays
 
 PNPM ?= pnpm
 
@@ -49,6 +50,23 @@ embed-playgrounds: ## Build playground-react/vue/vanilla at their embedded subpa
 	cp -r apps/playground-react/dist/. apps/docs/public/playground/react/
 	cp -r apps/playground-vue/dist/. apps/docs/public/playground/vue/
 	cp -r apps/playground-vanilla/dist/. apps/docs/public/playground/vanilla/
+
+# PR preview playgrounds use /pr-<n>/playground/... bases so asset URLs resolve on Pages.
+PR_PREVIEW_OUT ?= dist-pr
+embed-pr-playgrounds: ## Build playgrounds under /pr-$(PR)/playground/... into $(PR_PREVIEW_OUT)/pr-$(PR)/ : make embed-pr-playgrounds PR=42
+	@test -n "$(PR)" || (echo "Usage: make embed-pr-playgrounds PR=<number> [PR_PREVIEW_OUT=dist-pr]" && exit 1)
+	$(MAKE) app-build-at-base APP=playground-react BASE=/pr-$(PR)/playground/react/
+	$(MAKE) app-build-at-base APP=playground-vue BASE=/pr-$(PR)/playground/vue/
+	$(MAKE) app-build-at-base APP=playground-vanilla BASE=/pr-$(PR)/playground/vanilla/
+	mkdir -p $(PR_PREVIEW_OUT)/pr-$(PR)/playground/react $(PR_PREVIEW_OUT)/pr-$(PR)/playground/vue $(PR_PREVIEW_OUT)/pr-$(PR)/playground/vanilla
+	cp -r apps/playground-react/dist/. $(PR_PREVIEW_OUT)/pr-$(PR)/playground/react/
+	cp -r apps/playground-vue/dist/. $(PR_PREVIEW_OUT)/pr-$(PR)/playground/vue/
+	cp -r apps/playground-vanilla/dist/. $(PR_PREVIEW_OUT)/pr-$(PR)/playground/vanilla/
+
+pages-dist: ## Build docs site and mirror open PR previews into dist (pages.yml and PR preview deploy)
+	$(MAKE) embed-playgrounds
+	$(MAKE) build-docs
+	node scripts/pr-previews.mjs mirror apps/docs/.vitepress/dist
 
 typecheck: ## TypeScript check, across every package
 	$(PNPM) typecheck

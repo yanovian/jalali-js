@@ -1,0 +1,179 @@
+name: PR playground deploy
+
+# Runs on master after PR playground build finishes (or on a weekly sweep).
+# Builds the live docs site from master, mirrors other open /pr-* trees from
+# the live site, overlays this PR's artifact when the PR is open, then deploys.
+# No extra git branch.
+
+on:
+  workflow_run:
+    workflows: ['PR playground build']
+    types: [completed]
+  schedule:
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+
+env:
+  SITE_URL: https://jalali-js.yanovian.com
+
+jobs:
+  deploy:
+    name: Deploy Pages with PR previews
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v7
+        with:
+          ref: master
+
+      # workflow_run uses the deploy workflow from master. Until this PR merges,
+      # that file is absent and this job never runs. After merge, the first runs
+      # may still need the helper script from the triggering PR head.
+      - name: Ensure pr-previews helper script
+        if: github.event_name == 'workflow_run'
+        run: |
+          if [ -f scripts/pr-previews.mjs ]; then
+            exit 0
+          fi
+          git fetch --depth=1 origin "${{ github.event.workflow_run.head_sha }}"
+          git checkout FETCH_HEAD -- scripts/pr-previews.mjs
+
+      - name: Resolve PR context
+        id: pr
+        uses: actions/github-script@v9
+        with:
+          script: |
+            if (context.eventName !== 'workflow_run') {
+              core.setOutput('number', '');
+              core.setOutput('open', 'false');
+              core.setOutput('has_artifact', 'false');
+              return;
+            }
+            const run = context.payload.workflow_run;
+            const prs = run.pull_requests || [];
+            if (prs.length === 0) {
+              core.setOutput('number', '');
+              core.setOutput('open', 'false');
+              core.setOutput('has_artifact', 'false');
+              return;
+            }
+            const number = String(prs[0].number);
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: Number(number),
+            });
+            const isOpen = pr.state === 'open';
+            core.setOutput('number', number);
+            core.setOutput('open', String(isOpen));
+            // Artifact exists only for open/sync builds, not the closed marker job.
+            core.setOutput('has_artifact', String(isOpen));
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: make install-frozen
+
+      - name: Build docs and mirror open PR previews
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SITE_URL: ${{ env.SITE_URL }}
+        run: |
+          EXCLUDE="${{ steps.pr.outputs.number }}"
+          make embed-playgrounds
+          make build-docs
+          if [ -n "$EXCLUDE" ]; then
+            node scripts/pr-previews.mjs mirror apps/docs/.vitepress/dist --exclude "$EXCLUDE"
+          else
+            node scripts/pr-previews.mjs mirror apps/docs/.vitepress/dist
+          fi
+
+      - name: Download this PR preview artifact
+        if: steps.pr.outputs.has_artifact == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-preview
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: pr-overlay/pr-${{ steps.pr.outputs.number }}
+
+      - name: Overlay this PR preview
+        if: steps.pr.outputs.has_artifact == 'true'
+        run: |
+          mkdir -p "apps/docs/.vitepress/dist/pr-${{ steps.pr.outputs.number }}"
+          cp -R "pr-overlay/pr-${{ steps.pr.outputs.number }}/." \
+            "apps/docs/.vitepress/dist/pr-${{ steps.pr.outputs.number }}/"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: apps/docs/.vitepress/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+      - name: Comment preview links on the PR
+        if: steps.pr.outputs.open == 'true' && steps.pr.outputs.number != ''
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          SITE_URL: ${{ env.SITE_URL }}
+        with:
+          script: |
+            const prNumber = process.env.PR_NUMBER;
+            const site = process.env.SITE_URL.replace(/\/$/, '');
+            const marker = '<!-- pr-playground-preview -->';
+            let body = `${marker}\n## Playground previews\n\n`;
+            body += 'Temporary builds from this PR. GitHub Pages removes them when the PR closes.\n\n';
+            body += `- [React](${site}/pr-${prNumber}/playground/react/)\n`;
+            body += `- [Vue](${site}/pr-${prNumber}/playground/vue/)\n`;
+            body += `- [Web Components](${site}/pr-${prNumber}/playground/vanilla/)\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(prNumber),
+            });
+            const existing = comments.find((c) => c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: Number(prNumber),
+                body,
+              });
+            }
