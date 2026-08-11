@@ -784,11 +784,12 @@ publish-packages` (skipping any already published at that version, so a
 
 - **`pr-playground.yml` (Phase 27).** On each same-repo pull request, builds
   the three static playgrounds at `/pr-<n>/playground/{react,vue,vanilla}/`,
-  stores them on `pages-previews`, deploys a site shell built from `master`
-  plus those preview folders, and comments the live links on the PR. On PR
-  close it deletes only that `/pr-<n>/` tree and redeploys. A weekly job
-  sweeps `/pr-*` folders with no open PR. Preview content is playgrounds
-  only (not the full docs rewrite from the PR, and not Next/Nuxt).
+  stores them on `pages-previews`, asks `pages.yml` on `master` to redeploy
+  (so the `github-pages` environment never deploys from a pull_request job),
+  and comments the live links on the PR. On PR close it deletes only that
+  `/pr-<n>/` tree and redeploys. A weekly job sweeps `/pr-*` folders with no
+  open PR. Preview content is playgrounds only (not the full docs rewrite
+  from the PR, and not Next/Nuxt).
 
 The dependency-update, license-audit, and action-pruning Actions above are
 the org's own (`yanovian/update-dependencies-action`,

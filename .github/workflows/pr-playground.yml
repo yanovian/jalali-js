@@ -1,11 +1,10 @@
 name: PR playground previews
 
 # Publishes short-lived playgrounds under /pr-<n>/ on GitHub Pages.
-# Preview trees live on the orphan `pages-previews` branch. The publish job
-# builds the live site shell from master, merges those trees, and deploys.
-# pages.yml also merges the same trees on master pushes so previews survive
-# normal docs deploys. Remove and sweep update the branch, then ask pages.yml
-# to redeploy.
+# Preview trees live on the orphan `pages-previews` branch. This workflow
+# never calls deploy-pages from a pull_request job (the github-pages
+# environment only allows master). It updates pages-previews, then asks
+# pages.yml on master to rebuild and merge those folders.
 
 on:
   pull_request:
@@ -15,8 +14,8 @@ on:
     - cron: '17 4 * * 1'
   workflow_dispatch:
 
-# Serialize preview branch writes. Do not share the `pages` group with the
-# deploy job below in a way that waits on itself.
+# Serialize preview branch writes. Do not share the `pages` group: this job
+# waits on pages.yml, and a shared group would deadlock.
 concurrency:
   group: pages-previews
   cancel-in-progress: false
@@ -24,8 +23,6 @@ concurrency:
 permissions:
   actions: write
   contents: write
-  pages: write
-  id-token: write
   pull-requests: write
 
 env:
@@ -66,69 +63,41 @@ jobs:
             "${{ github.event.pull_request.number }}" \
             "dist-pr/pr-${{ github.event.pull_request.number }}"
 
-      - name: Checkout master for the live site shell
-        uses: actions/checkout@v7
-        with:
-          ref: master
-          path: site-master
-
-      - name: Install and build master site
-        working-directory: site-master
-        run: |
-          make install-frozen
-          make embed-playgrounds
-          make build-docs
-
-      - name: Merge PR playground previews into master dist
+      - name: Redeploy Pages from master
+        id: redeploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Use the script from this PR so the first landing PR can merge too.
-          node "$GITHUB_WORKSPACE/scripts/pages-previews.mjs" merge \
-            site-master/apps/docs/.vitepress/dist
+          # Master must already contain scripts/pages-previews.mjs (this PR's
+          # pages.yml merge step). Until then, skip live deploy so the check
+          # stays green; later PRs get live /pr-<n>/ URLs.
+          if ! gh api "repos/${GITHUB_REPOSITORY}/contents/scripts/pages-previews.mjs?ref=master" \
+            --silent >/dev/null 2>&1; then
+            echo "Master does not merge PR previews yet. Live /pr-<n>/ links start after this lands."
+            echo "deployed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          bash scripts/redeploy-pages.sh
+          echo "deployed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
-
-      - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: site-master/apps/docs/.vitepress/dist
-
-  deploy-publish:
-    name: Deploy PR playgrounds
-    needs: publish
-    runs-on: ubuntu-latest
-    # Queue with master Pages deploys so only one site tree goes live at a time.
-    concurrency:
-      group: pages
-      cancel-in-progress: false
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
-
-  comment:
-    name: Comment preview links
-    needs: [publish, deploy-publish]
-    runs-on: ubuntu-latest
-    steps:
       - name: Comment preview links on the PR
         uses: actions/github-script@v9
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           SITE_URL: ${{ env.SITE_URL }}
+          DEPLOYED: ${{ steps.redeploy.outputs.deployed }}
         with:
           script: |
             const prNumber = process.env.PR_NUMBER;
             const site = process.env.SITE_URL.replace(/\/$/, '');
+            const deployed = process.env.DEPLOYED === 'true';
             const marker = '<!-- pr-playground-preview -->';
             let body = `${marker}\n## Playground previews\n\n`;
-            body += 'Temporary builds from this PR. GitHub Pages removes them when the PR closes.\n\n';
+            if (deployed) {
+              body += 'Temporary builds from this PR. GitHub Pages removes them when the PR closes.\n\n';
+            } else {
+              body += 'Preview files are stored. Live `/pr-<n>/` URLs start after the Pages merge helper is on `master` (this landing PR), then on later PRs.\n\n';
+            }
             body += `- [React](${site}/pr-${prNumber}/playground/react/)\n`;
             body += `- [Vue](${site}/pr-${prNumber}/playground/vue/)\n`;
             body += `- [Web Components](${site}/pr-${prNumber}/playground/vanilla/)\n`;
@@ -183,7 +152,13 @@ jobs:
         if: steps.remove.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash scripts/redeploy-pages.sh
+        run: |
+          if ! gh api "repos/${GITHUB_REPOSITORY}/contents/scripts/pages-previews.mjs?ref=master" \
+            --silent >/dev/null 2>&1; then
+            echo "Master does not merge PR previews yet; skip redeploy."
+            exit 0
+          fi
+          bash scripts/redeploy-pages.sh
 
   sweep:
     name: Sweep orphan PR playgrounds
