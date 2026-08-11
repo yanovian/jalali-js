@@ -6,12 +6,16 @@ import {
   eventCoversDate,
   eventMinutesOnDate,
   eventsForDate,
+  eventsForTimeline,
   findEventById,
   isValidEventSpan,
   layoutDayTimedEvents,
   layoutMonthEvents,
   layoutWeekEvents,
   shiftEventViewAnchor,
+  TIMELINE_ACCENT_COLORS,
+  timelineAccentFor,
+  timelineEventDateTime,
   type CalendarEvent,
 } from './event-calendar.js';
 
@@ -62,6 +66,27 @@ describe('event-calendar layout', () => {
     expect(
       eventsForDate(events, { year: 1403, month: 5, day: 15 }).map((entry) => entry.id),
     ).toEqual(['c', 'b', 'a']);
+  });
+
+  it('orders timeline events chronologically and drops inverted spans', () => {
+    const events = [
+      event('later', { year: 1403, month: 5, day: 16 }),
+      event('earlier', { year: 1403, month: 5, day: 10 }),
+      event('bad', { year: 1403, month: 5, day: 12 }, { year: 1403, month: 5, day: 8 }),
+    ];
+    expect(eventsForTimeline(events).map((entry) => entry.id)).toEqual(['earlier', 'later']);
+  });
+
+  it('picks timeline accents and pads dateTime values', () => {
+    expect(timelineAccentFor(0)).toBe(TIMELINE_ACCENT_COLORS[0]);
+    expect(timelineAccentFor(5)).toBe(TIMELINE_ACCENT_COLORS[0]);
+    expect(timelineAccentFor(1, '#111111')).toBe('#111111');
+    expect(
+      timelineEventDateTime({
+        start: { year: 1403, month: 1, day: 2 },
+        startTime: { hour: 9, minute: 5 },
+      }),
+    ).toBe('1403-01-02T09:05');
   });
 
   it('assigns lanes for overlapping events in a week', () => {

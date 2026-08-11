@@ -386,7 +386,10 @@ export class JalaliDatePickerElement extends HTMLElement {
         {
           'data-jalali-datepicker-popover': true,
           role: 'dialog',
-          'aria-label': this.#precision === 'datetime' ? 'Choose a date and time' : 'Choose a date',
+          'aria-label':
+            this.#precision === 'datetime'
+              ? localePack.ui.chooseDateAndTime
+              : localePack.ui.chooseDate,
         },
         popoverChildren,
       );

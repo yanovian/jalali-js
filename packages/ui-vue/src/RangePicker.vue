@@ -37,6 +37,7 @@ import {
   nextMonth,
   previousMonth,
   toStorageValue,
+  weekdayLabelsForGrid,
 } from 'jalali-js';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
 import { localePackFor, type LocaleCode } from '@jalali-js/vue';
@@ -235,14 +236,14 @@ onBeforeUnmount(() => {
       :id="popoverId"
       data-jalali-datepicker-popover
       role="dialog"
-      aria-label="Choose a date range"
+      :aria-label="localePack.ui.chooseDateRange"
     >
       <div :dir="localePack.direction" data-jalali-calendar-root>
         <div data-jalali-calendar-header>
           <button
             type="button"
             data-jalali-calendar-nav="previous"
-            aria-label="Previous month"
+            :aria-label="localePack.ui.previousMonth"
             @click="goPrevious"
           >
             ‹
@@ -251,7 +252,7 @@ onBeforeUnmount(() => {
           <button
             type="button"
             data-jalali-calendar-nav="next"
-            aria-label="Next month"
+            :aria-label="localePack.ui.nextMonth"
             @click="goNext"
           >
             ›
@@ -260,7 +261,7 @@ onBeforeUnmount(() => {
         <div role="grid" data-jalali-calendar-grid>
           <div role="row" data-jalali-calendar-weekdays>
             <span
-              v-for="(name, index) in localePack.weekdayNames.short"
+              v-for="(name, index) in weekdayLabelsForGrid(localePack.weekdayNames.short, system)"
               :key="index"
               role="columnheader"
               data-jalali-calendar-weekday

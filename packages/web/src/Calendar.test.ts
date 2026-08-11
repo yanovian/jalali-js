@@ -53,6 +53,35 @@ describe('jalali-calendar', () => {
     expect(getByRole(document.body, 'button', { name: 'Choose year' })).toHaveTextContent('1403');
   });
 
+  it('starts Jalali weekday headers on Saturday and Gregorian on Sunday', () => {
+    const jalali = mountCalendar();
+    expect(
+      [...jalali.querySelectorAll('[data-jalali-calendar-weekday]')].map(
+        (node) => node.textContent,
+      ),
+    ).toEqual(['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
+
+    jalali.locale = 'fa';
+    expect(jalali.querySelector('[data-jalali-calendar-weekday]')?.textContent).toBe('ش');
+
+    const gregorian = document.createElement('jalali-calendar') as JalaliCalendarElement;
+    gregorian.system = 'gregorian';
+    gregorian.locale = 'en';
+    document.body.append(gregorian);
+    gregorian.value = {
+      precision: 'date',
+      system: 'gregorian',
+      year: 2024,
+      month: 8,
+      day: 5,
+    };
+    expect(
+      [...gregorian.querySelectorAll('[data-jalali-calendar-weekday]')].map(
+        (node) => node.textContent,
+      ),
+    ).toEqual(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
+  });
+
   it('marks the selected day and the current day with their data attributes', () => {
     mountCalendar();
     const selected = getByRole(document.body, 'gridcell', { selected: true });
@@ -86,8 +115,8 @@ describe('jalali-calendar', () => {
   it('renders Persian month names and digits in the fa locale', () => {
     const el = mountCalendar();
     el.locale = 'fa';
-    expect(getByRole(document.body, 'button', { name: 'Choose month' })).toHaveTextContent('مرداد');
-    expect(getByRole(document.body, 'button', { name: 'Choose year' })).toHaveTextContent('۱۴۰۳');
+    expect(getByRole(document.body, 'button', { name: 'انتخاب ماه' })).toHaveTextContent('مرداد');
+    expect(getByRole(document.body, 'button', { name: 'انتخاب سال' })).toHaveTextContent('۱۴۰۳');
   });
 
   describe('quickNav (default on)', () => {

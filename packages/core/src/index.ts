@@ -17,12 +17,20 @@ export type {
 } from './calendar.js';
 export { createCalendar } from './calendar.js';
 export type { CalendarGridDay } from './calendar-grid.js';
-export { buildCalendarGrid, nextMonth, previousMonth } from './calendar-grid.js';
+export {
+  buildCalendarGrid,
+  nextMonth,
+  previousMonth,
+  weekdayLabelsForGrid,
+} from './calendar-grid.js';
 export type {
   CalendarEvent,
   EventCalendarView,
   EventLaneSegment,
   TimedEventBlock,
+  TimelineDirection,
+  TimelineMarkerShape,
+  TimelineOptions,
 } from './event-calendar.js';
 export {
   daysForEventView,
@@ -30,6 +38,7 @@ export {
   eventIsAllDay,
   eventMinutesOnDate,
   eventsForDate,
+  eventsForTimeline,
   findEventById,
   isValidEventSpan,
   laneCountOf,
@@ -39,6 +48,9 @@ export {
   layoutWeekEvents,
   shiftEventViewAnchor,
   timedBlockStyle,
+  TIMELINE_ACCENT_COLORS,
+  timelineAccentFor,
+  timelineEventDateTime,
 } from './event-calendar.js';
 export type { CalendarDateFields, CalendarEngine } from './calendar-engine.js';
 export type { CalendarEngineOptions, CalendarSystem, JalaliEngineId } from './convert.js';

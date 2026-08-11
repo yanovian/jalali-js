@@ -11,19 +11,27 @@ Use these exact `##` headings (the check script matches them):
 1. Title (`# package-name`) and badges (version, license, docs; bundle size
    on `jalali-js` only).
 2. One short pitch (one or two sentences).
-3. `## Contents` with anchor links to the sections below.
-4. `## Install`
-5. `## Compatibility` (peers from `package.json`, framework majors from the
+3. A **Start here** line right after the pitch: Live demo and Documentation.
+   Directly under it, an **npm ecosystem** line that lists every publishable
+   package (`jalali-js`, `@jalali-js/i18n`, `@jalali-js/nlp`,
+   `@jalali-js/holidays`, `@jalali-js/react`, `@jalali-js/vue`,
+   `@jalali-js/web`, `@jalali-js/ui-react`, `@jalali-js/ui-vue`,
+   `@jalali-js/ui-web`), each linking to its npm page. Put these before
+   Install so a visitor finds them without scrolling past API detail.
+4. `## Contents` with anchor links to the sections below.
+5. `## Install`
+6. `## Compatibility` (peers from `package.json`, framework majors from the
    CI matrix, Node majors from the CI Node matrix).
-6. `## Quick start` (smallest working example).
-7. One or more API sections (`## API`, `## Components`, or similar) with a
+7. `## Quick start` (smallest working example).
+8. One or more API sections (`## API`, `## Components`, or similar) with a
    short example per main export.
-8. `## Options` with a small key-options table for the main surface, plus a
+9. `## Options` with a small key-options table for the main surface, plus a
    link to the docs guide prop tables (the source of truth).
-9. `## Theming` for UI packages (`react`, `vue`, `web`, `ui-*`). Other
-   packages use a one-line note that they have no UI.
-10. `## Links` (docs, playground, changelog, sibling packages).
-11. `## License`
+10. `## Theming` for UI packages (`react`, `vue`, `web`, `ui-*`). Other
+    packages use a one-line note that they have no UI.
+11. `## Links` (docs, playground, changelog, sibling packages). Lead with
+    Live demo and Documentation. Keep sibling package links here too.
+12. `## License`
 
 ## Options tables
 

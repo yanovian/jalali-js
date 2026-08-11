@@ -62,7 +62,7 @@ function onMinuteChange(event: Event): void {
 <template>
   <div :dir="localePack.direction" data-jalali-timepicker-root>
     <select
-      aria-label="Hour"
+      :aria-label="localePack.ui.hour"
       data-jalali-timepicker-field="hour"
       :value="time.hour"
       @change="onHourChange"
@@ -71,7 +71,7 @@ function onMinuteChange(event: Event): void {
     </select>
     <span data-jalali-timepicker-separator aria-hidden="true">:</span>
     <select
-      aria-label="Minute"
+      :aria-label="localePack.ui.minute"
       data-jalali-timepicker-field="minute"
       :value="snapMinute(time.minute, minuteStep)"
       @change="onMinuteChange"

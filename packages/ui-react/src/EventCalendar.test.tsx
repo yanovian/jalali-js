@@ -93,6 +93,26 @@ describe('EventCalendar', () => {
     expect(parts[1]! - parts[0]!).toBeGreaterThanOrEqual(2);
   });
 
+  it('exposes a labeled region and a keyboard-focusable week pane', () => {
+    render(
+      <EventCalendar
+        locale="en"
+        view="week"
+        initialDate={{ year: 1403, month: 5, day: 15 }}
+        events={demoEvents}
+      />,
+    );
+    const root = document.querySelector('[data-jalali-eventcalendar-root]');
+    expect(root).toHaveAttribute('role', 'region');
+    expect(root).toHaveAttribute('aria-labelledby');
+    const period = document.querySelector(
+      '[data-jalali-eventcalendar-period]',
+    ) as HTMLElement | null;
+    expect(period).toHaveAttribute('tabindex', '0');
+    expect(period).toHaveAttribute('role', 'region');
+    expect(period?.style.getPropertyValue('--jalali-event-cols')).toBe('7');
+  });
+
   it('renders week and day views with timed placement', () => {
     const { rerender } = render(
       <EventCalendar
@@ -105,6 +125,11 @@ describe('EventCalendar', () => {
     expect(document.querySelector('[data-view="week"]')).toBeTruthy();
     expect(document.querySelector('[data-jalali-eventcalendar-timed]')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Meeting' })).toHaveAttribute('data-timed');
+    expect(
+      (
+        document.querySelector('[data-jalali-eventcalendar-period]') as HTMLElement | null
+      )?.style.getPropertyValue('--jalali-event-cols'),
+    ).toBe('7');
 
     rerender(
       <EventCalendar
@@ -116,5 +141,55 @@ describe('EventCalendar', () => {
     );
     expect(document.querySelector('[data-view="day"]')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Meeting' })).toBeInTheDocument();
+    expect(
+      (
+        document.querySelector('[data-jalali-eventcalendar-period]') as HTMLElement | null
+      )?.style.getPropertyValue('--jalali-event-cols'),
+    ).toBe('1');
+  });
+
+  it('renders a timeline list with native digits and fires onEventClick', async () => {
+    const user = userEvent.setup();
+    const onEventClick = vi.fn();
+    const events: CalendarEvent[] = [
+      {
+        id: 'start',
+        title: 'آغاز پروژه',
+        description: 'شروع کار',
+        start: { year: 1403, month: 10, day: 26 },
+        end: { year: 1403, month: 10, day: 26 },
+        allDay: false,
+        startTime: { hour: 9, minute: 0 },
+        endTime: { hour: 10, minute: 0 },
+        color: '#22c55e',
+        icon: '◎',
+      },
+      {
+        id: 'later',
+        title: 'اتمام طراحی',
+        start: { year: 1403, month: 12, day: 2 },
+        end: { year: 1403, month: 12, day: 2 },
+        icon: '▣',
+      },
+    ];
+    render(
+      <EventCalendar
+        locale="fa"
+        view="timeline"
+        displayFormat={{ numerals: 'native', template: 'YYYY/MM/DD' }}
+        timeline={{ showIcons: true, markerShape: 'circular', alternating: true }}
+        events={events}
+        onEventClick={onEventClick}
+      />,
+    );
+    expect(document.querySelector('[data-view="timeline"]')).toBeTruthy();
+    expect(document.querySelector('[data-jalali-timeline]')).toHaveAttribute(
+      'data-direction',
+      'vertical',
+    );
+    expect(document.querySelector('[data-jalali-timeline-icon]')?.textContent).toBe('◎');
+    expect(screen.getByText(/۰۹:۰۰/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /آغاز پروژه/ }));
+    expect(onEventClick).toHaveBeenCalledWith(expect.objectContaining({ id: 'start' }));
   });
 });

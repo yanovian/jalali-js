@@ -4,6 +4,7 @@ import { en } from './en.js';
 import { fa } from './fa.js';
 import { ps } from './ps.js';
 import { format } from './format.js';
+import { formatTimelineStamp } from './timeline-stamp.js';
 
 // 2024-08-05 is 15 Mordad 1403 on the Jalali calendar, and a Monday (see day-of-week.test.ts
 // and convert.test.ts in packages/core).
@@ -98,5 +99,24 @@ describe('format: numerals option overrides the locale default in both direction
     // en.digits equals the Latin digits, so this is a no-op in output, but the option itself
     // must be honored rather than ignored.
     expect(format(jalaliDate, en, { numerals: 'native' })).toBe('15 Mordad 1403');
+  });
+});
+
+describe('formatTimelineStamp', () => {
+  it('formats a date and an optional time with native digits', () => {
+    expect(
+      formatTimelineStamp(
+        { year: 1403, month: 10, day: 26 },
+        'jalali',
+        fa,
+        { numerals: 'native' },
+        { hour: 9, minute: 0 },
+      ),
+    ).toBe('۰۹:۰۰ - ۱۴۰۳/۱۰/۲۶');
+    expect(
+      formatTimelineStamp({ year: 1403, month: 12, day: 2 }, 'jalali', fa, {
+        numerals: 'native',
+      }),
+    ).toBe('۱۴۰۳/۱۲/۰۲');
   });
 });

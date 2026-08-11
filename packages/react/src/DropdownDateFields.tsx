@@ -43,7 +43,7 @@ export function DropdownDateFields({
   return (
     <div className={className} dir={localePack.direction} data-jalali-datepicker-dropdown>
       <select
-        aria-label="Year"
+        aria-label={localePack.ui.year}
         data-jalali-datepicker-field="year"
         value={date.year}
         onChange={(event) => {
@@ -59,7 +59,7 @@ export function DropdownDateFields({
         ))}
       </select>
       <select
-        aria-label="Month"
+        aria-label={localePack.ui.month}
         data-jalali-datepicker-field="month"
         value={date.month}
         onChange={(event) => {
@@ -75,7 +75,7 @@ export function DropdownDateFields({
         ))}
       </select>
       <select
-        aria-label="Day"
+        aria-label={localePack.ui.day}
         data-jalali-datepicker-field="day"
         value={date.day}
         onChange={(event) => onChange({ ...date, day: Number(event.target.value) })}

@@ -53,7 +53,7 @@ export function TimePicker({
   return (
     <div className={className} dir={localePack.direction} data-jalali-timepicker-root>
       <select
-        aria-label="Hour"
+        aria-label={localePack.ui.hour}
         data-jalali-timepicker-field="hour"
         value={time.hour}
         onChange={(event) => emit({ ...time, hour: Number(event.target.value) })}
@@ -68,7 +68,7 @@ export function TimePicker({
         :
       </span>
       <select
-        aria-label="Minute"
+        aria-label={localePack.ui.minute}
         data-jalali-timepicker-field="minute"
         value={snapMinute(time.minute, minuteStep)}
         onChange={(event) => emit({ ...time, minute: Number(event.target.value) })}

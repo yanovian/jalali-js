@@ -7,6 +7,10 @@
 Locale packs and display formatting for jalali-js: English, Farsi, and Pashto, relative time,
 format templates, strict parsing, numerals, and RTL.
 
+**Start here:** [Live demo](https://jalali-js.yanovian.com/playground/react/) · [Documentation](https://jalali-js.yanovian.com/guide/i18n)
+
+**npm ecosystem:** [`jalali-js`](https://www.npmjs.com/package/jalali-js) · [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n) · [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp) · [`@jalali-js/holidays`](https://www.npmjs.com/package/@jalali-js/holidays) · [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) · [`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) · [`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web) · [`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react) · [`@jalali-js/ui-vue`](https://www.npmjs.com/package/@jalali-js/ui-vue) · [`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web)
+
 ## Contents
 
 - [Install](#install)
@@ -88,11 +92,11 @@ This package has no UI. Theme pickers in the binding packages with `--jalali-*` 
 
 ## Links
 
-- [i18n guide](https://jalali-js.yanovian.com/guide/i18n)
+- [Live demo](https://jalali-js.yanovian.com/playground/react/)
+- [Documentation](https://jalali-js.yanovian.com/guide/i18n)
+- npm ecosystem: [`jalali-js`](https://www.npmjs.com/package/jalali-js) · [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n) · [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp) · [`@jalali-js/holidays`](https://www.npmjs.com/package/@jalali-js/holidays) · [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) · [`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) · [`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web) · [`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react) · [`@jalali-js/ui-vue`](https://www.npmjs.com/package/@jalali-js/ui-vue) · [`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web)
 - [API reference](https://jalali-js.yanovian.com/api/@jalali-js/i18n/)
 - [Changelog](https://github.com/yanovian/jalali-js/blob/master/CHANGELOG.md)
-- [`jalali-js`](https://www.npmjs.com/package/jalali-js) ·
-  [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp)
 
 ## License
 

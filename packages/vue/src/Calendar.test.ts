@@ -41,6 +41,49 @@ describe('Calendar', () => {
     expect(wrapper.get('[data-jalali-calendar-title-year]').text()).toBe('1403');
   });
 
+  it('starts Jalali weekday headers on Saturday and Gregorian on Sunday', () => {
+    const jalali = mount(Calendar, {
+      props: { system: 'jalali', locale: 'en', value: selectedDate },
+    });
+    expect(jalali.findAll('[data-jalali-calendar-weekday]').map((node) => node.text())).toEqual([
+      'Sat',
+      'Sun',
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+    ]);
+
+    const fa = mount(Calendar, {
+      props: { system: 'jalali', locale: 'fa', value: selectedDate },
+    });
+    expect(fa.findAll('[data-jalali-calendar-weekday]')[0]!.text()).toBe('ش');
+
+    const gregorian = mount(Calendar, {
+      props: {
+        system: 'gregorian',
+        locale: 'en',
+        value: {
+          precision: 'date',
+          system: 'gregorian',
+          year: 2024,
+          month: 8,
+          day: 5,
+        },
+      },
+    });
+    expect(gregorian.findAll('[data-jalali-calendar-weekday]').map((node) => node.text())).toEqual([
+      'Sun',
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+    ]);
+  });
+
   it('marks the selected day and the current day with their data attributes', () => {
     const wrapper = mount(Calendar, {
       props: { system: 'jalali', locale: 'en', value: selectedDate },

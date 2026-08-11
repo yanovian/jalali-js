@@ -5,6 +5,7 @@ export { format } from './format.js';
 export type { FormatOptions } from './format.js';
 export type {
   LocalePack,
+  LocaleUi,
   MonthNames,
   RelativeForms,
   RelativeUnitForms,
@@ -18,3 +19,4 @@ export { formatRelative } from './relative.js';
 export type { FormatRelativeOptions } from './relative.js';
 export { parseTemplate } from './template.js';
 export type { ParseTemplateOptions } from './template.js';
+export { formatTimelineStamp } from './timeline-stamp.js';

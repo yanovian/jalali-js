@@ -90,4 +90,33 @@ describe('EventCalendar', () => {
     await wrapper.setProps({ view: 'day' });
     expect(wrapper.find('[data-view="day"]').exists()).toBe(true);
   });
+
+  it('renders a timeline list and emits eventClick', async () => {
+    const wrapper = mount(EventCalendar, {
+      props: {
+        locale: 'fa',
+        view: 'timeline',
+        displayFormat: { numerals: 'native', template: 'YYYY/MM/DD' },
+        timeline: { showIcons: true },
+        events: [
+          {
+            id: 'start',
+            title: 'آغاز پروژه',
+            start: { year: 1403, month: 10, day: 26 },
+            end: { year: 1403, month: 10, day: 26 },
+            allDay: false,
+            startTime: { hour: 9, minute: 0 },
+            endTime: { hour: 10, minute: 0 },
+            icon: '◎',
+          },
+        ],
+      },
+    });
+    expect(wrapper.find('[data-view="timeline"]').exists()).toBe(true);
+    expect(wrapper.find('[data-jalali-timeline]').exists()).toBe(true);
+    expect(wrapper.text()).toContain('آغاز پروژه');
+    expect(wrapper.text()).toMatch(/۰۹:۰۰/);
+    await wrapper.get('[data-jalali-timeline-card]').trigger('click');
+    expect(wrapper.emitted('eventClick')?.[0]?.[0]).toMatchObject({ id: 'start' });
+  });
 });

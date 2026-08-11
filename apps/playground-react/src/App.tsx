@@ -10,6 +10,7 @@ import {
   DEMO_DAY,
   DEMO_EVENTS,
   DEMO_MONTH,
+  DEMO_TIMELINE_EVENTS,
   parseDemoState,
   reactSnippet,
   themeStyleFromState,
@@ -32,6 +33,7 @@ const TABS: { id: DemoTab; label: string }[] = [
 ];
 
 const demoEvents = DEMO_EVENTS as unknown as CalendarEvent[];
+const demoTimelineEvents = DEMO_TIMELINE_EVENTS as unknown as CalendarEvent[];
 
 function CalendarSummary() {
   const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
@@ -178,8 +180,81 @@ export default function App() {
               <option value="month">month</option>
               <option value="week">week</option>
               <option value="day">day</option>
+              <option value="timeline">timeline</option>
             </select>
           </label>
+          {state.tab === 'event-calendar' && state.eventView === 'timeline' ? (
+            <>
+              <label>
+                Direction
+                <select
+                  value={state.timelineDirection}
+                  onChange={(e) =>
+                    patch({
+                      timelineDirection: e.target.value as DemoState['timelineDirection'],
+                    })
+                  }
+                >
+                  <option value="vertical">Vertical</option>
+                  <option value="horizontal">Horizontal</option>
+                </select>
+              </label>
+              <label>
+                Marker shape
+                <select
+                  value={state.timelineMarkerShape}
+                  onChange={(e) =>
+                    patch({
+                      timelineMarkerShape: e.target.value as DemoState['timelineMarkerShape'],
+                    })
+                  }
+                >
+                  <option value="circular">Circular</option>
+                  <option value="square">Square</option>
+                </select>
+              </label>
+              <label>
+                Marker size
+                <input
+                  type="range"
+                  min={16}
+                  max={40}
+                  value={state.timelineMarkerSize}
+                  onChange={(e) => patch({ timelineMarkerSize: Number(e.target.value) || 24 })}
+                />
+              </label>
+              <label>
+                <span>
+                  <input
+                    type="checkbox"
+                    checked={state.timelineShowIcons}
+                    onChange={(e) => patch({ timelineShowIcons: e.target.checked })}
+                  />{' '}
+                  Show icons
+                </span>
+              </label>
+              <label>
+                <span>
+                  <input
+                    type="checkbox"
+                    checked={state.timelineAlternating}
+                    onChange={(e) => patch({ timelineAlternating: e.target.checked })}
+                  />{' '}
+                  Alternating layout
+                </span>
+              </label>
+              <label>
+                <span>
+                  <input
+                    type="checkbox"
+                    checked={state.nativeDigits}
+                    onChange={(e) => patch({ nativeDigits: e.target.checked })}
+                  />{' '}
+                  Native digits
+                </span>
+              </label>
+            </>
+          ) : null}
           <label>
             Minute step
             <input
@@ -304,7 +379,18 @@ export default function App() {
               view={state.eventView}
               initialDisplayedMonth={DEMO_MONTH}
               initialDate={DEMO_DAY}
-              events={demoEvents}
+              displayFormat={{
+                style: state.displayStyle,
+                numerals: state.nativeDigits ? 'native' : 'latin',
+              }}
+              timeline={{
+                direction: state.timelineDirection,
+                markerShape: state.timelineMarkerShape,
+                showIcons: state.timelineShowIcons,
+                alternating: state.timelineAlternating,
+                markerSize: state.timelineMarkerSize,
+              }}
+              events={state.eventView === 'timeline' ? demoTimelineEvents : demoEvents}
               onEventClick={(event) => setEventClickLog(event.title)}
             />
           )}

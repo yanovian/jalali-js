@@ -7,6 +7,10 @@
 Higher-level React UI on `@jalali-js/react`: `RangePicker`, `InlineCalendar`, `EventCalendar`,
 and `TimeRangePicker`, plus extra themes.
 
+**Start here:** [Live demo](https://jalali-js.yanovian.com/playground/react/) · [Documentation](https://jalali-js.yanovian.com/guide/event-calendar)
+
+**npm ecosystem:** [`jalali-js`](https://www.npmjs.com/package/jalali-js) · [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n) · [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp) · [`@jalali-js/holidays`](https://www.npmjs.com/package/@jalali-js/holidays) · [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) · [`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) · [`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web) · [`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react) · [`@jalali-js/ui-vue`](https://www.npmjs.com/package/@jalali-js/ui-vue) · [`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web)
+
 ## Contents
 
 - [Install](#install)
@@ -91,11 +95,11 @@ See [Theming](https://jalali-js.yanovian.com/guide/theming).
 
 ## Links
 
+- [Live demo](https://jalali-js.yanovian.com/playground/react/)
+- [Documentation](https://jalali-js.yanovian.com/guide/event-calendar)
+- npm ecosystem: [`jalali-js`](https://www.npmjs.com/package/jalali-js) · [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n) · [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp) · [`@jalali-js/holidays`](https://www.npmjs.com/package/@jalali-js/holidays) · [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) · [`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) · [`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web) · [`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react) · [`@jalali-js/ui-vue`](https://www.npmjs.com/package/@jalali-js/ui-vue) · [`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web)
 - [React guide](https://jalali-js.yanovian.com/guide/react)
-- [Event calendar](https://jalali-js.yanovian.com/guide/event-calendar)
-- [Playground](https://jalali-js.yanovian.com/playground/react/)
 - [Changelog](https://github.com/yanovian/jalali-js/blob/master/CHANGELOG.md)
-- [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react)
 
 ## License
 

@@ -18,6 +18,7 @@ import {
   nextMonth,
   previousMonth,
   toStorageValue,
+  weekdayLabelsForGrid,
 } from 'jalali-js';
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { positionPopover } from './position-popover.js';
@@ -223,14 +224,14 @@ export function RangePicker({
           id={popoverId}
           data-jalali-datepicker-popover
           role="dialog"
-          aria-label="Choose a date range"
+          aria-label={localePack.ui.chooseDateRange}
         >
           <div dir={localePack.direction} data-jalali-calendar-root>
             <div data-jalali-calendar-header>
               <button
                 type="button"
                 data-jalali-calendar-nav="previous"
-                aria-label="Previous month"
+                aria-label={localePack.ui.previousMonth}
                 onClick={() => setDisplayed(previousMonth(system, displayed.year, displayed.month))}
               >
                 ‹
@@ -241,7 +242,7 @@ export function RangePicker({
               <button
                 type="button"
                 data-jalali-calendar-nav="next"
-                aria-label="Next month"
+                aria-label={localePack.ui.nextMonth}
                 onClick={() => setDisplayed(nextMonth(system, displayed.year, displayed.month))}
               >
                 ›
@@ -249,7 +250,7 @@ export function RangePicker({
             </div>
             <div role="grid" data-jalali-calendar-grid>
               <div role="row" data-jalali-calendar-weekdays>
-                {localePack.weekdayNames.short.map((name, index) => (
+                {weekdayLabelsForGrid(localePack.weekdayNames.short, system).map((name, index) => (
                   <span key={index} role="columnheader" data-jalali-calendar-weekday>
                     {name}
                   </span>

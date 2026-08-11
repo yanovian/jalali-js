@@ -1,4 +1,5 @@
-import { format as formatDate, formatNumber } from '@jalali-js/i18n';
+import type { FormatOptions } from '@jalali-js/i18n';
+import { format as formatDate, formatNumber, formatTimelineStamp } from '@jalali-js/i18n';
 import { localePackFor, parseLocaleAttribute, type LocaleCode } from '@jalali-js/web';
 import type {
   CalendarDate,
@@ -6,6 +7,7 @@ import type {
   CalendarEvent,
   CalendarSystem,
   EventCalendarView,
+  TimelineOptions,
 } from 'jalali-js';
 import {
   buildCalendarGrid,
@@ -13,6 +15,7 @@ import {
   dayOfWeek,
   daysForEventView,
   eventIsAllDay,
+  eventsForTimeline,
   findEventById,
   isSameDay,
   laneCountOf,
@@ -22,6 +25,9 @@ import {
   listHours,
   shiftEventViewAnchor,
   timedBlockStyle,
+  timelineAccentFor,
+  timelineEventDateTime,
+  weekdayLabelsForGrid,
 } from 'jalali-js';
 
 export interface EventCalendarEventClickDetail {
@@ -33,12 +39,13 @@ export interface EventCalendarDayClickDetail {
 }
 
 function parseView(value: string | null): EventCalendarView {
-  if (value === 'week' || value === 'day') return value;
+  if (value === 'week' || value === 'day' || value === 'timeline') return value;
   return 'month';
 }
 
 export class JalaliEventCalendarElement extends HTMLElement {
   static observedAttributes = ['system', 'locale', 'view'];
+  static #nextTitleId = 0;
 
   #system: CalendarSystem = 'jalali';
   #locale: LocaleCode = 'en';
@@ -46,7 +53,10 @@ export class JalaliEventCalendarElement extends HTMLElement {
   #events: readonly CalendarEvent[] = [];
   #initialDisplayedMonth: { year: number; month: number } | undefined;
   #initialDate: CalendarDateFields | undefined;
+  #displayFormat: FormatOptions | undefined;
+  #timeline: TimelineOptions | undefined;
   #anchor: CalendarDateFields | undefined;
+  #titleId = `jalali-ec-title-${JalaliEventCalendarElement.#nextTitleId++}`;
   #connected = false;
 
   get system(): CalendarSystem {
@@ -99,6 +109,22 @@ export class JalaliEventCalendarElement extends HTMLElement {
     this.render();
   }
 
+  get displayFormat(): FormatOptions | undefined {
+    return this.#displayFormat;
+  }
+  set displayFormat(value: FormatOptions | undefined) {
+    this.#displayFormat = value;
+    this.render();
+  }
+
+  get timeline(): TimelineOptions | undefined {
+    return this.#timeline;
+  }
+  set timeline(value: TimelineOptions | undefined) {
+    this.#timeline = value;
+    this.render();
+  }
+
   connectedCallback(): void {
     this.#connected = true;
     this.render();
@@ -144,12 +170,176 @@ export class JalaliEventCalendarElement extends HTMLElement {
     );
   }
 
+  #renderTimelineHeader(title: string): HTMLElement {
+    const header = document.createElement('div');
+    header.setAttribute('data-jalali-calendar-header', '');
+    header.setAttribute('data-jalali-timeline-header', '');
+    const titleEl = document.createElement('span');
+    titleEl.id = this.#titleId;
+    titleEl.setAttribute('data-jalali-calendar-title', '');
+    titleEl.textContent = title;
+    header.append(titleEl);
+    return header;
+  }
+
+  #renderNavHeader(
+    title: string,
+    anchor: CalendarDateFields,
+    previousLabel: string,
+    nextLabel: string,
+  ): HTMLElement {
+    const header = document.createElement('div');
+    header.setAttribute('data-jalali-calendar-header', '');
+
+    const prev = document.createElement('button');
+    prev.type = 'button';
+    prev.setAttribute('data-jalali-calendar-nav', 'previous');
+    prev.setAttribute('aria-label', previousLabel);
+    prev.textContent = '‹';
+    prev.addEventListener('click', () => {
+      this.#anchor = shiftEventViewAnchor(this.#system, this.#view, anchor, -1);
+      this.render();
+    });
+
+    const titleEl = document.createElement('span');
+    titleEl.id = this.#titleId;
+    titleEl.setAttribute('data-jalali-calendar-title', '');
+    titleEl.textContent = title;
+
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.setAttribute('data-jalali-calendar-nav', 'next');
+    next.setAttribute('aria-label', nextLabel);
+    next.textContent = '›';
+    next.addEventListener('click', () => {
+      this.#anchor = shiftEventViewAnchor(this.#system, this.#view, anchor, 1);
+      this.render();
+    });
+
+    header.append(prev, titleEl, next);
+    return header;
+  }
+
   render(): void {
     if (!this.#connected) return;
     const localePack = localePackFor(this.#locale);
     const today = createCalendar({ system: this.#system }).today();
     const anchor = this.#ensureAnchor();
-    const navLabel = this.#view === 'month' ? 'month' : this.#view === 'week' ? 'week' : 'day';
+    const previousLabel =
+      this.#view === 'month'
+        ? localePack.ui.previousMonth
+        : this.#view === 'week'
+          ? localePack.ui.previousWeek
+          : localePack.ui.previousDay;
+    const nextLabel =
+      this.#view === 'month'
+        ? localePack.ui.nextMonth
+        : this.#view === 'week'
+          ? localePack.ui.nextWeek
+          : localePack.ui.nextDay;
+    const direction = this.#timeline?.direction ?? 'vertical';
+    const markerShape = this.#timeline?.markerShape ?? 'circular';
+    const showIcons = this.#timeline?.showIcons ?? true;
+    const alternating = this.#timeline?.alternating ?? false;
+    const markerSize = this.#timeline?.markerSize;
+
+    this.dir = localePack.direction;
+    this.setAttribute('role', 'region');
+    this.setAttribute('aria-labelledby', this.#titleId);
+    this.setAttribute('data-jalali-calendar-root', '');
+    this.setAttribute('data-jalali-eventcalendar-root', '');
+    this.setAttribute('data-view', this.#view);
+
+    if (this.#view === 'timeline') {
+      const timelineEvents = eventsForTimeline(this.#events);
+      const title = (() => {
+        if (!timelineEvents.length) return 'Timeline';
+        const first = timelineEvents[0]!;
+        const last = timelineEvents[timelineEvents.length - 1]!;
+        const start = formatDate(
+          { precision: 'date', system: this.#system, ...first.start },
+          localePack,
+          this.#displayFormat ?? { style: 'short' },
+        );
+        const end = formatDate(
+          { precision: 'date', system: this.#system, ...last.start },
+          localePack,
+          this.#displayFormat ?? { style: 'short' },
+        );
+        return start === end ? start : `${start} – ${end}`;
+      })();
+
+      const list = document.createElement('ol');
+      list.setAttribute('data-jalali-timeline', '');
+      list.setAttribute('data-direction', direction);
+      list.setAttribute('data-marker-shape', markerShape);
+      if (showIcons) list.setAttribute('data-show-icons', '');
+      if (alternating) list.setAttribute('data-alternating', '');
+      if (markerSize != null) {
+        list.style.setProperty('--jalali-timeline-marker-size', `${markerSize}px`);
+      }
+
+      timelineEvents.forEach((event, index) => {
+        const item = document.createElement('li');
+        item.setAttribute('data-jalali-timeline-item', '');
+        item.style.setProperty('--jalali-timeline-accent', timelineAccentFor(index, event.color));
+
+        const marker = document.createElement('div');
+        marker.setAttribute('data-jalali-timeline-marker', '');
+        marker.setAttribute('aria-hidden', 'true');
+        if (showIcons && event.icon) {
+          const icon = document.createElement('span');
+          icon.setAttribute('data-jalali-timeline-icon', '');
+          icon.textContent = event.icon;
+          marker.append(icon);
+        }
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.setAttribute('data-jalali-timeline-card', '');
+        button.addEventListener('click', (click) => {
+          click.stopPropagation();
+          this.#emitEvent(event.id);
+        });
+
+        const when = document.createElement('time');
+        when.setAttribute('data-jalali-timeline-when', '');
+        when.dateTime = timelineEventDateTime(event);
+        when.textContent = formatTimelineStamp(
+          event.start,
+          this.#system,
+          localePack,
+          this.#displayFormat ?? {},
+          event.startTime,
+        );
+
+        const titleEl = document.createElement('span');
+        titleEl.setAttribute('data-jalali-timeline-title', '');
+        titleEl.textContent = event.title;
+        button.append(when, titleEl);
+
+        if (event.description) {
+          const description = document.createElement('span');
+          description.setAttribute('data-jalali-timeline-description', '');
+          description.textContent = event.description;
+          button.append(description);
+        }
+
+        item.append(marker, button);
+        list.append(item);
+      });
+
+      const shell = document.createElement('div');
+      if (direction === 'horizontal') {
+        shell.setAttribute('role', 'region');
+        shell.tabIndex = 0;
+        shell.setAttribute('aria-labelledby', this.#titleId);
+        shell.setAttribute('data-jalali-timeline-scroll', '');
+      }
+      shell.append(list);
+      this.replaceChildren(this.#renderTimelineHeader(title), shell);
+      return;
+    }
 
     const title = (() => {
       if (this.#view === 'month') {
@@ -159,7 +349,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
       }
       const periodDays = daysForEventView(this.#system, this.#view, anchor);
       if (this.#view === 'day') {
-        return formatDate(periodDays[0]!, localePack, { style: 'long' });
+        return formatDate(periodDays[0]!, localePack, this.#displayFormat ?? { style: 'long' });
       }
       return `${formatDate(periodDays[0]!, localePack, { style: 'short' })} – ${formatDate(
         periodDays[periodDays.length - 1]!,
@@ -168,52 +358,21 @@ export class JalaliEventCalendarElement extends HTMLElement {
       )}`;
     })();
 
-    this.dir = localePack.direction;
-    this.setAttribute('data-jalali-calendar-root', '');
-    this.setAttribute('data-jalali-eventcalendar-root', '');
-    this.setAttribute('data-view', this.#view);
-
-    const header = document.createElement('div');
-    header.setAttribute('data-jalali-calendar-header', '');
-
-    const prev = document.createElement('button');
-    prev.type = 'button';
-    prev.setAttribute('data-jalali-calendar-nav', 'previous');
-    prev.setAttribute('aria-label', `Previous ${navLabel}`);
-    prev.textContent = '‹';
-    prev.addEventListener('click', () => {
-      this.#anchor = shiftEventViewAnchor(this.#system, this.#view, anchor, -1);
-      this.render();
-    });
-
-    const titleEl = document.createElement('span');
-    titleEl.setAttribute('data-jalali-calendar-title', '');
-    titleEl.textContent = title;
-
-    const next = document.createElement('button');
-    next.type = 'button';
-    next.setAttribute('data-jalali-calendar-nav', 'next');
-    next.setAttribute('aria-label', `Next ${navLabel}`);
-    next.textContent = '›';
-    next.addEventListener('click', () => {
-      this.#anchor = shiftEventViewAnchor(this.#system, this.#view, anchor, 1);
-      this.render();
-    });
-
-    header.append(prev, titleEl, next);
+    const header = this.#renderNavHeader(title, anchor, previousLabel, nextLabel);
 
     if (this.#view === 'month') {
       const weeks = buildCalendarGrid(this.#system, anchor.year, anchor.month, today, null);
       const weekLayouts = layoutMonthEvents(this.#events, weeks);
       const grid = document.createElement('div');
       grid.setAttribute('role', 'grid');
+      grid.setAttribute('aria-labelledby', this.#titleId);
       grid.setAttribute('data-jalali-calendar-grid', '');
       grid.setAttribute('data-jalali-eventcalendar-grid', '');
 
       const weekdays = document.createElement('div');
       weekdays.setAttribute('role', 'row');
       weekdays.setAttribute('data-jalali-calendar-weekdays', '');
-      for (const name of localePack.weekdayNames.short) {
+      for (const name of weekdayLabelsForGrid(localePack.weekdayNames.short, this.#system)) {
         const cell = document.createElement('span');
         cell.setAttribute('role', 'columnheader');
         cell.setAttribute('data-jalali-calendar-weekday', '');
@@ -239,7 +398,10 @@ export class JalaliEventCalendarElement extends HTMLElement {
           if (cell.isToday) button.setAttribute('data-today', '');
           if (!cell.isCurrentMonth) button.setAttribute('data-outside-month', '');
           if (cell.isToday) button.setAttribute('aria-current', 'date');
-          button.setAttribute('aria-label', formatDate(cell.date, localePack, { style: 'long' }));
+          button.setAttribute(
+            'aria-label',
+            formatDate(cell.date, localePack, this.#displayFormat ?? { style: 'long' }),
+          );
           button.textContent = formatNumber(
             cell.date.day,
             localePack.defaultNumerals,
@@ -282,11 +444,14 @@ export class JalaliEventCalendarElement extends HTMLElement {
     const timedLayouts = layoutDaysTimedEvents(this.#events, periodDays);
     const allDayLaneCount = laneCountOf(allDaySegments);
     const period = document.createElement('div');
+    period.setAttribute('role', 'region');
+    period.tabIndex = 0;
+    period.setAttribute('aria-labelledby', this.#titleId);
     period.setAttribute('data-jalali-eventcalendar-period', '');
+    period.style.setProperty('--jalali-event-cols', String(periodDays.length));
 
     const days = document.createElement('div');
     days.setAttribute('data-jalali-eventcalendar-days', '');
-    days.style.gridTemplateColumns = `repeat(${periodDays.length}, minmax(0, 1fr))`;
     for (const day of periodDays) {
       const button = document.createElement('button');
       button.type = 'button';
@@ -295,7 +460,10 @@ export class JalaliEventCalendarElement extends HTMLElement {
         button.setAttribute('data-today', '');
         button.setAttribute('aria-current', 'date');
       }
-      button.setAttribute('aria-label', formatDate(day, localePack, { style: 'long' }));
+      button.setAttribute(
+        'aria-label',
+        formatDate(day, localePack, this.#displayFormat ?? { style: 'long' }),
+      );
       const name = document.createElement('span');
       name.setAttribute('data-jalali-eventcalendar-dayname', '');
       name.textContent = localePack.weekdayNames.short[dayOfWeek(day, this.#system)] ?? '';
@@ -312,7 +480,6 @@ export class JalaliEventCalendarElement extends HTMLElement {
     const allday = document.createElement('div');
     allday.setAttribute('data-jalali-eventcalendar-lanes', '');
     allday.setAttribute('data-jalali-eventcalendar-allday', '');
-    allday.style.gridTemplateColumns = `repeat(${periodDays.length}, minmax(0, 1fr))`;
     if (allDayLaneCount > 0) allday.style.gridTemplateRows = `repeat(${allDayLaneCount}, auto)`;
     for (const segment of allDaySegments) {
       const button = document.createElement('button');
@@ -332,8 +499,10 @@ export class JalaliEventCalendarElement extends HTMLElement {
     }
 
     const timed = document.createElement('div');
+    timed.setAttribute('role', 'region');
+    timed.tabIndex = 0;
+    timed.setAttribute('aria-labelledby', this.#titleId);
     timed.setAttribute('data-jalali-eventcalendar-timed', '');
-    timed.style.gridTemplateColumns = `auto repeat(${periodDays.length}, minmax(0, 1fr))`;
 
     const hours = document.createElement('div');
     hours.setAttribute('data-jalali-eventcalendar-hours', '');

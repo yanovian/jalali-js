@@ -1,7 +1,13 @@
 import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
-import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
+import {
+  buildCalendarGrid,
+  createCalendar,
+  nextMonth,
+  previousMonth,
+  weekdayLabelsForGrid,
+} from 'jalali-js';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import type { LocaleCode } from './use-calendar.js';
@@ -171,7 +177,7 @@ export function Calendar({
             <button
               type="button"
               data-jalali-calendar-nav="previous"
-              aria-label="Previous month"
+              aria-label={localePack.ui.previousMonth}
               onClick={() => setDisplayed(previousMonth(system, displayed.year, displayed.month))}
             >
               ‹
@@ -180,7 +186,7 @@ export function Calendar({
               <TitlePart
                 as={titleAs}
                 dataAttr="data-jalali-calendar-title-month"
-                ariaLabel="Choose month"
+                ariaLabel={localePack.ui.chooseMonth}
                 onClick={openMonthView}
               >
                 {monthLabel}
@@ -188,7 +194,7 @@ export function Calendar({
               <TitlePart
                 as={titleAs}
                 dataAttr="data-jalali-calendar-title-year"
-                ariaLabel="Choose year"
+                ariaLabel={localePack.ui.chooseYear}
                 onClick={openYearView}
               >
                 {yearLabel}
@@ -197,7 +203,7 @@ export function Calendar({
             <button
               type="button"
               data-jalali-calendar-nav="next"
-              aria-label="Next month"
+              aria-label={localePack.ui.nextMonth}
               onClick={() => setDisplayed(nextMonth(system, displayed.year, displayed.month))}
             >
               ›
@@ -205,7 +211,7 @@ export function Calendar({
           </div>
           <div role="grid" data-jalali-calendar-grid>
             <div role="row" data-jalali-calendar-weekdays>
-              {localePack.weekdayNames.short.map((name, index) => (
+              {weekdayLabelsForGrid(localePack.weekdayNames.short, system).map((name, index) => (
                 <span key={index} role="columnheader" data-jalali-calendar-weekday>
                   {name}
                 </span>
@@ -245,7 +251,7 @@ export function Calendar({
             <button
               type="button"
               data-jalali-calendar-nav="previous"
-              aria-label="Previous year"
+              aria-label={localePack.ui.previousYear}
               onClick={() => setDisplayed((current) => ({ ...current, year: current.year - 1 }))}
             >
               ‹
@@ -254,7 +260,7 @@ export function Calendar({
               <TitlePart
                 as={titleAs}
                 dataAttr="data-jalali-calendar-title-year"
-                ariaLabel="Choose year"
+                ariaLabel={localePack.ui.chooseYear}
                 onClick={openYearView}
               >
                 {yearLabel}
@@ -263,13 +269,13 @@ export function Calendar({
             <button
               type="button"
               data-jalali-calendar-nav="next"
-              aria-label="Next year"
+              aria-label={localePack.ui.nextYear}
               onClick={() => setDisplayed((current) => ({ ...current, year: current.year + 1 }))}
             >
               ›
             </button>
           </div>
-          <div role="listbox" aria-label="Month" data-jalali-calendar-months>
+          <div role="listbox" aria-label={localePack.ui.month} data-jalali-calendar-months>
             {localePack.monthNames[system].long.map((name, index) => {
               const month = index + 1;
               const isSelected = displayed.month === month;
@@ -300,7 +306,7 @@ export function Calendar({
             <button
               type="button"
               data-jalali-calendar-nav="previous"
-              aria-label="Previous years"
+              aria-label={localePack.ui.previousYears}
               onClick={() => setYearPage((current) => current - YEARS_PER_PAGE)}
             >
               ‹
@@ -317,13 +323,13 @@ export function Calendar({
             <button
               type="button"
               data-jalali-calendar-nav="next"
-              aria-label="Next years"
+              aria-label={localePack.ui.nextYears}
               onClick={() => setYearPage((current) => current + YEARS_PER_PAGE)}
             >
               ›
             </button>
           </div>
-          <div role="listbox" aria-label="Year" data-jalali-calendar-years>
+          <div role="listbox" aria-label={localePack.ui.year} data-jalali-calendar-years>
             {Array.from({ length: YEARS_PER_PAGE }, (_, index) => yearPage + index).map((year) => {
               const isSelected = displayed.year === year;
               const isCurrent = today.year === year;

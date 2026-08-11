@@ -12,6 +12,23 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Added
+
+- EventCalendar `view: 'timeline'` with locale digits, markers, and layout options.
+- `LocalePack.ui` chrome strings for calendar control `aria-label`s in `en`, `fa`, and `ps`.
+
+### Fixed
+
+- Jalali calendar weekday headers start on Saturday (شنبه).
+
+### Changed
+
+- READMEs and the docs home lead with live demo and npm ecosystem links.
+- EventCalendar works on phone widths, with keyboard-focusable scroll panes.
+- Calendar themes raise contrast for light and dark modes, with phone layout and high-contrast CSS support.
+- Default calendar density is tighter and more coherent, with density tokens and a denser `compact` theme.
+- Day cells use the same soft corner radius as the calendar shell, not full circles.
+
 ## [0.2.1] - 2026-08-10
 
 ### Added

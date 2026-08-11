@@ -8,6 +8,10 @@
 Jalali (Persian, Shamsi) to Gregorian conversion core. TypeScript-native, zero runtime
 dependencies, framework-agnostic.
 
+**Start here:** [Live demo](https://jalali-js.yanovian.com/playground/react/) · [Documentation](https://jalali-js.yanovian.com/guide/getting-started)
+
+**npm ecosystem:** [`jalali-js`](https://www.npmjs.com/package/jalali-js) · [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n) · [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp) · [`@jalali-js/holidays`](https://www.npmjs.com/package/@jalali-js/holidays) · [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) · [`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) · [`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web) · [`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react) · [`@jalali-js/ui-vue`](https://www.npmjs.com/package/@jalali-js/ui-vue) · [`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web)
+
 ## Contents
 
 - [Install](#install)
@@ -95,15 +99,10 @@ This package has no UI. Theme pickers through CSS variables in
 
 ## Links
 
-- [Docs](https://jalali-js.yanovian.com/guide/getting-started)
-- [Playground](https://jalali-js.yanovian.com/playground/react/)
+- [Live demo](https://jalali-js.yanovian.com/playground/react/)
+- [Documentation](https://jalali-js.yanovian.com/guide/getting-started)
+- npm ecosystem: [`jalali-js`](https://www.npmjs.com/package/jalali-js) · [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n) · [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp) · [`@jalali-js/holidays`](https://www.npmjs.com/package/@jalali-js/holidays) · [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) · [`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) · [`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web) · [`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react) · [`@jalali-js/ui-vue`](https://www.npmjs.com/package/@jalali-js/ui-vue) · [`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web)
 - [Changelog](https://github.com/yanovian/jalali-js/blob/master/CHANGELOG.md)
-- Bindings: [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react) ·
-  [`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue) ·
-  [`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web)
-- Optional: [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n) ·
-  [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp) ·
-  [`@jalali-js/holidays`](https://www.npmjs.com/package/@jalali-js/holidays)
 
 ## License
 

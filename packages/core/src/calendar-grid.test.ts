@@ -1,7 +1,12 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import type { CalendarDate } from './calendar-date.js';
-import { buildCalendarGrid, nextMonth, previousMonth } from './calendar-grid.js';
+import {
+  buildCalendarGrid,
+  nextMonth,
+  previousMonth,
+  weekdayLabelsForGrid,
+} from './calendar-grid.js';
 import { addDays } from './date-math.js';
 import { getCalendarEngine } from './convert.js';
 
@@ -146,5 +151,42 @@ describe('nextMonth / previousMonth', () => {
   it('rolls back into the previous year before the first month', () => {
     expect(previousMonth('jalali', 1403, 1)).toEqual({ year: 1402, month: 12 });
     expect(previousMonth('gregorian', 2024, 1)).toEqual({ year: 2023, month: 12 });
+  });
+});
+
+describe('weekdayLabelsForGrid', () => {
+  // Sunday-first English shorts, matching locale pack order (dayOfWeek index 0 = Sunday).
+  const enShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const faShort = ['ی', 'د', 'س', 'چ', 'پ', 'ج', 'ش'];
+
+  it('starts Jalali headers on Saturday', () => {
+    expect(weekdayLabelsForGrid(enShort, 'jalali')).toEqual([
+      'Sat',
+      'Sun',
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+    ]);
+    expect(weekdayLabelsForGrid(faShort, 'jalali')[0]).toBe('ش');
+  });
+
+  it('starts Gregorian headers on Sunday', () => {
+    expect(weekdayLabelsForGrid(enShort, 'gregorian')).toEqual(enShort);
+    expect(weekdayLabelsForGrid(faShort, 'gregorian')[0]).toBe('ی');
+  });
+
+  it('honors an explicit week start day', () => {
+    // Monday-first Gregorian week.
+    expect(weekdayLabelsForGrid(enShort, 'gregorian', 1)).toEqual([
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+      'Sun',
+    ]);
   });
 });

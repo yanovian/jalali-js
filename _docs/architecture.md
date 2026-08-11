@@ -262,8 +262,11 @@ in `core`.
   besides Iran); Dari itself is a national standard of Persian, close
   enough to `fa` that a dedicated pack is lower priority.
 - Locale data covers: month names, weekday names in full and short form,
-  native digits against Latin digits, and text direction (`ltr` or `rtl`),
-  so a consumer can set the `dir` attribute correctly.
+  native digits against Latin digits, text direction (`ltr` or `rtl`),
+  picker placeholders, and `LocalePack.ui` chrome strings for control
+  `aria-label`s (nav, dialogs, field labels), so a consumer can set the
+  `dir` attribute correctly and keep assistive labels in the same
+  language.
 - The locale pack format lets the team add another locale as a data file,
   with no code change: `ps.ts` proved this for real, landing as one data
   file plus one entry in `@jalali-js/i18n`'s shared locale table
@@ -352,6 +355,7 @@ in `core`.
 `react`'s and `vue`'s `date-picker.css` each define the same set of
 `--jalali-*` custom properties on every component's root element
 (`[data-jalali-datepicker-root]`, `[data-jalali-datepicker-dropdown]`,
+`[data-jalali-timepicker-root]`, `[data-jalali-timerangepicker-root]`,
 `[data-jalali-calendar-root]`), and every rule in that stylesheet reads a
 variable rather than a literal value. A theme is a stylesheet that
 overrides some subset of these variables on the same selectors; it does not
@@ -363,19 +367,35 @@ variables.
 | -------------------------- | ---------------------------------------------------------- |
 | `--jalali-font`            | Font family                                                |
 | `--jalali-font-size`       | Base font size                                             |
+| `--jalali-line-height`     | Base line height                                           |
 | `--jalali-bg`              | Background color (input, popover)                          |
 | `--jalali-fg`              | Text color                                                 |
 | `--jalali-muted-fg`        | Secondary text color (weekday headers, outside-month days) |
 | `--jalali-border`          | Border color                                               |
-| `--jalali-radius`          | Corner radius (input, popover, day cells, nav buttons)     |
+| `--jalali-radius`          | Corner radius (input, popover, month/year cells)           |
+| `--jalali-day-radius`      | Corner radius for day cells and nav controls               |
 | `--jalali-primary`         | Accent color: today's ring, selected/range-endpoint fill   |
 | `--jalali-primary-fg`      | Text color on top of `--jalali-primary`                    |
 | `--jalali-shadow`          | Popover drop shadow                                        |
 | `--jalali-gap`             | Gap between grid cells                                     |
-| `--jalali-input-padding`   | Padding inside the text input                              |
-| `--jalali-popover-padding` | Padding inside the popover                                 |
+| `--jalali-header-gap`      | Gap and margin in the calendar header                      |
+| `--jalali-control-size`    | Width and height of nav controls                           |
+| `--jalali-input-padding`   | Padding inside the text input and fields                   |
+| `--jalali-popover-padding` | Padding inside the popover and event calendar              |
+| `--jalali-cell-padding`    | Padding inside month and year picker cells                 |
 | `--jalali-day-min-size`    | Minimum width/height of a day cell                         |
+| `--jalali-weekday-size`    | Font size for weekday headers                              |
+| `--jalali-event-bg`        | Event chip background                                      |
+| `--jalali-event-fg`        | Event chip text                                            |
 | `--jalali-holiday-fg`      | Text color for days marked with `data-holiday`             |
+| `--jalali-hover-bg`        | Hover fill for days and nav                                |
+| `--jalali-range-bg`        | In-range day fill for `RangePicker`                        |
+| `--jalali-focus-ring`      | `:focus-visible` outline color                             |
+
+Default and `dark` theme tokens aim for WCAG 2.2 AA text contrast and about
+3:1 for borders. The stylesheet also responds to `prefers-contrast: more`
+and `forced-colors: active`. The default density is already compact on phone
+and laptop.
 
 Because CSS custom properties inherit, a theme applies to every picker on
 the page once its stylesheet is imported: theming is a whole-app choice
@@ -589,11 +609,10 @@ bootstrap on a repo with no `visual-baselines` branch yet, or to force a
 re-baseline with no code change.
 
 Screenshot comparisons are advisory (Phase 23). Specs call
-`expectScreenshot()` in `e2e/expect-screenshot.ts`, which catches a pixel
-mismatch or a missing baseline, keeps Playwright's image attachments, adds a
-`visual-change` annotation, and lets the test pass. Functional assertions
-(`toHaveCSS`, visibility, and so on) still fail the job. A screenshot that
-cannot be captured at all still fails the job.
+`expectScreenshot()` in `e2e/expect-screenshot.ts`, which turns a pixel
+mismatch or a missing baseline into a `visual-change` annotation and lets the
+test pass. Functional assertions (`toHaveCSS`, visibility, and so on) still
+fail the job. A screenshot that cannot be captured at all still fails the job.
 
 A PR that changes rendering stays green on the e2e check. The reviewer
 judges baseline / new / diff images in the PR comment. The baseline catches

@@ -230,7 +230,9 @@ export function DatePicker({
           id={popoverId}
           data-jalali-datepicker-popover
           role="dialog"
-          aria-label={precision === 'datetime' ? 'Choose a date and time' : 'Choose a date'}
+          aria-label={
+            precision === 'datetime' ? localePack.ui.chooseDateAndTime : localePack.ui.chooseDate
+          }
         >
           <Calendar
             system={system}

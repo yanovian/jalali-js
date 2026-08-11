@@ -1,7 +1,13 @@
 import { isHolidayRegion, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
-import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
+import {
+  buildCalendarGrid,
+  createCalendar,
+  nextMonth,
+  previousMonth,
+  weekdayLabelsForGrid,
+} from 'jalali-js';
 import { el } from './dom.js';
 import { localePackFor, parseLocaleAttribute, type LocaleCode } from './locale.js';
 
@@ -257,7 +263,11 @@ export class JalaliCalendarElement extends HTMLElement {
 
     const previousBtn = el(
       'button',
-      { type: 'button', 'data-jalali-calendar-nav': 'previous', 'aria-label': 'Previous month' },
+      {
+        type: 'button',
+        'data-jalali-calendar-nav': 'previous',
+        'aria-label': localePack.ui.previousMonth,
+      },
       ['‹'],
     );
     previousBtn.addEventListener('click', () => {
@@ -266,7 +276,7 @@ export class JalaliCalendarElement extends HTMLElement {
     });
     const nextBtn = el(
       'button',
-      { type: 'button', 'data-jalali-calendar-nav': 'next', 'aria-label': 'Next month' },
+      { type: 'button', 'data-jalali-calendar-nav': 'next', 'aria-label': localePack.ui.nextMonth },
       ['›'],
     );
     nextBtn.addEventListener('click', () => {
@@ -278,10 +288,15 @@ export class JalaliCalendarElement extends HTMLElement {
       this.#titlePart(
         monthLabel,
         'data-jalali-calendar-title-month',
-        'Choose month',
+        localePack.ui.chooseMonth,
         openMonthView,
       ),
-      this.#titlePart(yearLabel, 'data-jalali-calendar-title-year', 'Choose year', openYearView),
+      this.#titlePart(
+        yearLabel,
+        'data-jalali-calendar-title-year',
+        localePack.ui.chooseYear,
+        openYearView,
+      ),
     ]);
 
     const header = el('div', { 'data-jalali-calendar-header': true }, [
@@ -293,7 +308,7 @@ export class JalaliCalendarElement extends HTMLElement {
     const weekdayRow = el(
       'div',
       { role: 'row', 'data-jalali-calendar-weekdays': true },
-      localePack.weekdayNames.short.map((name) =>
+      weekdayLabelsForGrid(localePack.weekdayNames.short, this.#system).map((name) =>
         el('span', { role: 'columnheader', 'data-jalali-calendar-weekday': true }, [name]),
       ),
     );
@@ -348,7 +363,11 @@ export class JalaliCalendarElement extends HTMLElement {
 
     const previousBtn = el(
       'button',
-      { type: 'button', 'data-jalali-calendar-nav': 'previous', 'aria-label': 'Previous year' },
+      {
+        type: 'button',
+        'data-jalali-calendar-nav': 'previous',
+        'aria-label': localePack.ui.previousYear,
+      },
       ['‹'],
     );
     previousBtn.addEventListener('click', () => {
@@ -357,7 +376,7 @@ export class JalaliCalendarElement extends HTMLElement {
     });
     const nextBtn = el(
       'button',
-      { type: 'button', 'data-jalali-calendar-nav': 'next', 'aria-label': 'Next year' },
+      { type: 'button', 'data-jalali-calendar-nav': 'next', 'aria-label': localePack.ui.nextYear },
       ['›'],
     );
     nextBtn.addEventListener('click', () => {
@@ -366,7 +385,12 @@ export class JalaliCalendarElement extends HTMLElement {
     });
 
     const title = el('div', { 'data-jalali-calendar-title': true }, [
-      this.#titlePart(yearLabel, 'data-jalali-calendar-title-year', 'Choose year', openYearView),
+      this.#titlePart(
+        yearLabel,
+        'data-jalali-calendar-title-year',
+        localePack.ui.chooseYear,
+        openYearView,
+      ),
     ]);
     const header = el('div', { 'data-jalali-calendar-header': true }, [
       previousBtn,
@@ -376,7 +400,7 @@ export class JalaliCalendarElement extends HTMLElement {
 
     const months = el(
       'div',
-      { role: 'listbox', 'aria-label': 'Month', 'data-jalali-calendar-months': true },
+      { role: 'listbox', 'aria-label': localePack.ui.month, 'data-jalali-calendar-months': true },
       localePack.monthNames[this.#system].long.map((name, index) => {
         const month = index + 1;
         const isSelected = displayed.month === month;
@@ -412,7 +436,11 @@ export class JalaliCalendarElement extends HTMLElement {
   ): DocumentFragment {
     const previousBtn = el(
       'button',
-      { type: 'button', 'data-jalali-calendar-nav': 'previous', 'aria-label': 'Previous years' },
+      {
+        type: 'button',
+        'data-jalali-calendar-nav': 'previous',
+        'aria-label': localePack.ui.previousYears,
+      },
       ['‹'],
     );
     previousBtn.addEventListener('click', () => {
@@ -421,7 +449,7 @@ export class JalaliCalendarElement extends HTMLElement {
     });
     const nextBtn = el(
       'button',
-      { type: 'button', 'data-jalali-calendar-nav': 'next', 'aria-label': 'Next years' },
+      { type: 'button', 'data-jalali-calendar-nav': 'next', 'aria-label': localePack.ui.nextYears },
       ['›'],
     );
     nextBtn.addEventListener('click', () => {
@@ -444,7 +472,7 @@ export class JalaliCalendarElement extends HTMLElement {
 
     const years = el(
       'div',
-      { role: 'listbox', 'aria-label': 'Year', 'data-jalali-calendar-years': true },
+      { role: 'listbox', 'aria-label': localePack.ui.year, 'data-jalali-calendar-years': true },
       Array.from({ length: YEARS_PER_PAGE }, (_, index) => this.#yearPage + index).map((year) => {
         const isSelected = displayed.year === year;
         const isCurrent = today.year === year;

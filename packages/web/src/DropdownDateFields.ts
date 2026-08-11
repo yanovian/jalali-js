@@ -97,7 +97,7 @@ export class JalaliDropdownDateFieldsElement extends HTMLElement {
     for (let year = maxYear; year >= minYear; year--) years.push(year);
 
     const yearSelect = el('select', {
-      'aria-label': 'Year',
+      'aria-label': localePack.ui.year,
       'data-jalali-datepicker-field': 'year',
     });
     for (const year of years) {
@@ -118,7 +118,7 @@ export class JalaliDropdownDateFieldsElement extends HTMLElement {
     });
 
     const monthSelect = el('select', {
-      'aria-label': 'Month',
+      'aria-label': localePack.ui.month,
       'data-jalali-datepicker-field': 'month',
     });
     localePack.monthNames[this.#system].long.forEach((name, index) => {
@@ -134,7 +134,10 @@ export class JalaliDropdownDateFieldsElement extends HTMLElement {
     });
 
     const daysInSelectedMonth = engine.daysInMonth(date.year, date.month);
-    const daySelect = el('select', { 'aria-label': 'Day', 'data-jalali-datepicker-field': 'day' });
+    const daySelect = el('select', {
+      'aria-label': localePack.ui.day,
+      'data-jalali-datepicker-field': 'day',
+    });
     for (let day = 1; day <= daysInSelectedMonth; day++) {
       const option = el('option', { value: String(day) }, [
         formatNumber(day, localePack.defaultNumerals, localePack.digits),
