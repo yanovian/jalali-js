@@ -27,8 +27,9 @@ import {
   DEMO_EVENTS,
   DEMO_MONTH,
   DEMO_TIMELINE_EVENTS,
+  comfortableDensityCss,
   parseDemoState,
-  themeStyleFromState,
+  themeOverrideCss,
   webSnippet,
   writeDemoStateToUrl,
   type DemoState,
@@ -67,14 +68,9 @@ const copyBtn = document.getElementById('copy-snippet') as HTMLButtonElement;
 
 const darkStyleEl = document.createElement('style');
 darkStyleEl.textContent = darkThemeCss;
+const themeStyleEl = document.createElement('style');
 const compactStyleEl = document.createElement('style');
-compactStyleEl.textContent = `
-  [data-jalali-datepicker-root], [data-jalali-calendar-root], [data-jalali-event-calendar] {
-    --jalali-font-size: 1rem;
-    --jalali-gap: 0.5em;
-    --jalali-day-min-size: 2.5em;
-  }
-`;
+compactStyleEl.textContent = comfortableDensityCss();
 
 const jalaliToday = createCalendar({ system: 'jalali' }).today();
 document.getElementById('calendar-summary')!.textContent =
@@ -111,6 +107,10 @@ function applyPageChrome(): void {
   stageEl.dir = stageDir();
   if (state.dark) document.head.appendChild(darkStyleEl);
   else darkStyleEl.remove();
+  const themeCss = themeOverrideCss(state.theme);
+  themeStyleEl.textContent = themeCss;
+  if (themeCss) document.head.appendChild(themeStyleEl);
+  else themeStyleEl.remove();
   if (!state.compact) document.head.appendChild(compactStyleEl);
   else compactStyleEl.remove();
 }
@@ -315,19 +315,6 @@ function createDatePicker(options: {
 
 function renderStage(): void {
   stageEl.replaceChildren();
-  const themeStyle = themeStyleFromState(state.theme);
-  for (const [key, value] of Object.entries(themeStyle)) {
-    stageEl.style.setProperty(key, value);
-  }
-  for (const key of [
-    '--jalali-primary',
-    '--jalali-primary-fg',
-    '--jalali-bg',
-    '--jalali-radius',
-    '--jalali-gap',
-  ]) {
-    if (!(key in themeStyle)) stageEl.style.removeProperty(key);
-  }
 
   if (state.tab === 'date-picker') {
     const el = createDatePicker({
@@ -568,6 +555,12 @@ const galleryEventDay = document.getElementById(
 ) as JalaliEventCalendarElement;
 galleryEventDay.initialDate = { ...DEMO_DAY };
 galleryEventDay.events = demoEvents;
+
+const galleryEventTimeline = document.getElementById(
+  'gallery-event-calendar-timeline',
+) as JalaliEventCalendarElement;
+galleryEventTimeline.events = demoTimelineEvents;
+galleryEventTimeline.timeline = { direction: 'vertical', showIcons: true, alternating: true };
 
 const rulesCalendar = document.getElementById('rules-calendar') as JalaliInlineCalendarElement;
 rulesCalendar.initialDisplayedMonth = { ...DEMO_MONTH };

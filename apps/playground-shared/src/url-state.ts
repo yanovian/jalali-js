@@ -90,6 +90,7 @@ export const GALLERY_CELLS = [
   'event-calendar',
   'event-calendar-week',
   'event-calendar-day',
+  'event-calendar-timeline',
   'selection-rules',
   'holidays',
   'custom-theme',
@@ -214,6 +215,16 @@ export function writeDemoStateToUrl(state: DemoState): void {
   window.history.replaceState(null, '', next);
 }
 
+/** Roots that set `--jalali-*` in `date-picker.css`. Parent `.demo-stage` vars do not win. */
+export const JALALI_THEME_ROOT_SELECTORS = [
+  '[data-jalali-datepicker-root]',
+  '[data-jalali-datepicker-dropdown]',
+  '[data-jalali-timepicker-root]',
+  '[data-jalali-timerangepicker-root]',
+  '[data-jalali-calendar-root]',
+  '[data-jalali-eventcalendar-root]',
+] as const;
+
 export function themeStyleFromState(theme: DemoThemeVars): Record<string, string> {
   const style: Record<string, string> = {};
   if (theme.primary) {
@@ -224,4 +235,28 @@ export function themeStyleFromState(theme: DemoThemeVars): Record<string, string
   if (theme.radius) style['--jalali-radius'] = theme.radius;
   if (theme.gap) style['--jalali-gap'] = theme.gap;
   return style;
+}
+
+function cssVarDeclarations(vars: Record<string, string>): string {
+  return Object.entries(vars)
+    .map(([name, value]) => `  ${name}: ${value};`)
+    .join('\n');
+}
+
+/** CSS that sets theme vars on jalali roots under `scope` (default: live stage). */
+export function themeOverrideCss(theme: DemoThemeVars, scope = '.demo-stage'): string {
+  const vars = themeStyleFromState(theme);
+  if (Object.keys(vars).length === 0) return '';
+  const selectors = JALALI_THEME_ROOT_SELECTORS.map((root) => `${scope} ${root}`).join(',\n');
+  return `${selectors} {\n${cssVarDeclarations(vars)}\n}`;
+}
+
+/** Slightly roomier density when the compact theme stylesheet is off. */
+export function comfortableDensityCss(): string {
+  const selectors = JALALI_THEME_ROOT_SELECTORS.join(',\n');
+  return `${selectors} {
+  --jalali-font-size: 1rem;
+  --jalali-gap: 0.5em;
+  --jalali-day-min-size: 2.5em;
+}`;
 }

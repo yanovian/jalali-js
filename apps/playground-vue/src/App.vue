@@ -13,8 +13,9 @@ import {
   DEMO_EVENTS,
   DEMO_MONTH,
   DEMO_TIMELINE_EVENTS,
+  comfortableDensityCss,
   parseDemoState,
-  themeStyleFromState,
+  themeOverrideCss,
   vueSnippet,
   writeDemoStateToUrl,
   type DemoState,
@@ -47,7 +48,7 @@ const demoTimelineEvents = DEMO_TIMELINE_EVENTS as unknown as CalendarEvent[];
 const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
 
 const snippet = computed(() => vueSnippet(state));
-const themeStyle = computed(() => themeStyleFromState(state.theme));
+const themeCss = computed(() => themeOverrideCss(state.theme));
 // Host chrome stays LTR. Page direction only wraps the live stage.
 // Pickers keep locale direction on their own roots, not from this value.
 const stageDir = computed(() => (state.dir === 'auto' ? 'ltr' : state.dir));
@@ -79,15 +80,15 @@ watchEffect(() => {
   else darkStyleEl.remove();
 });
 
-const compactOverrideCss = `
-  [data-jalali-datepicker-root], [data-jalali-calendar-root], [data-jalali-event-calendar] {
-    --jalali-font-size: 1rem;
-    --jalali-gap: 0.5em;
-    --jalali-day-min-size: 2.5em;
-  }
-`;
+const themeStyleEl = document.createElement('style');
+watchEffect(() => {
+  themeStyleEl.textContent = themeCss.value;
+  if (themeCss.value) document.head.appendChild(themeStyleEl);
+  else themeStyleEl.remove();
+});
+
 const compactStyleEl = document.createElement('style');
-compactStyleEl.textContent = compactOverrideCss;
+compactStyleEl.textContent = comfortableDensityCss();
 watchEffect(() => {
   if (!state.compact) document.head.appendChild(compactStyleEl);
   else compactStyleEl.remove();
@@ -427,7 +428,7 @@ const datetimeDefault = {
         </label>
       </div>
 
-      <div class="demo-stage" :dir="stageDir" :style="themeStyle">
+      <div class="demo-stage" :dir="stageDir">
         <DatePicker
           v-if="state.tab === 'date-picker'"
           :system="state.system"
@@ -637,6 +638,17 @@ const datetimeDefault = {
           view="day"
           :initial-date="DEMO_DAY"
           :events="demoEvents"
+        />
+      </section>
+      <section data-testid="event-calendar-timeline">
+        <h3>Event calendar timeline</h3>
+        <EventCalendar
+          system="jalali"
+          :locale="state.locale as LocaleCode"
+          view="timeline"
+          :events="demoTimelineEvents"
+          :timeline="{ direction: 'vertical', showIcons: true, alternating: true }"
+          @event-click="(event) => (eventClickLog = event.title)"
         />
       </section>
       <section data-testid="selection-rules">

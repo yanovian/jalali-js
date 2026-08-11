@@ -1104,16 +1104,16 @@ Fix live playground controls and demos first, so later PR previews and
 holiday work ship against a working playground. Fix RTL time field order
 in the shared picker CSS.
 
-- [ ] **Playground theme color controls.** Live Primary / Background (and
+- [x] **Playground theme color controls.** Live Primary / Background (and
       related) controls must update the pickers. Apply overrides on the
       same `[data-jalali-*-root]` selectors the stylesheet uses, not only
       on `.demo-stage`. Fix once in playground-shared; use it in React,
       Vue, and vanilla.
-- [ ] **Time picker order in RTL locales.** Keep hour then minute as a
+- [x] **Time picker order in RTL locales.** Keep hour then minute as a
       left-to-right island for `fa` and `ps` (and any RTL locale). Apply
       across TimePicker, datetime DatePicker, and TimeRangePicker shared
       CSS.
-- [ ] **Timeline in the playground.** Add a gallery cell and e2e screenshot
+- [x] **Timeline in the playground.** Add a gallery cell and e2e screenshot
       for EventCalendar `view: 'timeline'`. Keep the interactive tab
       controls and seed events. Do not add event CRUD in this phase.
 

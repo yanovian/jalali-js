@@ -11,9 +11,10 @@ import {
   DEMO_EVENTS,
   DEMO_MONTH,
   DEMO_TIMELINE_EVENTS,
+  comfortableDensityCss,
   parseDemoState,
   reactSnippet,
-  themeStyleFromState,
+  themeOverrideCss,
   writeDemoStateToUrl,
   type DemoState,
   type DemoTab,
@@ -63,7 +64,7 @@ export default function App() {
   const [copyLabel, setCopyLabel] = useState('Copy');
 
   const snippet = useMemo(() => reactSnippet(state), [state]);
-  const themeStyle = themeStyleFromState(state.theme);
+  const themeCss = useMemo(() => themeOverrideCss(state.theme), [state.theme]);
   // Host chrome stays LTR. Page direction only wraps the live stage.
   // Pickers keep locale direction on their own roots, not from this value.
   const stageDir = state.dir === 'auto' ? 'ltr' : state.dir;
@@ -84,15 +85,8 @@ export default function App() {
       }}
     >
       {state.dark && <style>{darkThemeCss}</style>}
-      {!state.compact && (
-        <style>{`
-          [data-jalali-datepicker-root], [data-jalali-calendar-root], [data-jalali-event-calendar] {
-            --jalali-font-size: 1rem;
-            --jalali-gap: 0.5em;
-            --jalali-day-min-size: 2.5em;
-          }
-        `}</style>
-      )}
+      {themeCss ? <style>{themeCss}</style> : null}
+      {!state.compact && <style>{comfortableDensityCss()}</style>}
 
       <div className="demo-shell" data-testid="demo-shell">
         <div>
@@ -342,7 +336,7 @@ export default function App() {
           </label>
         </div>
 
-        <div className="demo-stage" dir={stageDir} style={themeStyle}>
+        <div className="demo-stage" dir={stageDir}>
           {state.tab === 'date-picker' && (
             <DatePicker
               system={state.system}
@@ -588,6 +582,17 @@ export default function App() {
             view="day"
             initialDate={DEMO_DAY}
             events={demoEvents}
+          />
+        </section>
+        <section data-testid="event-calendar-timeline">
+          <h3>Event calendar timeline</h3>
+          <EventCalendar
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            view="timeline"
+            events={demoTimelineEvents}
+            timeline={{ direction: 'vertical', showIcons: true, alternating: true }}
+            onEventClick={(event) => setEventClickLog(event.title)}
           />
         </section>
         <section data-testid="selection-rules">

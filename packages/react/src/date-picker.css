@@ -343,6 +343,8 @@ button[data-jalali-calendar-title-year]:hover {
 }
 
 [data-jalali-timepicker-root] {
+  /* Clock fields stay hour-then-minute even when the locale is RTL. */
+  direction: ltr;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -686,6 +688,8 @@ button[data-jalali-calendar-title-year]:hover {
 }
 
 [data-jalali-timerangepicker-root] {
+  /* Start and end times stay in clock order under RTL locales. */
+  direction: ltr;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
