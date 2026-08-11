@@ -22,6 +22,7 @@ import {
   listHours,
   shiftEventViewAnchor,
   timedBlockStyle,
+  weekdayLabelsForGrid,
 } from 'jalali-js';
 
 export interface EventCalendarEventClickDetail {
@@ -213,7 +214,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
       const weekdays = document.createElement('div');
       weekdays.setAttribute('role', 'row');
       weekdays.setAttribute('data-jalali-calendar-weekdays', '');
-      for (const name of localePack.weekdayNames.short) {
+      for (const name of weekdayLabelsForGrid(localePack.weekdayNames.short, this.#system)) {
         const cell = document.createElement('span');
         cell.setAttribute('role', 'columnheader');
         cell.setAttribute('data-jalali-calendar-weekday', '');

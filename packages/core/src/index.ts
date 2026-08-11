@@ -17,7 +17,12 @@ export type {
 } from './calendar.js';
 export { createCalendar } from './calendar.js';
 export type { CalendarGridDay } from './calendar-grid.js';
-export { buildCalendarGrid, nextMonth, previousMonth } from './calendar-grid.js';
+export {
+  buildCalendarGrid,
+  nextMonth,
+  previousMonth,
+  weekdayLabelsForGrid,
+} from './calendar-grid.js';
 export type {
   CalendarEvent,
   EventCalendarView,

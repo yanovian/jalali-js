@@ -37,6 +37,7 @@ import {
   nextMonth,
   previousMonth,
   toStorageValue,
+  weekdayLabelsForGrid,
 } from 'jalali-js';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
 import { localePackFor, type LocaleCode } from '@jalali-js/vue';
@@ -260,7 +261,7 @@ onBeforeUnmount(() => {
         <div role="grid" data-jalali-calendar-grid>
           <div role="row" data-jalali-calendar-weekdays>
             <span
-              v-for="(name, index) in localePack.weekdayNames.short"
+              v-for="(name, index) in weekdayLabelsForGrid(localePack.weekdayNames.short, system)"
               :key="index"
               role="columnheader"
               data-jalali-calendar-weekday

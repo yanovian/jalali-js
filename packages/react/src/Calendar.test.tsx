@@ -39,6 +39,37 @@ describe('Calendar', () => {
     expect(screen.getByRole('button', { name: 'Choose year' })).toHaveTextContent('1403');
   });
 
+  it('starts Jalali weekday headers on Saturday and Gregorian on Sunday', () => {
+    const { rerender } = render(
+      <Calendar
+        system="jalali"
+        locale="en"
+        value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
+      />,
+    );
+    const jalaliHeaders = screen.getAllByRole('columnheader').map((node) => node.textContent);
+    expect(jalaliHeaders).toEqual(['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
+
+    rerender(
+      <Calendar
+        system="jalali"
+        locale="fa"
+        value={{ precision: 'date', system: 'jalali', year: 1403, month: 5, day: 15 }}
+      />,
+    );
+    expect(screen.getAllByRole('columnheader')[0]).toHaveTextContent('ش');
+
+    rerender(
+      <Calendar
+        system="gregorian"
+        locale="en"
+        value={{ precision: 'date', system: 'gregorian', year: 2024, month: 8, day: 5 }}
+      />,
+    );
+    const gregorianHeaders = screen.getAllByRole('columnheader').map((node) => node.textContent);
+    expect(gregorianHeaders).toEqual(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
+  });
+
   it('marks the selected day and the current day with their data attributes', () => {
     render(
       <Calendar

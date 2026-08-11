@@ -18,6 +18,7 @@ import {
   nextMonth,
   previousMonth,
   toStorageValue,
+  weekdayLabelsForGrid,
 } from 'jalali-js';
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { positionPopover } from './position-popover.js';
@@ -249,7 +250,7 @@ export function RangePicker({
             </div>
             <div role="grid" data-jalali-calendar-grid>
               <div role="row" data-jalali-calendar-weekdays>
-                {localePack.weekdayNames.short.map((name, index) => (
+                {weekdayLabelsForGrid(localePack.weekdayNames.short, system).map((name, index) => (
                   <span key={index} role="columnheader" data-jalali-calendar-weekday>
                     {name}
                   </span>

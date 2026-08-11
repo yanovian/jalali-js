@@ -1,7 +1,13 @@
 import { isHolidayRegion, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
-import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
+import {
+  buildCalendarGrid,
+  createCalendar,
+  nextMonth,
+  previousMonth,
+  weekdayLabelsForGrid,
+} from 'jalali-js';
 import { el } from './dom.js';
 import { localePackFor, parseLocaleAttribute, type LocaleCode } from './locale.js';
 
@@ -293,7 +299,7 @@ export class JalaliCalendarElement extends HTMLElement {
     const weekdayRow = el(
       'div',
       { role: 'row', 'data-jalali-calendar-weekdays': true },
-      localePack.weekdayNames.short.map((name) =>
+      weekdayLabelsForGrid(localePack.weekdayNames.short, this.#system).map((name) =>
         el('span', { role: 'columnheader', 'data-jalali-calendar-weekday': true }, [name]),
       ),
     );

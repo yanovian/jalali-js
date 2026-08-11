@@ -1063,7 +1063,7 @@ them first. Land each item with a matching `CHANGELOG.md` bullet under
       root README, the docs home page, and each package README. A visitor
       should reach the demo, the guide, and each sibling npm package without
       scrolling past install or API detail.
-- [ ] **Week start (Shanbe / Saturday).** Core `WEEK_START_DAY.jalali` is
+- [x] **Week start (Shanbe / Saturday).** Core `WEEK_START_DAY.jalali` is
       already `6` (Saturday). Weekday header rows in Calendar,
       RangePicker, and EventCalendar still list locale names in Sunday-first
       array order. Rotate headers to `WEEK_START_DAY[system]` so the first

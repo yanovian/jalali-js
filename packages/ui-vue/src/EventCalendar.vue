@@ -24,6 +24,7 @@ import {
   listHours,
   shiftEventViewAnchor,
   timedBlockStyle,
+  weekdayLabelsForGrid,
 } from 'jalali-js';
 import { computed, ref } from 'vue';
 
@@ -153,7 +154,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
     >
       <div role="row" data-jalali-calendar-weekdays>
         <span
-          v-for="(name, index) in localePack.weekdayNames.short"
+          v-for="(name, index) in weekdayLabelsForGrid(localePack.weekdayNames.short, system)"
           :key="index"
           role="columnheader"
           data-jalali-calendar-weekday

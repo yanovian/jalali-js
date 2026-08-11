@@ -17,7 +17,13 @@
 import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarGridDay, CalendarSystem, SelectionRules } from 'jalali-js';
-import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
+import {
+  buildCalendarGrid,
+  createCalendar,
+  nextMonth,
+  previousMonth,
+  weekdayLabelsForGrid,
+} from 'jalali-js';
 import { computed, ref } from 'vue';
 import { localePackFor, type LocaleCode } from './use-calendar.js';
 
@@ -219,7 +225,7 @@ function dayNumber(cell: CalendarGridDay): string {
       <div role="grid" data-jalali-calendar-grid>
         <div role="row" data-jalali-calendar-weekdays>
           <span
-            v-for="(name, index) in localePack.weekdayNames.short"
+            v-for="(name, index) in weekdayLabelsForGrid(localePack.weekdayNames.short, system)"
             :key="index"
             role="columnheader"
             data-jalali-calendar-weekday

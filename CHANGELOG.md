@@ -12,10 +12,13 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Fixed
+
+- Jalali calendar weekday headers start on Saturday (شنبه).
+
 ### Changed
 
-- Live demo, docs, and an npm ecosystem list of every package sit near the top
-  of the root README, the docs home page, and every package README.
+- READMEs and the docs home lead with live demo and npm ecosystem links.
 
 ## [0.2.1] - 2026-08-10
 

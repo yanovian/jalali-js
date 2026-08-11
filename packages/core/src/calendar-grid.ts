@@ -70,6 +70,19 @@ export function buildCalendarGrid(
   return weeks;
 }
 
+/**
+ * Rotates Sunday-first weekday names so index 0 matches the first column of
+ * `buildCalendarGrid()` for `system`. Jalali weeks start on Saturday. Gregorian
+ * weeks start on Sunday. Locale packs always store names with Sunday at index 0.
+ */
+export function weekdayLabelsForGrid(
+  names: readonly string[],
+  system: CalendarSystem,
+  weekStartDay: number = WEEK_START_DAY[system],
+): string[] {
+  return [...names.slice(weekStartDay), ...names.slice(0, weekStartDay)];
+}
+
 export function nextMonth(
   system: CalendarSystem,
   year: number,

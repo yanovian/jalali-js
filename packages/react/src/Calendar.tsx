@@ -1,7 +1,13 @@
 import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
-import { buildCalendarGrid, createCalendar, nextMonth, previousMonth } from 'jalali-js';
+import {
+  buildCalendarGrid,
+  createCalendar,
+  nextMonth,
+  previousMonth,
+  weekdayLabelsForGrid,
+} from 'jalali-js';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import type { LocaleCode } from './use-calendar.js';
@@ -205,7 +211,7 @@ export function Calendar({
           </div>
           <div role="grid" data-jalali-calendar-grid>
             <div role="row" data-jalali-calendar-weekdays>
-              {localePack.weekdayNames.short.map((name, index) => (
+              {weekdayLabelsForGrid(localePack.weekdayNames.short, system).map((name, index) => (
                 <span key={index} role="columnheader" data-jalali-calendar-weekday>
                   {name}
                 </span>

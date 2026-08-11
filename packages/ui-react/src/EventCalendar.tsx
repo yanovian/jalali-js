@@ -24,6 +24,7 @@ import {
   listHours,
   shiftEventViewAnchor,
   timedBlockStyle,
+  weekdayLabelsForGrid,
 } from 'jalali-js';
 import { useMemo, useState, type MouseEvent } from 'react';
 
@@ -140,7 +141,7 @@ export function EventCalendar({
       {view === 'month' && weeks && monthLayouts ? (
         <div role="grid" data-jalali-calendar-grid data-jalali-eventcalendar-grid>
           <div role="row" data-jalali-calendar-weekdays>
-            {localePack.weekdayNames.short.map((name, index) => (
+            {weekdayLabelsForGrid(localePack.weekdayNames.short, system).map((name, index) => (
               <span key={index} role="columnheader" data-jalali-calendar-weekday>
                 {name}
               </span>

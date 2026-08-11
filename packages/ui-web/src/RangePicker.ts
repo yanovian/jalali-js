@@ -17,6 +17,7 @@ import {
   nextMonth,
   previousMonth,
   toStorageValue,
+  weekdayLabelsForGrid,
 } from 'jalali-js';
 import { positionPopover } from './position-popover.js';
 
@@ -383,7 +384,7 @@ export class JalaliRangePickerElement extends HTMLElement {
     const weekdayRow = document.createElement('div');
     weekdayRow.setAttribute('role', 'row');
     weekdayRow.setAttribute('data-jalali-calendar-weekdays', '');
-    for (const name of localePack.weekdayNames.short) {
+    for (const name of weekdayLabelsForGrid(localePack.weekdayNames.short, this.#system)) {
       const span = document.createElement('span');
       span.setAttribute('role', 'columnheader');
       span.setAttribute('data-jalali-calendar-weekday', '');
