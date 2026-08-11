@@ -1153,6 +1153,30 @@ reviewing this work.
       holiday and closed at once (explicit combined CSS and copy). Add one
       playground section that uses holidays and selection rules together.
 
+## Phase 29: EventCalendar timeline and timed-grid polish
+
+Make EventCalendar timeline, week, and day views read as one clear design.
+Use Phase 27 preview links when reviewing this work.
+
+- [x] **Continuous timeline rail.** Draw one solid vertical (and horizontal)
+      rail behind the markers so the line stays continuous beside tall cards.
+      Keep markers on top of the rail. Match the simple rail-and-card look
+      from the reference timeline (accent edge, marker disc, muted line).
+- [x] **Week and day hour grid.** Show hour lines across day columns, not
+      only on the hours label column. Align day headers and all-day lanes
+      with the timed columns through one shared hours-plus-day grid.
+      Soften the hours column so it does not look like a broken ladder of
+      boxes.
+- [x] **Library-grade alignment.** Use shared column tracks and a fixed
+      `--jalali-event-hour-row` so hour labels, grid lines, and minute
+      placement stay aligned. Remove the marker background ring that cut the
+      rail. Space overlapping timed events with lane-gap tokens. Keep
+      density and color configurable through `--jalali-*` variables.
+- [x] **Timeline layouts.** Support `layout: 'single' | 'alternating' |
+'roadmap'`. Single matches a one-side rail and cards. Alternating puts
+      cards on both sides. Roadmap is a serpentine road with markers on the
+      curve peaks. Show all three in the playground gallery.
+
 ## Later, not yet scheduled
 
 - Any other calendar system (ISO week-date, Hebrew, or otherwise), added

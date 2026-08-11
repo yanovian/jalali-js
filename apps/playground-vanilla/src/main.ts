@@ -215,8 +215,8 @@ function renderControls(): void {
     checkboxControl('Show icons', state.timelineShowIcons, (checked) =>
       patch({ timelineShowIcons: checked }),
     );
-    checkboxControl('Alternating layout', state.timelineAlternating, (checked) =>
-      patch({ timelineAlternating: checked }),
+    selectControl('Layout', state.timelineLayout, ['single', 'alternating', 'roadmap'], (value) =>
+      patch({ timelineLayout: value as DemoState['timelineLayout'] }),
     );
     checkboxControl('Native digits', state.nativeDigits, (checked) =>
       patch({ nativeDigits: checked }),
@@ -374,7 +374,7 @@ function renderStage(): void {
       direction: state.timelineDirection,
       markerShape: state.timelineMarkerShape,
       showIcons: state.timelineShowIcons,
-      alternating: state.timelineAlternating,
+      layout: state.timelineLayout,
       markerSize: state.timelineMarkerSize,
     };
     el.events = state.eventView === 'timeline' ? demoTimelineEvents : demoEvents;
@@ -560,7 +560,27 @@ const galleryEventTimeline = document.getElementById(
   'gallery-event-calendar-timeline',
 ) as JalaliEventCalendarElement;
 galleryEventTimeline.events = demoTimelineEvents;
-galleryEventTimeline.timeline = { direction: 'vertical', showIcons: true, alternating: true };
+galleryEventTimeline.timeline = { direction: 'vertical', showIcons: true, layout: 'single' };
+
+const galleryEventTimelineAlt = document.getElementById(
+  'gallery-event-calendar-timeline-alternating',
+) as JalaliEventCalendarElement;
+galleryEventTimelineAlt.events = demoTimelineEvents;
+galleryEventTimelineAlt.timeline = {
+  direction: 'vertical',
+  showIcons: true,
+  layout: 'alternating',
+};
+
+const galleryEventTimelineRoad = document.getElementById(
+  'gallery-event-calendar-timeline-roadmap',
+) as JalaliEventCalendarElement;
+galleryEventTimelineRoad.events = demoTimelineEvents;
+galleryEventTimelineRoad.timeline = {
+  direction: 'vertical',
+  showIcons: true,
+  layout: 'roadmap',
+};
 
 const rulesCalendar = document.getElementById('rules-calendar') as JalaliInlineCalendarElement;
 rulesCalendar.initialDisplayedMonth = { ...DEMO_MONTH };

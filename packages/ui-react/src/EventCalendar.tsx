@@ -24,6 +24,8 @@ import {
   layoutMonthEvents,
   layoutWeekEvents,
   listHours,
+  resolveTimelineLayout,
+  roadmapTrackPath,
   shiftEventViewAnchor,
   timedBlockStyle,
   timelineAccentFor,
@@ -145,8 +147,14 @@ export function EventCalendar({
   const direction = timeline?.direction ?? 'vertical';
   const markerShape = timeline?.markerShape ?? 'circular';
   const showIcons = timeline?.showIcons ?? true;
-  const alternating = timeline?.alternating ?? false;
+  const layout = resolveTimelineLayout(timeline);
+  const effectiveLayout =
+    direction === 'horizontal' && layout === 'roadmap' ? 'alternating' : layout;
   const markerSize = timeline?.markerSize;
+  const roadmapTrack =
+    view === 'timeline' && effectiveLayout === 'roadmap' && timelineEvents
+      ? roadmapTrackPath(timelineEvents.length)
+      : null;
 
   function clickEvent(eventId: string, click: MouseEvent): void {
     click.stopPropagation();
@@ -163,6 +171,11 @@ export function EventCalendar({
       data-jalali-calendar-root
       data-jalali-eventcalendar-root
       data-view={view}
+      style={
+        (view === 'week' || view === 'day') && periodDays
+          ? { ['--jalali-event-cols' as string]: String(periodDays.length) }
+          : undefined
+      }
     >
       {view !== 'timeline' ? (
         <div data-jalali-calendar-header>
@@ -265,14 +278,9 @@ export function EventCalendar({
       ) : null}
 
       {(view === 'week' || view === 'day') && periodDays ? (
-        <div
-          role="region"
-          tabIndex={0}
-          aria-labelledby={titleId}
-          data-jalali-eventcalendar-period
-          style={{ ['--jalali-event-cols' as string]: periodDays.length }}
-        >
+        <div role="region" tabIndex={0} aria-labelledby={titleId} data-jalali-eventcalendar-period>
           <div data-jalali-eventcalendar-days>
+            <span data-jalali-eventcalendar-gutter aria-hidden="true" />
             {periodDays.map((day) => (
               <button
                 key={`${day.year}-${day.month}-${day.day}`}
@@ -298,6 +306,11 @@ export function EventCalendar({
                 allDayLaneCount > 0 ? `repeat(${allDayLaneCount}, auto)` : undefined,
             }}
           >
+            <span
+              data-jalali-eventcalendar-gutter
+              aria-hidden="true"
+              style={{ gridRow: allDayLaneCount > 0 ? `1 / ${allDayLaneCount + 1}` : undefined }}
+            />
             {allDaySegments.map((segment) => (
               <button
                 key={`${segment.eventId}-${segment.startWeekday}-${segment.lane}`}
@@ -307,7 +320,7 @@ export function EventCalendar({
                 data-continues-after={segment.continuesAfter ? '' : undefined}
                 data-all-day=""
                 style={{
-                  gridColumn: `${segment.startWeekday + 1} / ${segment.endWeekday + 2}`,
+                  gridColumn: `${segment.startWeekday + 2} / ${segment.endWeekday + 3}`,
                   gridRow: segment.lane + 1,
                 }}
                 onClick={(event) => clickEvent(segment.eventId, event)}
@@ -358,21 +371,42 @@ export function EventCalendar({
           <ol
             data-jalali-timeline
             data-direction={direction}
+            data-layout={effectiveLayout}
             data-marker-shape={markerShape}
             data-show-icons={showIcons ? '' : undefined}
-            data-alternating={alternating ? '' : undefined}
             style={
               markerSize != null
                 ? { ['--jalali-timeline-marker-size' as string]: `${markerSize}px` }
                 : undefined
             }
           >
+            {roadmapTrack ? (
+              <svg
+                data-jalali-roadmap-track=""
+                viewBox={roadmapTrack.viewBox}
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <path data-jalali-roadmap-edge="" d={roadmapTrack.d} />
+                <path data-jalali-roadmap-asphalt="" d={roadmapTrack.d} />
+                <path data-jalali-roadmap-dash="" d={roadmapTrack.d} />
+              </svg>
+            ) : null}
             {timelineEvents.map((event, index) => {
+              const side = effectiveLayout === 'single' ? 'end' : index % 2 === 0 ? 'end' : 'start';
+              const roadSide =
+                effectiveLayout === 'roadmap' ? (index % 2 === 0 ? 'left' : 'right') : undefined;
               const itemStyle = {
                 ['--jalali-timeline-accent' as string]: timelineAccentFor(index, event.color),
               } satisfies CSSProperties;
               return (
-                <li key={event.id} data-jalali-timeline-item style={itemStyle}>
+                <li
+                  key={event.id}
+                  data-jalali-timeline-item
+                  data-side={effectiveLayout === 'roadmap' ? undefined : side}
+                  data-road-side={roadSide}
+                  style={itemStyle}
+                >
                   <div data-jalali-timeline-marker aria-hidden="true">
                     {showIcons && event.icon ? (
                       <span data-jalali-timeline-icon>{event.icon}</span>

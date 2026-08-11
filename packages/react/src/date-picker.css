@@ -16,7 +16,8 @@
 [data-jalali-datepicker-dropdown],
 [data-jalali-timepicker-root],
 [data-jalali-timerangepicker-root],
-[data-jalali-calendar-root] {
+[data-jalali-calendar-root],
+[data-jalali-eventcalendar-root] {
   --jalali-font: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --jalali-font-size: 0.9375rem;
   --jalali-line-height: 1.35;
@@ -409,7 +410,12 @@ button[data-jalali-calendar-title-year]:hover {
   box-sizing: border-box;
   width: min(100%, 34em);
   max-width: 100%;
-  --jalali-event-col-min: 3em;
+  --jalali-event-hours-width: 3em;
+  --jalali-event-hour-row: 2.75em;
+  --jalali-event-day-height: calc(24 * var(--jalali-event-hour-row));
+  --jalali-event-lane-gap: 0.2em;
+  --jalali-event-grid-line: color-mix(in srgb, var(--jalali-border) 45%, transparent);
+  --jalali-event-day-columns: repeat(7, minmax(0, 1fr));
   background: var(--jalali-bg);
   border: 1px solid var(--jalali-border);
   border-radius: var(--jalali-radius);
@@ -422,7 +428,16 @@ button[data-jalali-calendar-title-year]:hover {
 }
 
 [data-jalali-eventcalendar-root][data-view='timeline'] {
-  width: min(100%, 34em);
+  width: min(100%, 36em);
+  container-type: inline-size;
+  container-name: jalali-event-timeline;
+}
+
+[data-jalali-eventcalendar-root][data-view='timeline']:has(
+    [data-jalali-timeline][data-layout='alternating'],
+    [data-jalali-timeline][data-layout='roadmap']
+  ) {
+  width: min(100%, 48em);
 }
 
 [data-jalali-eventcalendar-week] {
@@ -434,17 +449,48 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-eventcalendar-days],
 [data-jalali-eventcalendar-lanes] {
   display: grid;
-  grid-template-columns: repeat(
-    var(--jalali-event-cols, 7),
-    minmax(var(--jalali-event-col-min), 1fr)
-  );
+  grid-template-columns: var(--jalali-event-day-columns);
   gap: var(--jalali-gap);
+}
+
+/* Week/day period: hours gutter + N day columns from --jalali-event-cols on root. */
+[data-jalali-eventcalendar-period] {
+  display: grid;
+  gap: 0.4em;
+  margin-top: 0.35em;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+[data-jalali-eventcalendar-period] > [data-jalali-eventcalendar-days],
+[data-jalali-eventcalendar-period] > [data-jalali-eventcalendar-allday],
+[data-jalali-eventcalendar-timed] {
+  display: grid;
+  grid-template-columns: var(--jalali-event-hours-width) repeat(
+      var(--jalali-event-cols, 7),
+      minmax(0, 1fr)
+    );
+  column-gap: 0;
+  row-gap: var(--jalali-gap);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+[data-jalali-eventcalendar-gutter] {
+  display: block;
+  min-width: 0;
 }
 
 [data-jalali-eventcalendar-days] [data-jalali-calendar-day] {
   min-height: 1.65em;
   aspect-ratio: auto;
   border-radius: var(--jalali-radius);
+}
+
+[data-jalali-eventcalendar-period] > [data-jalali-eventcalendar-days] [data-jalali-calendar-day] {
+  box-sizing: border-box;
+  border-inline-start: 1px solid var(--jalali-event-grid-line);
 }
 
 [data-jalali-eventcalendar-dayname] {
@@ -455,57 +501,62 @@ button[data-jalali-calendar-title-year]:hover {
   letter-spacing: 0.02em;
 }
 
-/* Week/day panes scroll instead of crushing columns. tabindex + role come from the markup. */
-[data-jalali-eventcalendar-period] {
-  display: grid;
-  gap: 0.35em;
-  margin-top: 0.35em;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-}
-
 [data-jalali-eventcalendar-allday] {
-  min-height: 1.25em;
+  min-height: 1.5em;
+  padding-block: 0.2em 0.35em;
+  border-block-end: 1px solid var(--jalali-event-grid-line);
 }
 
 [data-jalali-eventcalendar-timed] {
-  display: grid;
-  grid-template-columns: auto repeat(
-      var(--jalali-event-cols, 7),
-      minmax(var(--jalali-event-col-min), 1fr)
-    );
-  gap: var(--jalali-gap);
-  max-height: 28em;
+  max-height: calc(12 * var(--jalali-event-hour-row));
   overflow: auto;
   overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--jalali-fg) 30%, transparent) transparent;
 }
 
-[data-jalali-eventcalendar-hours],
-[data-jalali-eventcalendar-daycol] {
-  position: relative;
+[data-jalali-eventcalendar-hours] {
   display: grid;
-  grid-template-rows: repeat(24, minmax(1.5em, 1fr));
-  min-height: 36em;
+  grid-template-rows: repeat(24, var(--jalali-event-hour-row));
+  height: var(--jalali-event-day-height);
+  min-width: 0;
 }
 
 [data-jalali-eventcalendar-hour] {
+  box-sizing: border-box;
   color: var(--jalali-muted-fg);
-  font-size: 0.7em;
-  line-height: 1.5em;
-  padding-inline-end: 0.35em;
+  font-size: 0.72em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  padding-inline-end: 0.5em;
   text-align: end;
-  border-block-start: 1px solid var(--jalali-border);
+  transform: translateY(-50%);
+}
+
+[data-jalali-eventcalendar-hour]:first-child {
+  transform: none;
+  padding-block-start: 0.15em;
 }
 
 [data-jalali-eventcalendar-daycol] {
-  border-inline-start: 1px solid var(--jalali-border);
+  position: relative;
+  box-sizing: border-box;
+  min-width: 0;
+  height: var(--jalali-event-day-height);
+  border-inline-start: 1px solid var(--jalali-event-grid-line);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--jalali-event-grid-line) 0 1px,
+    transparent 1px var(--jalali-event-hour-row)
+  );
+  overflow: hidden;
 }
 
 [data-jalali-eventcalendar-event] {
   box-sizing: border-box;
   min-width: 0;
   margin: 0;
-  padding: 0.15em 0.4em;
+  padding: 0.2em 0.45em;
   border: 0;
   border-radius: calc(var(--jalali-radius) * 0.65);
   background: var(--jalali-event-bg);
@@ -524,8 +575,13 @@ button[data-jalali-calendar-title-year]:hover {
 
 [data-jalali-eventcalendar-event][data-timed] {
   position: absolute;
+  inset-inline-end: auto;
   z-index: 1;
-  white-space: normal;
+  max-width: 100%;
+  border-inline-start: 3px solid color-mix(in srgb, var(--jalali-event-fg) 55%, transparent);
+  line-height: 1.25;
+  padding: 0.15em 0.35em;
+  min-height: 1.15em;
 }
 
 [data-jalali-eventcalendar-event][data-continues-before] {
@@ -537,20 +593,26 @@ button[data-jalali-calendar-title-year]:hover {
   border-end-end-radius: 0;
 }
 
-/* Timeline view: chronological list with a rail, marker, and accent card. */
+/* Timeline: chronological list with a clear rail, marker, and accent card. */
 [data-jalali-timeline] {
   box-sizing: border-box;
   list-style: none;
   margin: var(--jalali-header-gap) 0 0;
   padding: 0;
-  --jalali-timeline-marker-size: 1.375rem;
-  --jalali-timeline-line: var(--jalali-border);
-  --jalali-timeline-card-bg: var(--jalali-bg);
+  --jalali-timeline-marker-size: 1.5rem;
+  --jalali-timeline-rail-width: 2px;
+  --jalali-timeline-line: color-mix(in srgb, var(--jalali-border) 78%, transparent);
+  --jalali-timeline-card-bg: color-mix(in srgb, var(--jalali-fg) 4.5%, var(--jalali-bg));
   --jalali-timeline-card-fg: var(--jalali-fg);
-  --jalali-timeline-muted: var(--jalali-muted-fg);
+  --jalali-timeline-muted: color-mix(in srgb, var(--jalali-fg) 86%, var(--jalali-bg));
   --jalali-timeline-accent: var(--jalali-primary);
-  --jalali-timeline-marker-fg: var(--jalali-primary-fg);
-  --jalali-timeline-gap: 0.85em;
+  --jalali-timeline-marker-fg: #ffffff;
+  --jalali-timeline-gap: 1.45em;
+  --jalali-timeline-card-gap: 1.2em;
+  --jalali-timeline-road-track: 0.9em;
+  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 28%, var(--jalali-bg));
+  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 52%, transparent);
+  --jalali-timeline-road-dash: color-mix(in srgb, var(--jalali-fg) 78%, #ffffff);
 }
 
 [data-jalali-timeline-header] {
@@ -558,16 +620,92 @@ button[data-jalali-calendar-title-year]:hover {
 }
 
 [data-jalali-timeline][data-direction='vertical'] {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--jalali-timeline-gap);
 }
 
+/* Straight center spine for single and alternating. */
+[data-jalali-timeline][data-direction='vertical'][data-layout='single']::before,
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: calc(var(--jalali-timeline-marker-size) / 2);
+  bottom: calc(var(--jalali-timeline-marker-size) / 2);
+  width: var(--jalali-timeline-rail-width);
+  background: var(--jalali-timeline-line);
+  border-radius: 999px;
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='single']::before {
+  inset-inline-start: calc(
+    var(--jalali-timeline-marker-size) / 2 - var(--jalali-timeline-rail-width) / 2
+  );
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before {
+  inset-inline-start: calc(50% - var(--jalali-timeline-rail-width) / 2);
+}
+
+/* Serpentine roadmap track (SVG). */
+[data-jalali-roadmap-track] {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+[data-jalali-roadmap-asphalt] {
+  fill: none;
+  stroke: var(--jalali-timeline-road-color);
+  stroke-width: var(--jalali-timeline-road-track);
+  stroke-linecap: butt;
+  stroke-linejoin: round;
+}
+
+[data-jalali-roadmap-dash] {
+  fill: none;
+  stroke: var(--jalali-timeline-road-dash);
+  stroke-width: 0.12em;
+  stroke-linecap: butt;
+  stroke-linejoin: round;
+  stroke-dasharray: 0.42em 0.55em;
+}
+
+[data-jalali-roadmap-edge] {
+  fill: none;
+  stroke: var(--jalali-timeline-road-edge);
+  stroke-width: calc(var(--jalali-timeline-road-track) + 0.16em);
+  stroke-linecap: butt;
+  stroke-linejoin: round;
+  opacity: 0.55;
+}
+
 [data-jalali-timeline][data-direction='horizontal'] {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: stretch;
   gap: var(--jalali-timeline-gap);
+}
+
+[data-jalali-timeline][data-direction='horizontal']::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset-block-start: calc(
+    var(--jalali-timeline-marker-size) / 2 - var(--jalali-timeline-rail-width) / 2
+  );
+  inset-inline-start: calc(var(--jalali-timeline-marker-size) / 2);
+  inset-inline-end: calc(var(--jalali-timeline-marker-size) / 2);
+  height: var(--jalali-timeline-rail-width);
+  background: var(--jalali-timeline-line);
+  border-radius: 999px;
 }
 
 [data-jalali-timeline-scroll] {
@@ -582,8 +720,8 @@ button[data-jalali-calendar-title-year]:hover {
   position: relative;
   display: grid;
   grid-template-columns: var(--jalali-timeline-marker-size) minmax(0, 1fr);
-  column-gap: 0.75em;
-  align-items: start;
+  column-gap: var(--jalali-timeline-card-gap);
+  align-items: center;
 }
 
 [data-jalali-timeline][data-direction='horizontal'] [data-jalali-timeline-item] {
@@ -596,48 +734,119 @@ button[data-jalali-calendar-title-year]:hover {
   scroll-snap-align: start;
 }
 
-[data-jalali-timeline][data-direction='vertical'][data-alternating] [data-jalali-timeline-item] {
+/* Both-sides layouts share a 3-column grid (card | marker | card). */
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+  [data-jalali-timeline-item] {
   grid-template-columns: minmax(0, 1fr) var(--jalali-timeline-marker-size) minmax(0, 1fr);
 }
 
-[data-jalali-timeline][data-direction='vertical'][data-alternating] [data-jalali-timeline-marker] {
-  grid-column: 2;
+/* Keep marker and card on one row when the card sits in column 1. */
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+  [data-jalali-timeline-marker],
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+  [data-jalali-timeline-card] {
+  grid-row: 1;
 }
 
-[data-jalali-timeline][data-direction='vertical'][data-alternating]
-  [data-jalali-timeline-item]:nth-child(odd)
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+  [data-jalali-timeline-marker] {
+  grid-column: 2;
+  justify-self: center;
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--jalali-timeline-accent) 28%, transparent),
+    0 2px 8px color-mix(in srgb, var(--jalali-fg) 18%, transparent);
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+  [data-jalali-timeline-item][data-side='end']
   [data-jalali-timeline-card] {
   grid-column: 3;
 }
 
-[data-jalali-timeline][data-direction='vertical'][data-alternating]
-  [data-jalali-timeline-item]:nth-child(even)
+[data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+  [data-jalali-timeline-item][data-side='start']
   [data-jalali-timeline-card] {
   grid-column: 1;
+  border-inline-start: 0;
+  border-inline-end: 4px solid var(--jalali-timeline-accent);
+  text-align: end;
 }
 
-[data-jalali-timeline][data-direction='vertical']
-  [data-jalali-timeline-item]:not(:last-child)
-  [data-jalali-timeline-marker]::after {
-  content: '';
-  position: absolute;
-  inset-inline-start: calc(50% - 1px);
-  top: var(--jalali-timeline-marker-size);
-  bottom: calc(var(--jalali-timeline-gap) * -1 - 2px);
-  width: 2px;
-  background: var(--jalali-timeline-line);
+/* Roadmap: equal rows so the SVG path peaks match markers.
+   Geometry is physical left/right. Card text keeps the calendar direction. */
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap'] {
+  direction: ltr;
+  display: grid;
+  gap: 0;
+  grid-auto-rows: 8.5em;
+  padding-block: 0;
 }
 
-[data-jalali-timeline][data-direction='horizontal']
-  [data-jalali-timeline-item]:not(:last-child)
-  [data-jalali-timeline-marker]::after {
-  content: '';
+[data-jalali-eventcalendar-root][dir='rtl']
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-card] {
+  direction: rtl;
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item] {
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-marker] {
   position: absolute;
-  inset-block-start: calc(50% - 1px);
-  inset-inline-start: var(--jalali-timeline-marker-size);
-  inset-inline-end: calc(var(--jalali-timeline-gap) * -1 - 2px);
-  height: 2px;
-  background: var(--jalali-timeline-line);
+  top: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  background: color-mix(in srgb, var(--jalali-bg) 82%, #ffffff);
+  color: var(--jalali-timeline-accent);
+  border: 3px solid var(--jalali-timeline-accent);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--jalali-timeline-accent) 28%, transparent),
+    0 2px 8px color-mix(in srgb, var(--jalali-fg) 18%, transparent);
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item][data-road-side='left']
+  [data-jalali-timeline-marker] {
+  left: 42%;
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item][data-road-side='right']
+  [data-jalali-timeline-marker] {
+  left: 58%;
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-card] {
+  width: min(18em, calc(40% - 1.1em));
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item][data-road-side='left']
+  [data-jalali-timeline-card] {
+  margin-left: 0;
+  margin-right: auto;
+  border-inline-start: 0;
+  border-right: 4px solid var(--jalali-timeline-accent);
+  border-left: 0;
+  text-align: end;
+}
+
+[data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item][data-road-side='right']
+  [data-jalali-timeline-card] {
+  margin-left: auto;
+  margin-right: 0;
+  border-inline-start: 0;
+  border-left: 4px solid var(--jalali-timeline-accent);
+  border-right: 0;
+  text-align: start;
 }
 
 [data-jalali-timeline-marker] {
@@ -646,12 +855,13 @@ button[data-jalali-calendar-title-year]:hover {
   box-sizing: border-box;
   width: var(--jalali-timeline-marker-size);
   height: var(--jalali-timeline-marker-size);
+  flex-shrink: 0;
   display: grid;
   place-items: center;
-  border: 2px solid var(--jalali-bg);
+  border: 0;
   border-radius: 999px;
   background: var(--jalali-timeline-accent);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--jalali-fg) 18%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--jalali-fg) 18%, transparent);
   color: var(--jalali-timeline-marker-fg);
   font-size: calc(var(--jalali-timeline-marker-size) * 0.42);
   line-height: 1;
@@ -669,51 +879,63 @@ button[data-jalali-calendar-title-year]:hover {
 }
 
 [data-jalali-timeline-card] {
+  position: relative;
+  z-index: 1;
   box-sizing: border-box;
   display: grid;
-  gap: 0.2em;
+  gap: 0.32em;
   min-width: 0;
   width: 100%;
   margin: 0;
-  padding: 0.65em 0.8em;
-  border: 1px solid var(--jalali-border);
-  border-inline-start: 3px solid var(--jalali-timeline-accent);
-  border-radius: var(--jalali-radius);
+  padding: 0.9em 1.05em;
+  border: 0;
+  border-inline-start: 4px solid var(--jalali-timeline-accent);
+  border-radius: 0.85em;
   background: var(--jalali-timeline-card-bg);
   color: var(--jalali-timeline-card-fg);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--jalali-fg) 10%, transparent);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--jalali-fg) 6%, transparent),
+    0 8px 22px color-mix(in srgb, var(--jalali-fg) 8%, transparent);
   font: inherit;
   text-align: start;
   cursor: pointer;
   touch-action: manipulation;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
 }
 
-[data-jalali-timeline][data-direction='vertical'][data-alternating]
-  [data-jalali-timeline-item]:nth-child(even)
-  [data-jalali-timeline-card] {
-  border-inline-start-width: 1px;
-  border-inline-end: 4px solid var(--jalali-timeline-accent);
-  text-align: end;
+[data-jalali-timeline-card]:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 4px color-mix(in srgb, var(--jalali-fg) 8%, transparent),
+    0 12px 28px color-mix(in srgb, var(--jalali-fg) 12%, transparent);
+}
+
+[data-jalali-timeline-card]:focus-visible {
+  outline: 2px solid var(--jalali-timeline-accent);
+  outline-offset: 2px;
 }
 
 [data-jalali-timeline-when] {
   color: var(--jalali-timeline-accent);
-  font-size: 0.82em;
-  font-weight: 500;
+  font-size: 0.8em;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   line-height: 1.3;
 }
 
 [data-jalali-timeline-title] {
-  font-weight: 600;
-  font-size: 0.98em;
+  font-weight: 700;
+  font-size: 1em;
   letter-spacing: -0.01em;
   line-height: 1.35;
 }
 
 [data-jalali-timeline-description] {
   color: var(--jalali-timeline-muted);
-  font-size: 0.88em;
+  font-size: 0.92em;
+  font-weight: 500;
   line-height: 1.45;
 }
 
@@ -767,7 +989,6 @@ button[data-jalali-calendar-title-year]:hover {
   [data-jalali-eventcalendar-root][data-view='week'],
   [data-jalali-eventcalendar-root][data-view='timeline'] {
     width: 100%;
-    --jalali-event-col-min: 4em;
   }
 
   [data-jalali-eventcalendar-event]:not([data-timed]) {
@@ -780,33 +1001,112 @@ button[data-jalali-calendar-title-year]:hover {
   }
 
   [data-jalali-eventcalendar-timed] {
-    max-height: min(28em, 70vh);
-  }
-
-  [data-jalali-timeline][data-direction='vertical'][data-alternating] [data-jalali-timeline-item] {
-    grid-template-columns: var(--jalali-timeline-marker-size) minmax(0, 1fr);
-  }
-
-  [data-jalali-timeline][data-direction='vertical'][data-alternating]
-    [data-jalali-timeline-item]
-    [data-jalali-timeline-marker],
-  [data-jalali-timeline][data-direction='vertical'][data-alternating]
-    [data-jalali-timeline-item]
-    [data-jalali-timeline-card] {
-    grid-column: auto;
-  }
-
-  [data-jalali-timeline][data-direction='vertical'][data-alternating]
-    [data-jalali-timeline-item]:nth-child(even)
-    [data-jalali-timeline-card] {
-    border-inline-end-width: 1px;
-    border-inline-start: 4px solid var(--jalali-timeline-accent);
-    text-align: start;
+    max-height: min(calc(10 * var(--jalali-event-hour-row, 2.75em)), 70vh);
   }
 
   [data-jalali-timerangepicker-root] {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+/* Collapse both-sides and roadmap when the calendar itself is narrow. */
+@container jalali-event-timeline (max-width: 32em) {
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating'],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap'] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jalali-timeline-gap);
+    direction: inherit;
+    grid-auto-rows: unset;
+    padding-block: 0;
+  }
+
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+    [data-jalali-timeline-item],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-item] {
+    display: grid;
+    grid-template-columns: var(--jalali-timeline-marker-size) minmax(0, 1fr);
+    column-gap: var(--jalali-timeline-card-gap);
+    align-items: center;
+  }
+
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before,
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: calc(var(--jalali-timeline-marker-size) / 2);
+    bottom: calc(var(--jalali-timeline-marker-size) / 2);
+    width: var(--jalali-timeline-rail-width);
+    inset-inline-start: calc(
+      var(--jalali-timeline-marker-size) / 2 - var(--jalali-timeline-rail-width) / 2
+    );
+    background: var(--jalali-timeline-line);
+    border-radius: 999px;
+  }
+
+  [data-jalali-roadmap-track] {
+    display: none;
+  }
+
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+    [data-jalali-timeline-marker],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+    [data-jalali-timeline-item][data-side='end']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+    [data-jalali-timeline-item][data-side='start']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-marker],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-item][data-road-side='left']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-item][data-road-side='right']
+    [data-jalali-timeline-card] {
+    grid-column: auto;
+    grid-row: auto;
+    position: relative;
+    inset: auto;
+    top: auto;
+    left: auto;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    margin-left: 0;
+    margin-right: 0;
+    transform: none;
+    justify-self: stretch;
+  }
+
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+    [data-jalali-timeline-item][data-side='start']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-item][data-road-side='left']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-item][data-road-side='right']
+    [data-jalali-timeline-card] {
+    border-inline-end-width: 0;
+    border-right: 0;
+    border-left: 0;
+    border-inline-start: 4px solid var(--jalali-timeline-accent);
+    text-align: start;
+  }
+
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-marker] {
+    background: var(--jalali-timeline-accent);
+    color: var(--jalali-timeline-marker-fg);
+    border: 0;
   }
 }
 
@@ -919,7 +1219,7 @@ button[data-jalali-calendar-title-year]:hover {
     min-height: var(--jalali-control-size);
   }
 
-  [data-jalali-eventcalendar-event] {
+  [data-jalali-eventcalendar-event]:not([data-timed]) {
     min-height: 2.75em;
     padding-block: 0.35em;
   }

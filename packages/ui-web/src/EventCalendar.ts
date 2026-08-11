@@ -23,6 +23,8 @@ import {
   layoutMonthEvents,
   layoutWeekEvents,
   listHours,
+  resolveTimelineLayout,
+  roadmapTrackPath,
   shiftEventViewAnchor,
   timedBlockStyle,
   timelineAccentFor,
@@ -240,7 +242,9 @@ export class JalaliEventCalendarElement extends HTMLElement {
     const direction = this.#timeline?.direction ?? 'vertical';
     const markerShape = this.#timeline?.markerShape ?? 'circular';
     const showIcons = this.#timeline?.showIcons ?? true;
-    const alternating = this.#timeline?.alternating ?? false;
+    const resolvedLayout = resolveTimelineLayout(this.#timeline);
+    const layout =
+      direction === 'horizontal' && resolvedLayout === 'roadmap' ? 'alternating' : resolvedLayout;
     const markerSize = this.#timeline?.markerSize;
 
     this.dir = localePack.direction;
@@ -249,6 +253,12 @@ export class JalaliEventCalendarElement extends HTMLElement {
     this.setAttribute('data-jalali-calendar-root', '');
     this.setAttribute('data-jalali-eventcalendar-root', '');
     this.setAttribute('data-view', this.#view);
+    if (this.#view === 'week' || this.#view === 'day') {
+      const periodDays = daysForEventView(this.#system, this.#view, anchor);
+      this.style.setProperty('--jalali-event-cols', String(periodDays.length));
+    } else {
+      this.style.removeProperty('--jalali-event-cols');
+    }
 
     if (this.#view === 'timeline') {
       const timelineEvents = eventsForTimeline(this.#events);
@@ -272,16 +282,40 @@ export class JalaliEventCalendarElement extends HTMLElement {
       const list = document.createElement('ol');
       list.setAttribute('data-jalali-timeline', '');
       list.setAttribute('data-direction', direction);
+      list.setAttribute('data-layout', layout);
       list.setAttribute('data-marker-shape', markerShape);
       if (showIcons) list.setAttribute('data-show-icons', '');
-      if (alternating) list.setAttribute('data-alternating', '');
       if (markerSize != null) {
         list.style.setProperty('--jalali-timeline-marker-size', `${markerSize}px`);
+      }
+
+      if (layout === 'roadmap' && timelineEvents.length > 0) {
+        const track = roadmapTrackPath(timelineEvents.length);
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('data-jalali-roadmap-track', '');
+        svg.setAttribute('viewBox', track.viewBox);
+        svg.setAttribute('preserveAspectRatio', 'none');
+        svg.setAttribute('aria-hidden', 'true');
+        for (const kind of ['edge', 'asphalt', 'dash'] as const) {
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute(`data-jalali-roadmap-${kind}`, '');
+          path.setAttribute('d', track.d);
+          svg.append(path);
+        }
+        list.append(svg);
       }
 
       timelineEvents.forEach((event, index) => {
         const item = document.createElement('li');
         item.setAttribute('data-jalali-timeline-item', '');
+        if (layout === 'roadmap') {
+          item.setAttribute('data-road-side', index % 2 === 0 ? 'left' : 'right');
+        } else {
+          item.setAttribute(
+            'data-side',
+            layout === 'single' ? 'end' : index % 2 === 0 ? 'end' : 'start',
+          );
+        }
         item.style.setProperty('--jalali-timeline-accent', timelineAccentFor(index, event.color));
 
         const marker = document.createElement('div');
@@ -448,10 +482,13 @@ export class JalaliEventCalendarElement extends HTMLElement {
     period.tabIndex = 0;
     period.setAttribute('aria-labelledby', this.#titleId);
     period.setAttribute('data-jalali-eventcalendar-period', '');
-    period.style.setProperty('--jalali-event-cols', String(periodDays.length));
 
     const days = document.createElement('div');
     days.setAttribute('data-jalali-eventcalendar-days', '');
+    const daysGutter = document.createElement('span');
+    daysGutter.setAttribute('data-jalali-eventcalendar-gutter', '');
+    daysGutter.setAttribute('aria-hidden', 'true');
+    days.append(daysGutter);
     for (const day of periodDays) {
       const button = document.createElement('button');
       button.type = 'button';
@@ -481,6 +518,13 @@ export class JalaliEventCalendarElement extends HTMLElement {
     allday.setAttribute('data-jalali-eventcalendar-lanes', '');
     allday.setAttribute('data-jalali-eventcalendar-allday', '');
     if (allDayLaneCount > 0) allday.style.gridTemplateRows = `repeat(${allDayLaneCount}, auto)`;
+    const allDayGutter = document.createElement('span');
+    allDayGutter.setAttribute('data-jalali-eventcalendar-gutter', '');
+    allDayGutter.setAttribute('aria-hidden', 'true');
+    if (allDayLaneCount > 0) {
+      allDayGutter.style.gridRow = `1 / ${allDayLaneCount + 1}`;
+    }
+    allday.append(allDayGutter);
     for (const segment of allDaySegments) {
       const button = document.createElement('button');
       button.type = 'button';
@@ -488,7 +532,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
       button.setAttribute('data-all-day', '');
       if (segment.continuesBefore) button.setAttribute('data-continues-before', '');
       if (segment.continuesAfter) button.setAttribute('data-continues-after', '');
-      button.style.gridColumn = `${segment.startWeekday + 1} / ${segment.endWeekday + 2}`;
+      button.style.gridColumn = `${segment.startWeekday + 2} / ${segment.endWeekday + 3}`;
       button.style.gridRow = `${segment.lane + 1}`;
       button.textContent = segment.title;
       button.addEventListener('click', (click) => {

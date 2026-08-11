@@ -293,16 +293,20 @@ const datetimeDefault = {
             </span>
           </label>
           <label>
-            <span>
-              <input
-                type="checkbox"
-                :checked="state.timelineAlternating"
-                @change="
-                  patch({ timelineAlternating: ($event.target as HTMLInputElement).checked })
-                "
-              />
-              Alternating layout
-            </span>
+            Layout
+            <select
+              :value="state.timelineLayout"
+              @change="
+                patch({
+                  timelineLayout: ($event.target as HTMLSelectElement)
+                    .value as DemoState['timelineLayout'],
+                })
+              "
+            >
+              <option value="single">Single side</option>
+              <option value="alternating">Both sides</option>
+              <option value="roadmap">Roadmap curves</option>
+            </select>
           </label>
           <label>
             <span>
@@ -470,7 +474,7 @@ const datetimeDefault = {
             direction: state.timelineDirection,
             markerShape: state.timelineMarkerShape,
             showIcons: state.timelineShowIcons,
-            alternating: state.timelineAlternating,
+            layout: state.timelineLayout,
             markerSize: state.timelineMarkerSize,
           }"
           :events="state.eventView === 'timeline' ? demoTimelineEvents : demoEvents"
@@ -647,7 +651,29 @@ const datetimeDefault = {
           :locale="state.locale as LocaleCode"
           view="timeline"
           :events="demoTimelineEvents"
-          :timeline="{ direction: 'vertical', showIcons: true, alternating: true }"
+          :timeline="{ direction: 'vertical', showIcons: true, layout: 'single' }"
+          @event-click="(event) => (eventClickLog = event.title)"
+        />
+      </section>
+      <section data-testid="event-calendar-timeline-alternating">
+        <h3>Event calendar timeline both sides</h3>
+        <EventCalendar
+          system="jalali"
+          :locale="state.locale as LocaleCode"
+          view="timeline"
+          :events="demoTimelineEvents"
+          :timeline="{ direction: 'vertical', showIcons: true, layout: 'alternating' }"
+          @event-click="(event) => (eventClickLog = event.title)"
+        />
+      </section>
+      <section data-testid="event-calendar-timeline-roadmap">
+        <h3>Event calendar timeline roadmap</h3>
+        <EventCalendar
+          system="jalali"
+          :locale="state.locale as LocaleCode"
+          view="timeline"
+          :events="demoTimelineEvents"
+          :timeline="{ direction: 'vertical', showIcons: true, layout: 'roadmap' }"
           @event-click="(event) => (eventClickLog = event.title)"
         />
       </section>

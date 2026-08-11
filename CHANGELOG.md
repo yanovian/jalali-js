@@ -14,15 +14,16 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- EventCalendar timeline `layout`: `single`, `alternating`, and `roadmap`, with playground gallery cells.
 - Holiday day tips on hover and focus as an overlay on the calendar (`data-jalali-calendar-tip`), with multi-holiday names from `@jalali-js/holidays`.
 - Combined holiday and closed tip, aria name, and CSS when a holiday is also blocked.
 - `LocalePack.ui.closedDay` in `en`, `fa`, and `ps`.
 - Playground section for holidays with selection rules.
 - Temporary PR playground previews under `/pr-<n>/playground/{react,vue,vanilla}/`, with PR comment links, delete on close, and an orphan sweep.
-- Playground gallery cell and e2e screenshot for EventCalendar timeline view.
 
 ### Fixed
 
+- EventCalendar timeline rail, serpentine roadmap track, week/day event lanes, and alternating marker alignment.
 - Playground Primary / Background theme controls apply on jalali picker roots.
 - TimePicker and TimeRangePicker keep hour-then-minute order in RTL locales.
 

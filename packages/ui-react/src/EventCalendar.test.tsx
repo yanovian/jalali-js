@@ -110,7 +110,7 @@ describe('EventCalendar', () => {
     ) as HTMLElement | null;
     expect(period).toHaveAttribute('tabindex', '0');
     expect(period).toHaveAttribute('role', 'region');
-    expect(period?.style.getPropertyValue('--jalali-event-cols')).toBe('7');
+    expect((root as HTMLElement | null)?.style.getPropertyValue('--jalali-event-cols')).toBe('7');
   });
 
   it('renders week and day views with timed placement', () => {
@@ -127,7 +127,7 @@ describe('EventCalendar', () => {
     expect(screen.getByRole('button', { name: 'Meeting' })).toHaveAttribute('data-timed');
     expect(
       (
-        document.querySelector('[data-jalali-eventcalendar-period]') as HTMLElement | null
+        document.querySelector('[data-jalali-eventcalendar-root]') as HTMLElement | null
       )?.style.getPropertyValue('--jalali-event-cols'),
     ).toBe('7');
 
@@ -143,7 +143,7 @@ describe('EventCalendar', () => {
     expect(screen.getByRole('button', { name: 'Meeting' })).toBeInTheDocument();
     expect(
       (
-        document.querySelector('[data-jalali-eventcalendar-period]') as HTMLElement | null
+        document.querySelector('[data-jalali-eventcalendar-root]') as HTMLElement | null
       )?.style.getPropertyValue('--jalali-event-cols'),
     ).toBe('1');
   });
@@ -177,15 +177,15 @@ describe('EventCalendar', () => {
         locale="fa"
         view="timeline"
         displayFormat={{ numerals: 'native', template: 'YYYY/MM/DD' }}
-        timeline={{ showIcons: true, markerShape: 'circular', alternating: true }}
+        timeline={{ showIcons: true, markerShape: 'circular', layout: 'alternating' }}
         events={events}
         onEventClick={onEventClick}
       />,
     );
     expect(document.querySelector('[data-view="timeline"]')).toBeTruthy();
     expect(document.querySelector('[data-jalali-timeline]')).toHaveAttribute(
-      'data-direction',
-      'vertical',
+      'data-layout',
+      'alternating',
     );
     expect(document.querySelector('[data-jalali-timeline-icon]')?.textContent).toBe('◎');
     expect(screen.getByText(/۰۹:۰۰/)).toBeInTheDocument();

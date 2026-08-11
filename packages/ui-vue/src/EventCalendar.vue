@@ -24,6 +24,8 @@ import {
   layoutMonthEvents,
   layoutWeekEvents,
   listHours,
+  resolveTimelineLayout,
+  roadmapTrackPath,
   shiftEventViewAnchor,
   timedBlockStyle,
   timelineAccentFor,
@@ -152,8 +154,17 @@ const titleId = useId();
 const direction = computed(() => props.timeline?.direction ?? 'vertical');
 const markerShape = computed(() => props.timeline?.markerShape ?? 'circular');
 const showIcons = computed(() => props.timeline?.showIcons ?? true);
-const alternating = computed(() => props.timeline?.alternating ?? false);
+const layout = computed(() => {
+  const resolved = resolveTimelineLayout(props.timeline);
+  return direction.value === 'horizontal' && resolved === 'roadmap' ? 'alternating' : resolved;
+});
 const markerSize = computed(() => props.timeline?.markerSize);
+const roadmapTrack = computed(() => {
+  if (props.view !== 'timeline' || layout.value !== 'roadmap' || !timelineEvents.value) {
+    return null;
+  }
+  return roadmapTrackPath(timelineEvents.value.length);
+});
 
 function onEventClick(eventId: string, click: MouseEvent): void {
   click.stopPropagation();
@@ -170,6 +181,11 @@ function onEventClick(eventId: string, click: MouseEvent): void {
     data-jalali-calendar-root
     data-jalali-eventcalendar-root
     :data-view="view"
+    :style="
+      (view === 'week' || view === 'day') && periodDays
+        ? { '--jalali-event-cols': String(periodDays.length) }
+        : undefined
+    "
   >
     <div v-if="view !== 'timeline'" data-jalali-calendar-header>
       <button
@@ -267,9 +283,9 @@ function onEventClick(eventId: string, click: MouseEvent): void {
       tabindex="0"
       :aria-labelledby="titleId"
       data-jalali-eventcalendar-period
-      :style="{ '--jalali-event-cols': periodDays.length }"
     >
       <div data-jalali-eventcalendar-days>
+        <span data-jalali-eventcalendar-gutter aria-hidden="true" />
         <button
           v-for="day in periodDays"
           :key="`${day.year}-${day.month}-${day.day}`"
@@ -293,6 +309,11 @@ function onEventClick(eventId: string, click: MouseEvent): void {
           gridTemplateRows: allDayLaneCount > 0 ? `repeat(${allDayLaneCount}, auto)` : undefined,
         }"
       >
+        <span
+          data-jalali-eventcalendar-gutter
+          aria-hidden="true"
+          :style="allDayLaneCount > 0 ? { gridRow: `1 / ${allDayLaneCount + 1}` } : undefined"
+        />
         <button
           v-for="segment in allDaySegments"
           :key="`${segment.eventId}-${segment.startWeekday}-${segment.lane}`"
@@ -302,7 +323,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
           :data-continues-after="segment.continuesAfter ? '' : undefined"
           data-all-day=""
           :style="{
-            gridColumn: `${segment.startWeekday + 1} / ${segment.endWeekday + 2}`,
+            gridColumn: `${segment.startWeekday + 2} / ${segment.endWeekday + 3}`,
             gridRow: segment.lane + 1,
           }"
           @click="onEventClick(segment.eventId, $event)"
@@ -346,17 +367,38 @@ function onEventClick(eventId: string, click: MouseEvent): void {
       <ol
         data-jalali-timeline
         :data-direction="direction"
+        :data-layout="layout"
         :data-marker-shape="markerShape"
         :data-show-icons="showIcons ? '' : undefined"
-        :data-alternating="alternating ? '' : undefined"
         :style="
           markerSize != null ? { '--jalali-timeline-marker-size': `${markerSize}px` } : undefined
         "
       >
+        <svg
+          v-if="roadmapTrack"
+          data-jalali-roadmap-track=""
+          :viewBox="roadmapTrack.viewBox"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path data-jalali-roadmap-edge="" :d="roadmapTrack.d" />
+          <path data-jalali-roadmap-asphalt="" :d="roadmapTrack.d" />
+          <path data-jalali-roadmap-dash="" :d="roadmapTrack.d" />
+        </svg>
         <li
           v-for="(event, index) in timelineEvents"
           :key="event.id"
           data-jalali-timeline-item
+          :data-side="
+            layout === 'roadmap'
+              ? undefined
+              : layout === 'single'
+                ? 'end'
+                : index % 2 === 0
+                  ? 'end'
+                  : 'start'
+          "
+          :data-road-side="layout === 'roadmap' ? (index % 2 === 0 ? 'left' : 'right') : undefined"
           :style="{ '--jalali-timeline-accent': timelineAccentFor(index, event.color) }"
         >
           <div data-jalali-timeline-marker aria-hidden="true">

@@ -228,14 +228,19 @@ export default function App() {
                 </span>
               </label>
               <label>
-                <span>
-                  <input
-                    type="checkbox"
-                    checked={state.timelineAlternating}
-                    onChange={(e) => patch({ timelineAlternating: e.target.checked })}
-                  />{' '}
-                  Alternating layout
-                </span>
+                Layout
+                <select
+                  value={state.timelineLayout}
+                  onChange={(e) =>
+                    patch({
+                      timelineLayout: e.target.value as DemoState['timelineLayout'],
+                    })
+                  }
+                >
+                  <option value="single">Single side</option>
+                  <option value="alternating">Both sides</option>
+                  <option value="roadmap">Roadmap curves</option>
+                </select>
               </label>
               <label>
                 <span>
@@ -381,7 +386,7 @@ export default function App() {
                 direction: state.timelineDirection,
                 markerShape: state.timelineMarkerShape,
                 showIcons: state.timelineShowIcons,
-                alternating: state.timelineAlternating,
+                layout: state.timelineLayout,
                 markerSize: state.timelineMarkerSize,
               }}
               events={state.eventView === 'timeline' ? demoTimelineEvents : demoEvents}
@@ -591,7 +596,29 @@ export default function App() {
             locale={state.locale as LocaleCode}
             view="timeline"
             events={demoTimelineEvents}
-            timeline={{ direction: 'vertical', showIcons: true, alternating: true }}
+            timeline={{ direction: 'vertical', showIcons: true, layout: 'single' }}
+            onEventClick={(event) => setEventClickLog(event.title)}
+          />
+        </section>
+        <section data-testid="event-calendar-timeline-alternating">
+          <h3>Event calendar timeline both sides</h3>
+          <EventCalendar
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            view="timeline"
+            events={demoTimelineEvents}
+            timeline={{ direction: 'vertical', showIcons: true, layout: 'alternating' }}
+            onEventClick={(event) => setEventClickLog(event.title)}
+          />
+        </section>
+        <section data-testid="event-calendar-timeline-roadmap">
+          <h3>Event calendar timeline roadmap</h3>
+          <EventCalendar
+            system="jalali"
+            locale={state.locale as LocaleCode}
+            view="timeline"
+            events={demoTimelineEvents}
+            timeline={{ direction: 'vertical', showIcons: true, layout: 'roadmap' }}
             onEventClick={(event) => setEventClickLog(event.title)}
           />
         </section>

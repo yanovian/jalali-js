@@ -8,6 +8,8 @@ export type EventCalendarView = 'month' | 'week' | 'day' | 'timeline';
 
 export type TimelineDirection = 'vertical' | 'horizontal';
 export type TimelineMarkerShape = 'circular' | 'square';
+/** Card placement for vertical timelines. */
+export type TimelineLayout = 'single' | 'alternating' | 'roadmap';
 
 /**
  * Options for `view: 'timeline'`. Defaults match a vertical, circular-marker
@@ -17,9 +19,77 @@ export interface TimelineOptions {
   direction?: TimelineDirection;
   markerShape?: TimelineMarkerShape;
   showIcons?: boolean;
+  /**
+   * Card layout. `single` keeps every card on one side of the rail.
+   * `alternating` puts cards on both sides of a straight center rail.
+   * `roadmap` uses a serpentine dashed road with markers on the curve peaks.
+   * Default: `'single'`.
+   */
+  layout?: TimelineLayout;
+  /**
+   * Prefer `layout: 'alternating'`. When `layout` is omitted, `true` maps to
+   * `alternating`.
+   */
   alternating?: boolean;
   /** Marker diameter in CSS pixels. When omitted, CSS `--jalali-timeline-marker-size` applies. */
   markerSize?: number;
+}
+
+/** True when the layout places cards on both sides. */
+export function isBothSidesTimelineLayout(layout: TimelineLayout): boolean {
+  return layout === 'alternating' || layout === 'roadmap';
+}
+
+/** Resolve the effective timeline layout from options. */
+export function resolveTimelineLayout(options?: TimelineOptions): TimelineLayout {
+  if (
+    options?.layout === 'single' ||
+    options?.layout === 'alternating' ||
+    options?.layout === 'roadmap'
+  ) {
+    return options.layout;
+  }
+  return options?.alternating ? 'alternating' : 'single';
+}
+
+/** Marker X positions in the roadmap SVG viewBox (0 to 100). */
+export const ROADMAP_LEFT_X = 42;
+export const ROADMAP_RIGHT_X = 58;
+
+/**
+ * Build an SVG path for a vertical serpentine roadmap.
+ * Each marker sits on a left or right curve peak.
+ */
+export function roadmapTrackPath(count: number): { d: string; viewBox: string } {
+  const step = 100;
+  const mid = 50;
+  const height = Math.max(step, count * step);
+  const viewBox = `0 0 100 ${height}`;
+  if (count <= 0) {
+    return { d: `M ${mid} 4 L ${mid} ${height - 4}`, viewBox };
+  }
+
+  const xAt = (index: number): number => (index % 2 === 0 ? ROADMAP_LEFT_X : ROADMAP_RIGHT_X);
+  const yAt = (index: number): number => index * step + step / 2;
+
+  let d = `M ${mid} 4`;
+  d += ` C ${mid} ${yAt(0) * 0.5}, ${xAt(0)} ${yAt(0) * 0.75}, ${xAt(0)} ${yAt(0)}`;
+
+  for (let index = 1; index < count; index += 1) {
+    const x0 = xAt(index - 1);
+    const y0 = yAt(index - 1);
+    const x1 = xAt(index);
+    const y1 = yAt(index);
+    const midY = (y0 + y1) / 2;
+    d += ` C ${x0} ${midY}, ${x1} ${midY}, ${x1} ${y1}`;
+  }
+
+  const lastX = xAt(count - 1);
+  const lastY = yAt(count - 1);
+  const endY = height - 4;
+  d += ` C ${lastX} ${lastY + step * 0.28}, ${mid} ${endY - step * 0.18}, ${mid} ${endY}`;
+
+  return { d, viewBox };
 }
 
 /**
@@ -338,7 +408,10 @@ export function layoutDaysTimedEvents(
   return days.map((day) => layoutDayTimedEvents(events, day));
 }
 
-/** CSS-friendly placement for a timed block inside a day column. */
+/**
+ * CSS placement for a timed block in a day column.
+ * Overlapping events share the column side by side.
+ */
 export function timedBlockStyle(
   block: TimedEventBlock,
   laneCount: number,
@@ -347,13 +420,19 @@ export function timedBlockStyle(
   height: string;
   insetInlineStart: string;
   width: string;
+  zIndex: string;
 } {
   const lanes = Math.max(1, laneCount);
+  const startPct = (block.startMinute / MINUTES_PER_DAY) * 100;
+  const heightPct = ((block.endMinute - block.startMinute) / MINUTES_PER_DAY) * 100;
+  const start = (block.lane / lanes) * 100;
+  const width = (1 / lanes) * 100;
   return {
-    top: `${(block.startMinute / MINUTES_PER_DAY) * 100}%`,
-    height: `${((block.endMinute - block.startMinute) / MINUTES_PER_DAY) * 100}%`,
-    insetInlineStart: `${(block.lane / lanes) * 100}%`,
-    width: `${(1 / lanes) * 100}%`,
+    top: `${startPct}%`,
+    height: `${heightPct}%`,
+    insetInlineStart: `calc(${start}% + var(--jalali-event-lane-gap, 2px) / 2)`,
+    width: `calc(${width}% - var(--jalali-event-lane-gap, 2px))`,
+    zIndex: String(1 + block.lane),
   };
 }
 

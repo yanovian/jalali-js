@@ -16,6 +16,9 @@ import {
   TIMELINE_ACCENT_COLORS,
   timelineAccentFor,
   timelineEventDateTime,
+  timedBlockStyle,
+  resolveTimelineLayout,
+  roadmapTrackPath,
   type CalendarEvent,
 } from './event-calendar.js';
 
@@ -87,6 +90,20 @@ describe('event-calendar layout', () => {
         startTime: { hour: 9, minute: 5 },
       }),
     ).toBe('1403-01-02T09:05');
+  });
+
+  it('resolves timeline layout from layout or alternating', () => {
+    expect(resolveTimelineLayout()).toBe('single');
+    expect(resolveTimelineLayout({ layout: 'roadmap' })).toBe('roadmap');
+    expect(resolveTimelineLayout({ alternating: true })).toBe('alternating');
+    expect(resolveTimelineLayout({ layout: 'single', alternating: true })).toBe('single');
+  });
+
+  it('builds a serpentine roadmap track path', () => {
+    const track = roadmapTrackPath(3);
+    expect(track.viewBox).toBe('0 0 100 300');
+    expect(track.d.startsWith('M 50 4')).toBe(true);
+    expect(track.d).toContain('C');
   });
 
   it('assigns lanes for overlapping events in a week', () => {
@@ -195,5 +212,12 @@ describe('event-calendar layout', () => {
     const layout = layoutDayTimedEvents(events, { year: 1403, month: 5, day: 15 });
     expect(layout).toHaveLength(2);
     expect(layout[0]!.lane).not.toBe(layout[1]!.lane);
+    const first = timedBlockStyle(layout[0]!, 2);
+    const second = timedBlockStyle(layout[1]!, 2);
+    expect(first.top).toContain('%');
+    expect(first.width).toBe(second.width);
+    expect(first.width).toContain('50%');
+    expect(second.insetInlineStart).toContain('50%');
+    expect(first.zIndex).toBe('1');
   });
 });
