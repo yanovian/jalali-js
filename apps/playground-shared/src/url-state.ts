@@ -11,8 +11,10 @@ export type DemoTab =
 export type DemoLocale = 'en' | 'fa' | 'ps';
 export type DemoSystem = 'jalali' | 'gregorian';
 export type DemoVariant = 'grid' | 'dropdown';
-export type DemoEventView = 'month' | 'week' | 'day';
+export type DemoEventView = 'month' | 'week' | 'day' | 'timeline';
 export type DemoValueFormat = 'gregorian-iso' | 'jalali-object';
+export type DemoTimelineDirection = 'vertical' | 'horizontal';
+export type DemoTimelineMarkerShape = 'circular' | 'square';
 
 export interface DemoThemeVars {
   primary: string;
@@ -32,6 +34,13 @@ export interface DemoState {
   compact: boolean;
   dir: 'ltr' | 'rtl' | 'auto';
   eventView: DemoEventView;
+  timelineDirection: DemoTimelineDirection;
+  timelineMarkerShape: DemoTimelineMarkerShape;
+  timelineShowIcons: boolean;
+  timelineAlternating: boolean;
+  timelineMarkerSize: number;
+  /** Force native or Latin digits in EventCalendar displayFormat. */
+  nativeDigits: boolean;
   minuteStep: number;
   showHolidays: boolean;
   theme: DemoThemeVars;
@@ -50,6 +59,12 @@ export const DEFAULT_DEMO_STATE: DemoState = {
   // Pickers keep their own locale direction on their roots.
   dir: 'ltr',
   eventView: 'month',
+  timelineDirection: 'vertical',
+  timelineMarkerShape: 'circular',
+  timelineShowIcons: true,
+  timelineAlternating: false,
+  timelineMarkerSize: 24,
+  nativeDigits: true,
   minuteStep: 15,
   showHolidays: false,
   theme: {
@@ -121,7 +136,25 @@ export function parseDemoState(search: string): DemoState {
     dark: parseBool(params.get('dark'), d.dark),
     compact: parseBool(params.get('compact'), d.compact),
     dir: oneOf(params.get('dir'), ['ltr', 'rtl', 'auto'] as const, d.dir),
-    eventView: oneOf(params.get('eventView'), ['month', 'week', 'day'] as const, d.eventView),
+    eventView: oneOf(
+      params.get('eventView'),
+      ['month', 'week', 'day', 'timeline'] as const,
+      d.eventView,
+    ),
+    timelineDirection: oneOf(
+      params.get('timelineDirection'),
+      ['vertical', 'horizontal'] as const,
+      d.timelineDirection,
+    ),
+    timelineMarkerShape: oneOf(
+      params.get('timelineMarkerShape'),
+      ['circular', 'square'] as const,
+      d.timelineMarkerShape,
+    ),
+    timelineShowIcons: parseBool(params.get('timelineShowIcons'), d.timelineShowIcons),
+    timelineAlternating: parseBool(params.get('timelineAlternating'), d.timelineAlternating),
+    timelineMarkerSize: Number(params.get('timelineMarkerSize')) || d.timelineMarkerSize,
+    nativeDigits: parseBool(params.get('nativeDigits'), d.nativeDigits),
     minuteStep: Number(params.get('minuteStep')) || d.minuteStep,
     showHolidays: parseBool(params.get('showHolidays'), d.showHolidays),
     theme: {
@@ -150,6 +183,16 @@ export function serializeDemoState(state: DemoState): string {
   set('compact', state.compact ? '1' : '0', d.compact ? '1' : '0');
   set('dir', state.dir, d.dir);
   set('eventView', state.eventView, d.eventView);
+  set('timelineDirection', state.timelineDirection, d.timelineDirection);
+  set('timelineMarkerShape', state.timelineMarkerShape, d.timelineMarkerShape);
+  set('timelineShowIcons', state.timelineShowIcons ? '1' : '0', d.timelineShowIcons ? '1' : '0');
+  set(
+    'timelineAlternating',
+    state.timelineAlternating ? '1' : '0',
+    d.timelineAlternating ? '1' : '0',
+  );
+  set('timelineMarkerSize', String(state.timelineMarkerSize), String(d.timelineMarkerSize));
+  set('nativeDigits', state.nativeDigits ? '1' : '0', d.nativeDigits ? '1' : '0');
   set('minuteStep', String(state.minuteStep), String(d.minuteStep));
   set('showHolidays', state.showHolidays ? '1' : '0', d.showHolidays ? '1' : '0');
   if (state.theme.primary) params.set('themePrimary', state.theme.primary);

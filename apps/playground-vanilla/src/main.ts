@@ -26,6 +26,7 @@ import {
   DEMO_DAY,
   DEMO_EVENTS,
   DEMO_MONTH,
+  DEMO_TIMELINE_EVENTS,
   parseDemoState,
   themeStyleFromState,
   webSnippet,
@@ -47,6 +48,7 @@ const TABS: { id: DemoTab; label: string }[] = [
 ];
 
 const demoEvents = [...DEMO_EVENTS];
+const demoTimelineEvents = [...DEMO_TIMELINE_EVENTS];
 let state = parseDemoState(window.location.search);
 let stored: unknown = null;
 let storedRange: unknown = null;
@@ -187,9 +189,39 @@ function renderControls(): void {
   selectControl('Display style', state.displayStyle, ['short', 'long'], (value) =>
     patch({ displayStyle: value as DemoState['displayStyle'] }),
   );
-  selectControl('Event view', state.eventView, ['month', 'week', 'day'], (value) =>
+  selectControl('Event view', state.eventView, ['month', 'week', 'day', 'timeline'], (value) =>
     patch({ eventView: value as DemoState['eventView'] }),
   );
+
+  if (state.tab === 'event-calendar' && state.eventView === 'timeline') {
+    selectControl('Direction', state.timelineDirection, ['vertical', 'horizontal'], (value) =>
+      patch({ timelineDirection: value as DemoState['timelineDirection'] }),
+    );
+    selectControl('Marker shape', state.timelineMarkerShape, ['circular', 'square'], (value) =>
+      patch({ timelineMarkerShape: value as DemoState['timelineMarkerShape'] }),
+    );
+    const sizeLabel = document.createElement('label');
+    sizeLabel.append('Marker size');
+    const sizeInput = document.createElement('input');
+    sizeInput.type = 'range';
+    sizeInput.min = '16';
+    sizeInput.max = '40';
+    sizeInput.value = String(state.timelineMarkerSize);
+    sizeInput.addEventListener('input', () =>
+      patch({ timelineMarkerSize: Number(sizeInput.value) || 24 }),
+    );
+    sizeLabel.appendChild(sizeInput);
+    controlsEl.appendChild(sizeLabel);
+    checkboxControl('Show icons', state.timelineShowIcons, (checked) =>
+      patch({ timelineShowIcons: checked }),
+    );
+    checkboxControl('Alternating layout', state.timelineAlternating, (checked) =>
+      patch({ timelineAlternating: checked }),
+    );
+    checkboxControl('Native digits', state.nativeDigits, (checked) =>
+      patch({ nativeDigits: checked }),
+    );
+  }
 
   const minuteLabel = document.createElement('label');
   minuteLabel.append('Minute step');
@@ -347,7 +379,18 @@ function renderStage(): void {
     el.view = state.eventView;
     el.initialDisplayedMonth = { ...DEMO_MONTH };
     el.initialDate = { ...DEMO_DAY };
-    el.events = demoEvents;
+    el.displayFormat = {
+      style: state.displayStyle,
+      numerals: state.nativeDigits ? 'native' : 'latin',
+    };
+    el.timeline = {
+      direction: state.timelineDirection,
+      markerShape: state.timelineMarkerShape,
+      showIcons: state.timelineShowIcons,
+      alternating: state.timelineAlternating,
+      markerSize: state.timelineMarkerSize,
+    };
+    el.events = state.eventView === 'timeline' ? demoTimelineEvents : demoEvents;
     el.addEventListener('event-click', (event) => {
       eventClickLog = (event as CustomEvent<EventCalendarEventClickDetail>).detail.event.title;
       updateValueAndSnippet();

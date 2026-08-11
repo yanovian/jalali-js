@@ -12,6 +12,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Added
+
+- EventCalendar `view: 'timeline'` with locale digits, markers, and layout options.
+
 ### Fixed
 
 - Jalali calendar weekday headers start on Saturday (شنبه).

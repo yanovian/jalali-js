@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormatOptions } from '@jalali-js/i18n';
-import { format as formatDate, formatNumber } from '@jalali-js/i18n';
+import { format as formatDate, formatNumber, formatTimelineStamp } from '@jalali-js/i18n';
 import { localePackFor, type LocaleCode } from '@jalali-js/vue';
 import type {
   CalendarDate,
@@ -8,6 +8,7 @@ import type {
   CalendarEvent,
   CalendarSystem,
   EventCalendarView,
+  TimelineOptions,
 } from 'jalali-js';
 import {
   buildCalendarGrid,
@@ -15,6 +16,7 @@ import {
   dayOfWeek,
   daysForEventView,
   eventIsAllDay,
+  eventsForTimeline,
   findEventById,
   isSameDay,
   laneCountOf,
@@ -24,6 +26,8 @@ import {
   listHours,
   shiftEventViewAnchor,
   timedBlockStyle,
+  timelineAccentFor,
+  timelineEventDateTime,
   weekdayLabelsForGrid,
 } from 'jalali-js';
 import { computed, ref, useId } from 'vue';
@@ -37,6 +41,7 @@ const props = withDefaults(
     initialDisplayedMonth?: { year: number; month: number };
     initialDate?: CalendarDateFields;
     displayFormat?: FormatOptions;
+    timeline?: TimelineOptions;
   }>(),
   {
     system: 'jalali',
@@ -71,7 +76,9 @@ const monthLayouts = computed(() =>
 );
 
 const periodDays = computed(() =>
-  props.view === 'month' ? null : daysForEventView(props.system, props.view, anchor.value),
+  props.view === 'week' || props.view === 'day'
+    ? daysForEventView(props.system, props.view, anchor.value)
+    : null,
 );
 const allDayEvents = computed(() => props.events.filter(eventIsAllDay));
 const allDaySegments = computed(() =>
@@ -81,8 +88,27 @@ const timedLayouts = computed(() =>
   periodDays.value ? layoutDaysTimedEvents(props.events, periodDays.value) : [],
 );
 const allDayLaneCount = computed(() => laneCountOf(allDaySegments.value));
+const timelineEvents = computed(() =>
+  props.view === 'timeline' ? eventsForTimeline(props.events) : null,
+);
 
 const title = computed(() => {
+  if (props.view === 'timeline') {
+    if (!timelineEvents.value?.length) return 'Timeline';
+    const first = timelineEvents.value[0]!;
+    const last = timelineEvents.value[timelineEvents.value.length - 1]!;
+    const start = formatDate(
+      { precision: 'date', system: props.system, ...first.start },
+      localePack.value,
+      props.displayFormat ?? { style: 'short' },
+    );
+    const end = formatDate(
+      { precision: 'date', system: props.system, ...last.start },
+      localePack.value,
+      props.displayFormat ?? { style: 'short' },
+    );
+    return start === end ? start : `${start} – ${end}`;
+  }
   if (props.view === 'month') {
     const monthLabel = localePack.value.monthNames[props.system].long[anchor.value.month - 1];
     const yearLabel = formatNumber(
@@ -112,6 +138,11 @@ const navLabel = computed(() =>
 );
 const hours = listHours();
 const titleId = useId();
+const direction = computed(() => props.timeline?.direction ?? 'vertical');
+const markerShape = computed(() => props.timeline?.markerShape ?? 'circular');
+const showIcons = computed(() => props.timeline?.showIcons ?? true);
+const alternating = computed(() => props.timeline?.alternating ?? false);
+const markerSize = computed(() => props.timeline?.markerSize ?? 24);
 
 function onEventClick(eventId: string, click: MouseEvent): void {
   click.stopPropagation();
@@ -129,7 +160,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
     data-jalali-eventcalendar-root
     :data-view="view"
   >
-    <div data-jalali-calendar-header>
+    <div v-if="view !== 'timeline'" data-jalali-calendar-header>
       <button
         type="button"
         data-jalali-calendar-nav="previous"
@@ -147,6 +178,9 @@ function onEventClick(eventId: string, click: MouseEvent): void {
       >
         ›
       </button>
+    </div>
+    <div v-else data-jalali-calendar-header data-jalali-timeline-header="">
+      <span :id="titleId" data-jalali-calendar-title>{{ title }}</span>
     </div>
 
     <div
@@ -217,7 +251,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
     </div>
 
     <div
-      v-else-if="periodDays"
+      v-else-if="(view === 'week' || view === 'day') && periodDays"
       role="region"
       tabindex="0"
       :aria-labelledby="titleId"
@@ -289,6 +323,51 @@ function onEventClick(eventId: string, click: MouseEvent): void {
           </button>
         </div>
       </div>
+    </div>
+
+    <div
+      v-else-if="view === 'timeline' && timelineEvents"
+      :role="direction === 'horizontal' ? 'region' : undefined"
+      :tabindex="direction === 'horizontal' ? 0 : undefined"
+      :aria-labelledby="direction === 'horizontal' ? titleId : undefined"
+      :data-jalali-timeline-scroll="direction === 'horizontal' ? '' : undefined"
+    >
+      <ol
+        data-jalali-timeline
+        :data-direction="direction"
+        :data-marker-shape="markerShape"
+        :data-show-icons="showIcons ? '' : undefined"
+        :data-alternating="alternating ? '' : undefined"
+        :style="{ '--jalali-timeline-marker-size': `${markerSize}px` }"
+      >
+        <li
+          v-for="(event, index) in timelineEvents"
+          :key="event.id"
+          data-jalali-timeline-item
+          :style="{ '--jalali-timeline-accent': timelineAccentFor(index, event.color) }"
+        >
+          <div data-jalali-timeline-marker aria-hidden="true">
+            <span v-if="showIcons && event.icon" data-jalali-timeline-icon>{{ event.icon }}</span>
+          </div>
+          <button type="button" data-jalali-timeline-card @click="onEventClick(event.id, $event)">
+            <time data-jalali-timeline-when :datetime="timelineEventDateTime(event)">
+              {{
+                formatTimelineStamp(
+                  event.start,
+                  system,
+                  localePack,
+                  displayFormat ?? {},
+                  event.startTime,
+                )
+              }}
+            </time>
+            <span data-jalali-timeline-title>{{ event.title }}</span>
+            <span v-if="event.description" data-jalali-timeline-description>
+              {{ event.description }}
+            </span>
+          </button>
+        </li>
+      </ol>
     </div>
   </div>
 </template>

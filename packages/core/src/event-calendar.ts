@@ -4,7 +4,23 @@ import type { CalendarSystem } from './convert.js';
 import { addDays, addMonths, compareDates, isSameDay, startOf } from './date-math.js';
 import type { TimeOfDay } from './time-of-day.js';
 
-export type EventCalendarView = 'month' | 'week' | 'day';
+export type EventCalendarView = 'month' | 'week' | 'day' | 'timeline';
+
+export type TimelineDirection = 'vertical' | 'horizontal';
+export type TimelineMarkerShape = 'circular' | 'square';
+
+/**
+ * Options for `view: 'timeline'`. Defaults match a vertical, circular-marker
+ * list with icons on and a single-sided rail.
+ */
+export interface TimelineOptions {
+  direction?: TimelineDirection;
+  markerShape?: TimelineMarkerShape;
+  showIcons?: boolean;
+  alternating?: boolean;
+  /** Marker diameter in CSS pixels. Default: 24. */
+  markerSize?: number;
+}
 
 /**
  * A consumer-owned calendar event. The library lays events out. The consumer
@@ -13,6 +29,8 @@ export type EventCalendarView = 'month' | 'week' | 'day';
  * `start` and `end` are inclusive date fields in the calendar system the
  * view uses. Timed events may set `startTime` / `endTime`. Recurring rules
  * are not expanded here: expand them before you pass the array.
+ *
+ * Timeline view also reads optional `description`, `color`, and `icon`.
  */
 export interface CalendarEvent {
   id: string;
@@ -23,6 +41,12 @@ export interface CalendarEvent {
   allDay?: boolean;
   startTime?: TimeOfDay;
   endTime?: TimeOfDay;
+  /** Optional body text for timeline cards. */
+  description?: string;
+  /** CSS color for timeline accent (marker and card edge). */
+  color?: string;
+  /** Short icon for timeline markers (emoji or text). */
+  icon?: string;
 }
 
 /** One event chip or bar segment inside an all-day row. */
@@ -103,7 +127,7 @@ function toMinute(time: TimeOfDay | undefined, fallback: number): number {
 /** Days shown for `view` around `anchor` (week = 7, day = 1). */
 export function daysForEventView(
   system: CalendarSystem,
-  view: Exclude<EventCalendarView, 'month'>,
+  view: 'week' | 'day',
   anchor: CalendarDateFields,
 ): CalendarDate[] {
   if (view === 'day') {
@@ -116,18 +140,49 @@ export function daysForEventView(
   });
 }
 
-/** Move the anchor by one month, week, or day. */
+/** Move the anchor by one month, week, or day. Timeline keeps the same anchor. */
 export function shiftEventViewAnchor(
   system: CalendarSystem,
   view: EventCalendarView,
   anchor: CalendarDateFields,
   direction: -1 | 1,
 ): CalendarDateFields {
+  if (view === 'timeline') return asFields(anchor);
   if (view === 'month') {
     const next = addMonths({ ...anchor, day: 1 }, direction, system);
     return { year: next.year, month: next.month, day: 1 };
   }
   return addDays(anchor, view === 'week' ? direction * 7 : direction, system);
+}
+
+/** Events in chronological order for a timeline list. */
+export function eventsForTimeline(events: readonly CalendarEvent[]): CalendarEvent[] {
+  return events.filter((event) => isValidEventSpan(event)).sort(compareEventOrder);
+}
+
+/** Default accent colors when a timeline event has no `color`. */
+export const TIMELINE_ACCENT_COLORS = [
+  '#22c55e',
+  '#6366f1',
+  '#f97316',
+  '#ef4444',
+  '#a855f7',
+] as const;
+
+/** Accent for timeline item `index`, or `color` when set. */
+export function timelineAccentFor(index: number, color?: string): string {
+  return color ?? TIMELINE_ACCENT_COLORS[index % TIMELINE_ACCENT_COLORS.length]!;
+}
+
+/** Machine-readable `dateTime` value for a timeline `<time>` element. */
+export function timelineEventDateTime(event: Pick<CalendarEvent, 'start' | 'startTime'>): string {
+  const month = String(event.start.month).padStart(2, '0');
+  const day = String(event.start.day).padStart(2, '0');
+  const date = `${event.start.year}-${month}-${day}`;
+  if (!event.startTime) return date;
+  const hour = String(event.startTime.hour).padStart(2, '0');
+  const minute = String(event.startTime.minute).padStart(2, '0');
+  return `${date}T${hour}:${minute}`;
 }
 
 /**

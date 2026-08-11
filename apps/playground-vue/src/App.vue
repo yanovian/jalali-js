@@ -12,6 +12,7 @@ import {
   DEMO_DAY,
   DEMO_EVENTS,
   DEMO_MONTH,
+  DEMO_TIMELINE_EVENTS,
   parseDemoState,
   themeStyleFromState,
   vueSnippet,
@@ -42,6 +43,7 @@ const inlineSelected = ref<CalendarDate | null>(null);
 const eventClickLog = ref('none');
 const copyLabel = ref('Copy');
 const demoEvents = DEMO_EVENTS as unknown as CalendarEvent[];
+const demoTimelineEvents = DEMO_TIMELINE_EVENTS as unknown as CalendarEvent[];
 const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
 
 const snippet = computed(() => vueSnippet(state));
@@ -231,8 +233,87 @@ const datetimeDefault = {
             <option value="month">month</option>
             <option value="week">week</option>
             <option value="day">day</option>
+            <option value="timeline">timeline</option>
           </select>
         </label>
+        <template v-if="state.tab === 'event-calendar' && state.eventView === 'timeline'">
+          <label>
+            Direction
+            <select
+              :value="state.timelineDirection"
+              @change="
+                patch({
+                  timelineDirection: ($event.target as HTMLSelectElement)
+                    .value as DemoState['timelineDirection'],
+                })
+              "
+            >
+              <option value="vertical">Vertical</option>
+              <option value="horizontal">Horizontal</option>
+            </select>
+          </label>
+          <label>
+            Marker shape
+            <select
+              :value="state.timelineMarkerShape"
+              @change="
+                patch({
+                  timelineMarkerShape: ($event.target as HTMLSelectElement)
+                    .value as DemoState['timelineMarkerShape'],
+                })
+              "
+            >
+              <option value="circular">Circular</option>
+              <option value="square">Square</option>
+            </select>
+          </label>
+          <label>
+            Marker size
+            <input
+              type="range"
+              min="16"
+              max="40"
+              :value="state.timelineMarkerSize"
+              @input="
+                patch({
+                  timelineMarkerSize: Number(($event.target as HTMLInputElement).value) || 24,
+                })
+              "
+            />
+          </label>
+          <label>
+            <span>
+              <input
+                type="checkbox"
+                :checked="state.timelineShowIcons"
+                @change="patch({ timelineShowIcons: ($event.target as HTMLInputElement).checked })"
+              />
+              Show icons
+            </span>
+          </label>
+          <label>
+            <span>
+              <input
+                type="checkbox"
+                :checked="state.timelineAlternating"
+                @change="
+                  patch({ timelineAlternating: ($event.target as HTMLInputElement).checked })
+                "
+              />
+              Alternating layout
+            </span>
+          </label>
+          <label>
+            <span>
+              <input
+                type="checkbox"
+                :checked="state.nativeDigits"
+                @change="patch({ nativeDigits: ($event.target as HTMLInputElement).checked })"
+              />
+              Native digits
+            </span>
+          </label>
+        </template>
         <label>
           Minute step
           <input
@@ -380,7 +461,18 @@ const datetimeDefault = {
           :view="state.eventView"
           :initial-displayed-month="DEMO_MONTH"
           :initial-date="DEMO_DAY"
-          :events="demoEvents"
+          :display-format="{
+            style: state.displayStyle,
+            numerals: state.nativeDigits ? 'native' : 'latin',
+          }"
+          :timeline="{
+            direction: state.timelineDirection,
+            markerShape: state.timelineMarkerShape,
+            showIcons: state.timelineShowIcons,
+            alternating: state.timelineAlternating,
+            markerSize: state.timelineMarkerSize,
+          }"
+          :events="state.eventView === 'timeline' ? demoTimelineEvents : demoEvents"
           @event-click="(event) => (eventClickLog = event.title)"
         />
         <TimePicker

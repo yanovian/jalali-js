@@ -80,4 +80,35 @@ describe('jalali-event-calendar', () => {
     el.view = 'day';
     expect(el.getAttribute('data-view')).toBe('day');
   });
+
+  it('supports timeline view with native digits', () => {
+    const el = document.createElement('jalali-event-calendar') as JalaliEventCalendarElement;
+    el.setAttribute('locale', 'fa');
+    el.setAttribute('view', 'timeline');
+    el.displayFormat = { numerals: 'native', template: 'YYYY/MM/DD' };
+    el.timeline = { showIcons: true, direction: 'vertical' };
+    el.events = [
+      {
+        id: 'start',
+        title: 'آغاز پروژه',
+        start: { year: 1403, month: 10, day: 26 },
+        end: { year: 1403, month: 10, day: 26 },
+        allDay: false,
+        startTime: { hour: 9, minute: 0 },
+        endTime: { hour: 10, minute: 0 },
+        icon: '◎',
+      },
+    ];
+    document.body.append(el);
+    expect(el.getAttribute('data-view')).toBe('timeline');
+    expect(el.querySelector('[data-jalali-timeline]')).toBeTruthy();
+    expect(getByText(document.body, 'آغاز پروژه')).toBeInTheDocument();
+    expect(el.textContent).toMatch(/۰۹:۰۰/);
+
+    const onEvent = vi.fn();
+    el.addEventListener('event-click', onEvent);
+    getByText(document.body, 'آغاز پروژه').click();
+    expect(onEvent).toHaveBeenCalled();
+    expect((onEvent.mock.calls[0]![0] as CustomEvent).detail.event.id).toBe('start');
+  });
 });

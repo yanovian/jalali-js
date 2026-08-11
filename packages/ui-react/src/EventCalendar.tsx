@@ -1,5 +1,5 @@
 import type { FormatOptions } from '@jalali-js/i18n';
-import { format as formatDate, formatNumber } from '@jalali-js/i18n';
+import { format as formatDate, formatNumber, formatTimelineStamp } from '@jalali-js/i18n';
 import type { LocaleCode } from '@jalali-js/react';
 import { localePackFor } from '@jalali-js/react';
 import type {
@@ -8,6 +8,7 @@ import type {
   CalendarEvent,
   CalendarSystem,
   EventCalendarView,
+  TimelineOptions,
 } from 'jalali-js';
 import {
   buildCalendarGrid,
@@ -15,6 +16,7 @@ import {
   dayOfWeek,
   daysForEventView,
   eventIsAllDay,
+  eventsForTimeline,
   findEventById,
   isSameDay,
   laneCountOf,
@@ -24,9 +26,11 @@ import {
   listHours,
   shiftEventViewAnchor,
   timedBlockStyle,
+  timelineAccentFor,
+  timelineEventDateTime,
   weekdayLabelsForGrid,
 } from 'jalali-js';
-import { useId, useMemo, useState, type MouseEvent } from 'react';
+import { useId, useMemo, useState, type CSSProperties, type MouseEvent } from 'react';
 
 export interface EventCalendarProps {
   system?: CalendarSystem;
@@ -36,6 +40,8 @@ export interface EventCalendarProps {
   initialDisplayedMonth?: { year: number; month: number };
   initialDate?: CalendarDateFields;
   displayFormat?: FormatOptions;
+  /** Options for `view: 'timeline'`. */
+  timeline?: TimelineOptions;
   onEventClick?: (event: CalendarEvent) => void;
   onDayClick?: (date: CalendarDate) => void;
   className?: string;
@@ -49,6 +55,7 @@ export function EventCalendar({
   initialDisplayedMonth,
   initialDate,
   displayFormat,
+  timeline,
   onEventClick,
   onDayClick,
   className,
@@ -72,7 +79,7 @@ export function EventCalendar({
   );
 
   const periodDays = useMemo(
-    () => (view === 'month' ? null : daysForEventView(system, view, anchor)),
+    () => (view === 'week' || view === 'day' ? daysForEventView(system, view, anchor) : null),
     [view, system, anchor],
   );
   const allDayEvents = useMemo(() => events.filter(eventIsAllDay), [events]);
@@ -85,8 +92,28 @@ export function EventCalendar({
     [events, periodDays],
   );
   const allDayLaneCount = laneCountOf(allDaySegments);
+  const timelineEvents = useMemo(
+    () => (view === 'timeline' ? eventsForTimeline(events) : null),
+    [view, events],
+  );
 
   const title = useMemo(() => {
+    if (view === 'timeline') {
+      if (!timelineEvents?.length) return 'Timeline';
+      const first = timelineEvents[0]!;
+      const last = timelineEvents[timelineEvents.length - 1]!;
+      const start = formatDate(
+        { precision: 'date', system, ...first.start },
+        localePack,
+        displayFormat ?? { style: 'short' },
+      );
+      const end = formatDate(
+        { precision: 'date', system, ...last.start },
+        localePack,
+        displayFormat ?? { style: 'short' },
+      );
+      return start === end ? start : `${start} – ${end}`;
+    }
     if (view === 'month') {
       const monthLabel = localePack.monthNames[system].long[anchor.month - 1];
       const yearLabel = formatNumber(anchor.year, localePack.defaultNumerals, localePack.digits);
@@ -99,11 +126,16 @@ export function EventCalendar({
     const start = formatDate(periodDays[0]!, localePack, { style: 'short' });
     const end = formatDate(periodDays[periodDays.length - 1]!, localePack, { style: 'short' });
     return `${start} – ${end}`;
-  }, [view, system, anchor, localePack, periodDays, displayFormat]);
+  }, [view, system, anchor, localePack, periodDays, displayFormat, timelineEvents]);
 
   const navLabel = view === 'month' ? 'month' : view === 'week' ? 'week' : 'day';
   const hours = listHours();
   const titleId = useId();
+  const direction = timeline?.direction ?? 'vertical';
+  const markerShape = timeline?.markerShape ?? 'circular';
+  const showIcons = timeline?.showIcons ?? true;
+  const alternating = timeline?.alternating ?? false;
+  const markerSize = timeline?.markerSize ?? 24;
 
   function clickEvent(eventId: string, click: MouseEvent): void {
     click.stopPropagation();
@@ -121,27 +153,35 @@ export function EventCalendar({
       data-jalali-eventcalendar-root
       data-view={view}
     >
-      <div data-jalali-calendar-header>
-        <button
-          type="button"
-          data-jalali-calendar-nav="previous"
-          aria-label={`Previous ${navLabel}`}
-          onClick={() => setAnchor(shiftEventViewAnchor(system, view, anchor, -1))}
-        >
-          ‹
-        </button>
-        <span id={titleId} data-jalali-calendar-title>
-          {title}
-        </span>
-        <button
-          type="button"
-          data-jalali-calendar-nav="next"
-          aria-label={`Next ${navLabel}`}
-          onClick={() => setAnchor(shiftEventViewAnchor(system, view, anchor, 1))}
-        >
-          ›
-        </button>
-      </div>
+      {view !== 'timeline' ? (
+        <div data-jalali-calendar-header>
+          <button
+            type="button"
+            data-jalali-calendar-nav="previous"
+            aria-label={`Previous ${navLabel}`}
+            onClick={() => setAnchor(shiftEventViewAnchor(system, view, anchor, -1))}
+          >
+            ‹
+          </button>
+          <span id={titleId} data-jalali-calendar-title>
+            {title}
+          </span>
+          <button
+            type="button"
+            data-jalali-calendar-nav="next"
+            aria-label={`Next ${navLabel}`}
+            onClick={() => setAnchor(shiftEventViewAnchor(system, view, anchor, 1))}
+          >
+            ›
+          </button>
+        </div>
+      ) : (
+        <div data-jalali-calendar-header data-jalali-timeline-header="">
+          <span id={titleId} data-jalali-calendar-title>
+            {title}
+          </span>
+        </div>
+      )}
 
       {view === 'month' && weeks && monthLayouts ? (
         <div
@@ -213,7 +253,7 @@ export function EventCalendar({
         </div>
       ) : null}
 
-      {view !== 'month' && periodDays ? (
+      {(view === 'week' || view === 'day') && periodDays ? (
         <div
           role="region"
           tabIndex={0}
@@ -294,6 +334,58 @@ export function EventCalendar({
               );
             })}
           </div>
+        </div>
+      ) : null}
+
+      {view === 'timeline' && timelineEvents ? (
+        <div
+          role={direction === 'horizontal' ? 'region' : undefined}
+          tabIndex={direction === 'horizontal' ? 0 : undefined}
+          aria-labelledby={direction === 'horizontal' ? titleId : undefined}
+          data-jalali-timeline-scroll={direction === 'horizontal' ? '' : undefined}
+        >
+          <ol
+            data-jalali-timeline
+            data-direction={direction}
+            data-marker-shape={markerShape}
+            data-show-icons={showIcons ? '' : undefined}
+            data-alternating={alternating ? '' : undefined}
+            style={{ ['--jalali-timeline-marker-size' as string]: `${markerSize}px` }}
+          >
+            {timelineEvents.map((event, index) => {
+              const itemStyle = {
+                ['--jalali-timeline-accent' as string]: timelineAccentFor(index, event.color),
+              } satisfies CSSProperties;
+              return (
+                <li key={event.id} data-jalali-timeline-item style={itemStyle}>
+                  <div data-jalali-timeline-marker aria-hidden="true">
+                    {showIcons && event.icon ? (
+                      <span data-jalali-timeline-icon>{event.icon}</span>
+                    ) : null}
+                  </div>
+                  <button
+                    type="button"
+                    data-jalali-timeline-card
+                    onClick={(click) => clickEvent(event.id, click)}
+                  >
+                    <time data-jalali-timeline-when dateTime={timelineEventDateTime(event)}>
+                      {formatTimelineStamp(
+                        event.start,
+                        system,
+                        localePack,
+                        displayFormat ?? {},
+                        event.startTime,
+                      )}
+                    </time>
+                    <span data-jalali-timeline-title>{event.title}</span>
+                    {event.description ? (
+                      <span data-jalali-timeline-description>{event.description}</span>
+                    ) : null}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       ) : null}
     </div>

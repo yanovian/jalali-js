@@ -1075,7 +1075,7 @@ them first. Land each item with a matching `CHANGELOG.md` bullet under
       week and day lanes, touch-friendly event chips, and no horizontal
       overflow that clips content. Apply across `ui-react`, `ui-vue`, and
       `ui-web`. Add playground and e2e coverage at a phone width.
-- [ ] **Timeline calendar.** Add a vertical timeline EventCalendar
+- [x] **Timeline calendar.** Add a vertical timeline EventCalendar
       alternative (or sibling view) in the `ui-*` packages. Support Persian
       locale text, native digits, and date formats from `@jalali-js/i18n`.
       Expose configuration close to the attached design: direction

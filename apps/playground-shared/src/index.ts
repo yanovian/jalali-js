@@ -1,4 +1,4 @@
-export { DEMO_DAY, DEMO_EVENTS, DEMO_MONTH } from './demo-events.js';
+export { DEMO_DAY, DEMO_EVENTS, DEMO_MONTH, DEMO_TIMELINE_EVENTS } from './demo-events.js';
 export { reactSnippet, vueSnippet, webSnippet } from './snippets.js';
 export {
   DEFAULT_DEMO_STATE,
