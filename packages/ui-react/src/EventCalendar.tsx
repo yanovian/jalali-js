@@ -165,6 +165,11 @@ export function EventCalendar({
       data-jalali-calendar-root
       data-jalali-eventcalendar-root
       data-view={view}
+      style={
+        (view === 'week' || view === 'day') && periodDays
+          ? { ['--jalali-event-cols' as string]: String(periodDays.length) }
+          : undefined
+      }
     >
       {view !== 'timeline' ? (
         <div data-jalali-calendar-header>
@@ -267,13 +272,7 @@ export function EventCalendar({
       ) : null}
 
       {(view === 'week' || view === 'day') && periodDays ? (
-        <div
-          role="region"
-          tabIndex={0}
-          aria-labelledby={titleId}
-          data-jalali-eventcalendar-period
-          style={{ ['--jalali-event-cols' as string]: periodDays.length }}
-        >
+        <div role="region" tabIndex={0} aria-labelledby={titleId} data-jalali-eventcalendar-period>
           <div data-jalali-eventcalendar-days>
             <span data-jalali-eventcalendar-gutter aria-hidden="true" />
             {periodDays.map((day) => (

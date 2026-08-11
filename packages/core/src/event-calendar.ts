@@ -21,8 +21,8 @@ export interface TimelineOptions {
   showIcons?: boolean;
   /**
    * Card layout. `single` keeps every card on one side of the rail.
-   * `alternating` flips sides. `road` is a roadmap with a center track,
-   * stems, and outer turns. Default: `'single'`.
+   * `alternating` and `road` put cards on both sides. `road` uses a thick
+   * dashed center track. Default: `'single'`.
    */
   layout?: TimelineLayout;
   /**
@@ -364,7 +364,7 @@ export function layoutDaysTimedEvents(
 
 /**
  * CSS placement for a timed block in a day column.
- * Themes tune overlap with `--jalali-event-lane-gap`.
+ * Lanes cascade so overlapping titles stay readable.
  */
 export function timedBlockStyle(
   block: TimedEventBlock,
@@ -379,12 +379,13 @@ export function timedBlockStyle(
   const lanes = Math.max(1, laneCount);
   const startPct = (block.startMinute / MINUTES_PER_DAY) * 100;
   const heightPct = ((block.endMinute - block.startMinute) / MINUTES_PER_DAY) * 100;
-  const lanePct = 100 / lanes;
+  const start = (block.lane / lanes) * 100;
+  const width = ((lanes - block.lane) / lanes) * 100;
   return {
     top: `${startPct}%`,
     height: `${heightPct}%`,
-    insetInlineStart: `calc(${block.lane * lanePct}% + var(--jalali-event-lane-gap, 2px) / 2)`,
-    width: `calc(${lanePct}% - var(--jalali-event-lane-gap, 2px))`,
+    insetInlineStart: `calc(${start}% + var(--jalali-event-lane-gap, 2px) / 2)`,
+    width: `calc(${width}% - var(--jalali-event-lane-gap, 2px))`,
     zIndex: String(1 + block.lane),
   };
 }

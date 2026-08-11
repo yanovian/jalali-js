@@ -174,6 +174,11 @@ function onEventClick(eventId: string, click: MouseEvent): void {
     data-jalali-calendar-root
     data-jalali-eventcalendar-root
     :data-view="view"
+    :style="
+      (view === 'week' || view === 'day') && periodDays
+        ? { '--jalali-event-cols': String(periodDays.length) }
+        : undefined
+    "
   >
     <div v-if="view !== 'timeline'" data-jalali-calendar-header>
       <button
@@ -271,7 +276,6 @@ function onEventClick(eventId: string, click: MouseEvent): void {
       tabindex="0"
       :aria-labelledby="titleId"
       data-jalali-eventcalendar-period
-      :style="{ '--jalali-event-cols': periodDays.length }"
     >
       <div data-jalali-eventcalendar-days>
         <span data-jalali-eventcalendar-gutter aria-hidden="true" />

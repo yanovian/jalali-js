@@ -252,6 +252,12 @@ export class JalaliEventCalendarElement extends HTMLElement {
     this.setAttribute('data-jalali-calendar-root', '');
     this.setAttribute('data-jalali-eventcalendar-root', '');
     this.setAttribute('data-view', this.#view);
+    if (this.#view === 'week' || this.#view === 'day') {
+      const periodDays = daysForEventView(this.#system, this.#view, anchor);
+      this.style.setProperty('--jalali-event-cols', String(periodDays.length));
+    } else {
+      this.style.removeProperty('--jalali-event-cols');
+    }
 
     if (this.#view === 'timeline') {
       const timelineEvents = eventsForTimeline(this.#events);
@@ -455,7 +461,6 @@ export class JalaliEventCalendarElement extends HTMLElement {
     period.tabIndex = 0;
     period.setAttribute('aria-labelledby', this.#titleId);
     period.setAttribute('data-jalali-eventcalendar-period', '');
-    period.style.setProperty('--jalali-event-cols', String(periodDays.length));
 
     const days = document.createElement('div');
     days.setAttribute('data-jalali-eventcalendar-days', '');

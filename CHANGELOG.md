@@ -23,7 +23,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Fixed
 
-- EventCalendar timeline rail, serpentine `road` path, and week/day event grid alignment.
+- EventCalendar timeline rail, roadmap track, and week/day event grid alignment.
 - Playground Primary / Background theme controls apply on jalali picker roots.
 - TimePicker and TimeRangePicker keep hour-then-minute order in RTL locales.
 
