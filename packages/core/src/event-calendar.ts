@@ -56,34 +56,28 @@ export function resolveTimelineLayout(options?: TimelineOptions): TimelineLayout
 export const ROADMAP_LEFT_X = 42;
 export const ROADMAP_RIGHT_X = 58;
 
-/** One marker row and top/bottom caps in path units (match CSS row/cap ratio). */
-const ROADMAP_ROW = 100;
-const ROADMAP_CAP = 48;
-
 /**
  * Build an SVG path for a vertical serpentine roadmap.
- * Top and bottom runs are straight. Markers sit on left/right curve peaks.
+ * The road enters and exits on straight vertical runs at the first and
+ * last marker X. Curves sit only between markers.
  */
 export function roadmapTrackPath(count: number): { d: string; viewBox: string } {
+  const step = 100;
   const mid = 50;
-  const height = Math.max(ROADMAP_ROW, count * ROADMAP_ROW + ROADMAP_CAP * 2);
+  const height = Math.max(step, count * step);
   const viewBox = `0 0 100 ${height}`;
   if (count <= 0) {
     return { d: `M ${mid} 0 L ${mid} ${height}`, viewBox };
   }
 
   const xAt = (index: number): number => (index % 2 === 0 ? ROADMAP_LEFT_X : ROADMAP_RIGHT_X);
-  const yAt = (index: number): number => ROADMAP_CAP + index * ROADMAP_ROW + ROADMAP_ROW / 2;
-  const bend = ROADMAP_ROW * 0.18;
+  const yAt = (index: number): number => index * step + step / 2;
 
   const firstX = xAt(0);
-  const firstY = yAt(0);
   const lastX = xAt(count - 1);
-  const lastY = yAt(count - 1);
 
-  let d = `M ${mid} 0`;
-  d += ` L ${mid} ${firstY - bend}`;
-  d += ` C ${mid} ${firstY - bend * 0.35}, ${firstX} ${firstY - bend * 0.35}, ${firstX} ${firstY}`;
+  let d = `M ${firstX} 0`;
+  d += ` L ${firstX} ${yAt(0)}`;
 
   for (let index = 1; index < count; index += 1) {
     const x0 = xAt(index - 1);
@@ -94,8 +88,7 @@ export function roadmapTrackPath(count: number): { d: string; viewBox: string } 
     d += ` C ${x0} ${midY}, ${x1} ${midY}, ${x1} ${y1}`;
   }
 
-  d += ` C ${lastX} ${lastY + bend * 0.35}, ${mid} ${lastY + bend * 0.35}, ${mid} ${lastY + bend}`;
-  d += ` L ${mid} ${height}`;
+  d += ` L ${lastX} ${height}`;
 
   return { d, viewBox };
 }

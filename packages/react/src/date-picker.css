@@ -773,16 +773,13 @@ button[data-jalali-calendar-title-year]:hover {
 }
 
 /* Roadmap: equal rows so the SVG path peaks match markers.
-   Cap padding matches ROADMAP_CAP / ROADMAP_ROW in core.
    Geometry is physical left/right. Card text keeps the calendar direction. */
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap'] {
-  --jalali-roadmap-row: 8.5em;
-  --jalali-roadmap-cap: 4.08em;
   direction: ltr;
   display: grid;
   gap: 0;
-  grid-auto-rows: var(--jalali-roadmap-row);
-  padding-block: var(--jalali-roadmap-cap);
+  grid-auto-rows: 8.5em;
+  padding-block: 0;
 }
 
 [data-jalali-eventcalendar-root][dir='rtl']
