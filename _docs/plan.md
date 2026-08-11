@@ -1172,7 +1172,7 @@ Use Phase 27 preview links when reviewing this work.
       rail. Space overlapping timed events with lane-gap tokens. Keep
       density and color configurable through `--jalali-*` variables.
 - [x] **Timeline layouts.** Support `layout: 'single' | 'alternating' |
-    'road'`. Single matches a one-side rail and cards. Alternating puts
+'road'`. Single matches a one-side rail and cards. Alternating puts
       cards on both sides. Road draws a curved path with cards on both
       sides. Show all three in the playground gallery.
 
