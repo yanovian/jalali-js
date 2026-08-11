@@ -93,6 +93,7 @@ export const GALLERY_CELLS = [
   'event-calendar-timeline',
   'selection-rules',
   'holidays',
+  'holidays-and-rules',
   'custom-theme',
 ] as const;
 

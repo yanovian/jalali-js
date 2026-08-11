@@ -1,4 +1,9 @@
-import { isHolidayRegion, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import {
+  holidayDayChrome,
+  isHolidayRegion,
+  resolveCalendarHolidays,
+  type HolidayRegion,
+} from '@jalali-js/holidays';
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import { localePackFor, parseLocaleAttribute, type LocaleCode } from '@jalali-js/web';
@@ -80,6 +85,7 @@ export class JalaliRangePickerElement extends HTMLElement {
   #start: CalendarDate | null = null;
   #end: CalendarDate | null = null;
   #hoverDate: CalendarDate | null = null;
+  #dayTipEl: HTMLElement | undefined;
   #displayed: { year: number; month: number } | undefined;
   #open = false;
   #connected = false;
@@ -87,6 +93,10 @@ export class JalaliRangePickerElement extends HTMLElement {
   // buttons (#updateRangeAttributes) rather than rebuilding the grid, so a mouseenter while
   // moving toward a click target never replaces the very button the click is about to land on.
   #dayCells: { date: CalendarDate; button: HTMLButtonElement }[] = [];
+
+  #setDayTip(tip: string | undefined): void {
+    if (this.#dayTipEl) this.#dayTipEl.textContent = tip ?? '';
+  }
 
   #onPointerDown = (event: PointerEvent): void => {
     if (!this.contains(event.target as Node)) this.#setOpen(false);
@@ -417,40 +427,63 @@ export class JalaliRangePickerElement extends HTMLElement {
         day.setAttribute('data-jalali-calendar-day', '');
         if (cell.isToday) day.setAttribute('data-today', '');
         if (!cell.isCurrentMonth) day.setAttribute('data-outside-month', '');
-        if (!cell.isSelectable) {
-          day.setAttribute('data-disabled', '');
-          day.disabled = true;
-        }
+        const { tip, ariaLabel, blocked } = holidayDayChrome(
+          formatDate(cell.date, localePack, { style: 'long' }),
+          cell,
+          {
+            locale: this.#locale,
+            region: this.#holidayRegion,
+            closedLabel: localePack.ui.closedDay,
+          },
+        );
         if (cell.isHoliday) day.setAttribute('data-holiday', '');
         if (isRangeStart) day.setAttribute('data-range-start', '');
         if (isRangeEnd) day.setAttribute('data-range-end', '');
         if (isInRange) day.setAttribute('data-in-range', '');
         if (cell.isToday) day.setAttribute('aria-current', 'date');
-        day.setAttribute('aria-label', formatDate(cell.date, localePack, { style: 'long' }));
+        if (tip) day.setAttribute('data-jalali-day-tip', tip);
+        if (blocked) {
+          day.setAttribute('data-disabled', '');
+          day.setAttribute('aria-disabled', blocked['aria-disabled']);
+          day.tabIndex = blocked.tabIndex;
+        }
+        day.setAttribute('aria-label', ariaLabel);
         day.textContent = formatNumber(
           cell.date.day,
           localePack.defaultNumerals,
           localePack.digits,
         );
-        day.addEventListener('click', () => this.#selectDay(cell.date));
+        day.addEventListener('click', () => {
+          if (blocked) return;
+          this.#selectDay(cell.date);
+        });
         day.addEventListener('mouseenter', () => {
           this.#hoverDate = cell.date;
           this.#updateRangeAttributes();
+          this.#setDayTip(tip);
         });
         day.addEventListener('mouseleave', () => {
           this.#hoverDate = null;
           this.#updateRangeAttributes();
+          this.#setDayTip(undefined);
         });
+        day.addEventListener('focus', () => this.#setDayTip(tip));
+        day.addEventListener('blur', () => this.#setDayTip(undefined));
         this.#dayCells.push({ date: cell.date, button: day });
         row.append(day);
       }
       grid.append(row);
     }
 
+    const tipEl = document.createElement('div');
+    tipEl.setAttribute('data-jalali-calendar-tip', '');
+    tipEl.setAttribute('aria-hidden', 'true');
+    this.#dayTipEl = tipEl;
+
     const calendarRoot = document.createElement('div');
     calendarRoot.dir = localePack.direction;
     calendarRoot.setAttribute('data-jalali-calendar-root', '');
-    calendarRoot.append(header, grid);
+    calendarRoot.append(header, grid, tipEl);
 
     const popover = document.createElement('div');
     popover.setAttribute('data-jalali-datepicker-popover', '');

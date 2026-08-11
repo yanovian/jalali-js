@@ -85,6 +85,7 @@ export const ps: LocalePack = {
     day: 'ورځ',
     hour: 'ساعت',
     minute: 'دقیقه',
+    closedDay: 'تړلی',
   },
   relative: {
     today: 'نن',

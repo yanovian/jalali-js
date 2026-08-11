@@ -1,4 +1,4 @@
-import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import { holidayDayChrome, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
 import {
@@ -88,9 +88,10 @@ function TitlePart({
  * consumer can restyle it completely. `DatePicker` is this same component with a default
  * stylesheet and a popover wrapped around it.
  *
- * Days blocked by `rules` render as disabled buttons: clicks do nothing and the Tab order
- * skips them, so keyboard navigation skips blocked days. With `showHolidays`, holiday days
- * get `data-holiday`. With `blockHolidays`, those days also become unselectable.
+ * Days blocked by `rules` use `aria-disabled` and `data-disabled`: clicks do nothing and
+ * the Tab order skips them, so keyboard navigation skips blocked days. Holiday tips still
+ * work on hover and focus for those days. With `showHolidays`, holiday days get
+ * `data-holiday`. With `blockHolidays`, those days also become unselectable.
  *
  * With `quickNav` (default on), clicking the month or year in the header opens a month grid or
  * a year grid, so a person can jump years ahead without paging one month at a time. Picking a
@@ -118,6 +119,7 @@ export function Calendar({
   );
   const [view, setView] = useState<CalendarView>('day');
   const [yearPage, setYearPage] = useState(() => yearPageStart(displayed.year));
+  const [dayTip, setDayTip] = useState<string | undefined>();
 
   const holidayOptions = useMemo(
     () =>
@@ -219,28 +221,49 @@ export function Calendar({
             </div>
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} role="row" data-jalali-calendar-week>
-                {week.map((cell) => (
-                  <button
-                    key={`${cell.date.year}-${cell.date.month}-${cell.date.day}`}
-                    type="button"
-                    role="gridcell"
-                    data-jalali-calendar-day
-                    data-selected={cell.isSelected ? '' : undefined}
-                    data-today={cell.isToday ? '' : undefined}
-                    data-outside-month={cell.isCurrentMonth ? undefined : ''}
-                    data-disabled={cell.isSelectable ? undefined : ''}
-                    data-holiday={cell.isHoliday ? '' : undefined}
-                    disabled={!cell.isSelectable}
-                    aria-selected={cell.isSelected}
-                    aria-current={cell.isToday ? 'date' : undefined}
-                    aria-label={formatDate(cell.date, localePack, { style: 'long' })}
-                    onClick={() => onSelect?.(cell.date)}
-                  >
-                    {formatNumber(cell.date.day, localePack.defaultNumerals, localePack.digits)}
-                  </button>
-                ))}
+                {week.map((cell) => {
+                  const { tip, ariaLabel, blocked } = holidayDayChrome(
+                    formatDate(cell.date, localePack, { style: 'long' }),
+                    cell,
+                    {
+                      locale,
+                      region: holidayRegion,
+                      closedLabel: localePack.ui.closedDay,
+                    },
+                  );
+                  return (
+                    <button
+                      key={`${cell.date.year}-${cell.date.month}-${cell.date.day}`}
+                      type="button"
+                      role="gridcell"
+                      data-jalali-calendar-day
+                      data-selected={cell.isSelected ? '' : undefined}
+                      data-today={cell.isToday ? '' : undefined}
+                      data-outside-month={cell.isCurrentMonth ? undefined : ''}
+                      data-holiday={cell.isHoliday ? '' : undefined}
+                      data-jalali-day-tip={tip}
+                      {...blocked}
+                      aria-selected={cell.isSelected}
+                      aria-current={cell.isToday ? 'date' : undefined}
+                      aria-label={ariaLabel}
+                      onClick={() => {
+                        if (blocked) return;
+                        onSelect?.(cell.date);
+                      }}
+                      onMouseEnter={() => setDayTip(tip)}
+                      onMouseLeave={() => setDayTip(undefined)}
+                      onFocus={() => setDayTip(tip)}
+                      onBlur={() => setDayTip(undefined)}
+                    >
+                      {formatNumber(cell.date.day, localePack.defaultNumerals, localePack.digits)}
+                    </button>
+                  );
+                })}
               </div>
             ))}
+          </div>
+          <div data-jalali-calendar-tip aria-hidden="true">
+            {dayTip}
           </div>
         </>
       )}

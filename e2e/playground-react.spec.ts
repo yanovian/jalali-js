@@ -23,6 +23,7 @@ const SECTIONS = [
   { testId: 'event-calendar-timeline', name: 'event-calendar-timeline.png' },
   { testId: 'selection-rules', name: 'selection-rules.png' },
   { testId: 'holidays', name: 'holidays.png' },
+  { testId: 'holidays-and-rules', name: 'holidays-and-rules.png' },
   { testId: 'custom-theme', name: 'custom-theme.png' },
 ] as const;
 

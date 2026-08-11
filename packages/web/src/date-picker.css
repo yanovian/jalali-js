@@ -287,6 +287,36 @@ button[data-jalali-calendar-title-year]:hover {
   font-weight: 600;
 }
 
+[data-jalali-calendar-day][data-holiday][data-disabled] {
+  color: var(--jalali-holiday-fg);
+  background: color-mix(in srgb, var(--jalali-holiday-fg) 12%, transparent);
+}
+
+/* Holiday tip overlays the calendar bottom. Absolute so the calendar size does not change. */
+[data-jalali-calendar-tip] {
+  position: absolute;
+  z-index: 6;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 0.35em 0.55em;
+  border-radius: var(--jalali-radius);
+  border: 1px solid var(--jalali-border);
+  background: var(--jalali-bg);
+  color: var(--jalali-fg);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: start;
+  box-sizing: border-box;
+  max-width: 100%;
+  pointer-events: none;
+  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--jalali-fg) 16%, transparent);
+}
+
+[data-jalali-calendar-tip]:empty {
+  display: none;
+}
+
 [data-jalali-calendar-day][data-holiday][data-selected],
 [data-jalali-calendar-day][data-holiday][data-range-start],
 [data-jalali-calendar-day][data-holiday][data-range-end] {

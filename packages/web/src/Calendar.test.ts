@@ -158,13 +158,14 @@ describe('jalali-calendar', () => {
       el.addEventListener('select', onSelect);
 
       const blocked = getByRole(document.body, 'gridcell', { name: '9 Mordad 1403' });
-      expect(blocked).toBeDisabled();
+      expect(blocked).toHaveAttribute('aria-disabled', 'true');
       expect(blocked).toHaveAttribute('data-disabled');
-      await user.click(blocked).catch(() => {}); // user-event refuses disabled targets
+      await user.click(blocked);
       expect(onSelect).not.toHaveBeenCalled();
 
       const allowed = getByRole(document.body, 'gridcell', { name: '10 Mordad 1403' });
-      expect(allowed).toBeEnabled();
+      expect(allowed).not.toHaveAttribute('aria-disabled');
+      expect(allowed).not.toHaveAttribute('data-disabled');
       await user.click(allowed);
       expect(onSelect).toHaveBeenCalledTimes(1);
     });
@@ -173,8 +174,63 @@ describe('jalali-calendar', () => {
       // 1403-05-15 is a Monday (weekday index 1); so is 1403-05-08.
       const el = mountCalendar();
       el.rules = { disabledWeekdays: [1] };
-      expect(getByRole(document.body, 'gridcell', { name: '8 Mordad 1403' })).toBeDisabled();
-      expect(getByRole(document.body, 'gridcell', { name: '9 Mordad 1403' })).toBeEnabled();
+      expect(getByRole(document.body, 'gridcell', { name: '8 Mordad 1403' })).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      );
+      expect(getByRole(document.body, 'gridcell', { name: '9 Mordad 1403' })).not.toHaveAttribute(
+        'aria-disabled',
+      );
+    });
+  });
+
+  describe('holidays', () => {
+    function mountHolidayCalendar(blockHolidays = false): JalaliCalendarElement {
+      const el = document.createElement('jalali-calendar') as JalaliCalendarElement;
+      el.system = 'jalali';
+      el.locale = 'en';
+      el.initialDisplayedMonth = { year: 1403, month: 1 };
+      el.showHolidays = true;
+      el.blockHolidays = blockHolidays;
+      document.body.append(el);
+      return el;
+    }
+
+    it('wires holiday tip and aria name when showHolidays is on', async () => {
+      const user = userEvent.setup({ delay: null });
+      mountHolidayCalendar();
+      const nowruz = getByRole(document.body, 'gridcell', { name: '1 Farvardin 1403. Nowruz' });
+      expect(nowruz).toHaveAttribute('data-holiday');
+      expect(nowruz).toHaveAttribute('data-jalali-day-tip', 'Nowruz');
+      const tip = document.querySelector('[data-jalali-calendar-tip]');
+      expect(tip).toBeEmptyDOMElement();
+      await user.hover(nowruz);
+      expect(tip).toHaveTextContent('Nowruz');
+      expect(
+        getByRole(document.body, 'gridcell', { name: '5 Farvardin 1403' }),
+      ).not.toHaveAttribute('data-jalali-day-tip');
+    });
+
+    it('marks blocked holidays closed in tip and aria', async () => {
+      const user = userEvent.setup({ delay: null });
+      const el = mountHolidayCalendar(true);
+      const onSelect = vi.fn();
+      el.addEventListener('select', onSelect);
+
+      const nowruz = getByRole(document.body, 'gridcell', {
+        name: '1 Farvardin 1403. Nowruz · Closed',
+      });
+      expect(nowruz).toHaveAttribute('aria-disabled', 'true');
+      expect(nowruz).toHaveAttribute('data-jalali-day-tip', 'Nowruz · Closed');
+      await user.hover(nowruz);
+      expect(document.querySelector('[data-jalali-calendar-tip]')).toHaveTextContent(
+        'Nowruz · Closed',
+      );
+      await user.click(nowruz).catch(() => {});
+      expect(onSelect).not.toHaveBeenCalled();
+
+      await user.click(getByRole(document.body, 'gridcell', { name: '5 Farvardin 1403' }));
+      expect(onSelect).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -6,6 +6,13 @@ export {
   holidaysOn,
   isHoliday,
 } from './holidays.js';
+export { holidayDayAriaLabel, holidayDayChrome, holidayDayTip } from './day-tip.js';
+export type {
+  BlockedDayAttrs,
+  HolidayDayCell,
+  HolidayDayChrome,
+  HolidayDayTipOptions,
+} from './day-tip.js';
 export { resolveCalendarHolidays, withHolidaysBlocked } from './picker.js';
 export type { CalendarHolidayOptions, ResolvedCalendarHolidays } from './picker.js';
 export {

@@ -19,7 +19,7 @@
  * day does not complete: the second click starts a new range instead (see
  * `isRangeSelectable()` in `jalali-js`).
  */
-import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import { holidayDayChrome, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type {
@@ -91,6 +91,7 @@ const today = computed(() => createCalendar({ system: props.system }).today());
 const start = ref<CalendarDate | null>(props.defaultRange?.start ?? null);
 const end = ref<CalendarDate | null>(props.defaultRange?.end ?? null);
 const hoverDate = ref<CalendarDate | null>(null);
+const dayTip = ref<string | undefined>();
 const displayAnchor = props.defaultRange?.start ?? today.value;
 const displayed = ref({ year: displayAnchor.year, month: displayAnchor.month });
 const open = ref(false);
@@ -117,6 +118,19 @@ const weeks = computed(() =>
     null,
     holidayOptions.value.rules,
     holidayOptions.value.isHolidayDay,
+  ),
+);
+
+const dayWeeks = computed(() =>
+  weeks.value.map((week) =>
+    week.map((cell) => ({
+      cell,
+      chrome: holidayDayChrome(formatDate(cell.date, localePack.value, { style: 'long' }), cell, {
+        locale: props.locale,
+        region: props.holidayRegion,
+        closedLabel: localePack.value.ui.closedDay,
+      }),
+    })),
   ),
 );
 
@@ -162,9 +176,6 @@ function selectDay(date: CalendarDate): void {
   open.value = false;
 }
 
-function dayLabel(date: CalendarDate): string {
-  return formatDate(date, localePack.value, { style: 'long' });
-}
 function dayNumber(date: CalendarDate): string {
   return formatNumber(date.day, localePack.value.defaultNumerals, localePack.value.digits);
 }
@@ -270,44 +281,53 @@ onBeforeUnmount(() => {
             </span>
           </div>
           <div
-            v-for="(week, weekIndex) in weeks"
+            v-for="(week, weekIndex) in dayWeeks"
             :key="weekIndex"
             role="row"
             data-jalali-calendar-week
           >
             <button
-              v-for="cell in week"
-              :key="`${cell.date.year}-${cell.date.month}-${cell.date.day}`"
+              v-for="day in week"
+              :key="`${day.cell.date.year}-${day.cell.date.month}-${day.cell.date.day}`"
               type="button"
               role="gridcell"
               data-jalali-calendar-day
-              :data-today="cell.isToday ? '' : undefined"
-              :data-outside-month="cell.isCurrentMonth ? undefined : ''"
-              :data-range-start="start && compareDates(cell.date, start) === 0 ? '' : undefined"
+              :data-today="day.cell.isToday ? '' : undefined"
+              :data-outside-month="day.cell.isCurrentMonth ? undefined : ''"
+              :data-range-start="start && compareDates(day.cell.date, start) === 0 ? '' : undefined"
               :data-range-end="
-                previewEnd && compareDates(cell.date, previewEnd) === 0 ? '' : undefined
+                previewEnd && compareDates(day.cell.date, previewEnd) === 0 ? '' : undefined
               "
               :data-in-range="
                 start &&
                 previewEnd &&
-                compareDates(cell.date, start) > 0 &&
-                compareDates(cell.date, previewEnd) < 0
+                compareDates(day.cell.date, start) > 0 &&
+                compareDates(day.cell.date, previewEnd) < 0
                   ? ''
                   : undefined
               "
-              :data-disabled="cell.isSelectable ? undefined : ''"
-              :data-holiday="cell.isHoliday ? '' : undefined"
-              :disabled="!cell.isSelectable"
-              :aria-current="cell.isToday ? 'date' : undefined"
-              :aria-label="dayLabel(cell.date)"
-              @click="selectDay(cell.date)"
-              @mouseenter="hoverDate = cell.date"
-              @mouseleave="hoverDate = null"
+              :data-holiday="day.cell.isHoliday ? '' : undefined"
+              :data-jalali-day-tip="day.chrome.tip"
+              v-bind="day.chrome.blocked"
+              :aria-current="day.cell.isToday ? 'date' : undefined"
+              :aria-label="day.chrome.ariaLabel"
+              @click="!day.chrome.blocked && selectDay(day.cell.date)"
+              @mouseenter="
+                hoverDate = day.cell.date;
+                dayTip = day.chrome.tip;
+              "
+              @mouseleave="
+                hoverDate = null;
+                dayTip = undefined;
+              "
+              @focus="dayTip = day.chrome.tip"
+              @blur="dayTip = undefined"
             >
-              {{ dayNumber(cell.date) }}
+              {{ dayNumber(day.cell.date) }}
             </button>
           </div>
         </div>
+        <div data-jalali-calendar-tip aria-hidden="true">{{ dayTip }}</div>
       </div>
     </div>
   </div>

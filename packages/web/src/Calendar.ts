@@ -1,4 +1,9 @@
-import { isHolidayRegion, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import {
+  holidayDayChrome,
+  isHolidayRegion,
+  resolveCalendarHolidays,
+  type HolidayRegion,
+} from '@jalali-js/holidays';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { CalendarDate, CalendarSystem, SelectionRules } from 'jalali-js';
 import {
@@ -39,10 +44,10 @@ export interface CalendarSelectEventDetail {
  * and `TJ` are planned). `value`, `initial-displayed-month`, and `rules` are properties only,
  * since none of them is representable as a plain HTML attribute string. Listen for `select`.
  *
- * Days blocked by `rules` render as disabled buttons with a `data-disabled` attribute: clicks
- * do nothing and the Tab order skips them. With `show-holidays`, holiday days get
- * `data-holiday`. With `block-holidays`, those days also become unselectable. The default
- * holiday list is Iran (`holiday-region="IR"`).
+ * Days blocked by `rules` use `aria-disabled` and a `data-disabled` attribute: clicks do
+ * nothing and the Tab order skips them. Holiday tips still work on hover and focus. With
+ * `show-holidays`, holiday days get `data-holiday`. With `block-holidays`, those days also
+ * become unselectable. The default holiday list is Iran (`holiday-region="IR"`).
  */
 export class JalaliCalendarElement extends HTMLElement {
   static observedAttributes = [
@@ -67,6 +72,7 @@ export class JalaliCalendarElement extends HTMLElement {
   #view: CalendarView = 'day';
   #yearPage = 0;
   #connected = false;
+  #dayTipEl: HTMLElement | undefined;
 
   get system(): CalendarSystem {
     return this.#system;
@@ -179,6 +185,10 @@ export class JalaliCalendarElement extends HTMLElement {
     this.dispatchEvent(
       new CustomEvent<CalendarSelectEventDetail>('select', { detail: { date }, bubbles: true }),
     );
+  }
+
+  #setDayTip(tip: string | undefined): void {
+    if (this.#dayTipEl) this.#dayTipEl.textContent = tip ?? '';
   }
 
   #titlePart(
@@ -318,6 +328,15 @@ export class JalaliCalendarElement extends HTMLElement {
         'div',
         { role: 'row', 'data-jalali-calendar-week': true },
         week.map((cell) => {
+          const { tip, ariaLabel, blocked } = holidayDayChrome(
+            formatDate(cell.date, localePack, { style: 'long' }),
+            cell,
+            {
+              locale: this.#locale,
+              region: this.#holidayRegion,
+              closedLabel: localePack.ui.closedDay,
+            },
+          );
           const day = el(
             'button',
             {
@@ -327,16 +346,25 @@ export class JalaliCalendarElement extends HTMLElement {
               'data-selected': cell.isSelected,
               'data-today': cell.isToday,
               'data-outside-month': !cell.isCurrentMonth,
-              'data-disabled': !cell.isSelectable,
               'data-holiday': cell.isHoliday,
-              disabled: !cell.isSelectable,
+              'data-jalali-day-tip': tip,
+              'data-disabled': blocked ? true : undefined,
+              'aria-disabled': blocked?.['aria-disabled'],
+              tabindex: blocked ? String(blocked.tabIndex) : undefined,
               'aria-selected': cell.isSelected ? 'true' : 'false',
               'aria-current': cell.isToday ? 'date' : undefined,
-              'aria-label': formatDate(cell.date, localePack, { style: 'long' }),
+              'aria-label': ariaLabel,
             },
             [formatNumber(cell.date.day, localePack.defaultNumerals, localePack.digits)],
           );
-          day.addEventListener('click', () => this.#emitSelect(cell.date));
+          day.addEventListener('click', () => {
+            if (blocked) return;
+            this.#emitSelect(cell.date);
+          });
+          day.addEventListener('mouseenter', () => this.#setDayTip(tip));
+          day.addEventListener('mouseleave', () => this.#setDayTip(undefined));
+          day.addEventListener('focus', () => this.#setDayTip(tip));
+          day.addEventListener('blur', () => this.#setDayTip(undefined));
           return day;
         }),
       ),
@@ -346,9 +374,11 @@ export class JalaliCalendarElement extends HTMLElement {
       weekdayRow,
       ...weekRows,
     ]);
+    const tipEl = el('div', { 'data-jalali-calendar-tip': true, 'aria-hidden': 'true' });
+    this.#dayTipEl = tipEl;
 
     const fragment = document.createDocumentFragment();
-    fragment.append(header, grid);
+    fragment.append(header, grid, tipEl);
     return fragment;
   }
 

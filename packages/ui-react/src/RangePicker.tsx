@@ -1,4 +1,4 @@
-import { resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
+import { holidayDayChrome, resolveCalendarHolidays, type HolidayRegion } from '@jalali-js/holidays';
 import type { FormatOptions } from '@jalali-js/i18n';
 import { format as formatDate, formatNumber } from '@jalali-js/i18n';
 import type { LocaleCode } from '@jalali-js/react';
@@ -112,6 +112,7 @@ export function RangePicker({
   const [start, setStart] = useState<CalendarDate | null>(defaultRange?.start ?? null);
   const [end, setEnd] = useState<CalendarDate | null>(defaultRange?.end ?? null);
   const [hoverDate, setHoverDate] = useState<CalendarDate | null>(null);
+  const [dayTip, setDayTip] = useState<string | undefined>();
   const [displayed, setDisplayed] = useState(() => {
     const anchor = defaultRange?.start ?? today;
     return { year: anchor.year, month: anchor.month };
@@ -267,6 +268,15 @@ export function RangePicker({
                       previewEnd !== null &&
                       compareDates(cell.date, start) > 0 &&
                       compareDates(cell.date, previewEnd) < 0;
+                    const { tip, ariaLabel, blocked } = holidayDayChrome(
+                      formatDate(cell.date, localePack, { style: 'long' }),
+                      cell,
+                      {
+                        locale,
+                        region: holidayRegion,
+                        closedLabel: localePack.ui.closedDay,
+                      },
+                    );
                     return (
                       <button
                         key={`${cell.date.year}-${cell.date.month}-${cell.date.day}`}
@@ -278,14 +288,25 @@ export function RangePicker({
                         data-range-start={isRangeStart ? '' : undefined}
                         data-range-end={isRangeEnd ? '' : undefined}
                         data-in-range={isInRange ? '' : undefined}
-                        data-disabled={cell.isSelectable ? undefined : ''}
                         data-holiday={cell.isHoliday ? '' : undefined}
-                        disabled={!cell.isSelectable}
+                        data-jalali-day-tip={tip}
+                        {...blocked}
                         aria-current={cell.isToday ? 'date' : undefined}
-                        aria-label={formatDate(cell.date, localePack, { style: 'long' })}
-                        onClick={() => selectDay(cell.date)}
-                        onMouseEnter={() => setHoverDate(cell.date)}
-                        onMouseLeave={() => setHoverDate(null)}
+                        aria-label={ariaLabel}
+                        onClick={() => {
+                          if (blocked) return;
+                          selectDay(cell.date);
+                        }}
+                        onMouseEnter={() => {
+                          setHoverDate(cell.date);
+                          setDayTip(tip);
+                        }}
+                        onMouseLeave={() => {
+                          setHoverDate(null);
+                          setDayTip(undefined);
+                        }}
+                        onFocus={() => setDayTip(tip)}
+                        onBlur={() => setDayTip(undefined)}
                       >
                         {formatNumber(cell.date.day, localePack.defaultNumerals, localePack.digits)}
                       </button>
@@ -293,6 +314,9 @@ export function RangePicker({
                   })}
                 </div>
               ))}
+            </div>
+            <div data-jalali-calendar-tip aria-hidden="true">
+              {dayTip}
             </div>
           </div>
         </div>

@@ -55,6 +55,8 @@ export interface LocaleUi {
   readonly day: string;
   readonly hour: string;
   readonly minute: string;
+  /** Day is not selectable. */
+  readonly closedDay: string;
 }
 
 /**

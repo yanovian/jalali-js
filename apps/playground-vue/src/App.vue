@@ -675,6 +675,22 @@ const datetimeDefault = {
           holiday-region="IR"
         />
       </section>
+      <section data-testid="holidays-and-rules">
+        <h3>Holidays and rules</h3>
+        <InlineCalendar
+          system="jalali"
+          :locale="state.locale as LocaleCode"
+          :initial-displayed-month="{ year: 1403, month: 1 }"
+          show-holidays
+          block-holidays
+          holiday-region="IR"
+          :rules="{
+            minDate: { year: 1403, month: 1, day: 1 },
+            maxDate: { year: 1403, month: 1, day: 31 },
+            disabledWeekdays: [5],
+          }"
+        />
+      </section>
       <section data-testid="custom-theme">
         <h3>Custom theme</h3>
         <div class="custom-theme-scope">
