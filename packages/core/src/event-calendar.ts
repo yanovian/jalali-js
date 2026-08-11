@@ -53,8 +53,8 @@ export function resolveTimelineLayout(options?: TimelineOptions): TimelineLayout
 }
 
 /** Marker X positions in the roadmap SVG viewBox (0 to 100). */
-export const ROADMAP_LEFT_X = 28;
-export const ROADMAP_RIGHT_X = 72;
+export const ROADMAP_LEFT_X = 42;
+export const ROADMAP_RIGHT_X = 58;
 
 /**
  * Build an SVG path for a vertical serpentine roadmap.
@@ -73,7 +73,7 @@ export function roadmapTrackPath(count: number): { d: string; viewBox: string } 
   const yAt = (index: number): number => index * step + step / 2;
 
   let d = `M ${mid} 4`;
-  d += ` C ${mid} ${yAt(0) * 0.35}, ${xAt(0)} ${yAt(0) * 0.55}, ${xAt(0)} ${yAt(0)}`;
+  d += ` C ${mid} ${yAt(0) * 0.5}, ${xAt(0)} ${yAt(0) * 0.75}, ${xAt(0)} ${yAt(0)}`;
 
   for (let index = 1; index < count; index += 1) {
     const x0 = xAt(index - 1);
@@ -87,7 +87,7 @@ export function roadmapTrackPath(count: number): { d: string; viewBox: string } 
   const lastX = xAt(count - 1);
   const lastY = yAt(count - 1);
   const endY = height - 4;
-  d += ` C ${lastX} ${lastY + step * 0.35}, ${mid} ${endY - step * 0.2}, ${mid} ${endY}`;
+  d += ` C ${lastX} ${lastY + step * 0.28}, ${mid} ${endY - step * 0.18}, ${mid} ${endY}`;
 
   return { d, viewBox };
 }

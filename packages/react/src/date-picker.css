@@ -429,6 +429,8 @@ button[data-jalali-calendar-title-year]:hover {
 
 [data-jalali-eventcalendar-root][data-view='timeline'] {
   width: min(100%, 36em);
+  container-type: inline-size;
+  container-name: jalali-event-timeline;
 }
 
 [data-jalali-eventcalendar-root][data-view='timeline']:has(
@@ -602,12 +604,12 @@ button[data-jalali-calendar-title-year]:hover {
   --jalali-timeline-line: color-mix(in srgb, var(--jalali-border) 78%, transparent);
   --jalali-timeline-card-bg: color-mix(in srgb, var(--jalali-fg) 4.5%, var(--jalali-bg));
   --jalali-timeline-card-fg: var(--jalali-fg);
-  --jalali-timeline-muted: var(--jalali-muted-fg);
+  --jalali-timeline-muted: color-mix(in srgb, var(--jalali-fg) 86%, var(--jalali-bg));
   --jalali-timeline-accent: var(--jalali-primary);
   --jalali-timeline-marker-fg: #ffffff;
   --jalali-timeline-gap: 1.45em;
   --jalali-timeline-card-gap: 1.2em;
-  --jalali-timeline-road-track: 1.05em;
+  --jalali-timeline-road-track: 0.9em;
   --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 28%, var(--jalali-bg));
   --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 52%, transparent);
   --jalali-timeline-road-dash: color-mix(in srgb, var(--jalali-fg) 78%, #ffffff);
@@ -776,7 +778,7 @@ button[data-jalali-calendar-title-year]:hover {
   direction: ltr;
   display: grid;
   gap: 0;
-  grid-auto-rows: 7.25em;
+  grid-auto-rows: 8.5em;
   padding-block: 0.35em;
 }
 
@@ -810,18 +812,18 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-item][data-road-side='left']
   [data-jalali-timeline-marker] {
-  left: 28%;
+  left: 42%;
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-item][data-road-side='right']
   [data-jalali-timeline-marker] {
-  left: 72%;
+  left: 58%;
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-card] {
-  width: min(17.5em, calc(28% - 1.35em));
+  width: min(18em, calc(40% - 1.1em));
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
@@ -931,7 +933,8 @@ button[data-jalali-calendar-title-year]:hover {
 
 [data-jalali-timeline-description] {
   color: var(--jalali-timeline-muted);
-  font-size: 0.86em;
+  font-size: 0.92em;
+  font-weight: 500;
   line-height: 1.45;
 }
 
@@ -1000,7 +1003,24 @@ button[data-jalali-calendar-title-year]:hover {
     max-height: min(calc(10 * var(--jalali-event-hour-row, 2.75em)), 70vh);
   }
 
-  /* Narrow screens: both-sides layouts collapse to one column. */
+  [data-jalali-timerangepicker-root] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Collapse both-sides and roadmap when the calendar itself is narrow. */
+@container jalali-event-timeline (max-width: 32em) {
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating'],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap'] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jalali-timeline-gap);
+    direction: inherit;
+    grid-auto-rows: unset;
+    padding-block: 0;
+  }
+
   [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
     [data-jalali-timeline-item],
   [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
@@ -1008,18 +1028,22 @@ button[data-jalali-calendar-title-year]:hover {
     display: grid;
     grid-template-columns: var(--jalali-timeline-marker-size) minmax(0, 1fr);
     column-gap: var(--jalali-timeline-card-gap);
+    align-items: center;
   }
 
-  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before {
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']::before,
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: calc(var(--jalali-timeline-marker-size) / 2);
+    bottom: calc(var(--jalali-timeline-marker-size) / 2);
+    width: var(--jalali-timeline-rail-width);
     inset-inline-start: calc(
       var(--jalali-timeline-marker-size) / 2 - var(--jalali-timeline-rail-width) / 2
     );
-  }
-
-  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap'] {
-    direction: inherit;
-    grid-auto-rows: auto;
-    gap: var(--jalali-timeline-gap);
+    background: var(--jalali-timeline-line);
+    border-radius: 999px;
   }
 
   [data-jalali-roadmap-track] {
@@ -1030,9 +1054,21 @@ button[data-jalali-calendar-title-year]:hover {
     [data-jalali-timeline-marker],
   [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
     [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+    [data-jalali-timeline-item][data-side='end']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
+    [data-jalali-timeline-item][data-side='start']
+    [data-jalali-timeline-card],
   [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
     [data-jalali-timeline-marker],
   [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-item][data-road-side='left']
+    [data-jalali-timeline-card],
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+    [data-jalali-timeline-item][data-road-side='right']
     [data-jalali-timeline-card] {
     grid-column: auto;
     grid-row: auto;
@@ -1042,10 +1078,11 @@ button[data-jalali-calendar-title-year]:hover {
     left: auto;
     width: auto;
     max-width: none;
+    margin: 0;
     margin-left: 0;
     margin-right: 0;
-    margin-inline: 0;
     transform: none;
+    justify-self: stretch;
   }
 
   [data-jalali-timeline][data-direction='vertical'][data-layout='alternating']
@@ -1069,11 +1106,6 @@ button[data-jalali-calendar-title-year]:hover {
     background: var(--jalali-timeline-accent);
     color: var(--jalali-timeline-marker-fg);
     border: 0;
-  }
-
-  [data-jalali-timerangepicker-root] {
-    flex-direction: column;
-    align-items: stretch;
   }
 }
 
