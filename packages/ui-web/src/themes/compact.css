@@ -8,15 +8,23 @@
  *
  * Identical to the React and Vue themes of the same name, on purpose: all bindings use the
  * same [data-jalali-*] attribute names, so a team can reuse one theme across them.
+ *
+ * Use this for dense dashboards. The default stylesheet is already compact for most UIs.
  */
 [data-jalali-datepicker-root],
 [data-jalali-datepicker-dropdown],
 [data-jalali-timepicker-root],
 [data-jalali-timerangepicker-root],
 [data-jalali-calendar-root] {
-  --jalali-font-size: 0.875rem;
+  --jalali-font-size: 0.8125rem;
+  --jalali-line-height: 1.3;
   --jalali-gap: 1px;
-  --jalali-input-padding: 0.35em 0.5em;
-  --jalali-popover-padding: 0.5em;
-  --jalali-day-min-size: 1.5em;
+  --jalali-header-gap: 0.3em;
+  --jalali-control-size: 1.75em;
+  --jalali-input-padding: 0.3em 0.45em;
+  --jalali-popover-padding: 0.45em;
+  --jalali-cell-padding: 0.45em 0.3em;
+  --jalali-day-min-size: 1.625em;
+  --jalali-weekday-size: 0.72em;
+  --jalali-radius: 0.375rem;
 }

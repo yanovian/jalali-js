@@ -52,7 +52,7 @@ Pass a `timeline` object when `view` is `'timeline'`:
 | `markerShape` | `'circular' \| 'square'`     | `'circular'` | Marker shape                    |
 | `showIcons`   | `boolean`                    | `true`       | Show `event.icon` in the marker |
 | `alternating` | `boolean`                    | `false`      | Alternate cards beside the rail |
-| `markerSize`  | `number`                     | `24`         | Marker diameter in CSS pixels   |
+| `markerSize`  | `number`                     | CSS default  | Marker diameter in CSS pixels   |
 
 Native digits come from the locale pack (`fa` / `ps`) or from
 `displayFormat.numerals` (`'native'` or `'latin'`).
@@ -210,4 +210,5 @@ Vue: same props, emits `eventClick` and `dayClick`. Web: attrs `system`, `locale
 Import the same `date-picker.css` as the other pickers. Event chips use
 `data-jalali-eventcalendar-*` and the `--jalali-event-bg` / `--jalali-event-fg`
 variables. Timeline uses `data-jalali-timeline-*` and
-`--jalali-timeline-marker-size` / `--jalali-timeline-accent`.
+`--jalali-timeline-marker-size` / `--jalali-timeline-accent`. When
+`timeline.markerSize` is omitted, the stylesheet default marker size applies.

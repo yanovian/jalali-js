@@ -63,7 +63,7 @@ export const DEFAULT_DEMO_STATE: DemoState = {
   timelineMarkerShape: 'circular',
   timelineShowIcons: true,
   timelineAlternating: false,
-  timelineMarkerSize: 24,
+  timelineMarkerSize: 22,
   nativeDigits: true,
   minuteStep: 15,
   showHolidays: false,

@@ -142,7 +142,7 @@ const direction = computed(() => props.timeline?.direction ?? 'vertical');
 const markerShape = computed(() => props.timeline?.markerShape ?? 'circular');
 const showIcons = computed(() => props.timeline?.showIcons ?? true);
 const alternating = computed(() => props.timeline?.alternating ?? false);
-const markerSize = computed(() => props.timeline?.markerSize ?? 24);
+const markerSize = computed(() => props.timeline?.markerSize);
 
 function onEventClick(eventId: string, click: MouseEvent): void {
   click.stopPropagation();
@@ -338,7 +338,9 @@ function onEventClick(eventId: string, click: MouseEvent): void {
         :data-marker-shape="markerShape"
         :data-show-icons="showIcons ? '' : undefined"
         :data-alternating="alternating ? '' : undefined"
-        :style="{ '--jalali-timeline-marker-size': `${markerSize}px` }"
+        :style="
+          markerSize != null ? { '--jalali-timeline-marker-size': `${markerSize}px` } : undefined
+        "
       >
         <li
           v-for="(event, index) in timelineEvents"

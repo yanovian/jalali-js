@@ -25,6 +25,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 - READMEs and the docs home lead with live demo and npm ecosystem links.
 - EventCalendar works on phone widths, with keyboard-focusable scroll panes.
 - Calendar themes raise contrast for light and dark modes, with phone layout and high-contrast CSS support.
+- Default calendar density is tighter and more coherent, with density tokens and a denser `compact` theme.
 
 ## [0.2.1] - 2026-08-10
 

@@ -1087,7 +1087,7 @@ them first. Land each item with a matching `CHANGELOG.md` bullet under
       the new timeline) at phone widths and in light and dark themes. Fix
       contrast, accent, surface, and border token use so dark mode does not
       wash out or clash. Keep the same `--jalali-*` theme surface.
-- [ ] **Size, density, and elegance.** Review default calendar size, spacing,
+- [x] **Size, density, and elegance.** Review default calendar size, spacing,
       radius, and type scale so the default look is clean and compact while
       still configurable through theme CSS variables (and timeline marker
       size where that API exists). Prefer one coherent visual system across

@@ -135,7 +135,7 @@ export function EventCalendar({
   const markerShape = timeline?.markerShape ?? 'circular';
   const showIcons = timeline?.showIcons ?? true;
   const alternating = timeline?.alternating ?? false;
-  const markerSize = timeline?.markerSize ?? 24;
+  const markerSize = timeline?.markerSize;
 
   function clickEvent(eventId: string, click: MouseEvent): void {
     click.stopPropagation();
@@ -350,7 +350,11 @@ export function EventCalendar({
             data-marker-shape={markerShape}
             data-show-icons={showIcons ? '' : undefined}
             data-alternating={alternating ? '' : undefined}
-            style={{ ['--jalali-timeline-marker-size' as string]: `${markerSize}px` }}
+            style={
+              markerSize != null
+                ? { ['--jalali-timeline-marker-size' as string]: `${markerSize}px` }
+                : undefined
+            }
           >
             {timelineEvents.map((event, index) => {
               const itemStyle = {

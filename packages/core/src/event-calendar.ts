@@ -18,7 +18,7 @@ export interface TimelineOptions {
   markerShape?: TimelineMarkerShape;
   showIcons?: boolean;
   alternating?: boolean;
-  /** Marker diameter in CSS pixels. Default: 24. */
+  /** Marker diameter in CSS pixels. When omitted, CSS `--jalali-timeline-marker-size` applies. */
   markerSize?: number;
 }
 

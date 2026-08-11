@@ -40,18 +40,24 @@ values. A theme is a stylesheet that overrides some subset of these on the same 
 | -------------------------- | ---------------------------------------------------------- |
 | `--jalali-font`            | Font family                                                |
 | `--jalali-font-size`       | Base font size                                             |
+| `--jalali-line-height`     | Base line height                                           |
 | `--jalali-bg`              | Background color (input, popover)                          |
 | `--jalali-fg`              | Text color                                                 |
 | `--jalali-muted-fg`        | Secondary text color (weekday headers, outside-month days) |
 | `--jalali-border`          | Border color                                               |
-| `--jalali-radius`          | Corner radius (input, popover, day cells, nav buttons)     |
+| `--jalali-radius`          | Corner radius (input, popover, month/year cells)           |
+| `--jalali-day-radius`      | Corner radius for day cells and circular controls          |
 | `--jalali-primary`         | Accent color: today's ring, selected/range-endpoint fill   |
 | `--jalali-primary-fg`      | Text color on top of `--jalali-primary`                    |
 | `--jalali-shadow`          | Popover drop shadow                                        |
 | `--jalali-gap`             | Gap between grid cells                                     |
-| `--jalali-input-padding`   | Padding inside the text input                              |
-| `--jalali-popover-padding` | Padding inside the popover                                 |
+| `--jalali-header-gap`      | Gap and margin in the calendar header                      |
+| `--jalali-control-size`    | Width and height of nav controls                           |
+| `--jalali-input-padding`   | Padding inside the text input and fields                   |
+| `--jalali-popover-padding` | Padding inside the popover and event calendar              |
+| `--jalali-cell-padding`    | Padding inside month and year picker cells                 |
 | `--jalali-day-min-size`    | Minimum width/height of a day cell                         |
+| `--jalali-weekday-size`    | Font size for weekday headers                              |
 | `--jalali-event-bg`        | Event chip background                                      |
 | `--jalali-event-fg`        | Event chip text                                            |
 | `--jalali-holiday-fg`      | Holiday day text                                           |
@@ -61,7 +67,9 @@ values. A theme is a stylesheet that overrides some subset of these on the same 
 
 Default and `dark` theme tokens aim for WCAG 2.2 AA text contrast and about
 3:1 for borders. The stylesheet also responds to `prefers-contrast: more`
-and `forced-colors: active`.
+and `forced-colors: active`. The default density is already compact on phone
+and laptop. Import `themes/compact.css` only when you need a denser dashboard
+scale.
 
 Because CSS custom properties inherit, a theme applies to every picker on the page once its
 stylesheet is imported: theming is a whole-app choice, not a per-instance prop. For a single

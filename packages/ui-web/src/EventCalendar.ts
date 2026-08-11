@@ -225,7 +225,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
     const markerShape = this.#timeline?.markerShape ?? 'circular';
     const showIcons = this.#timeline?.showIcons ?? true;
     const alternating = this.#timeline?.alternating ?? false;
-    const markerSize = this.#timeline?.markerSize ?? 24;
+    const markerSize = this.#timeline?.markerSize;
 
     this.dir = localePack.direction;
     this.setAttribute('role', 'region');
@@ -259,7 +259,9 @@ export class JalaliEventCalendarElement extends HTMLElement {
       list.setAttribute('data-marker-shape', markerShape);
       if (showIcons) list.setAttribute('data-show-icons', '');
       if (alternating) list.setAttribute('data-alternating', '');
-      list.style.setProperty('--jalali-timeline-marker-size', `${markerSize}px`);
+      if (markerSize != null) {
+        list.style.setProperty('--jalali-timeline-marker-size', `${markerSize}px`);
+      }
 
       timelineEvents.forEach((event, index) => {
         const item = document.createElement('li');
