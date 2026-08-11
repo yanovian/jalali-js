@@ -12,6 +12,11 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Changed
+
+- Live demo, docs, and an npm ecosystem list of every package sit near the top
+  of the root README, the docs home page, and every package README.
+
 ## [0.2.1] - 2026-08-10
 
 ### Added

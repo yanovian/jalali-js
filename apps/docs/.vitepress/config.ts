@@ -96,8 +96,30 @@ export default defineConfig({
   themeConfig: {
     logo: { src: '/favicon.svg', alt: 'jalali-js' },
     nav: [
+      { text: 'Live demo', link: '/playground/react/', target: '_blank' },
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API', link: '/api/jalali-js/' },
+      {
+        text: 'npm ecosystem',
+        items: [
+          { text: 'jalali-js', link: 'https://www.npmjs.com/package/jalali-js' },
+          { text: '@jalali-js/i18n', link: 'https://www.npmjs.com/package/@jalali-js/i18n' },
+          { text: '@jalali-js/nlp', link: 'https://www.npmjs.com/package/@jalali-js/nlp' },
+          {
+            text: '@jalali-js/holidays',
+            link: 'https://www.npmjs.com/package/@jalali-js/holidays',
+          },
+          { text: '@jalali-js/react', link: 'https://www.npmjs.com/package/@jalali-js/react' },
+          { text: '@jalali-js/vue', link: 'https://www.npmjs.com/package/@jalali-js/vue' },
+          { text: '@jalali-js/web', link: 'https://www.npmjs.com/package/@jalali-js/web' },
+          {
+            text: '@jalali-js/ui-react',
+            link: 'https://www.npmjs.com/package/@jalali-js/ui-react',
+          },
+          { text: '@jalali-js/ui-vue', link: 'https://www.npmjs.com/package/@jalali-js/ui-vue' },
+          { text: '@jalali-js/ui-web', link: 'https://www.npmjs.com/package/@jalali-js/ui-web' },
+        ],
+      },
       {
         text: 'Playground',
         items: [

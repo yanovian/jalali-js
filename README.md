@@ -19,15 +19,45 @@
 </p>
 
 <p align="center">
+  <a href="https://jalali-js.yanovian.com/playground/react/"><b>Live demo</b></a>
+  ·
+  <a href="https://jalali-js.yanovian.com/">Documentation</a>
+  ·
   <a href="https://jalali-js.yanovian.com/guide/getting-started">Guide</a>
   ·
-  <a href="https://jalali-js.yanovian.com/api/jalali-js/">API reference</a>
-  ·
-  <a href="https://jalali-js.yanovian.com/playground/react/"><b>Live demo</b></a>
+  <a href="https://jalali-js.yanovian.com/api/jalali-js/">API</a>
+</p>
+
+<p align="center">
+  Playgrounds:
+  <a href="https://jalali-js.yanovian.com/playground/react/">React</a>
   ·
   <a href="https://jalali-js.yanovian.com/playground/vue/">Vue</a>
   ·
   <a href="https://jalali-js.yanovian.com/playground/vanilla/">Web Components</a>
+</p>
+
+<p align="center">
+  npm ecosystem:
+  <a href="https://www.npmjs.com/package/jalali-js"><code>jalali-js</code></a>
+  ·
+  <a href="https://www.npmjs.com/package/@jalali-js/i18n"><code>@jalali-js/i18n</code></a>
+  ·
+  <a href="https://www.npmjs.com/package/@jalali-js/nlp"><code>@jalali-js/nlp</code></a>
+  ·
+  <a href="https://www.npmjs.com/package/@jalali-js/holidays"><code>@jalali-js/holidays</code></a>
+  ·
+  <a href="https://www.npmjs.com/package/@jalali-js/react"><code>@jalali-js/react</code></a>
+  ·
+  <a href="https://www.npmjs.com/package/@jalali-js/vue"><code>@jalali-js/vue</code></a>
+  ·
+  <a href="https://www.npmjs.com/package/@jalali-js/web"><code>@jalali-js/web</code></a>
+  ·
+  <a href="https://www.npmjs.com/package/@jalali-js/ui-react"><code>@jalali-js/ui-react</code></a>
+  ·
+  <a href="https://www.npmjs.com/package/@jalali-js/ui-vue"><code>@jalali-js/ui-vue</code></a>
+  ·
+  <a href="https://www.npmjs.com/package/@jalali-js/ui-web"><code>@jalali-js/ui-web</code></a>
 </p>
 
 ## Why this exists
@@ -125,18 +155,18 @@ linked above.
 
 ## Packages
 
-| Package               | What it is                                                        |
-| --------------------- | ----------------------------------------------------------------- |
-| `jalali-js`           | The conversion core. Zero runtime dependencies.                   |
-| `@jalali-js/i18n`     | Locale data (`en`, `fa`, `ps`), formatting, and format templates. |
-| `@jalali-js/nlp`      | Natural language date parsing: English, Farsi, and Pashto.        |
-| `@jalali-js/holidays` | Official Iran public holidays (`IR`). Offline, zero runtime deps. |
-| `@jalali-js/react`    | React bindings: `useCalendar`, headless `Calendar`, `DatePicker`. |
-| `@jalali-js/vue`      | The same, for Vue.                                                |
-| `@jalali-js/web`      | The same, as plain Web Components. No framework required.         |
-| `@jalali-js/ui-react` | `RangePicker`, `EventCalendar`, `InlineCalendar`, and themes.     |
-| `@jalali-js/ui-vue`   | The same, for Vue.                                                |
-| `@jalali-js/ui-web`   | The same, for web.                                                |
+| Package                                                                    | What it is                                                        |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| [`jalali-js`](https://www.npmjs.com/package/jalali-js)                     | The conversion core. Zero runtime dependencies.                   |
+| [`@jalali-js/i18n`](https://www.npmjs.com/package/@jalali-js/i18n)         | Locale data (`en`, `fa`, `ps`), formatting, and format templates. |
+| [`@jalali-js/nlp`](https://www.npmjs.com/package/@jalali-js/nlp)           | Natural language date parsing: English, Farsi, and Pashto.        |
+| [`@jalali-js/holidays`](https://www.npmjs.com/package/@jalali-js/holidays) | Official Iran public holidays (`IR`). Offline, zero runtime deps. |
+| [`@jalali-js/react`](https://www.npmjs.com/package/@jalali-js/react)       | React bindings: `useCalendar`, headless `Calendar`, `DatePicker`. |
+| [`@jalali-js/vue`](https://www.npmjs.com/package/@jalali-js/vue)           | The same, for Vue.                                                |
+| [`@jalali-js/web`](https://www.npmjs.com/package/@jalali-js/web)           | The same, as plain Web Components. No framework required.         |
+| [`@jalali-js/ui-react`](https://www.npmjs.com/package/@jalali-js/ui-react) | `RangePicker`, `EventCalendar`, `InlineCalendar`, and themes.     |
+| [`@jalali-js/ui-vue`](https://www.npmjs.com/package/@jalali-js/ui-vue)     | The same, for Vue.                                                |
+| [`@jalali-js/ui-web`](https://www.npmjs.com/package/@jalali-js/ui-web)     | The same, for web.                                                |
 
 ## This repo
 

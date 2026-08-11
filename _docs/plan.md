@@ -1058,10 +1058,10 @@ view. Put live demo, docs, and ecosystem package links where visitors see
 them first. Land each item with a matching `CHANGELOG.md` bullet under
 `## [Unreleased]`.
 
-- [ ] **Discoverability links.** Put live demo, documentation, and links to
-      the other packages in this ecosystem among the first few links on the
+- [x] **Discoverability links.** Put live demo, documentation, and npm links
+      for every package in this ecosystem among the first few links on the
       root README, the docs home page, and each package README. A visitor
-      should reach the demo, the guide, and sibling packages without
+      should reach the demo, the guide, and each sibling npm package without
       scrolling past install or API detail.
 - [ ] **Week start (Shanbe / Saturday).** Core `WEEK_START_DAY.jalali` is
       already `6` (Saturday). Weekday header rows in Calendar,
