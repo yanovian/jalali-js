@@ -131,7 +131,7 @@ describe('jalali-range-picker', () => {
       el.rules = rules;
       await user.click(getByRole(document.body, 'combobox'));
       const blocked = getByRole(document.body, 'gridcell', { name: '12 Mordad 1403' });
-      expect(blocked).toBeDisabled();
+      expect(blocked).toHaveAttribute('aria-disabled', 'true');
       expect(blocked).toHaveAttribute('data-disabled');
     });
 

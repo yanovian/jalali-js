@@ -152,7 +152,7 @@ describe('RangePicker', () => {
       );
       await user.click(screen.getByRole('combobox'));
       const blocked = screen.getByRole('gridcell', { name: '12 Mordad 1403' });
-      expect(blocked).toBeDisabled();
+      expect(blocked).toHaveAttribute('aria-disabled', 'true');
       expect(blocked).toHaveAttribute('data-disabled');
     });
 

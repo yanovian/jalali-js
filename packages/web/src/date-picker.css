@@ -53,7 +53,6 @@
   display: inline-block;
   max-width: 100%;
   box-sizing: border-box;
-  overflow: visible;
 }
 
 /* Buttons should read as buttons: no drag-to-select text, no iOS press-and-hold callout. */
@@ -122,8 +121,7 @@ button[data-jalali-calendar-title-year]:focus-visible,
   padding: var(--jalali-popover-padding);
   max-width: calc(100vw - 2rem);
   box-sizing: border-box;
-  /* Tips and focus rings must paint outside the calendar box. */
-  overflow: visible;
+  overflow-x: auto;
 }
 
 [data-jalali-datepicker-popover][data-positioned] {
@@ -232,7 +230,6 @@ button[data-jalali-calendar-title-year]:hover {
   gap: var(--jalali-gap);
   width: 100%;
   box-sizing: border-box;
-  overflow: visible;
 }
 
 [data-jalali-calendar-weekdays],
@@ -240,7 +237,6 @@ button[data-jalali-calendar-title-year]:hover {
   display: grid;
   grid-template-columns: repeat(7, minmax(var(--jalali-day-min-size), 1fr));
   gap: var(--jalali-gap);
-  overflow: visible;
 }
 
 [data-jalali-calendar-weekday] {
@@ -296,26 +292,9 @@ button[data-jalali-calendar-title-year]:hover {
   background: color-mix(in srgb, var(--jalali-holiday-fg) 12%, transparent);
 }
 
-[data-jalali-calendar-day][data-jalali-day-tip] {
-  position: relative;
-  overflow: visible;
-}
-
-[data-jalali-calendar-day][data-jalali-day-tip]:hover,
-[data-jalali-calendar-day][data-jalali-day-tip]:focus-visible {
-  z-index: 5;
-}
-
-[data-jalali-calendar-day][data-jalali-day-tip]:hover::after,
-[data-jalali-calendar-day][data-jalali-day-tip]:focus-visible::after {
-  content: attr(data-jalali-day-tip);
-  position: absolute;
-  z-index: 1;
-  top: calc(100% + 0.25em);
-  left: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  max-width: min(14rem, calc(100vw - 2rem));
+/* Holiday tip lives under the grid so it never clips at week edges. */
+[data-jalali-calendar-tip] {
+  margin-top: 0.45em;
   padding: 0.35em 0.55em;
   border-radius: var(--jalali-radius);
   border: 1px solid var(--jalali-border);
@@ -324,43 +303,13 @@ button[data-jalali-calendar-title-year]:hover {
   font-size: 0.75rem;
   font-weight: 500;
   line-height: 1.3;
-  white-space: normal;
   text-align: start;
-  text-decoration: none;
-  pointer-events: none;
-  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--jalali-fg) 16%, transparent);
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
-/* Keep tips inside the grid near the week edges (works in LTR and RTL). */
-[data-jalali-calendar-week]
-  > [data-jalali-calendar-day][data-jalali-day-tip]:nth-child(-n + 3):hover::after,
-[data-jalali-calendar-week]
-  > [data-jalali-calendar-day][data-jalali-day-tip]:nth-child(-n + 3):focus-visible::after {
-  inset-inline-start: 0;
-  left: auto;
-  right: auto;
-  transform: none;
-}
-
-[data-jalali-calendar-week]
-  > [data-jalali-calendar-day][data-jalali-day-tip]:nth-child(n + 5):hover::after,
-[data-jalali-calendar-week]
-  > [data-jalali-calendar-day][data-jalali-day-tip]:nth-child(n + 5):focus-visible::after {
-  inset-inline-end: 0;
-  left: auto;
-  right: auto;
-  transform: none;
-}
-
-/* Last week: open the tip upward so it stays in the calendar and popover. */
-[data-jalali-calendar-grid]
-  > [data-jalali-calendar-week]:last-child
-  > [data-jalali-calendar-day][data-jalali-day-tip]:hover::after,
-[data-jalali-calendar-grid]
-  > [data-jalali-calendar-week]:last-child
-  > [data-jalali-calendar-day][data-jalali-day-tip]:focus-visible::after {
-  top: auto;
-  bottom: calc(100% + 0.25em);
+[data-jalali-calendar-tip]:empty {
+  display: none;
 }
 
 [data-jalali-calendar-day][data-holiday][data-selected],

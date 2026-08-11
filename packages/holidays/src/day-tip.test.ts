@@ -34,8 +34,13 @@ describe('holidayDayTip', () => {
 describe('holidayDayChrome', () => {
   const options = { locale: 'en' as const, region: 'IR' as const, closedLabel: 'Closed' };
   const nowruz = { year: 1403, month: 1, day: 1 };
+  const blocked = {
+    'data-disabled': '',
+    'aria-disabled': 'true',
+    tabIndex: -1,
+  } as const;
 
-  it('builds tip and aria for holiday, closed holiday, and plain day', () => {
+  it('builds tip, aria, and blocked attrs for holiday, closed holiday, and plain day', () => {
     expect(
       holidayDayChrome(
         '1 Farvardin 1403',
@@ -43,20 +48,26 @@ describe('holidayDayChrome', () => {
         options,
       ),
     ).toEqual({ tip: 'Nowruz', ariaLabel: '1 Farvardin 1403. Nowruz' });
+
     expect(
       holidayDayChrome(
         '1 Farvardin 1403',
         { date: nowruz, isHoliday: true, isSelectable: false },
         options,
       ),
-    ).toEqual({ tip: 'Nowruz · Closed', ariaLabel: '1 Farvardin 1403. Nowruz · Closed' });
+    ).toEqual({
+      tip: 'Nowruz · Closed',
+      ariaLabel: '1 Farvardin 1403. Nowruz · Closed',
+      blocked,
+    });
+
     expect(
       holidayDayChrome(
         '1 Farvardin 1403',
-        { date: nowruz, isHoliday: false, isSelectable: true },
+        { date: nowruz, isHoliday: false, isSelectable: false },
         options,
       ),
-    ).toEqual({ ariaLabel: '1 Farvardin 1403' });
+    ).toEqual({ ariaLabel: '1 Farvardin 1403', blocked });
   });
 });
 

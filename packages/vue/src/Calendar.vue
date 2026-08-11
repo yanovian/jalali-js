@@ -6,9 +6,10 @@
  * markup outright while keeping the grid and header structure. `DatePicker` is this same
  * component with a default stylesheet and a popover wrapped around it.
  *
- * Days blocked by `rules` render as disabled buttons: clicks do nothing and the Tab order
- * skips them, so keyboard navigation skips blocked days. With `showHolidays`, holiday days
- * get `data-holiday`. With `blockHolidays`, those days also become unselectable.
+ * Days blocked by `rules` use `aria-disabled` and `data-disabled`: clicks do nothing and
+ * the Tab order skips them, so keyboard navigation skips blocked days. Holiday tips still
+ * work on hover and focus for those days. With `showHolidays`, holiday days get
+ * `data-holiday`. With `blockHolidays`, those days also become unselectable.
  *
  * With `quickNav` (default on), clicking the month or year in the header opens a month grid or
  * a year grid, so a person can jump years ahead without paging one month at a time. Picking a
@@ -75,6 +76,7 @@ const displayed = ref(
 );
 const view = ref<'day' | 'month' | 'year'>('day');
 const yearPage = ref(yearPageStart(displayed.value.year));
+const dayTip = ref<string | undefined>();
 
 const holidayOptions = computed(() =>
   resolveCalendarHolidays(props.system, displayed.value.year, displayed.value.month, {
@@ -94,6 +96,19 @@ const weeks = computed<CalendarGridDay[][]>(() =>
     props.value,
     holidayOptions.value.rules,
     holidayOptions.value.isHolidayDay,
+  ),
+);
+
+const dayWeeks = computed(() =>
+  weeks.value.map((week) =>
+    week.map((cell) => ({
+      cell,
+      chrome: holidayDayChrome(formatDate(cell.date, localePack.value, { style: 'long' }), cell, {
+        locale: props.locale,
+        region: props.holidayRegion,
+        closedLabel: localePack.value.ui.closedDay,
+      }),
+    })),
   ),
 );
 
@@ -173,18 +188,6 @@ function pickYear(year: number): void {
 function selectDay(date: CalendarDate): void {
   emit('select', date);
 }
-function dayTipAttrs(cell: CalendarGridDay) {
-  const { tip, ariaLabel } = holidayDayChrome(
-    formatDate(cell.date, localePack.value, { style: 'long' }),
-    cell,
-    {
-      locale: props.locale,
-      region: props.holidayRegion,
-      closedLabel: localePack.value.ui.closedDay,
-    },
-  );
-  return { 'data-jalali-day-tip': tip, 'aria-label': ariaLabel };
-}
 function dayNumber(cell: CalendarGridDay): string {
   return formatNumber(cell.date.day, localePack.value.defaultNumerals, localePack.value.digits);
 }
@@ -243,38 +246,43 @@ function dayNumber(cell: CalendarGridDay): string {
           </span>
         </div>
         <div
-          v-for="(week, weekIndex) in weeks"
+          v-for="(week, weekIndex) in dayWeeks"
           :key="weekIndex"
           role="row"
           data-jalali-calendar-week
         >
           <slot
-            v-for="cell in week"
-            :key="`${cell.date.year}-${cell.date.month}-${cell.date.day}`"
+            v-for="day in week"
+            :key="`${day.cell.date.year}-${day.cell.date.month}-${day.cell.date.day}`"
             name="day"
-            :cell="cell"
+            :cell="day.cell"
             :select="selectDay"
           >
             <button
               type="button"
               role="gridcell"
               data-jalali-calendar-day
-              :data-selected="cell.isSelected ? '' : undefined"
-              :data-today="cell.isToday ? '' : undefined"
-              :data-outside-month="cell.isCurrentMonth ? undefined : ''"
-              :data-disabled="cell.isSelectable ? undefined : ''"
-              :data-holiday="cell.isHoliday ? '' : undefined"
-              :disabled="!cell.isSelectable"
-              :aria-selected="cell.isSelected"
-              :aria-current="cell.isToday ? 'date' : undefined"
-              v-bind="dayTipAttrs(cell)"
-              @click="selectDay(cell.date)"
+              :data-selected="day.cell.isSelected ? '' : undefined"
+              :data-today="day.cell.isToday ? '' : undefined"
+              :data-outside-month="day.cell.isCurrentMonth ? undefined : ''"
+              :data-holiday="day.cell.isHoliday ? '' : undefined"
+              :data-jalali-day-tip="day.chrome.tip"
+              v-bind="day.chrome.blocked"
+              :aria-selected="day.cell.isSelected"
+              :aria-current="day.cell.isToday ? 'date' : undefined"
+              :aria-label="day.chrome.ariaLabel"
+              @click="!day.chrome.blocked && selectDay(day.cell.date)"
+              @mouseenter="dayTip = day.chrome.tip"
+              @mouseleave="dayTip = undefined"
+              @focus="dayTip = day.chrome.tip"
+              @blur="dayTip = undefined"
             >
-              {{ dayNumber(cell) }}
+              {{ dayNumber(day.cell) }}
             </button>
           </slot>
         </div>
       </div>
+      <div data-jalali-calendar-tip aria-hidden="true">{{ dayTip }}</div>
     </template>
 
     <template v-else-if="view === 'month'">

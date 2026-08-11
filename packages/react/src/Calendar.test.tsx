@@ -193,13 +193,13 @@ describe('Calendar', () => {
         />,
       );
       const blocked = screen.getByRole('gridcell', { name: '9 Mordad 1403' });
-      expect(blocked).toBeDisabled();
+      expect(blocked).toHaveAttribute('aria-disabled', 'true');
       expect(blocked).toHaveAttribute('data-disabled');
       await user.click(blocked);
       expect(onSelect).not.toHaveBeenCalled();
 
       const allowed = screen.getByRole('gridcell', { name: '10 Mordad 1403' });
-      expect(allowed).toBeEnabled();
+      expect(allowed).not.toHaveAttribute('aria-disabled');
       expect(allowed).not.toHaveAttribute('data-disabled');
       await user.click(allowed);
       expect(onSelect).toHaveBeenCalledTimes(1);
@@ -215,15 +215,21 @@ describe('Calendar', () => {
           rules={{ disabledWeekdays: [1] }}
         />,
       );
-      expect(screen.getByRole('gridcell', { name: '8 Mordad 1403' })).toBeDisabled();
-      expect(screen.getByRole('gridcell', { name: '9 Mordad 1403' })).toBeEnabled();
+      expect(screen.getByRole('gridcell', { name: '8 Mordad 1403' })).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      );
+      expect(screen.getByRole('gridcell', { name: '9 Mordad 1403' })).not.toHaveAttribute(
+        'aria-disabled',
+      );
     });
   });
 
   describe('holidays', () => {
     const farvardin1403 = { year: 1403, month: 1 };
 
-    it('wires holiday tip and aria name when showHolidays is on', () => {
+    it('wires holiday tip and aria name when showHolidays is on', async () => {
+      const user = userEvent.setup({ delay: null });
       render(
         <Calendar system="jalali" locale="en" initialDisplayedMonth={farvardin1403} showHolidays />,
       );
@@ -231,6 +237,10 @@ describe('Calendar', () => {
       expect(nowruz).toHaveAttribute('data-holiday');
       expect(nowruz).toHaveAttribute('data-jalali-day-tip', 'Nowruz');
       expect(nowruz).toBeEnabled();
+      const tip = document.querySelector('[data-jalali-calendar-tip]');
+      expect(tip).toBeEmptyDOMElement();
+      await user.hover(nowruz);
+      expect(tip).toHaveTextContent('Nowruz');
       expect(screen.getByRole('gridcell', { name: '5 Farvardin 1403' })).not.toHaveAttribute(
         'data-jalali-day-tip',
       );
@@ -250,8 +260,12 @@ describe('Calendar', () => {
         />,
       );
       const nowruz = screen.getByRole('gridcell', { name: '1 Farvardin 1403. Nowruz · Closed' });
-      expect(nowruz).toBeDisabled();
+      expect(nowruz).toHaveAttribute('aria-disabled', 'true');
       expect(nowruz).toHaveAttribute('data-jalali-day-tip', 'Nowruz · Closed');
+      await user.hover(nowruz);
+      expect(document.querySelector('[data-jalali-calendar-tip]')).toHaveTextContent(
+        'Nowruz · Closed',
+      );
       await user.click(nowruz);
       expect(onSelect).not.toHaveBeenCalled();
 

@@ -178,13 +178,14 @@ describe('Calendar', () => {
         },
       });
       const blocked = wrapper.get('[aria-label="9 Mordad 1403"]');
-      expect(blocked.attributes('disabled')).toBeDefined();
+      expect(blocked.attributes('aria-disabled')).toBe('true');
       expect(blocked.attributes('data-disabled')).toBe('');
       await blocked.trigger('click');
       expect(wrapper.emitted('select')).toBeUndefined();
 
       const allowed = wrapper.get('[aria-label="10 Mordad 1403"]');
-      expect(allowed.attributes('disabled')).toBeUndefined();
+      expect(allowed.attributes('aria-disabled')).toBeUndefined();
+      expect(allowed.attributes('data-disabled')).toBeUndefined();
       await allowed.trigger('click');
       expect(wrapper.emitted('select')).toHaveLength(1);
     });
@@ -199,8 +200,10 @@ describe('Calendar', () => {
           rules: { disabledWeekdays: [1] },
         },
       });
-      expect(wrapper.get('[aria-label="8 Mordad 1403"]').attributes('disabled')).toBeDefined();
-      expect(wrapper.get('[aria-label="9 Mordad 1403"]').attributes('disabled')).toBeUndefined();
+      expect(wrapper.get('[aria-label="8 Mordad 1403"]').attributes('aria-disabled')).toBe('true');
+      expect(
+        wrapper.get('[aria-label="9 Mordad 1403"]').attributes('aria-disabled'),
+      ).toBeUndefined();
     });
   });
 
@@ -212,11 +215,14 @@ describe('Calendar', () => {
       showHolidays: true,
     };
 
-    it('wires holiday tip and aria name when showHolidays is on', () => {
+    it('wires holiday tip and aria name when showHolidays is on', async () => {
       const wrapper = mount(Calendar, { props: farvardin1403 });
       const nowruz = wrapper.get('[aria-label="1 Farvardin 1403. Nowruz"]');
       expect(nowruz.attributes('data-holiday')).toBe('');
       expect(nowruz.attributes('data-jalali-day-tip')).toBe('Nowruz');
+      expect(wrapper.get('[data-jalali-calendar-tip]').text()).toBe('');
+      await nowruz.trigger('mouseenter');
+      expect(wrapper.get('[data-jalali-calendar-tip]').text()).toBe('Nowruz');
       expect(
         wrapper.get('[aria-label="5 Farvardin 1403"]').attributes('data-jalali-day-tip'),
       ).toBeUndefined();
@@ -225,8 +231,10 @@ describe('Calendar', () => {
     it('marks blocked holidays closed in tip and aria', async () => {
       const wrapper = mount(Calendar, { props: { ...farvardin1403, blockHolidays: true } });
       const nowruz = wrapper.get('[aria-label="1 Farvardin 1403. Nowruz · Closed"]');
-      expect(nowruz.attributes('disabled')).toBeDefined();
+      expect(nowruz.attributes('aria-disabled')).toBe('true');
       expect(nowruz.attributes('data-jalali-day-tip')).toBe('Nowruz · Closed');
+      await nowruz.trigger('mouseenter');
+      expect(wrapper.get('[data-jalali-calendar-tip]').text()).toBe('Nowruz · Closed');
       await nowruz.trigger('click');
       expect(wrapper.emitted('select')).toBeUndefined();
 

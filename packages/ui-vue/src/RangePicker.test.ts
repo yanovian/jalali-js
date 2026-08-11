@@ -128,7 +128,7 @@ describe('RangePicker', () => {
       const wrapper = mount(RangePicker, { props: { locale: 'en', rules } });
       await wrapper.get('[role="combobox"]').trigger('click');
       const blocked = wrapper.get('[aria-label="12 Mordad 1403"]');
-      expect(blocked.attributes('disabled')).toBeDefined();
+      expect(blocked.attributes('aria-disabled')).toBe('true');
       expect(blocked.attributes('data-disabled')).toBe('');
     });
 

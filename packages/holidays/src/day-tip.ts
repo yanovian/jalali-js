@@ -31,13 +31,38 @@ export interface HolidayDayCell {
   isSelectable: boolean;
 }
 
-/** Tip and aria-label for one calendar day cell. */
+/**
+ * Attrs for a blocked day button. Prefer these over native `disabled` so hover and focus
+ * still work for the holiday tip strip.
+ */
+export type BlockedDayAttrs = {
+  'data-disabled': '';
+  'aria-disabled': 'true';
+  tabIndex: -1;
+};
+
+export interface HolidayDayChrome {
+  tip?: string;
+  ariaLabel: string;
+  blocked?: BlockedDayAttrs;
+}
+
+function blockedDayAttrs(isSelectable: boolean): BlockedDayAttrs | undefined {
+  if (isSelectable) return undefined;
+  return { 'data-disabled': '', 'aria-disabled': 'true', tabIndex: -1 };
+}
+
+/** Tip, aria-label, and blocked-day attrs for one calendar day cell. */
 export function holidayDayChrome(
   dateLabel: string,
   cell: HolidayDayCell,
   options: { locale: HolidayLocale; region?: HolidayQueryOptions['region']; closedLabel: string },
-): { tip?: string; ariaLabel: string } {
-  if (!cell.isHoliday) return { ariaLabel: dateLabel };
+): HolidayDayChrome {
+  const blocked = blockedDayAttrs(cell.isSelectable);
+  if (!cell.isHoliday) {
+    return blocked ? { ariaLabel: dateLabel, blocked } : { ariaLabel: dateLabel };
+  }
+
   const tipOptions: HolidayDayTipOptions = {
     locale: options.locale,
     closed: !cell.isSelectable,
@@ -45,5 +70,10 @@ export function holidayDayChrome(
   };
   if (options.region !== undefined) tipOptions.region = options.region;
   const tip = holidayDayTip(cell.date, tipOptions);
-  return tip ? { tip, ariaLabel: holidayDayAriaLabel(dateLabel, tip) } : { ariaLabel: dateLabel };
+  const result: HolidayDayChrome = {
+    ariaLabel: tip ? holidayDayAriaLabel(dateLabel, tip) : dateLabel,
+  };
+  if (tip) result.tip = tip;
+  if (blocked) result.blocked = blocked;
+  return result;
 }

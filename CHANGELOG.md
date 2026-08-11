@@ -14,7 +14,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
-- Holiday day tips on hover and focus, with multi-holiday names from `@jalali-js/holidays`.
+- Holiday day tips on hover and focus under the calendar grid (`data-jalali-calendar-tip`), with multi-holiday names from `@jalali-js/holidays`.
 - Combined holiday and closed tip, aria name, and CSS when a holiday is also blocked.
 - `LocalePack.ui.closedDay` in `en`, `fa`, and `ps`.
 - Playground section for holidays with selection rules.
@@ -23,7 +23,6 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Fixed
 
-- Holiday day tips stay readable in the default calendar and DatePicker popover: full text, above neighboring days, pinned inside week edges, and flipped up on the last week.
 - Playground Primary / Background theme controls apply on jalali picker roots.
 - TimePicker and TimeRangePicker keep hour-then-minute order in RTL locales.
 
