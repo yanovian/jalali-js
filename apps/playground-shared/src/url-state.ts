@@ -15,6 +15,7 @@ export type DemoEventView = 'month' | 'week' | 'day' | 'timeline';
 export type DemoValueFormat = 'gregorian-iso' | 'jalali-object';
 export type DemoTimelineDirection = 'vertical' | 'horizontal';
 export type DemoTimelineMarkerShape = 'circular' | 'square';
+export type DemoTimelineLayout = 'single' | 'alternating' | 'road';
 
 export interface DemoThemeVars {
   primary: string;
@@ -37,7 +38,7 @@ export interface DemoState {
   timelineDirection: DemoTimelineDirection;
   timelineMarkerShape: DemoTimelineMarkerShape;
   timelineShowIcons: boolean;
-  timelineAlternating: boolean;
+  timelineLayout: DemoTimelineLayout;
   timelineMarkerSize: number;
   /** Force native or Latin digits in EventCalendar displayFormat. */
   nativeDigits: boolean;
@@ -62,7 +63,7 @@ export const DEFAULT_DEMO_STATE: DemoState = {
   timelineDirection: 'vertical',
   timelineMarkerShape: 'circular',
   timelineShowIcons: true,
-  timelineAlternating: false,
+  timelineLayout: 'single',
   timelineMarkerSize: 22,
   nativeDigits: true,
   minuteStep: 15,
@@ -91,6 +92,8 @@ export const GALLERY_CELLS = [
   'event-calendar-week',
   'event-calendar-day',
   'event-calendar-timeline',
+  'event-calendar-timeline-alternating',
+  'event-calendar-timeline-road',
   'selection-rules',
   'holidays',
   'holidays-and-rules',
@@ -154,7 +157,16 @@ export function parseDemoState(search: string): DemoState {
       d.timelineMarkerShape,
     ),
     timelineShowIcons: parseBool(params.get('timelineShowIcons'), d.timelineShowIcons),
-    timelineAlternating: parseBool(params.get('timelineAlternating'), d.timelineAlternating),
+    timelineLayout: (() => {
+      const layout = oneOf(
+        params.get('timelineLayout'),
+        ['single', 'alternating', 'road'] as const,
+        d.timelineLayout,
+      );
+      if (params.has('timelineLayout')) return layout;
+      if (parseBool(params.get('timelineAlternating'), false)) return 'alternating';
+      return layout;
+    })(),
     timelineMarkerSize: Number(params.get('timelineMarkerSize')) || d.timelineMarkerSize,
     nativeDigits: parseBool(params.get('nativeDigits'), d.nativeDigits),
     minuteStep: Number(params.get('minuteStep')) || d.minuteStep,
@@ -188,11 +200,7 @@ export function serializeDemoState(state: DemoState): string {
   set('timelineDirection', state.timelineDirection, d.timelineDirection);
   set('timelineMarkerShape', state.timelineMarkerShape, d.timelineMarkerShape);
   set('timelineShowIcons', state.timelineShowIcons ? '1' : '0', d.timelineShowIcons ? '1' : '0');
-  set(
-    'timelineAlternating',
-    state.timelineAlternating ? '1' : '0',
-    d.timelineAlternating ? '1' : '0',
-  );
+  set('timelineLayout', state.timelineLayout, d.timelineLayout);
   set('timelineMarkerSize', String(state.timelineMarkerSize), String(d.timelineMarkerSize));
   set('nativeDigits', state.nativeDigits ? '1' : '0', d.nativeDigits ? '1' : '0');
   set('minuteStep', String(state.minuteStep), String(d.minuteStep));

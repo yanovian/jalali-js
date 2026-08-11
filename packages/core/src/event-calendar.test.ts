@@ -16,6 +16,8 @@ import {
   TIMELINE_ACCENT_COLORS,
   timelineAccentFor,
   timelineEventDateTime,
+  timedBlockStyle,
+  resolveTimelineLayout,
   type CalendarEvent,
 } from './event-calendar.js';
 
@@ -87,6 +89,13 @@ describe('event-calendar layout', () => {
         startTime: { hour: 9, minute: 5 },
       }),
     ).toBe('1403-01-02T09:05');
+  });
+
+  it('resolves timeline layout from layout or alternating', () => {
+    expect(resolveTimelineLayout()).toBe('single');
+    expect(resolveTimelineLayout({ layout: 'road' })).toBe('road');
+    expect(resolveTimelineLayout({ alternating: true })).toBe('alternating');
+    expect(resolveTimelineLayout({ layout: 'single', alternating: true })).toBe('single');
   });
 
   it('assigns lanes for overlapping events in a week', () => {
@@ -195,5 +204,9 @@ describe('event-calendar layout', () => {
     const layout = layoutDayTimedEvents(events, { year: 1403, month: 5, day: 15 });
     expect(layout).toHaveLength(2);
     expect(layout[0]!.lane).not.toBe(layout[1]!.lane);
+    const style = timedBlockStyle(layout[0]!, 2);
+    expect(style.top).toContain('%');
+    expect(style.width).toContain('--jalali-event-lane-gap');
+    expect(style.zIndex).toBe('1');
   });
 });

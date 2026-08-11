@@ -177,15 +177,15 @@ describe('EventCalendar', () => {
         locale="fa"
         view="timeline"
         displayFormat={{ numerals: 'native', template: 'YYYY/MM/DD' }}
-        timeline={{ showIcons: true, markerShape: 'circular', alternating: true }}
+        timeline={{ showIcons: true, markerShape: 'circular', layout: 'alternating' }}
         events={events}
         onEventClick={onEventClick}
       />,
     );
     expect(document.querySelector('[data-view="timeline"]')).toBeTruthy();
     expect(document.querySelector('[data-jalali-timeline]')).toHaveAttribute(
-      'data-direction',
-      'vertical',
+      'data-layout',
+      'alternating',
     );
     expect(document.querySelector('[data-jalali-timeline-icon]')?.textContent).toBe('◎');
     expect(screen.getByText(/۰۹:۰۰/)).toBeInTheDocument();

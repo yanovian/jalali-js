@@ -29,6 +29,7 @@ export type {
   EventLaneSegment,
   TimedEventBlock,
   TimelineDirection,
+  TimelineLayout,
   TimelineMarkerShape,
   TimelineOptions,
 } from './event-calendar.js';
@@ -46,6 +47,7 @@ export {
   layoutDaysTimedEvents,
   layoutMonthEvents,
   layoutWeekEvents,
+  resolveTimelineLayout,
   shiftEventViewAnchor,
   timedBlockStyle,
   TIMELINE_ACCENT_COLORS,

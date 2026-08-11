@@ -23,6 +23,7 @@ import {
   layoutMonthEvents,
   layoutWeekEvents,
   listHours,
+  resolveTimelineLayout,
   shiftEventViewAnchor,
   timedBlockStyle,
   timelineAccentFor,
@@ -240,7 +241,9 @@ export class JalaliEventCalendarElement extends HTMLElement {
     const direction = this.#timeline?.direction ?? 'vertical';
     const markerShape = this.#timeline?.markerShape ?? 'circular';
     const showIcons = this.#timeline?.showIcons ?? true;
-    const alternating = this.#timeline?.alternating ?? false;
+    const resolvedLayout = resolveTimelineLayout(this.#timeline);
+    const layout =
+      direction === 'horizontal' && resolvedLayout === 'road' ? 'alternating' : resolvedLayout;
     const markerSize = this.#timeline?.markerSize;
 
     this.dir = localePack.direction;
@@ -272,9 +275,9 @@ export class JalaliEventCalendarElement extends HTMLElement {
       const list = document.createElement('ol');
       list.setAttribute('data-jalali-timeline', '');
       list.setAttribute('data-direction', direction);
+      list.setAttribute('data-layout', layout);
       list.setAttribute('data-marker-shape', markerShape);
       if (showIcons) list.setAttribute('data-show-icons', '');
-      if (alternating) list.setAttribute('data-alternating', '');
       if (markerSize != null) {
         list.style.setProperty('--jalali-timeline-marker-size', `${markerSize}px`);
       }
@@ -282,6 +285,10 @@ export class JalaliEventCalendarElement extends HTMLElement {
       timelineEvents.forEach((event, index) => {
         const item = document.createElement('li');
         item.setAttribute('data-jalali-timeline-item', '');
+        item.setAttribute(
+          'data-side',
+          layout === 'single' ? 'end' : index % 2 === 0 ? 'end' : 'start',
+        );
         item.style.setProperty('--jalali-timeline-accent', timelineAccentFor(index, event.color));
 
         const marker = document.createElement('div');

@@ -14,7 +14,8 @@
 [data-jalali-datepicker-dropdown],
 [data-jalali-timepicker-root],
 [data-jalali-timerangepicker-root],
-[data-jalali-calendar-root] {
+[data-jalali-calendar-root],
+[data-jalali-eventcalendar-root] {
   --jalali-bg: #161616;
   --jalali-fg: #f2f2f2;
   --jalali-muted-fg: #b3b3b3;

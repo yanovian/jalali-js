@@ -24,6 +24,7 @@ import {
   layoutMonthEvents,
   layoutWeekEvents,
   listHours,
+  resolveTimelineLayout,
   shiftEventViewAnchor,
   timedBlockStyle,
   timelineAccentFor,
@@ -152,7 +153,10 @@ const titleId = useId();
 const direction = computed(() => props.timeline?.direction ?? 'vertical');
 const markerShape = computed(() => props.timeline?.markerShape ?? 'circular');
 const showIcons = computed(() => props.timeline?.showIcons ?? true);
-const alternating = computed(() => props.timeline?.alternating ?? false);
+const layout = computed(() => {
+  const resolved = resolveTimelineLayout(props.timeline);
+  return direction.value === 'horizontal' && resolved === 'road' ? 'alternating' : resolved;
+});
 const markerSize = computed(() => props.timeline?.markerSize);
 
 function onEventClick(eventId: string, click: MouseEvent): void {
@@ -346,9 +350,9 @@ function onEventClick(eventId: string, click: MouseEvent): void {
       <ol
         data-jalali-timeline
         :data-direction="direction"
+        :data-layout="layout"
         :data-marker-shape="markerShape"
         :data-show-icons="showIcons ? '' : undefined"
-        :data-alternating="alternating ? '' : undefined"
         :style="
           markerSize != null ? { '--jalali-timeline-marker-size': `${markerSize}px` } : undefined
         "
@@ -357,6 +361,7 @@ function onEventClick(eventId: string, click: MouseEvent): void {
           v-for="(event, index) in timelineEvents"
           :key="event.id"
           data-jalali-timeline-item
+          :data-side="layout === 'single' ? 'end' : index % 2 === 0 ? 'end' : 'start'"
           :style="{ '--jalali-timeline-accent': timelineAccentFor(index, event.color) }"
         >
           <div data-jalali-timeline-marker aria-hidden="true">

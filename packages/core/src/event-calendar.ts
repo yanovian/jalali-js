@@ -8,6 +8,8 @@ export type EventCalendarView = 'month' | 'week' | 'day' | 'timeline';
 
 export type TimelineDirection = 'vertical' | 'horizontal';
 export type TimelineMarkerShape = 'circular' | 'square';
+/** Card placement for vertical timelines. */
+export type TimelineLayout = 'single' | 'alternating' | 'road';
 
 /**
  * Options for `view: 'timeline'`. Defaults match a vertical, circular-marker
@@ -17,9 +19,31 @@ export interface TimelineOptions {
   direction?: TimelineDirection;
   markerShape?: TimelineMarkerShape;
   showIcons?: boolean;
+  /**
+   * Card layout. `single` keeps every card on one side of the rail.
+   * `alternating` flips sides. `road` is a winding both-sides path.
+   * Default: `'single'`.
+   */
+  layout?: TimelineLayout;
+  /**
+   * Prefer `layout: 'alternating'`. When `layout` is omitted, `true` maps to
+   * `alternating`.
+   */
   alternating?: boolean;
   /** Marker diameter in CSS pixels. When omitted, CSS `--jalali-timeline-marker-size` applies. */
   markerSize?: number;
+}
+
+/** Resolve the effective timeline layout from options. */
+export function resolveTimelineLayout(options?: TimelineOptions): TimelineLayout {
+  if (
+    options?.layout === 'single' ||
+    options?.layout === 'alternating' ||
+    options?.layout === 'road'
+  ) {
+    return options.layout;
+  }
+  return options?.alternating ? 'alternating' : 'single';
 }
 
 /**
@@ -338,7 +362,10 @@ export function layoutDaysTimedEvents(
   return days.map((day) => layoutDayTimedEvents(events, day));
 }
 
-/** CSS-friendly placement for a timed block inside a day column. */
+/**
+ * CSS placement for a timed block in a day column.
+ * Themes tune overlap with `--jalali-event-lane-gap` and `--jalali-event-block-inset`.
+ */
 export function timedBlockStyle(
   block: TimedEventBlock,
   laneCount: number,
@@ -347,13 +374,18 @@ export function timedBlockStyle(
   height: string;
   insetInlineStart: string;
   width: string;
+  zIndex: string;
 } {
   const lanes = Math.max(1, laneCount);
+  const startPct = (block.startMinute / MINUTES_PER_DAY) * 100;
+  const heightPct = ((block.endMinute - block.startMinute) / MINUTES_PER_DAY) * 100;
+  const lanePct = 100 / lanes;
   return {
-    top: `${(block.startMinute / MINUTES_PER_DAY) * 100}%`,
-    height: `${((block.endMinute - block.startMinute) / MINUTES_PER_DAY) * 100}%`,
-    insetInlineStart: `${(block.lane / lanes) * 100}%`,
-    width: `${(1 / lanes) * 100}%`,
+    top: `calc(${startPct}% + var(--jalali-event-block-inset, 1px))`,
+    height: `max(1.25em, calc(${heightPct}% - 2 * var(--jalali-event-block-inset, 1px)))`,
+    insetInlineStart: `calc(${block.lane * lanePct}% + var(--jalali-event-lane-gap, 2px) / 2)`,
+    width: `calc(${lanePct}% - var(--jalali-event-lane-gap, 2px))`,
+    zIndex: String(1 + block.lane),
   };
 }
 

@@ -24,6 +24,7 @@ import {
   layoutMonthEvents,
   layoutWeekEvents,
   listHours,
+  resolveTimelineLayout,
   shiftEventViewAnchor,
   timedBlockStyle,
   timelineAccentFor,
@@ -145,7 +146,8 @@ export function EventCalendar({
   const direction = timeline?.direction ?? 'vertical';
   const markerShape = timeline?.markerShape ?? 'circular';
   const showIcons = timeline?.showIcons ?? true;
-  const alternating = timeline?.alternating ?? false;
+  const layout = resolveTimelineLayout(timeline);
+  const effectiveLayout = direction === 'horizontal' && layout === 'road' ? 'alternating' : layout;
   const markerSize = timeline?.markerSize;
 
   function clickEvent(eventId: string, click: MouseEvent): void {
@@ -358,9 +360,9 @@ export function EventCalendar({
           <ol
             data-jalali-timeline
             data-direction={direction}
+            data-layout={effectiveLayout}
             data-marker-shape={markerShape}
             data-show-icons={showIcons ? '' : undefined}
-            data-alternating={alternating ? '' : undefined}
             style={
               markerSize != null
                 ? { ['--jalali-timeline-marker-size' as string]: `${markerSize}px` }
@@ -368,11 +370,12 @@ export function EventCalendar({
             }
           >
             {timelineEvents.map((event, index) => {
+              const side = effectiveLayout === 'single' ? 'end' : index % 2 === 0 ? 'end' : 'start';
               const itemStyle = {
                 ['--jalali-timeline-accent' as string]: timelineAccentFor(index, event.color),
               } satisfies CSSProperties;
               return (
-                <li key={event.id} data-jalali-timeline-item style={itemStyle}>
+                <li key={event.id} data-jalali-timeline-item data-side={side} style={itemStyle}>
                   <div data-jalali-timeline-marker aria-hidden="true">
                     {showIcons && event.icon ? (
                       <span data-jalali-timeline-icon>{event.icon}</span>

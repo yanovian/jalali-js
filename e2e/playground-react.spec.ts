@@ -21,6 +21,11 @@ const SECTIONS = [
   { testId: 'event-calendar-week', name: 'event-calendar-week.png' },
   { testId: 'event-calendar-day', name: 'event-calendar-day.png' },
   { testId: 'event-calendar-timeline', name: 'event-calendar-timeline.png' },
+  {
+    testId: 'event-calendar-timeline-alternating',
+    name: 'event-calendar-timeline-alternating.png',
+  },
+  { testId: 'event-calendar-timeline-road', name: 'event-calendar-timeline-road.png' },
   { testId: 'selection-rules', name: 'selection-rules.png' },
   { testId: 'holidays', name: 'holidays.png' },
   { testId: 'holidays-and-rules', name: 'holidays-and-rules.png' },

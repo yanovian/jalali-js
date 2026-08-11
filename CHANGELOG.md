@@ -14,6 +14,8 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Added
 
+- EventCalendar timeline `layout`: `single` (one side), `alternating` (both sides), and `road` (curved both-sides path).
+- Playground gallery cells for all three timeline layouts.
 - Holiday day tips on hover and focus as an overlay on the calendar (`data-jalali-calendar-tip`), with multi-holiday names from `@jalali-js/holidays`.
 - Combined holiday and closed tip, aria name, and CSS when a holiday is also blocked.
 - `LocalePack.ui.closedDay` in `en`, `fa`, and `ps`.
@@ -23,8 +25,9 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Fixed
 
-- EventCalendar timeline draws one continuous rail behind markers.
-- EventCalendar week and day show hour lines across day columns and align headers with the hours gutter.
+- EventCalendar timeline draws one continuous rail behind markers with no background ring gaps.
+- EventCalendar week and day use shared column tokens and a fixed hour-row height so labels, lines, and events stay aligned.
+- Overlapping timed events use simple lane-gap CSS tokens and an accent edge for a clear default look.
 - Playground Primary / Background theme controls apply on jalali picker roots.
 - TimePicker and TimeRangePicker keep hour-then-minute order in RTL locales.
 
