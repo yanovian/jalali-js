@@ -616,10 +616,10 @@ button[data-jalali-calendar-title-year]:hover {
   --jalali-timeline-marker-fg: #ffffff;
   --jalali-timeline-gap: 1.45em;
   --jalali-timeline-card-gap: 1.2em;
-  --jalali-timeline-road-track: max(3.5em, 12cqw);
-  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 48%, var(--jalali-bg));
-  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 74%, transparent);
-  --jalali-timeline-road-dash: color-mix(in srgb, #ffffff 82%, var(--jalali-fg));
+  --jalali-timeline-road-track: 7em;
+  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 44%, var(--jalali-bg));
+  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 70%, transparent);
+  --jalali-timeline-road-dash: color-mix(in srgb, #ffffff 88%, var(--jalali-fg));
 }
 
 [data-jalali-timeline-header] {
@@ -680,20 +680,20 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-roadmap-dash] {
   fill: none;
   stroke: var(--jalali-timeline-road-dash);
-  stroke-width: 0.28em;
+  stroke-width: 0.35em;
   stroke-linecap: butt;
   stroke-linejoin: round;
-  stroke-dasharray: 0.7em 0.85em;
+  stroke-dasharray: 0.85em 1em;
   vector-effect: non-scaling-stroke;
 }
 
 [data-jalali-roadmap-edge] {
   fill: none;
   stroke: var(--jalali-timeline-road-edge);
-  stroke-width: calc(var(--jalali-timeline-road-track) + 0.4em);
+  stroke-width: calc(var(--jalali-timeline-road-track) + 0.55em);
   stroke-linecap: butt;
   stroke-linejoin: round;
-  opacity: 0.8;
+  opacity: 0.85;
   vector-effect: non-scaling-stroke;
 }
 
@@ -839,18 +839,18 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-item][data-road-side='left']
   [data-jalali-timeline-marker] {
-  left: 42%;
+  left: 38%;
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-item][data-road-side='right']
   [data-jalali-timeline-marker] {
-  left: 58%;
+  left: 62%;
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-card] {
-  width: min(18em, calc(40% - 1.1em));
+  width: min(16em, calc(30% - 0.75em));
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']

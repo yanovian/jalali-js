@@ -53,17 +53,17 @@ export function resolveTimelineLayout(options?: TimelineOptions): TimelineLayout
 }
 
 /** Marker X positions in the roadmap SVG viewBox (0 to 100). */
-export const ROADMAP_LEFT_X = 42;
-export const ROADMAP_RIGHT_X = 58;
+export const ROADMAP_LEFT_X = 38;
+export const ROADMAP_RIGHT_X = 62;
 
 /**
  * Cubic S-curve between two points with vertical end tangents.
- * Matching vertical handles keep left and right road edges parallel
- * when the SVG stroke uses a constant width.
+ * Equal vertical handles keep every bend the same shape so a constant
+ * stroke width reads as parallel road edges.
  */
 function roadmapCurve(x0: number, y0: number, x1: number, y1: number): string {
-  const midY = (y0 + y1) / 2;
-  return ` C ${x0} ${midY}, ${x1} ${midY}, ${x1} ${y1}`;
+  const dy = (y1 - y0) / 2;
+  return ` C ${x0} ${y0 + dy}, ${x1} ${y1 - dy}, ${x1} ${y1}`;
 }
 
 /**
