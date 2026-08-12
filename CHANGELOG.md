@@ -12,6 +12,8 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-08-12
+
 ### Changed
 
 - Docs nav drops the duplicate Live demo link.
@@ -169,7 +171,8 @@ The initial release. This covers phases 0 through 11 of the plan.
   peer-dependency compatibility matrix, and visual e2e tests with a PR
   screenshot bot.
 
-[unreleased]: https://github.com/yanovian/jalali-js/compare/v0.4.0...HEAD
+[unreleased]: https://github.com/yanovian/jalali-js/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/yanovian/jalali-js/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/yanovian/jalali-js/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/yanovian/jalali-js/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/yanovian/jalali-js/compare/v0.2.0...v0.2.1
