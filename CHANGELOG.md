@@ -18,6 +18,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Changed
 
+- Package READMEs keep the npm ecosystem line at the top only.
 - Docs cover EventCalendar timeline `layout` (`single`, `alternating`, `roadmap`), holiday day tips, and `LocalePack.ui.closedDay`.
 
 ### Fixed
