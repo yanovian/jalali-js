@@ -101,13 +101,9 @@ export function buildLocaleConfig(
         {
           text: m.nav.playground,
           items: [
-            { text: m.nav.playgroundReact, link: '/playground/react/', target: '_blank' },
-            { text: m.nav.playgroundVue, link: '/playground/vue/', target: '_blank' },
-            {
-              text: m.nav.playgroundVanilla,
-              link: '/playground/vanilla/',
-              target: '_blank',
-            },
+            { text: m.nav.playgroundReact, link: '/playground/react/' },
+            { text: m.nav.playgroundVue, link: '/playground/vue/' },
+            { text: m.nav.playgroundVanilla, link: '/playground/vanilla/' },
           ],
         },
       ],

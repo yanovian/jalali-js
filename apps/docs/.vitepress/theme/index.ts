@@ -1,37 +1,27 @@
 import DefaultTheme from 'vitepress/theme';
-import type { Theme } from 'vitepress';
+import type { EnhanceAppContext, Theme } from 'vitepress';
 import './custom.css';
 
 /**
- * /playground/* is served by Vite proxy or public files, not by VitePress routes.
- * Client-side navigation would show the docs 404. Force a full page load instead.
+ * Playgrounds live under /playground/* as static apps, not VitePress pages.
+ * Open them in a new tab and cancel the SPA route so the docs 404 never shows.
  */
-function bindPlaygroundFullNavigation(): void {
+function bindPlaygroundLinks({ router }: EnhanceAppContext): void {
   if (typeof window === 'undefined') return;
-  window.addEventListener(
-    'click',
-    (event) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const anchor = target.closest('a');
-      if (!anchor) return;
-      const href = anchor.getAttribute('href');
-      if (!href) return;
-      let path: string;
-      try {
-        path = new URL(href, window.location.origin).pathname;
-      } catch {
-        return;
-      }
-      if (!path.startsWith('/playground/')) return;
-      if (event.defaultPrevented || event.button !== 0) return;
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      if (anchor.target && anchor.target !== '_self') return;
-      event.preventDefault();
-      window.location.assign(anchor.href);
-    },
-    true,
-  );
+  const previous = router.onBeforeRouteChange;
+  router.onBeforeRouteChange = (to) => {
+    let path: string;
+    try {
+      path = new URL(to, window.location.origin).pathname;
+    } catch {
+      return previous?.(to);
+    }
+    if (path.startsWith('/playground/')) {
+      window.open(to, '_blank', 'noopener,noreferrer');
+      return false;
+    }
+    return previous?.(to);
+  };
 }
 
 /**
@@ -49,8 +39,8 @@ function bindApiLocaleFallback(): void {
 
 export default {
   extends: DefaultTheme,
-  enhanceApp() {
-    bindPlaygroundFullNavigation();
+  enhanceApp(ctx) {
+    bindPlaygroundLinks(ctx);
     bindApiLocaleFallback();
   },
 } satisfies Theme;
