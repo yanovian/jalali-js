@@ -616,7 +616,7 @@ button[data-jalali-calendar-title-year]:hover {
   --jalali-timeline-marker-fg: #ffffff;
   --jalali-timeline-gap: 1.45em;
   --jalali-timeline-card-gap: 1.2em;
-  --jalali-timeline-road-track: 2.75em;
+  --jalali-timeline-road-track: 6.5em;
   --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 28%, var(--jalali-bg));
   --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 52%, transparent);
   --jalali-timeline-road-dash: color-mix(in srgb, var(--jalali-fg) 78%, #ffffff);
@@ -680,17 +680,17 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-roadmap-dash] {
   fill: none;
   stroke: var(--jalali-timeline-road-dash);
-  stroke-width: 0.18em;
+  stroke-width: 0.35em;
   stroke-linecap: butt;
   stroke-linejoin: round;
-  stroke-dasharray: 0.5em 0.65em;
+  stroke-dasharray: 0.85em 1.1em;
   vector-effect: non-scaling-stroke;
 }
 
 [data-jalali-roadmap-edge] {
   fill: none;
   stroke: var(--jalali-timeline-road-edge);
-  stroke-width: calc(var(--jalali-timeline-road-track) + 0.22em);
+  stroke-width: calc(var(--jalali-timeline-road-track) + 0.45em);
   stroke-linecap: butt;
   stroke-linejoin: round;
   opacity: 0.55;
