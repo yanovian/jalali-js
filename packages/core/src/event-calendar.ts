@@ -53,17 +53,11 @@ export function resolveTimelineLayout(options?: TimelineOptions): TimelineLayout
 }
 
 /** Marker X positions as percent of the roadmap width (0 to 100). */
-export const ROADMAP_LEFT_X = 34;
-export const ROADMAP_RIGHT_X = 66;
-
-/**
- * Half-amplitude from center as a fraction of width.
- * Keep this larger than half the road width so bends stay open.
- */
-export const ROADMAP_AMPLITUDE_FRACTION = 0.16;
+export const ROADMAP_LEFT_X = 32;
+export const ROADMAP_RIGHT_X = 68;
 
 /** Road width as a fraction of the timeline width. */
-export const ROADMAP_WIDTH_FRACTION = 0.12;
+export const ROADMAP_WIDTH_FRACTION = 0.13;
 
 export interface RoadmapTrackBounds {
   width: number;
@@ -71,10 +65,23 @@ export interface RoadmapTrackBounds {
 }
 
 /**
+ * Cubic S-curve with vertical end tangents.
+ * Vertical tangents at marker peaks keep a thick stroke open (no V-points).
+ */
+function roadmapCurve(x0: number, y0: number, x1: number, y1: number): string {
+  // 1/3 handles keep vertical peak tangents and a rounder S than mid-point handles.
+  const dy = (y1 - y0) / 3;
+  return ` C ${round(x0)} ${round(y0 + dy)}, ${round(x1)} ${round(y1 - dy)}, ${round(x1)} ${round(y1)}`;
+}
+
+function round(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
+/**
  * Build an SVG path for a vertical serpentine roadmap.
- * Pass the painted pixel size so the viewBox matches 1:1.
- * The centerline is a sine wave through each marker peak so a thick
- * stroke reads as a smooth road, not linked blobs.
+ * Pass the painted pixel size so the viewBox matches 1:1 and stroke width
+ * stays even. Marker peaks use vertical tangents so the road reads smooth.
  */
 export function roadmapTrackPath(
   count: number,
@@ -83,44 +90,33 @@ export function roadmapTrackPath(
   const width = Math.max(1, bounds?.width ?? 100);
   const height = Math.max(1, bounds?.height ?? Math.max(100, count * 100));
   const mid = width / 2;
-  const amp = width * ROADMAP_AMPLITUDE_FRACTION;
-  const roadWidth = Math.round(width * ROADMAP_WIDTH_FRACTION * 1000) / 1000;
-  const viewBox = `0 0 ${width} ${height}`;
+  const left = (ROADMAP_LEFT_X / 100) * width;
+  const right = (ROADMAP_RIGHT_X / 100) * width;
+  const roadWidth = Math.round(width * ROADMAP_WIDTH_FRACTION * 100) / 100;
+  const viewBox = `0 0 ${round(width)} ${round(height)}`;
 
   if (count <= 0) {
     const pad = Math.min(roadWidth, height / 4);
     return {
-      d: `M ${mid} ${pad} L ${mid} ${height - pad}`,
+      d: `M ${round(mid)} ${round(pad)} L ${round(mid)} ${round(height - pad)}`,
       viewBox,
       roadWidth,
     };
   }
 
   const step = height / count;
-  // phase = y / step: marker i sits at phase i+0.5 (left on even, right on odd).
-  const xAtPhase = (phase: number): number => mid - amp * Math.sin(Math.PI * phase);
-  const samplesPerRow = 48;
-  const totalSamples = count * samplesPerRow;
-  const points: Array<{ x: number; y: number }> = [];
-  for (let i = 0; i <= totalSamples; i += 1) {
-    const phase = (i / totalSamples) * count;
-    const y = phase * step;
-    points.push({ x: xAtPhase(phase), y });
-  }
+  const xAt = (index: number): number => (index % 2 === 0 ? left : right);
+  const yAt = (index: number): number => index * step + step / 2;
+  // Keep entry/exit short so the first and last bends stay open.
+  const startY = Math.min(step * 0.12, step / 2 - roadWidth * 0.35);
+  const endY = height - startY;
 
-  // Smooth cubic path through samples (Catmull-Rom style segment fit).
-  let d = `M ${points[0]!.x} ${points[0]!.y}`;
-  for (let i = 0; i < points.length - 1; i += 1) {
-    const p0 = points[Math.max(0, i - 1)]!;
-    const p1 = points[i]!;
-    const p2 = points[i + 1]!;
-    const p3 = points[Math.min(points.length - 1, i + 2)]!;
-    const c1x = p1.x + (p2.x - p0.x) / 6;
-    const c1y = p1.y + (p2.y - p0.y) / 6;
-    const c2x = p2.x - (p3.x - p1.x) / 6;
-    const c2y = p2.y - (p3.y - p1.y) / 6;
-    d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`;
+  let d = `M ${round(mid)} ${round(Math.max(roadWidth * 0.2, startY))}`;
+  d += roadmapCurve(mid, Math.max(roadWidth * 0.2, startY), xAt(0), yAt(0));
+  for (let index = 1; index < count; index += 1) {
+    d += roadmapCurve(xAt(index - 1), yAt(index - 1), xAt(index), yAt(index));
   }
+  d += roadmapCurve(xAt(count - 1), yAt(count - 1), mid, Math.min(height - roadWidth * 0.2, endY));
 
   return { d, viewBox, roadWidth };
 }
