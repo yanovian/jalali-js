@@ -616,10 +616,10 @@ button[data-jalali-calendar-title-year]:hover {
   --jalali-timeline-marker-fg: #ffffff;
   --jalali-timeline-gap: 1.45em;
   --jalali-timeline-card-gap: 1.2em;
-  --jalali-timeline-road-track: 4.5em;
-  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 40%, var(--jalali-bg));
-  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 66%, transparent);
-  --jalali-timeline-road-dash: color-mix(in srgb, #ffffff 88%, var(--jalali-fg));
+  --jalali-timeline-road-track: 2.75em;
+  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 28%, var(--jalali-bg));
+  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 52%, transparent);
+  --jalali-timeline-road-dash: color-mix(in srgb, var(--jalali-fg) 78%, #ffffff);
 }
 
 [data-jalali-timeline-header] {
@@ -667,32 +667,34 @@ button[data-jalali-calendar-title-year]:hover {
   pointer-events: none;
 }
 
-/* Road stroke uses pixel viewBox units from roadmapTrackPath (1:1 with layout). */
+/* Keep stroke width even under preserveAspectRatio="none". */
 [data-jalali-roadmap-asphalt] {
   fill: none;
   stroke: var(--jalali-timeline-road-color);
   stroke-width: var(--jalali-timeline-road-track);
-  stroke-linecap: round;
+  stroke-linecap: butt;
   stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 
 [data-jalali-roadmap-dash] {
   fill: none;
   stroke: var(--jalali-timeline-road-dash);
-  stroke-width: calc(var(--jalali-timeline-road-track) * 0.07);
+  stroke-width: 0.18em;
   stroke-linecap: butt;
   stroke-linejoin: round;
-  stroke-dasharray: calc(var(--jalali-timeline-road-track) * 0.22)
-    calc(var(--jalali-timeline-road-track) * 0.28);
+  stroke-dasharray: 0.5em 0.65em;
+  vector-effect: non-scaling-stroke;
 }
 
 [data-jalali-roadmap-edge] {
   fill: none;
   stroke: var(--jalali-timeline-road-edge);
-  stroke-width: calc(var(--jalali-timeline-road-track) * 1.12);
-  stroke-linecap: round;
+  stroke-width: calc(var(--jalali-timeline-road-track) + 0.22em);
+  stroke-linecap: butt;
   stroke-linejoin: round;
-  opacity: 0.8;
+  opacity: 0.55;
+  vector-effect: non-scaling-stroke;
 }
 
 [data-jalali-timeline][data-direction='horizontal'] {
@@ -787,7 +789,7 @@ button[data-jalali-calendar-title-year]:hover {
   direction: ltr;
   display: grid;
   gap: 0;
-  grid-auto-rows: 12em;
+  grid-auto-rows: 8.5em;
   padding-block: 0;
 }
 
@@ -837,18 +839,18 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-item][data-road-side='left']
   [data-jalali-timeline-marker] {
-  left: 32%;
+  left: 42%;
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-item][data-road-side='right']
   [data-jalali-timeline-marker] {
-  left: 68%;
+  left: 58%;
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-card] {
-  width: min(17em, calc(30% - 0.75em));
+  width: min(18em, calc(40% - 1.1em));
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']

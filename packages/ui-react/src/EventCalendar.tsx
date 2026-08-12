@@ -32,15 +32,7 @@ import {
   timelineEventDateTime,
   weekdayLabelsForGrid,
 } from 'jalali-js';
-import {
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type MouseEvent,
-} from 'react';
+import { useId, useMemo, useState, type CSSProperties, type MouseEvent } from 'react';
 
 export interface EventCalendarProps {
   system?: CalendarSystem;
@@ -159,43 +151,10 @@ export function EventCalendar({
   const effectiveLayout =
     direction === 'horizontal' && layout === 'roadmap' ? 'alternating' : layout;
   const markerSize = timeline?.markerSize;
-  const timelineListRef = useRef<HTMLOListElement>(null);
-  const [roadmapBounds, setRoadmapBounds] = useState<{ width: number; height: number } | null>(
-    null,
-  );
-  const showRoadmap = view === 'timeline' && effectiveLayout === 'roadmap' && !!timelineEvents;
-
-  useLayoutEffect(() => {
-    if (!showRoadmap) return;
-    const list = timelineListRef.current;
-    if (!list) return;
-
-    const observer = new ResizeObserver((entries) => {
-      const box = entries[0]?.contentRect;
-      if (!box) return;
-      const width = Math.round(box.width);
-      const height = Math.round(box.height);
-      if (width <= 0 || height <= 0) return;
-      setRoadmapBounds((prev) =>
-        prev && prev.width === width && prev.height === height ? prev : { width, height },
-      );
-    });
-    observer.observe(list);
-    return () => observer.disconnect();
-  }, [showRoadmap, timelineEvents?.length]);
-
   const roadmapTrack =
-    showRoadmap && roadmapBounds ? roadmapTrackPath(timelineEvents!.length, roadmapBounds) : null;
-
-  const timelineStyle: CSSProperties | undefined =
-    markerSize != null || roadmapTrack
-      ? ({
-          ...(markerSize != null ? { '--jalali-timeline-marker-size': `${markerSize}px` } : {}),
-          ...(roadmapTrack
-            ? { '--jalali-timeline-road-track': `${roadmapTrack.roadWidth}px` }
-            : {}),
-        } as CSSProperties)
-      : undefined;
+    view === 'timeline' && effectiveLayout === 'roadmap' && timelineEvents
+      ? roadmapTrackPath(timelineEvents.length)
+      : null;
 
   function clickEvent(eventId: string, click: MouseEvent): void {
     click.stopPropagation();
@@ -410,13 +369,16 @@ export function EventCalendar({
           data-jalali-timeline-scroll={direction === 'horizontal' ? '' : undefined}
         >
           <ol
-            ref={timelineListRef}
             data-jalali-timeline
             data-direction={direction}
             data-layout={effectiveLayout}
             data-marker-shape={markerShape}
             data-show-icons={showIcons ? '' : undefined}
-            style={timelineStyle}
+            style={
+              markerSize != null
+                ? { ['--jalali-timeline-marker-size' as string]: `${markerSize}px` }
+                : undefined
+            }
           >
             {roadmapTrack ? (
               <svg
@@ -425,9 +387,21 @@ export function EventCalendar({
                 preserveAspectRatio="none"
                 aria-hidden="true"
               >
-                <path data-jalali-roadmap-edge="" d={roadmapTrack.d} />
-                <path data-jalali-roadmap-asphalt="" d={roadmapTrack.d} />
-                <path data-jalali-roadmap-dash="" d={roadmapTrack.d} />
+                <path
+                  data-jalali-roadmap-edge=""
+                  d={roadmapTrack.d}
+                  vectorEffect="non-scaling-stroke"
+                />
+                <path
+                  data-jalali-roadmap-asphalt=""
+                  d={roadmapTrack.d}
+                  vectorEffect="non-scaling-stroke"
+                />
+                <path
+                  data-jalali-roadmap-dash=""
+                  d={roadmapTrack.d}
+                  vectorEffect="non-scaling-stroke"
+                />
               </svg>
             ) : null}
             {timelineEvents.map((event, index) => {

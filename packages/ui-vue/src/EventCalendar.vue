@@ -32,7 +32,7 @@ import {
   timelineEventDateTime,
   weekdayLabelsForGrid,
 } from 'jalali-js';
-import { computed, onBeforeUnmount, ref, useId, watchEffect } from 'vue';
+import { computed, ref, useId } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -159,63 +159,11 @@ const layout = computed(() => {
   return direction.value === 'horizontal' && resolved === 'roadmap' ? 'alternating' : resolved;
 });
 const markerSize = computed(() => props.timeline?.markerSize);
-const timelineListRef = ref<HTMLOListElement | null>(null);
-const roadmapBounds = ref<{ width: number; height: number } | null>(null);
-const showRoadmap = computed(
-  () => props.view === 'timeline' && layout.value === 'roadmap' && !!timelineEvents.value,
-);
-
-let roadmapObserver: ResizeObserver | null = null;
-
-watchEffect((onCleanup) => {
-  if (!showRoadmap.value) {
-    roadmapBounds.value = null;
-    return;
-  }
-  const list = timelineListRef.value;
-  const eventCount = timelineEvents.value?.length ?? 0;
-  if (!list || eventCount <= 0) return;
-
-  const syncBounds = (): void => {
-    const width = Math.round(list.clientWidth);
-    const height = Math.round(list.clientHeight);
-    if (width <= 0 || height <= 0) return;
-    const prev = roadmapBounds.value;
-    if (prev && prev.width === width && prev.height === height) return;
-    roadmapBounds.value = { width, height };
-  };
-
-  syncBounds();
-  roadmapObserver?.disconnect();
-  roadmapObserver = new ResizeObserver(syncBounds);
-  roadmapObserver.observe(list);
-  onCleanup(() => {
-    roadmapObserver?.disconnect();
-    roadmapObserver = null;
-  });
-});
-
-onBeforeUnmount(() => {
-  roadmapObserver?.disconnect();
-  roadmapObserver = null;
-});
-
 const roadmapTrack = computed(() => {
-  if (!showRoadmap.value || !roadmapBounds.value || !timelineEvents.value) {
+  if (props.view !== 'timeline' || layout.value !== 'roadmap' || !timelineEvents.value) {
     return null;
   }
-  return roadmapTrackPath(timelineEvents.value.length, roadmapBounds.value);
-});
-
-const timelineStyle = computed(() => {
-  const style: Record<string, string> = {};
-  if (markerSize.value != null) {
-    style['--jalali-timeline-marker-size'] = `${markerSize.value}px`;
-  }
-  if (roadmapTrack.value) {
-    style['--jalali-timeline-road-track'] = `${roadmapTrack.value.roadWidth}px`;
-  }
-  return style;
+  return roadmapTrackPath(timelineEvents.value.length);
 });
 
 function onEventClick(eventId: string, click: MouseEvent): void {
@@ -417,13 +365,14 @@ function onEventClick(eventId: string, click: MouseEvent): void {
       :data-jalali-timeline-scroll="direction === 'horizontal' ? '' : undefined"
     >
       <ol
-        ref="timelineListRef"
         data-jalali-timeline
         :data-direction="direction"
         :data-layout="layout"
         :data-marker-shape="markerShape"
         :data-show-icons="showIcons ? '' : undefined"
-        :style="timelineStyle"
+        :style="
+          markerSize != null ? { '--jalali-timeline-marker-size': `${markerSize}px` } : undefined
+        "
       >
         <svg
           v-if="roadmapTrack"
@@ -432,9 +381,21 @@ function onEventClick(eventId: string, click: MouseEvent): void {
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          <path data-jalali-roadmap-edge="" :d="roadmapTrack.d" />
-          <path data-jalali-roadmap-asphalt="" :d="roadmapTrack.d" />
-          <path data-jalali-roadmap-dash="" :d="roadmapTrack.d" />
+          <path
+            data-jalali-roadmap-edge=""
+            :d="roadmapTrack.d"
+            vector-effect="non-scaling-stroke"
+          />
+          <path
+            data-jalali-roadmap-asphalt=""
+            :d="roadmapTrack.d"
+            vector-effect="non-scaling-stroke"
+          />
+          <path
+            data-jalali-roadmap-dash=""
+            :d="roadmapTrack.d"
+            vector-effect="non-scaling-stroke"
+          />
         </svg>
         <li
           v-for="(event, index) in timelineEvents"

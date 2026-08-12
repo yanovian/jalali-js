@@ -18,8 +18,6 @@ import {
   timelineEventDateTime,
   timedBlockStyle,
   resolveTimelineLayout,
-  ROADMAP_LEFT_X,
-  ROADMAP_RIGHT_X,
   roadmapTrackPath,
   type CalendarEvent,
 } from './event-calendar.js';
@@ -101,26 +99,11 @@ describe('event-calendar layout', () => {
     expect(resolveTimelineLayout({ layout: 'single', alternating: true })).toBe('single');
   });
 
-  it('builds a serpentine roadmap track path in pixel bounds', () => {
-    const track = roadmapTrackPath(3, { width: 200, height: 400 });
-    expect(track.viewBox).toBe('0 0 200 400');
-    expect(track.roadWidth).toBeCloseTo(26, 5);
-    expect(track.d.startsWith('M 100 ')).toBe(true);
+  it('builds a serpentine roadmap track path', () => {
+    const track = roadmapTrackPath(3);
+    expect(track.viewBox).toBe('0 0 100 300');
+    expect(track.d.startsWith('M 50 4')).toBe(true);
     expect(track.d).toContain('C');
-    expect(track.d).toContain(` ${ROADMAP_LEFT_X * 2} `);
-    expect(track.d).toContain(` ${ROADMAP_RIGHT_X * 2} `);
-  });
-
-  it('falls back to a unit viewBox when bounds are omitted', () => {
-    const track = roadmapTrackPath(2);
-    expect(track.viewBox).toBe('0 0 100 200');
-    expect(track.roadWidth).toBeCloseTo(13, 5);
-  });
-
-  it('uses vertical-tangent peaks so marker x matches left/right constants', () => {
-    const track = roadmapTrackPath(2, { width: 100, height: 200 });
-    expect(track.d).toContain(` ${ROADMAP_LEFT_X} `);
-    expect(track.d).toContain(` ${ROADMAP_RIGHT_X} `);
   });
 
   it('assigns lanes for overlapping events in a week', () => {
