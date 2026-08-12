@@ -787,7 +787,7 @@ button[data-jalali-calendar-title-year]:hover {
   direction: ltr;
   display: grid;
   gap: 0;
-  grid-auto-rows: 8.5em;
+  grid-auto-rows: 11em;
   padding-block: 0;
 }
 
@@ -837,18 +837,18 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-item][data-road-side='left']
   [data-jalali-timeline-marker] {
-  left: 38%;
+  left: 34%;
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-item][data-road-side='right']
   [data-jalali-timeline-marker] {
-  left: 62%;
+  left: 66%;
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-card] {
-  width: min(17em, calc(32% - 0.85em));
+  width: min(17em, calc(30% - 0.75em));
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']

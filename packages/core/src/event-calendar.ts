@@ -53,20 +53,17 @@ export function resolveTimelineLayout(options?: TimelineOptions): TimelineLayout
 }
 
 /** Marker X positions as percent of the roadmap width (0 to 100). */
-export const ROADMAP_LEFT_X = 38;
-export const ROADMAP_RIGHT_X = 62;
-
-/** Road width as a fraction of the timeline width (matches the thick production look). */
-export const ROADMAP_WIDTH_FRACTION = 0.14;
+export const ROADMAP_LEFT_X = 34;
+export const ROADMAP_RIGHT_X = 66;
 
 /**
- * Cubic S-curve between two points with vertical end tangents.
- * Same handles on every segment keep bend shape consistent.
+ * Half-amplitude from center as a fraction of width.
+ * Keep this larger than half the road width so bends stay open.
  */
-function roadmapCurve(x0: number, y0: number, x1: number, y1: number): string {
-  const dy = (y1 - y0) / 2;
-  return ` C ${x0} ${y0 + dy}, ${x1} ${y1 - dy}, ${x1} ${y1}`;
-}
+export const ROADMAP_AMPLITUDE_FRACTION = 0.16;
+
+/** Road width as a fraction of the timeline width. */
+export const ROADMAP_WIDTH_FRACTION = 0.12;
 
 export interface RoadmapTrackBounds {
   width: number;
@@ -75,8 +72,9 @@ export interface RoadmapTrackBounds {
 
 /**
  * Build an SVG path for a vertical serpentine roadmap.
- * Pass the painted pixel size so the viewBox matches 1:1 and stroke width
- * stays even (no anisotropic stretch from preserveAspectRatio="none").
+ * Pass the painted pixel size so the viewBox matches 1:1.
+ * The centerline is a sine wave through each marker peak so a thick
+ * stroke reads as a smooth road, not linked blobs.
  */
 export function roadmapTrackPath(
   count: number,
@@ -85,8 +83,7 @@ export function roadmapTrackPath(
   const width = Math.max(1, bounds?.width ?? 100);
   const height = Math.max(1, bounds?.height ?? Math.max(100, count * 100));
   const mid = width / 2;
-  const left = (ROADMAP_LEFT_X / 100) * width;
-  const right = (ROADMAP_RIGHT_X / 100) * width;
+  const amp = width * ROADMAP_AMPLITUDE_FRACTION;
   const roadWidth = Math.round(width * ROADMAP_WIDTH_FRACTION * 1000) / 1000;
   const viewBox = `0 0 ${width} ${height}`;
 
@@ -100,17 +97,30 @@ export function roadmapTrackPath(
   }
 
   const step = height / count;
-  const xAt = (index: number): number => (index % 2 === 0 ? left : right);
-  const yAt = (index: number): number => index * step + step / 2;
-  const startY = Math.min(step * 0.08, roadWidth * 0.35);
-  const endY = height - startY;
-
-  let d = `M ${mid} ${startY}`;
-  d += roadmapCurve(mid, startY, xAt(0), yAt(0));
-  for (let index = 1; index < count; index += 1) {
-    d += roadmapCurve(xAt(index - 1), yAt(index - 1), xAt(index), yAt(index));
+  // phase = y / step: marker i sits at phase i+0.5 (left on even, right on odd).
+  const xAtPhase = (phase: number): number => mid - amp * Math.sin(Math.PI * phase);
+  const samplesPerRow = 48;
+  const totalSamples = count * samplesPerRow;
+  const points: Array<{ x: number; y: number }> = [];
+  for (let i = 0; i <= totalSamples; i += 1) {
+    const phase = (i / totalSamples) * count;
+    const y = phase * step;
+    points.push({ x: xAtPhase(phase), y });
   }
-  d += roadmapCurve(xAt(count - 1), yAt(count - 1), mid, endY);
+
+  // Smooth cubic path through samples (Catmull-Rom style segment fit).
+  let d = `M ${points[0]!.x} ${points[0]!.y}`;
+  for (let i = 0; i < points.length - 1; i += 1) {
+    const p0 = points[Math.max(0, i - 1)]!;
+    const p1 = points[i]!;
+    const p2 = points[i + 1]!;
+    const p3 = points[Math.min(points.length - 1, i + 2)]!;
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`;
+  }
 
   return { d, viewBox, roadWidth };
 }

@@ -104,18 +104,27 @@ describe('event-calendar layout', () => {
   it('builds a serpentine roadmap track path in pixel bounds', () => {
     const track = roadmapTrackPath(3, { width: 200, height: 400 });
     expect(track.viewBox).toBe('0 0 200 400');
-    expect(track.roadWidth).toBeCloseTo(28, 5);
+    expect(track.roadWidth).toBeCloseTo(24, 5);
     expect(track.d.startsWith('M 100 ')).toBe(true);
-    // Peaks at 38% / 62% of width, with the same S-curve shape between them.
-    expect(track.d).toContain(` ${ROADMAP_LEFT_X * 2} `);
-    expect(track.d).toContain(` ${ROADMAP_RIGHT_X * 2} `);
-    expect(track.d).toMatch(/C [\d.]+ [\d.]+, [\d.]+ [\d.]+, [\d.]+ [\d.]+/);
+    expect(track.d).toContain('C');
+    // First peak is left of center, second peak is right of center.
+    expect(track.d).toContain(` ${((100 - 200 * 0.16) * 1000) / 1000}`.trim());
   });
 
   it('falls back to a unit viewBox when bounds are omitted', () => {
     const track = roadmapTrackPath(2);
     expect(track.viewBox).toBe('0 0 100 200');
-    expect(track.roadWidth).toBeCloseTo(14, 5);
+    expect(track.roadWidth).toBeCloseTo(12, 5);
+  });
+
+  it('places even markers on the left peak of the sine road', () => {
+    const track = roadmapTrackPath(2, { width: 100, height: 200 });
+    const leftPeak = 50 - 100 * 0.16;
+    const rightPeak = 50 + 100 * 0.16;
+    expect(leftPeak).toBeCloseTo(ROADMAP_LEFT_X, 5);
+    expect(rightPeak).toBeCloseTo(ROADMAP_RIGHT_X, 5);
+    expect(track.d).toContain(` ${leftPeak} `);
+    expect(track.d).toContain(` ${rightPeak} `);
   });
 
   it('assigns lanes for overlapping events in a week', () => {
