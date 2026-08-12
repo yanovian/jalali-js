@@ -99,7 +99,6 @@ export default defineConfig({
   themeConfig: {
     logo: { src: '/favicon.svg', alt: 'jalali-js' },
     nav: [
-      { text: 'Live demo', link: '/playground/react/', target: '_blank' },
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API', link: '/api/jalali-js/' },
       {

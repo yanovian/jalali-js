@@ -12,6 +12,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Changed
+
+- Docs nav drops the duplicate Live demo link.
+
 ### Fixed
 
 - PR playground close job no longer fails.
