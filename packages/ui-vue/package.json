@@ -1,6 +1,6 @@
 {
   "name": "@jalali-js/ui-vue",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "RangePicker, EventCalendar, InlineCalendar, and extra themes for @jalali-js/vue, built on the same headless primitives.",
   "keywords": [
     "jalali",
