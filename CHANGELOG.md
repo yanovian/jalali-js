@@ -18,6 +18,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ### Fixed
 
+- RTL date order in calendar titles were fixed.
 - PR playground close job no longer fails.
 
 ## [0.4.0] - 2026-08-11

@@ -131,12 +131,19 @@ button[data-jalali-calendar-title-year]:focus-visible,
 }
 
 [data-jalali-calendar-header] {
-  direction: ltr; /* nav chrome stays LTR; grid keeps locale dir from the root */
+  /* Nav buttons stay LTR (‹ left, › right). Title follows the root dir below. */
+  direction: ltr;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--jalali-header-gap);
   margin-bottom: var(--jalali-header-gap);
+}
+
+/* Keep Persian/Pashto date text in the locale direction inside the LTR header. */
+[dir='rtl'] [data-jalali-calendar-title] {
+  direction: rtl;
+  unicode-bidi: isolate;
 }
 
 [data-jalali-calendar-nav] {
@@ -782,10 +789,25 @@ button[data-jalali-calendar-title-year]:hover {
   padding-block: 0;
 }
 
+/* Roadmap geometry is LTR; card text follows the calendar locale direction. */
 [data-jalali-eventcalendar-root][dir='rtl']
   [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-card] {
   direction: rtl;
+}
+
+[data-jalali-eventcalendar-root][dir='rtl']
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item][data-road-side='left']
+  [data-jalali-timeline-card] {
+  text-align: start;
+}
+
+[data-jalali-eventcalendar-root][dir='rtl']
+  [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
+  [data-jalali-timeline-item][data-road-side='right']
+  [data-jalali-timeline-card] {
+  text-align: end;
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
