@@ -20,6 +20,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 - Docs cover EventCalendar timeline `layout` (`single`, `alternating`, `roadmap`), holiday day tips, and `LocalePack.ui.closedDay`.
 
+### Fixed
+
+- Docs `/playground/*` links open in a new tab via one theme route hook, so the VitePress 404 never shows.
+
 ## [0.4.1] - 2026-08-12
 
 ### Changed
