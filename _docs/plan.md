@@ -1177,6 +1177,13 @@ Use Phase 27 preview links when reviewing this work.
       cards on both sides. Roadmap is a serpentine road with markers on the
       curve peaks. Show all three in the playground gallery.
 
+## Phase 30: EventCalendar roadmap road polish
+
+Make the EventCalendar roadmap road look like a real road.
+
+- [ ] **Even road width.** Keep the current thick look. Make the road width
+      even through every bend.
+
 ## Later, not yet scheduled
 
 - Any other calendar system (ISO week-date, Hebrew, or otherwise), added
