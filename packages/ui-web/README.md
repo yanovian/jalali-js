@@ -57,12 +57,12 @@ import '@jalali-js/web/date-picker.css';
 
 ## Elements
 
-| Element                      | Role                      |
-| ---------------------------- | ------------------------- |
-| `<jalali-range-picker>`      | Start and end dates       |
-| `<jalali-inline-calendar>`   | Always-visible month grid |
-| `<jalali-event-calendar>`    | Month / week / day events |
-| `<jalali-time-range-picker>` | Start and end times       |
+| Element                      | Role                                 |
+| ---------------------------- | ------------------------------------ |
+| `<jalali-range-picker>`      | Start and end dates                  |
+| `<jalali-inline-calendar>`   | Always-visible month grid            |
+| `<jalali-event-calendar>`    | Month / week / day / timeline events |
+| `<jalali-time-range-picker>` | Start and end times                  |
 
 ## Options
 
@@ -75,7 +75,9 @@ Key `<jalali-range-picker>` attributes:
 | `value-format`  | `gregorian-iso` / …    | `gregorian-iso` | Storage shape    |
 | `show-holidays` | boolean attribute      | off             | Mark holidays    |
 
-`EventCalendar`: `view`, `events` (property), `event-click` event.
+`EventCalendar`: `view` (`month` / `week` / `day` / `timeline`), `events` and
+`timeline` (properties), `event-click` event. Timeline `layout` is `single`,
+`alternating`, or `roadmap`.
 
 Full tables: [Web Components guide](https://jalali-js.yanovian.com/guide/web-components#attribute-and-property-tables).
 

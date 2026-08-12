@@ -156,16 +156,17 @@ Boolean attributes use presence for on. Set `"false"` to turn them off. Objects
 
 ### `<jalali-event-calendar>`
 
-| Name                    | Kind  | Default  | Meaning                   |
-| ----------------------- | ----- | -------- | ------------------------- |
-| `system`                | attr  | `jalali` | Display calendar          |
-| `locale`                | attr  | `en`     | UI language               |
-| `view`                  | attr  | `month`  | `month`, `week`, or `day` |
-| `events`                | prop  | `[]`     | Events to layout          |
-| `initialDisplayedMonth` | prop  | -        | Month anchor              |
-| `initialDate`           | prop  | today    | Week or day anchor        |
-| `event-click`           | event | -        | `{ event }`               |
-| `day-click`             | event | -        | `{ date }`                |
+| Name                    | Kind  | Default  | Meaning                                |
+| ----------------------- | ----- | -------- | -------------------------------------- |
+| `system`                | attr  | `jalali` | Display calendar                       |
+| `locale`                | attr  | `en`     | UI language                            |
+| `view`                  | attr  | `month`  | `month`, `week`, `day`, or `timeline`  |
+| `timeline`              | prop  | -        | Timeline options (`layout`, and so on) |
+| `events`                | prop  | `[]`     | Events to layout                       |
+| `initialDisplayedMonth` | prop  | -        | Month anchor                           |
+| `initialDate`           | prop  | today    | Week or day anchor                     |
+| `event-click`           | event | -        | `{ event }`                            |
+| `day-click`             | event | -        | `{ date }`                             |
 
 ## No shadow DOM, on purpose
 

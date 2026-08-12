@@ -37,7 +37,8 @@ Layout helpers (`layoutMonthEvents`, `layoutWeekEvents`, `layoutDayTimedEvents`,
   `startTime` / `endTime`. Overlaps get side-by-side lanes.
 - **Timeline**: a chronological list with a rail, marker, and accent card.
   Dates and times use `@jalali-js/i18n` (`format`, `formatNumber`, locale
-  digits, and `displayFormat.numerals`).
+  digits, and `displayFormat.numerals`). Pick a card layout with
+  `timeline.layout` (see below).
 
 Set the anchor with `initialDisplayedMonth` (month) or `initialDate` (week and day).
 Timeline does not use prev/next month navigation.
@@ -46,18 +47,26 @@ Timeline does not use prev/next month navigation.
 
 Pass a `timeline` object when `view` is `'timeline'`:
 
-| Field         | Type                         | Default      | Meaning                         |
-| ------------- | ---------------------------- | ------------ | ------------------------------- |
-| `direction`   | `'vertical' \| 'horizontal'` | `'vertical'` | Rail orientation                |
-| `markerShape` | `'circular' \| 'square'`     | `'circular'` | Marker shape                    |
-| `showIcons`   | `boolean`                    | `true`       | Show `event.icon` in the marker |
-| `alternating` | `boolean`                    | `false`      | Alternate cards beside the rail |
-| `markerSize`  | `number`                     | CSS default  | Marker diameter in CSS pixels   |
+| Field         | Type                                     | Default      | Meaning                                                                       |
+| ------------- | ---------------------------------------- | ------------ | ----------------------------------------------------------------------------- |
+| `direction`   | `'vertical' \| 'horizontal'`             | `'vertical'` | Rail orientation                                                              |
+| `markerShape` | `'circular' \| 'square'`                 | `'circular'` | Marker shape                                                                  |
+| `showIcons`   | `boolean`                                | `true`       | Show `event.icon` in the marker                                               |
+| `layout`      | `'single' \| 'alternating' \| 'roadmap'` | `'single'`   | Card placement beside the rail                                                |
+| `alternating` | `boolean`                                | `false`      | Legacy alias: `true` maps to `layout: 'alternating'` when `layout` is omitted |
+| `markerSize`  | `number`                                 | CSS default  | Marker diameter in CSS pixels                                                 |
+
+`layout` values:
+
+- **`single`**: every card on one side of a straight rail (default).
+- **`alternating`**: cards on both sides of a straight center rail.
+- **`roadmap`**: serpentine dashed road with markers on the curve peaks.
+  Horizontal `direction` falls back from `roadmap` to `alternating`.
 
 Native digits come from the locale pack (`fa` / `ps`) or from
 `displayFormat.numerals` (`'native'` or `'latin'`).
 
-On narrow viewports, alternating layout collapses to a single-sided rail.
+On narrow viewports, both-sided layouts collapse to a single-sided rail.
 
 ## React
 
@@ -106,7 +115,7 @@ Timeline example:
     direction: 'vertical',
     markerShape: 'circular',
     showIcons: true,
-    alternating: true,
+    layout: 'roadmap',
     markerSize: 28,
   }}
   events={[
@@ -209,6 +218,8 @@ Vue: same props, emits `eventClick` and `dayClick`. Web: attrs `system`, `locale
 
 Import the same `date-picker.css` as the other pickers. Event chips use
 `data-jalali-eventcalendar-*` and the `--jalali-event-bg` / `--jalali-event-fg`
-variables. Timeline uses `data-jalali-timeline-*` and
-`--jalali-timeline-marker-size` / `--jalali-timeline-accent`. When
+variables. Timeline uses `data-jalali-timeline-*`, `data-layout`, and tokens such
+as `--jalali-timeline-marker-size`, `--jalali-timeline-accent`, and the
+`--jalali-timeline-road-*` set for `layout: 'roadmap'`. When
 `timeline.markerSize` is omitted, the stylesheet default marker size applies.
+See [Configuration and theming](/guide/theming) for the full variable list.

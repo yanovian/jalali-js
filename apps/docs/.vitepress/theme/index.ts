@@ -34,9 +34,23 @@ function bindPlaygroundFullNavigation(): void {
   );
 }
 
+/**
+ * TypeDoc API stays English at /api/. Language switch from those pages can land
+ * on /fa/api/*. Send that path back to the English API tree.
+ */
+function bindApiLocaleFallback(): void {
+  if (typeof window === 'undefined') return;
+  const { pathname } = window.location;
+  if (!pathname.startsWith('/fa/api')) return;
+  window.location.replace(
+    pathname.replace(/^\/fa/, '') + window.location.search + window.location.hash,
+  );
+}
+
 export default {
   extends: DefaultTheme,
   enhanceApp() {
     bindPlaygroundFullNavigation();
+    bindApiLocaleFallback();
   },
 } satisfies Theme;

@@ -12,6 +12,14 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Added
+
+- Docs site i18n: English (root) and Farsi (`/fa/`), with locale files for nav, sidebar, and search.
+
+### Changed
+
+- Docs cover EventCalendar timeline `layout` (`single`, `alternating`, `roadmap`), holiday day tips, and `LocalePack.ui.closedDay`.
+
 ## [0.4.1] - 2026-08-12
 
 ### Changed

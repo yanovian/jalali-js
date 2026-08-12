@@ -191,5 +191,7 @@ Checked against source. Types are shortened. Full signatures live in the
 ### `EventCalendar` (`@jalali-js/ui-react`)
 
 See [Event calendar](/guide/event-calendar) for the event model. Props: `system`, `locale`,
-`view` (`month` \| `week` \| `day`, default `month`), `events`, `initialDisplayedMonth`,
-`initialDate`, `displayFormat`, `onEventClick`, `onDayClick`, `className`.
+`view` (`month` \| `week` \| `day` \| `timeline`, default `month`), `events`,
+`initialDisplayedMonth`, `initialDate`, `displayFormat`, `timeline` (including
+`layout`: `single` \| `alternating` \| `roadmap`), `onEventClick`, `onDayClick`,
+`className`.

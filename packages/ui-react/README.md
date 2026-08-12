@@ -52,12 +52,12 @@ import { RangePicker, InlineCalendar } from '@jalali-js/ui-react';
 
 ## Components
 
-| Component         | Role                                           |
-| ----------------- | ---------------------------------------------- |
-| `RangePicker`     | Start and end dates, one storage value per end |
-| `InlineCalendar`  | Always-visible month grid                      |
-| `EventCalendar`   | Month / week / day views over your event list  |
-| `TimeRangePicker` | Start and end times                            |
+| Component         | Role                                                 |
+| ----------------- | ---------------------------------------------------- |
+| `RangePicker`     | Start and end dates, one storage value per end       |
+| `InlineCalendar`  | Always-visible month grid                            |
+| `EventCalendar`   | Month / week / day / timeline views over your events |
+| `TimeRangePicker` | Start and end times                                  |
 
 You own the event list and editing UI for `EventCalendar`. Expand recurring rules before
 pass-in. Layout helpers live in `jalali-js`.
@@ -74,7 +74,8 @@ Key `RangePicker` props:
 | `rules`        | `SelectionRules` | -                 | Day and range limits   |
 | `showHolidays` | `boolean`        | `false`           | Mark holidays          |
 
-`EventCalendar`: `view` (`month` / `week` / `day`), `events`, `onEventClick`.
+`EventCalendar`: `view` (`month` / `week` / `day` / `timeline`), `events`,
+`timeline.layout` (`single` / `alternating` / `roadmap`), `onEventClick`.
 
 Full tables: [React guide](https://jalali-js.yanovian.com/guide/react#prop-tables) and
 [Event calendar](https://jalali-js.yanovian.com/guide/event-calendar).

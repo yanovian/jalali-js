@@ -50,6 +50,8 @@ holidayName('nowruz', 'fa'); // 'نوروز'
 ```
 
 In pickers, pass `showHolidays`, `blockHolidays`, and `holidayRegion` (default `'IR'`).
+With `showHolidays`, hover or focus shows a day tip (`data-jalali-calendar-tip`). Blocked
+holidays append `LocalePack.ui.closedDay` from `@jalali-js/i18n`.
 
 ## API
 
@@ -59,6 +61,7 @@ In pickers, pass `showHolidays`, `blockHolidays`, and `holidayRegion` (default `
 | `holidaysInMonth` / `Year` | List in a span                            |
 | `holidayDatesAround`       | Nearby holidays                           |
 | `holidayName` / `Names`    | Localized labels                          |
+| `holidayDayTip` / `Chrome` | Tip text, aria label, blocked-day attrs   |
 | `resolveCalendarHolidays`  | Wire holidays into a calendar grid        |
 | `withHolidaysBlocked`      | Merge holiday blocks into selection rules |
 | `IRAN_*_HOLIDAY_IDS`       | Fixed and lunar id lists                  |

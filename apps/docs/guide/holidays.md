@@ -48,6 +48,8 @@ import {
   holidaysOn,
   holidaysInMonth,
   holidayName,
+  holidayDayTip,
+  holidayDayChrome,
   HOLIDAY_YEAR_RANGE,
 } from '@jalali-js/holidays';
 
@@ -63,6 +65,15 @@ HOLIDAY_YEAR_RANGE; // { min: 1402, max: 1426 }
 `showHolidays` marks days with `data-holiday`. `blockHolidays` also blocks
 selection. Default region is Iran (`holidayRegion` / `holiday-region`).
 
+With `showHolidays`, hover or focus on a holiday day shows a tip overlay under
+the grid (`data-jalali-calendar-tip`). Several holidays on one day join with
+`·`. When the day is also blocked, the tip adds the locale's
+`LocalePack.ui.closedDay` label (for example `Closed` / `بسته`). The day
+button's accessible name includes the tip text.
+
+Blocked holiday days use `data-disabled` and `aria-disabled` instead of the
+native `disabled` attribute, so hover and focus still work for the tip.
+
 ```tsx
 <DatePicker system="jalali" locale="fa" showHolidays />
 <DatePicker system="jalali" locale="fa" showHolidays blockHolidays />
@@ -74,6 +85,30 @@ selection. Default region is Iran (`holidayRegion` / `holiday-region`).
 
 ```html
 <jalali-date-picker system="jalali" locale="fa" show-holidays></jalali-date-picker>
+```
+
+## Day tips (headless)
+
+For a custom grid, build the tip and aria label with the same helpers the pickers
+use:
+
+```ts
+import { holidayDayTip, holidayDayChrome } from '@jalali-js/holidays';
+
+holidayDayTip({ year: 1403, month: 1, day: 1 }, { locale: 'en' });
+// 'Nowruz'
+
+holidayDayTip(
+  { year: 1403, month: 1, day: 1 },
+  { locale: 'en', closed: true, closedLabel: 'Closed' },
+);
+// 'Nowruz · Closed'
+
+holidayDayChrome('15 Mordad 1403', cell, {
+  locale: 'en',
+  closedLabel: 'Closed',
+});
+// { tip?, ariaLabel, blocked? }
 ```
 
 ## Update lunar data

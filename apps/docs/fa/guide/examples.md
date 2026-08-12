@@ -1,15 +1,15 @@
 ---
-description: Copy-paste snippets for conversion, pickers, ranges, NLP, and theming.
+description: قطعه‌های آماده‌کپی برای تبدیل، انتخابگر، بازه، NLP و قالب ظاهری.
 ---
 
-# Examples
+# مثال‌ها
 
-Short, self-contained snippets for common tasks. Each one is copy-paste ready: it shows every
-import it needs. For task-shaped answers (bounds, epoch, forms, SSR), see
-[Recipes](/guide/recipes). For concepts, see [Getting started](/guide/getting-started),
-[Core concepts](/guide/core-concepts), and [Configuration and theming](/guide/theming).
+قطعه‌های کوتاه و مستقل برای کارهای رایج. هر کدام آماده‌کپی است: هر واردکردنی که لازم دارد
+را نشان می‌دهد. برای پاسخ‌های شکل‌وظیفه (کران، epoch، فرم، SSR)، ببینید
+[دستورالعمل‌ها](/fa/guide/recipes). برای مفاهیم، ببینید [شروع کار](/fa/guide/getting-started)،
+[مفاهیم اصلی](/fa/guide/core-concepts)، و [پیکربندی و قالب ظاهری](/fa/guide/theming).
 
-## Convert between calendars
+## تبدیل بین تقویم‌ها
 
 ```ts
 import { toGregorian, fromGregorian } from 'jalali-js';
@@ -21,7 +21,7 @@ fromGregorian({ year: 2024, month: 8, day: 5 }, 'jalali');
 // { year: 1403, month: 5, day: 15 }
 ```
 
-## Format a date for display
+## قالب‌بندی تاریخ برای نمایش
 
 ```ts
 import { format, fa } from '@jalali-js/i18n';
@@ -39,18 +39,18 @@ format(date, fa, { weekday: true }); // 'دوشنبه، ۱۵ مرداد ۱۴۰۳
 format(date, fa, { numerals: 'latin' }); // '15 مرداد 1403'
 ```
 
-## Parse a natural language phrase
+## خواندن یک عبارت زبان طبیعی
 
 ```ts
 import { parse } from '@jalali-js/nlp';
 
 parse('tomorrow', 'en');
 parse('فردا', 'fa');
-parse('نن', 'ps'); // Pashto for 'today'
+parse('نن', 'ps'); // پشتو برای 'today'
 parse('next Farvardin', 'en');
 ```
 
-## React: a date field that stores Gregorian, displays Jalali
+## React: فیلد تاریخی که میلادی ذخیره می‌کند و جلالی نشان می‌دهد
 
 ```tsx
 import '@jalali-js/react/date-picker.css';
@@ -62,14 +62,14 @@ function BirthDateField() {
       system="jalali"
       locale="fa"
       onChange={(value) => {
-        // value is a Gregorian ISO string, e.g. '2024-08-05'. Store this.
+        // value یک رشته ISO میلادی است، مثل '2024-08-05'. همین را ذخیره کنید.
       }}
     />
   );
 }
 ```
 
-## Vue: the same field, with `v-model`
+## Vue: همان فیلد، با `v-model`
 
 ```vue
 <script setup lang="ts">
@@ -86,7 +86,7 @@ const stored = ref<StorageValue>();
 </template>
 ```
 
-## Vanilla / Web Components: the same field, no framework
+## Vanilla / Web Components: همان فیلد، بدون فریم‌ورک
 
 ```html
 <jalali-date-picker id="birth-date" system="jalali" locale="fa"></jalali-date-picker>
@@ -95,12 +95,12 @@ const stored = ref<StorageValue>();
   import '@jalali-js/web';
 
   document.getElementById('birth-date').addEventListener('change', (event) => {
-    // event.detail.value is a Gregorian ISO string, e.g. '2024-08-05'. Store this.
+    // event.detail.value یک رشته ISO میلادی است، مثل '2024-08-05'. همین را ذخیره کنید.
   });
 </script>
 ```
 
-## React: a date range field
+## React: فیلد بازه تاریخ
 
 ```tsx
 import '@jalali-js/react/date-picker.css';
@@ -109,7 +109,7 @@ import { RangePicker } from '@jalali-js/ui-react';
 <RangePicker system="jalali" locale="en" onChange={(value) => console.log(value)} />;
 ```
 
-## React: an always-visible calendar, no popover
+## React: تقویم همیشه دیده‌شده، بدون popover
 
 ```tsx
 import '@jalali-js/react/date-picker.css';
@@ -123,7 +123,7 @@ function EventDatePicker() {
 }
 ```
 
-## React: event calendar (month, week, day, or timeline)
+## React: تقویم رویداد (ماه، هفته، روز، یا timeline)
 
 ```tsx
 import '@jalali-js/react/date-picker.css';
@@ -158,7 +158,7 @@ const events: CalendarEvent[] = [
 />;
 ```
 
-Timeline with a roadmap layout:
+Timeline با چیدمان roadmap:
 
 ```tsx
 <EventCalendar
@@ -170,21 +170,21 @@ Timeline with a roadmap layout:
 />
 ```
 
-## Holidays with day tips
+## تعطیلات با نوک راهنمای روز
 
 ```tsx
 <DatePicker system="jalali" locale="fa" showHolidays blockHolidays />
 ```
 
-Hover or focus a holiday day to read the tip under the grid. See
-[Holidays](/guide/holidays#pickers).
+برای خواندن نوک راهنما زیر شبکه، روی روز تعطیل hover یا focus کنید. ببینید
+[تعطیلات](/fa/guide/holidays#انتخابگرها).
 
-## A custom theme, without a theme file
+## یک قالب ظاهری سفارشی، بدون فایل قالب
 
-`--jalali-*` custom properties inherit, so a naive override on a wrapping element can lose to a
-value set directly on the picker's own root, for example if `dark.css` is imported on the same
-page (see [Configuration and theming](/guide/theming)). Scope the override under a parent class
-instead, on a selector that matches the root element itself:
+ویژگی‌های سفارشی `--jalali-*` به ارث می‌رسند، پس بازنویسی خام روی عنصر پوششی می‌تواند به
+مقداری که مستقیم روی ریشه خود انتخابگر نشسته ببازد، برای مثال اگر `dark.css` در همان صفحه
+وارد شده باشد (ببینید [پیکربندی و قالب ظاهری](/fa/guide/theming)). به‌جای آن بازنویسی را زیر
+یک کلاس والد محدود کنید، روی گزینشگری که خود عنصر ریشه را می‌گیرد:
 
 ```css
 /* my-theme.css */

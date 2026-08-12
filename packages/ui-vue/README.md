@@ -58,12 +58,12 @@ const range = ref();
 
 ## Components
 
-| Component         | Role                                          |
-| ----------------- | --------------------------------------------- |
-| `RangePicker`     | Start and end dates                           |
-| `InlineCalendar`  | Always-visible month grid                     |
-| `EventCalendar`   | Month / week / day views over your event list |
-| `TimeRangePicker` | Start and end times                           |
+| Component         | Role                                                 |
+| ----------------- | ---------------------------------------------------- |
+| `RangePicker`     | Start and end dates                                  |
+| `InlineCalendar`  | Always-visible month grid                            |
+| `EventCalendar`   | Month / week / day / timeline views over your events |
+| `TimeRangePicker` | Start and end times                                  |
 
 You own the event list and editing UI for `EventCalendar`.
 
@@ -78,6 +78,9 @@ Key `RangePicker` props:
 | `valueFormat`  | `ValueFormat`    | `'gregorian-iso'` | Storage shape for ends |
 | `rules`        | `SelectionRules` | -                 | Day and range limits   |
 | `showHolidays` | `boolean`        | `false`           | Mark holidays          |
+
+`EventCalendar`: `view` (`month` / `week` / `day` / `timeline`), `events`,
+`timeline.layout` (`single` / `alternating` / `roadmap`), `@event-click`.
 
 Full tables: [Vue guide](https://jalali-js.yanovian.com/guide/vue#prop-tables) and
 [Event calendar](https://jalali-js.yanovian.com/guide/event-calendar).

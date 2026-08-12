@@ -64,14 +64,17 @@ parseTemplate('1403/05/15', 'YYYY/MM/DD', en); // date, or null
 
 ## API
 
-| Export             | Role                                               |
-| ------------------ | -------------------------------------------------- |
-| `en` / `fa` / `ps` | Locale packs (months, weekdays, digits, direction) |
-| `format`           | Display string from a calendar date                |
-| `formatRelative`   | "3 days ago", "۳ روز پیش", "in 2 months"           |
-| `parseTemplate`    | Strict parse with `YYYY` / `MM` / `DD` tokens      |
-| `formatNumber`     | Digits in the locale numeral style                 |
-| `localePackFor`    | Resolve a pack from a locale code                  |
+| Export             | Role                                                     |
+| ------------------ | -------------------------------------------------------- |
+| `en` / `fa` / `ps` | Locale packs (months, weekdays, digits, `ui`, direction) |
+| `format`           | Display string from a calendar date                      |
+| `formatRelative`   | "3 days ago", "۳ روز پیش", "in 2 months"                 |
+| `parseTemplate`    | Strict parse with `YYYY` / `MM` / `DD` tokens            |
+| `formatNumber`     | Digits in the locale numeral style                       |
+| `localePackFor`    | Resolve a pack from a locale code                        |
+
+Each pack's `ui` object holds control `aria-label`s, including `closedDay` for
+blocked holiday tips.
 
 ## Options
 

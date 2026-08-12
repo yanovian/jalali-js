@@ -36,40 +36,49 @@ values. A theme is a stylesheet that overrides some subset of these on the same 
 `[data-jalali-timepicker-root]`, `[data-jalali-timerangepicker-root]`,
 `[data-jalali-calendar-root]`); it never redefines a rule.
 
-| Variable                   | Controls                                                   |
-| -------------------------- | ---------------------------------------------------------- |
-| `--jalali-font`            | Font family                                                |
-| `--jalali-font-size`       | Base font size                                             |
-| `--jalali-line-height`     | Base line height                                           |
-| `--jalali-bg`              | Background color (input, popover)                          |
-| `--jalali-fg`              | Text color                                                 |
-| `--jalali-muted-fg`        | Secondary text color (weekday headers, outside-month days) |
-| `--jalali-border`          | Border color                                               |
-| `--jalali-radius`          | Corner radius (input, popover, month/year cells)           |
-| `--jalali-day-radius`      | Corner radius for day cells and nav controls               |
-| `--jalali-primary`         | Accent color: today's ring, selected/range-endpoint fill   |
-| `--jalali-primary-fg`      | Text color on top of `--jalali-primary`                    |
-| `--jalali-shadow`          | Popover drop shadow                                        |
-| `--jalali-gap`             | Gap between grid cells                                     |
-| `--jalali-header-gap`      | Gap and margin in the calendar header                      |
-| `--jalali-control-size`    | Width and height of nav controls                           |
-| `--jalali-input-padding`   | Padding inside the text input and fields                   |
-| `--jalali-popover-padding` | Padding inside the popover and event calendar              |
-| `--jalali-cell-padding`    | Padding inside month and year picker cells                 |
-| `--jalali-day-min-size`    | Minimum width/height of a day cell                         |
-| `--jalali-weekday-size`    | Font size for weekday headers                              |
-| `--jalali-event-bg`        | Event chip background                                      |
-| `--jalali-event-fg`        | Event chip text                                            |
-| `--jalali-holiday-fg`      | Holiday day text                                           |
-| `--jalali-hover-bg`        | Hover fill for days and nav                                |
-| `--jalali-range-bg`        | In-range day fill for `RangePicker`                        |
-| `--jalali-focus-ring`      | `:focus-visible` outline color                             |
+| Variable                        | Controls                                                   |
+| ------------------------------- | ---------------------------------------------------------- |
+| `--jalali-font`                 | Font family                                                |
+| `--jalali-font-size`            | Base font size                                             |
+| `--jalali-line-height`          | Base line height                                           |
+| `--jalali-bg`                   | Background color (input, popover)                          |
+| `--jalali-fg`                   | Text color                                                 |
+| `--jalali-muted-fg`             | Secondary text color (weekday headers, outside-month days) |
+| `--jalali-border`               | Border color                                               |
+| `--jalali-radius`               | Corner radius (input, popover, month/year cells)           |
+| `--jalali-day-radius`           | Corner radius for day cells and nav controls               |
+| `--jalali-primary`              | Accent color: today's ring, selected/range-endpoint fill   |
+| `--jalali-primary-fg`           | Text color on top of `--jalali-primary`                    |
+| `--jalali-shadow`               | Popover drop shadow                                        |
+| `--jalali-gap`                  | Gap between grid cells                                     |
+| `--jalali-header-gap`           | Gap and margin in the calendar header                      |
+| `--jalali-control-size`         | Width and height of nav controls                           |
+| `--jalali-input-padding`        | Padding inside the text input and fields                   |
+| `--jalali-popover-padding`      | Padding inside the popover and event calendar              |
+| `--jalali-cell-padding`         | Padding inside month and year picker cells                 |
+| `--jalali-day-min-size`         | Minimum width/height of a day cell                         |
+| `--jalali-weekday-size`         | Font size for weekday headers                              |
+| `--jalali-event-bg`             | Event chip background                                      |
+| `--jalali-event-fg`             | Event chip text                                            |
+| `--jalali-holiday-fg`           | Holiday day text                                           |
+| `--jalali-hover-bg`             | Hover fill for days and nav                                |
+| `--jalali-range-bg`             | In-range day fill for `RangePicker`                        |
+| `--jalali-focus-ring`           | `:focus-visible` outline color                             |
+| `--jalali-timeline-marker-size` | Timeline marker diameter                                   |
+| `--jalali-timeline-accent`      | Timeline card accent                                       |
+| `--jalali-timeline-road-track`  | Roadmap layout road width                                  |
+| `--jalali-timeline-road-color`  | Roadmap asphalt stroke                                     |
+| `--jalali-timeline-road-dash`   | Roadmap center dash                                        |
+| `--jalali-timeline-road-edge`   | Roadmap edge stroke                                        |
+
+Holiday tip text uses `[data-jalali-calendar-tip]` under the month grid. A holiday
+that is also blocked keeps `--jalali-holiday-fg` and a soft holiday fill.
 
 Default and `dark` theme tokens aim for WCAG 2.2 AA text contrast and about
 3:1 for borders. The stylesheet also responds to `prefers-contrast: more`
-and `forced-colors: active`. The default density is already compact on phone
-and laptop. Import `themes/compact.css` only when you need a denser dashboard
-scale.
+and `forced-colors: active`. Day cells use the same soft corner radius as the
+calendar shell. The default density is already compact on phone and laptop.
+Import `themes/compact.css` only when you need a denser dashboard scale.
 
 Because CSS custom properties inherit, a theme applies to every picker on the page once its
 stylesheet is imported: theming is a whole-app choice, not a per-instance prop. For a single
@@ -96,8 +105,9 @@ primitives:
   start, second sets the end and closes the popover); clicking before the current start
   restarts the range from the new point instead of erroring. Hovering after a start is picked
   previews the range a completed selection would produce.
-- **`EventCalendar`**: a month grid for consumer-owned events. See
-  [Event calendar](/guide/event-calendar).
+- **`EventCalendar`**: month, week, day, and timeline views for consumer-owned
+  events, including timeline `layout` values `single`, `alternating`, and
+  `roadmap`. See [Event calendar](/guide/event-calendar).
 - **`InlineCalendar`**: `Calendar` re-exported under a more discoverable name, for an
   always-visible grid with no popover around it.
 
