@@ -12,6 +12,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 ## [Unreleased]
 
+### Added
+
+- Docs site `sitemap.xml` and `robots.txt` for `https://jalali-js.yanovian.com/`.
+
 ## [0.4.2] - 2026-08-12
 
 ### Added

@@ -35,6 +35,29 @@ export default defineConfig({
   // Links in the nav and home page open them in a new tab.
   ignoreDeadLinks: [/^\/playground\//],
   locales: localeConfigs,
+  // Built into dist/sitemap.xml. Submit that URL in Bing and Google Search Console.
+  sitemap: {
+    hostname: SITE_URL,
+    transformItems(items) {
+      // Playgrounds live under public/, so VitePress does not list them as pages.
+      for (const path of ['playground/react/', 'playground/vue/', 'playground/vanilla/']) {
+        items.push({ url: path, changefreq: 'monthly', priority: 0.7 });
+      }
+      return items;
+    },
+  },
+  // Per-page canonical and Open Graph URL for the custom domain.
+  transformPageData(pageData) {
+    const canonicalUrl = `${SITE_URL}${pageData.relativePath}`
+      .replace(/index\.md$/, '')
+      .replace(/\.md$/, '');
+
+    pageData.frontmatter.head ??= [];
+    pageData.frontmatter.head.push(
+      ['link', { rel: 'canonical', href: canonicalUrl }],
+      ['meta', { property: 'og:url', content: canonicalUrl }],
+    );
+  },
   vite: {
     server: {
       proxy: playgroundDevProxy(),
@@ -88,7 +111,7 @@ export default defineConfig({
     ['meta', { property: 'og:site_name', content: 'jalali-js' }],
     ['meta', { property: 'og:title', content: 'jalali-js' }],
     ['meta', { property: 'og:description', content: SITE_DESCRIPTION }],
-    ['meta', { property: 'og:url', content: SITE_URL }],
+    // og:url and canonical are set per page in transformPageData.
     ['meta', { property: 'og:image', content: `${SITE_URL}og-image.png` }],
     ['meta', { property: 'og:image:width', content: '1200' }],
     ['meta', { property: 'og:image:height', content: '630' }],

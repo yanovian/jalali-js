@@ -1,0 +1,8 @@
+# Custom domain: https://jalali-js.yanovian.com/
+User-agent: *
+Allow: /
+
+# PR playground previews are temporary. Do not index them.
+Disallow: /pr-
+
+Sitemap: https://jalali-js.yanovian.com/sitemap.xml
