@@ -616,10 +616,10 @@ button[data-jalali-calendar-title-year]:hover {
   --jalali-timeline-marker-fg: #ffffff;
   --jalali-timeline-gap: 1.45em;
   --jalali-timeline-card-gap: 1.2em;
-  --jalali-timeline-road-track: 2em;
-  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 42%, var(--jalali-bg));
-  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 68%, transparent);
-  --jalali-timeline-road-dash: color-mix(in srgb, var(--jalali-fg) 88%, #ffffff);
+  --jalali-timeline-road-track: max(3.5em, 12cqw);
+  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 48%, var(--jalali-bg));
+  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 74%, transparent);
+  --jalali-timeline-road-dash: color-mix(in srgb, #ffffff 82%, var(--jalali-fg));
 }
 
 [data-jalali-timeline-header] {
@@ -680,20 +680,20 @@ button[data-jalali-calendar-title-year]:hover {
 [data-jalali-roadmap-dash] {
   fill: none;
   stroke: var(--jalali-timeline-road-dash);
-  stroke-width: 0.2em;
+  stroke-width: 0.28em;
   stroke-linecap: butt;
   stroke-linejoin: round;
-  stroke-dasharray: 0.55em 0.7em;
+  stroke-dasharray: 0.7em 0.85em;
   vector-effect: non-scaling-stroke;
 }
 
 [data-jalali-roadmap-edge] {
   fill: none;
   stroke: var(--jalali-timeline-road-edge);
-  stroke-width: calc(var(--jalali-timeline-road-track) + 0.28em);
+  stroke-width: calc(var(--jalali-timeline-road-track) + 0.4em);
   stroke-linecap: butt;
   stroke-linejoin: round;
-  opacity: 0.72;
+  opacity: 0.8;
   vector-effect: non-scaling-stroke;
 }
 

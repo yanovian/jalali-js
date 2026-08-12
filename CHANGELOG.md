@@ -25,7 +25,6 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 - Docs `/playground/*` links open in a new tab via one theme route hook, so the VitePress 404 never shows.
 - EventCalendar roadmap road keeps a constant width with parallel curve edges.
-- EventCalendar roadmap road is thicker and higher contrast so the track reads clearly.
 
 ## [0.4.1] - 2026-08-12
 
