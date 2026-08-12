@@ -101,20 +101,21 @@ describe('event-calendar layout', () => {
     expect(resolveTimelineLayout({ layout: 'single', alternating: true })).toBe('single');
   });
 
-  it('builds a serpentine roadmap track path', () => {
-    const track = roadmapTrackPath(3);
-    expect(track.viewBox).toBe('0 0 100 300');
-    expect(track.d.startsWith('M 50 4')).toBe(true);
-    // Same vertical-tangent S-curve for entry, between markers, and exit.
-    expect(track.d).toBe(
-      [
-        'M 50 4',
-        `C 50 27, ${ROADMAP_LEFT_X} 27, ${ROADMAP_LEFT_X} 50`,
-        `C ${ROADMAP_LEFT_X} 100, ${ROADMAP_RIGHT_X} 100, ${ROADMAP_RIGHT_X} 150`,
-        `C ${ROADMAP_RIGHT_X} 200, ${ROADMAP_LEFT_X} 200, ${ROADMAP_LEFT_X} 250`,
-        `C ${ROADMAP_LEFT_X} 273, 50 273, 50 296`,
-      ].join(' '),
-    );
+  it('builds a serpentine roadmap track path in pixel bounds', () => {
+    const track = roadmapTrackPath(3, { width: 200, height: 400 });
+    expect(track.viewBox).toBe('0 0 200 400');
+    expect(track.roadWidth).toBeCloseTo(28, 5);
+    expect(track.d.startsWith('M 100 ')).toBe(true);
+    // Peaks at 38% / 62% of width, with the same S-curve shape between them.
+    expect(track.d).toContain(` ${ROADMAP_LEFT_X * 2} `);
+    expect(track.d).toContain(` ${ROADMAP_RIGHT_X * 2} `);
+    expect(track.d).toMatch(/C [\d.]+ [\d.]+, [\d.]+ [\d.]+, [\d.]+ [\d.]+/);
+  });
+
+  it('falls back to a unit viewBox when bounds are omitted', () => {
+    const track = roadmapTrackPath(2);
+    expect(track.viewBox).toBe('0 0 100 200');
+    expect(track.roadWidth).toBeCloseTo(14, 5);
   });
 
   it('assigns lanes for overlapping events in a week', () => {

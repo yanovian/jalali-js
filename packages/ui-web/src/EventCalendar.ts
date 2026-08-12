@@ -60,6 +60,7 @@ export class JalaliEventCalendarElement extends HTMLElement {
   #anchor: CalendarDateFields | undefined;
   #titleId = `jalali-ec-title-${JalaliEventCalendarElement.#nextTitleId++}`;
   #connected = false;
+  #roadmapObserver: ResizeObserver | null = null;
 
   get system(): CalendarSystem {
     return this.#system;
@@ -130,6 +131,43 @@ export class JalaliEventCalendarElement extends HTMLElement {
   connectedCallback(): void {
     this.#connected = true;
     this.render();
+  }
+
+  disconnectedCallback(): void {
+    this.#connected = false;
+    this.#roadmapObserver?.disconnect();
+    this.#roadmapObserver = null;
+  }
+
+  #syncRoadmapTrack(list: HTMLOListElement, count: number): void {
+    this.#roadmapObserver?.disconnect();
+    const paint = (): void => {
+      const width = Math.round(list.clientWidth);
+      const height = Math.round(list.clientHeight);
+      if (width <= 0 || height <= 0) return;
+      const track = roadmapTrackPath(count, { width, height });
+      list.style.setProperty('--jalali-timeline-road-track', `${track.roadWidth}px`);
+      let svg = list.querySelector<SVGSVGElement>('[data-jalali-roadmap-track]');
+      if (!svg) {
+        svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('data-jalali-roadmap-track', '');
+        svg.setAttribute('preserveAspectRatio', 'none');
+        svg.setAttribute('aria-hidden', 'true');
+        for (const kind of ['edge', 'asphalt', 'dash'] as const) {
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute(`data-jalali-roadmap-${kind}`, '');
+          svg.append(path);
+        }
+        list.prepend(svg);
+      }
+      svg.setAttribute('viewBox', track.viewBox);
+      for (const kind of ['edge', 'asphalt', 'dash'] as const) {
+        svg.querySelector(`[data-jalali-roadmap-${kind}]`)?.setAttribute('d', track.d);
+      }
+    };
+    paint();
+    this.#roadmapObserver = new ResizeObserver(paint);
+    this.#roadmapObserver.observe(list);
   }
 
   attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
@@ -289,22 +327,6 @@ export class JalaliEventCalendarElement extends HTMLElement {
         list.style.setProperty('--jalali-timeline-marker-size', `${markerSize}px`);
       }
 
-      if (layout === 'roadmap' && timelineEvents.length > 0) {
-        const track = roadmapTrackPath(timelineEvents.length);
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('data-jalali-roadmap-track', '');
-        svg.setAttribute('viewBox', track.viewBox);
-        svg.setAttribute('preserveAspectRatio', 'none');
-        svg.setAttribute('aria-hidden', 'true');
-        for (const kind of ['edge', 'asphalt', 'dash'] as const) {
-          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-          path.setAttribute(`data-jalali-roadmap-${kind}`, '');
-          path.setAttribute('d', track.d);
-          svg.append(path);
-        }
-        list.append(svg);
-      }
-
       timelineEvents.forEach((event, index) => {
         const item = document.createElement('li');
         item.setAttribute('data-jalali-timeline-item', '');
@@ -372,6 +394,12 @@ export class JalaliEventCalendarElement extends HTMLElement {
       }
       shell.append(list);
       this.replaceChildren(this.#renderTimelineHeader(title), shell);
+      if (layout === 'roadmap' && timelineEvents.length > 0) {
+        this.#syncRoadmapTrack(list, timelineEvents.length);
+      } else {
+        this.#roadmapObserver?.disconnect();
+        this.#roadmapObserver = null;
+      }
       return;
     }
 

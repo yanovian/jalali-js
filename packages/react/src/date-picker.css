@@ -616,9 +616,9 @@ button[data-jalali-calendar-title-year]:hover {
   --jalali-timeline-marker-fg: #ffffff;
   --jalali-timeline-gap: 1.45em;
   --jalali-timeline-card-gap: 1.2em;
-  --jalali-timeline-road-track: 7em;
-  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 44%, var(--jalali-bg));
-  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 70%, transparent);
+  --jalali-timeline-road-track: 4.5em;
+  --jalali-timeline-road-color: color-mix(in srgb, var(--jalali-fg) 40%, var(--jalali-bg));
+  --jalali-timeline-road-edge: color-mix(in srgb, var(--jalali-fg) 66%, transparent);
   --jalali-timeline-road-dash: color-mix(in srgb, #ffffff 88%, var(--jalali-fg));
 }
 
@@ -667,34 +667,32 @@ button[data-jalali-calendar-title-year]:hover {
   pointer-events: none;
 }
 
-/* Constant screen-space stroke keeps edges parallel under preserveAspectRatio=none. */
+/* Road stroke uses pixel viewBox units from roadmapTrackPath (1:1 with layout). */
 [data-jalali-roadmap-asphalt] {
   fill: none;
   stroke: var(--jalali-timeline-road-color);
   stroke-width: var(--jalali-timeline-road-track);
-  stroke-linecap: butt;
+  stroke-linecap: round;
   stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
 }
 
 [data-jalali-roadmap-dash] {
   fill: none;
   stroke: var(--jalali-timeline-road-dash);
-  stroke-width: 0.35em;
+  stroke-width: calc(var(--jalali-timeline-road-track) * 0.07);
   stroke-linecap: butt;
   stroke-linejoin: round;
-  stroke-dasharray: 0.85em 1em;
-  vector-effect: non-scaling-stroke;
+  stroke-dasharray: calc(var(--jalali-timeline-road-track) * 0.22)
+    calc(var(--jalali-timeline-road-track) * 0.28);
 }
 
 [data-jalali-roadmap-edge] {
   fill: none;
   stroke: var(--jalali-timeline-road-edge);
-  stroke-width: calc(var(--jalali-timeline-road-track) + 0.55em);
-  stroke-linecap: butt;
+  stroke-width: calc(var(--jalali-timeline-road-track) * 1.12);
+  stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: 0.85;
-  vector-effect: non-scaling-stroke;
+  opacity: 0.8;
 }
 
 [data-jalali-timeline][data-direction='horizontal'] {
@@ -850,7 +848,7 @@ button[data-jalali-calendar-title-year]:hover {
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']
   [data-jalali-timeline-card] {
-  width: min(16em, calc(30% - 0.75em));
+  width: min(17em, calc(32% - 0.85em));
 }
 
 [data-jalali-timeline][data-direction='vertical'][data-layout='roadmap']

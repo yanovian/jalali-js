@@ -52,49 +52,67 @@ export function resolveTimelineLayout(options?: TimelineOptions): TimelineLayout
   return options?.alternating ? 'alternating' : 'single';
 }
 
-/** Marker X positions in the roadmap SVG viewBox (0 to 100). */
+/** Marker X positions as percent of the roadmap width (0 to 100). */
 export const ROADMAP_LEFT_X = 38;
 export const ROADMAP_RIGHT_X = 62;
 
+/** Road width as a fraction of the timeline width (matches the thick production look). */
+export const ROADMAP_WIDTH_FRACTION = 0.14;
+
 /**
  * Cubic S-curve between two points with vertical end tangents.
- * Equal vertical handles keep every bend the same shape so a constant
- * stroke width reads as parallel road edges.
+ * Same handles on every segment keep bend shape consistent.
  */
 function roadmapCurve(x0: number, y0: number, x1: number, y1: number): string {
   const dy = (y1 - y0) / 2;
   return ` C ${x0} ${y0 + dy}, ${x1} ${y1 - dy}, ${x1} ${y1}`;
 }
 
+export interface RoadmapTrackBounds {
+  width: number;
+  height: number;
+}
+
 /**
  * Build an SVG path for a vertical serpentine roadmap.
- * Each marker sits on a left or right curve peak. Every segment uses
- * the same vertical-tangent S-curve so the road keeps one width.
+ * Pass the painted pixel size so the viewBox matches 1:1 and stroke width
+ * stays even (no anisotropic stretch from preserveAspectRatio="none").
  */
-export function roadmapTrackPath(count: number): { d: string; viewBox: string } {
-  const step = 100;
-  const mid = 50;
-  const height = Math.max(step, count * step);
-  const viewBox = `0 0 100 ${height}`;
+export function roadmapTrackPath(
+  count: number,
+  bounds?: RoadmapTrackBounds,
+): { d: string; viewBox: string; roadWidth: number } {
+  const width = Math.max(1, bounds?.width ?? 100);
+  const height = Math.max(1, bounds?.height ?? Math.max(100, count * 100));
+  const mid = width / 2;
+  const left = (ROADMAP_LEFT_X / 100) * width;
+  const right = (ROADMAP_RIGHT_X / 100) * width;
+  const roadWidth = Math.round(width * ROADMAP_WIDTH_FRACTION * 1000) / 1000;
+  const viewBox = `0 0 ${width} ${height}`;
+
   if (count <= 0) {
-    return { d: `M ${mid} 4 L ${mid} ${height - 4}`, viewBox };
+    const pad = Math.min(roadWidth, height / 4);
+    return {
+      d: `M ${mid} ${pad} L ${mid} ${height - pad}`,
+      viewBox,
+      roadWidth,
+    };
   }
 
-  const xAt = (index: number): number => (index % 2 === 0 ? ROADMAP_LEFT_X : ROADMAP_RIGHT_X);
+  const step = height / count;
+  const xAt = (index: number): number => (index % 2 === 0 ? left : right);
   const yAt = (index: number): number => index * step + step / 2;
+  const startY = Math.min(step * 0.08, roadWidth * 0.35);
+  const endY = height - startY;
 
-  const startY = 4;
-  const endY = height - 4;
   let d = `M ${mid} ${startY}`;
   d += roadmapCurve(mid, startY, xAt(0), yAt(0));
-
   for (let index = 1; index < count; index += 1) {
     d += roadmapCurve(xAt(index - 1), yAt(index - 1), xAt(index), yAt(index));
   }
-
   d += roadmapCurve(xAt(count - 1), yAt(count - 1), mid, endY);
 
-  return { d, viewBox };
+  return { d, viewBox, roadWidth };
 }
 
 /**
