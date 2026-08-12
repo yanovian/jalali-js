@@ -16,6 +16,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 - Docs site `sitemap.xml` and `robots.txt` for `https://jalali-js.yanovian.com/`.
 
+### Fixed
+
+- Docs `sitemap.xml` lists guide, locale, playground, and API package pages. It no longer lists every TypeDoc symbol page.
+
 ## [0.4.2] - 2026-08-12
 
 ### Added
