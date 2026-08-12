@@ -29,8 +29,9 @@ Use these exact `##` headings (the check script matches them):
    link to the docs guide prop tables (the source of truth).
 10. `## Theming` for UI packages (`react`, `vue`, `web`, `ui-*`). Other
     packages use a one-line note that they have no UI.
-11. `## Links` (docs, playground, changelog, sibling packages). Lead with
-    Live demo and Documentation. Keep sibling package links here too.
+11. `## Links` (docs, playground, changelog, and other guide links). Lead
+    with Live demo and Documentation. Do not repeat the npm ecosystem line
+    here. Keep that list only under Start here.
 12. `## License`
 
 ## Options tables
