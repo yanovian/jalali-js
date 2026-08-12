@@ -18,6 +18,8 @@ import {
   timelineEventDateTime,
   timedBlockStyle,
   resolveTimelineLayout,
+  ROADMAP_LEFT_X,
+  ROADMAP_RIGHT_X,
   roadmapTrackPath,
   type CalendarEvent,
 } from './event-calendar.js';
@@ -103,7 +105,16 @@ describe('event-calendar layout', () => {
     const track = roadmapTrackPath(3);
     expect(track.viewBox).toBe('0 0 100 300');
     expect(track.d.startsWith('M 50 4')).toBe(true);
-    expect(track.d).toContain('C');
+    // Same vertical-tangent S-curve for entry, between markers, and exit.
+    expect(track.d).toBe(
+      [
+        'M 50 4',
+        `C 50 27, ${ROADMAP_LEFT_X} 27, ${ROADMAP_LEFT_X} 50`,
+        `C ${ROADMAP_LEFT_X} 100, ${ROADMAP_RIGHT_X} 100, ${ROADMAP_RIGHT_X} 150`,
+        `C ${ROADMAP_RIGHT_X} 200, ${ROADMAP_LEFT_X} 200, ${ROADMAP_LEFT_X} 250`,
+        `C ${ROADMAP_LEFT_X} 273, 50 273, 50 296`,
+      ].join(' '),
+    );
   });
 
   it('assigns lanes for overlapping events in a week', () => {

@@ -57,8 +57,19 @@ export const ROADMAP_LEFT_X = 42;
 export const ROADMAP_RIGHT_X = 58;
 
 /**
+ * Cubic S-curve between two points with vertical end tangents.
+ * Matching vertical handles keep left and right road edges parallel
+ * when the SVG stroke uses a constant width.
+ */
+function roadmapCurve(x0: number, y0: number, x1: number, y1: number): string {
+  const midY = (y0 + y1) / 2;
+  return ` C ${x0} ${midY}, ${x1} ${midY}, ${x1} ${y1}`;
+}
+
+/**
  * Build an SVG path for a vertical serpentine roadmap.
- * Each marker sits on a left or right curve peak.
+ * Each marker sits on a left or right curve peak. Every segment uses
+ * the same vertical-tangent S-curve so the road keeps one width.
  */
 export function roadmapTrackPath(count: number): { d: string; viewBox: string } {
   const step = 100;
@@ -72,22 +83,16 @@ export function roadmapTrackPath(count: number): { d: string; viewBox: string } 
   const xAt = (index: number): number => (index % 2 === 0 ? ROADMAP_LEFT_X : ROADMAP_RIGHT_X);
   const yAt = (index: number): number => index * step + step / 2;
 
-  let d = `M ${mid} 4`;
-  d += ` C ${mid} ${yAt(0) * 0.5}, ${xAt(0)} ${yAt(0) * 0.75}, ${xAt(0)} ${yAt(0)}`;
+  const startY = 4;
+  const endY = height - 4;
+  let d = `M ${mid} ${startY}`;
+  d += roadmapCurve(mid, startY, xAt(0), yAt(0));
 
   for (let index = 1; index < count; index += 1) {
-    const x0 = xAt(index - 1);
-    const y0 = yAt(index - 1);
-    const x1 = xAt(index);
-    const y1 = yAt(index);
-    const midY = (y0 + y1) / 2;
-    d += ` C ${x0} ${midY}, ${x1} ${midY}, ${x1} ${y1}`;
+    d += roadmapCurve(xAt(index - 1), yAt(index - 1), xAt(index), yAt(index));
   }
 
-  const lastX = xAt(count - 1);
-  const lastY = yAt(count - 1);
-  const endY = height - 4;
-  d += ` C ${lastX} ${lastY + step * 0.28}, ${mid} ${endY - step * 0.18}, ${mid} ${endY}`;
+  d += roadmapCurve(xAt(count - 1), yAt(count - 1), mid, endY);
 
   return { d, viewBox };
 }

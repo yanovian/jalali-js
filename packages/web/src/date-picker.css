@@ -667,12 +667,14 @@ button[data-jalali-calendar-title-year]:hover {
   pointer-events: none;
 }
 
+/* Constant screen-space stroke keeps edges parallel under preserveAspectRatio=none. */
 [data-jalali-roadmap-asphalt] {
   fill: none;
   stroke: var(--jalali-timeline-road-color);
   stroke-width: var(--jalali-timeline-road-track);
   stroke-linecap: butt;
   stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 
 [data-jalali-roadmap-dash] {
@@ -682,6 +684,7 @@ button[data-jalali-calendar-title-year]:hover {
   stroke-linecap: butt;
   stroke-linejoin: round;
   stroke-dasharray: 0.42em 0.55em;
+  vector-effect: non-scaling-stroke;
 }
 
 [data-jalali-roadmap-edge] {
@@ -691,6 +694,7 @@ button[data-jalali-calendar-title-year]:hover {
   stroke-linecap: butt;
   stroke-linejoin: round;
   opacity: 0.55;
+  vector-effect: non-scaling-stroke;
 }
 
 [data-jalali-timeline][data-direction='horizontal'] {
