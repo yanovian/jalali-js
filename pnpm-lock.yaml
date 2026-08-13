@@ -63,7 +63,7 @@ importers:
         specifier: ^8.5.1
         version: 8.5.1(jiti@2.7.0)(postcss@8.5.26)(typescript@6.0.3)(yaml@2.9.0)
       typescript:
-        specifier: ^6.0.3
+        specifier: 6.0.3
         version: 6.0.3
       typescript-eslint:
         specifier: ^8.67.0
@@ -130,7 +130,7 @@ importers:
         specifier: ^19.2.4
         version: 19.2.4(@types/react@19.2.18)
       typescript:
-        specifier: ^6.0.3
+        specifier: 6.0.3
         version: 6.0.3
 
   apps/playground-nuxt:
@@ -194,7 +194,7 @@ importers:
   apps/playground-shared:
     devDependencies:
       typescript:
-        specifier: ^6.0.3
+        specifier: 6.0.3
         version: 6.0.3
 
   apps/playground-vanilla:
