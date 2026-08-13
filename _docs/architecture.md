@@ -703,12 +703,13 @@ publish-packages` (skipping any already published at that version, so a
 - **`update-dependencies-non-breaking.yml`** and
   **`update-dependencies-breaking.yml` (Phase 9).**
   `yanovian/update-dependencies-action@v1`, scoped by `update-strategy` to
-  `non-breaking` and `breaking` respectively. **This repo's cadence is
-  slower than a browser extension's use of the same Action on purpose,
-  not copied verbatim:** monthly for non-breaking (the 1st of every
-  month, 03:00 UTC) and every 6 months for breaking (January 1st and
-  July 1st, 05:00 UTC, offset an hour from the non-breaking run so the
-  two never race on the months both fire). jalali-js releases
+  `non-breaking` and `breaking` respectively. Both jobs set up pnpm
+  first. **This repo's cadence is slower than a browser extension's use
+  of the same Action on purpose, not copied verbatim:** monthly for
+  non-breaking (the 1st of every month, 03:00 UTC) and every 6 months
+  for breaking (January 1st and July 1st, 05:00 UTC, offset an hour
+  from the non-breaking run so the two never race on the months both
+  fire). jalali-js releases
   deliberately, by hand (`make release-patch`/etc.),
   not continuously the way a browser extension ships, so a breaking
   dependency bump benefits from a slower, more deliberate cadence with

@@ -19,6 +19,7 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 ### Fixed
 
 - Docs `sitemap.xml` lists guide, locale, playground, and API package pages. It no longer lists every TypeDoc symbol page.
+- Breaking and non-breaking dependency-update workflows set up pnpm before they run.
 
 ## [0.4.2] - 2026-08-12
 

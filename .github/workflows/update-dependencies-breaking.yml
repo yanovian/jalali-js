@@ -1,17 +1,5 @@
 name: Update Dependencies (breaking)
 
-# `PAT_TOKEN` (a real personal access token, not the default GITHUB_TOKEN) is required: a
-# GITHUB_TOKEN-authored pull request cannot trigger this repo's own ci.yml, so nothing would
-# check the update once opened. See yanovian/update-dependencies-action's README, "Permissions
-# and tokens". `min-release-age-days: 30` gives a compromised or broken release a month to get
-# caught before this repo ever picks it up.
-#
-# Every 6 months, a slower cadence than a monthly one: a breaking update needs real, hand-done
-# migration review here, so this repo picks a slower, more deliberate cadence than a
-# continuously-shipped product would use for the same action. Offset an hour from
-# update-dependencies-non-breaking.yml's own 1st-of-the-month run so the two never race on the
-# two months (January, July) where both fire.
-
 on:
   schedule:
     - cron: '0 5 1 1,7 *' # January 1st and July 1st, 05:00 UTC
@@ -26,6 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
 
       - uses: yanovian/update-dependencies-action@v1
         with:

@@ -1,15 +1,5 @@
 name: Update Dependencies (non-breaking)
 
-# `PAT_TOKEN` (a real personal access token, not the default GITHUB_TOKEN) is required: a
-# GITHUB_TOKEN-authored pull request cannot trigger this repo's own ci.yml, so nothing would
-# check the update once opened. See yanovian/update-dependencies-action's README, "Permissions
-# and tokens".
-#
-# Monthly, not a weekly cadence: this repo ships a library, released deliberately and by hand
-# (make release-patch/-minor/-major), not continuously like a browser extension, so a slower
-# non-breaking cadence matches it better. See update-dependencies-breaking.yml for the (much
-# slower) breaking-update cadence.
-
 on:
   schedule:
     - cron: '0 3 1 * *' # the 1st of every month at 03:00 UTC
@@ -24,6 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
 
       - uses: yanovian/update-dependencies-action@v1
         with:
