@@ -27,24 +27,29 @@
     "@size-limit/preset-small-lib": "^13.0.3",
     "@types/node": "^26.2.0",
     "@vitejs/plugin-vue": "^6.0.8",
-    "esbuild": "0.28.1",
-    "eslint": "^10.8.0",
+    "esbuild": "0.28.2",
+    "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-vue": "^10.10.0",
-    "globals": "^17.9.0",
+    "globals": "^17.11.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
     "size-limit": "^13.0.3",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.66.0",
-    "vite": "8.2.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.67.0",
+    "vite": "8.2.1",
     "vite-plugin-dts": "^5.0.3",
     "vitest": "^4.1.10",
     "vue-eslint-parser": "^10.4.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "typescript": "6.0.3"
+    }
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,vue}": [
