@@ -16,6 +16,10 @@ Planned work lives in [`_docs/plan.md`](_docs/plan.md).
 
 - Docs site `sitemap.xml` and `robots.txt` for `https://jalali-js.yanovian.com/`.
 
+### Changed
+
+- Keep TypeScript on 6.x with a pnpm override until `vue-tsc` supports TypeScript 7.
+
 ### Fixed
 
 - Docs `sitemap.xml` lists guide, locale, playground, and API package pages. It no longer lists every TypeDoc symbol page.
