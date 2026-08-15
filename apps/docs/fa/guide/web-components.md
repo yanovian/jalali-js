@@ -13,7 +13,7 @@ npm install @jalali-js/web
 (custom element) می‌فرستد، پس در HTML و JavaScript ساده کار می‌کند، و مثل هر عنصر HTML دیگر
 در React، Vue، Svelte، Angular یا هر فریم‌ورک دیگر می‌نشیند.
 
-## `<jalali-calendar>`: ابتدایی بدون ظاهر
+## `<jalali-calendar>`: پریمیتیو بدون ظاهر
 
 شبکه ماه با ویژگی‌های `data-jalali-calendar-*` و بدون CSS اجباری.
 
@@ -58,7 +58,7 @@ npm install @jalali-js/web
 برود، به‌جای ورق زدن ماه به ماه. این به‌صورت پیش‌فرض روشن است؛ برای خاموش کردن
 `quick-nav="false"` بگذارید. برای بدون انتخاب اولیه `.defaultDate = null` بگذارید (یک
 property، نه attribute)، تا انتخابگر خالی باز شود و جایگاه‌نما را نشان دهد تا کسی تاریخ
-بگزیند؛ اگر نگذارید تاریخ امروز است.
+انتخاب کند؛ اگر نگذارید تاریخ امروز است.
 
 فهرست کامل property و رویداد:
 [`JalaliDatePickerElement`](/api/@jalali-js/web/classes/JalaliDatePickerElement).
@@ -66,7 +66,7 @@ property، نه attribute)، تا انتخابگر خالی باز شود و ج�
 ## انتخابگر بازه، تقویم رویداد، و تقویم درون‌خطی
 
 `@jalali-js/ui-web` عناصر `<jalali-range-picker>`، `<jalali-event-calendar>` و
-`<jalali-inline-calendar>` را روی همان ابتدایی‌ها اضافه می‌کند؛ ببینید
+`<jalali-inline-calendar>` را روی همان پریمیتیوها اضافه می‌کند؛ ببینید
 [پیکربندی و قالب ظاهری](/fa/guide/theming#range-picker-event-calendar-and-inline-calendar) و
 [تقویم رویداد](/fa/guide/event-calendar).
 
@@ -172,8 +172,8 @@ npm install @jalali-js/ui-web
 
 این عنصرها در light DOM رندر می‌شوند: بدون `attachShadow()`، بدون مرز encapsulation. همین
 باعث می‌شود `@jalali-js/web/date-picker.css` (و قالب‌های `compact`/`dark` از
-`@jalali-js/ui-web/themes`) دقیقاً همان stylesheetهایی باشند که رابط‌های React و Vue به کار
+`@jalali-js/ui-web/themes`) دقیقاً همان stylesheetهایی باشند که بایندینگ‌های React و Vue به کار
 می‌برند، و همان ویژگی‌های `[data-jalali-*]` را از هر دو مسیر قالب دهند. تیمی که از قبل یکی از
 آن قالب‌ها را در React و Vue اجرا می‌کند می‌تواند یک `<jalali-date-picker>` را در صفحه HTML
-ساده، یا در فریم‌ورکی که این پروژه برایش رابط اختصاصی ندارد، بگذارد و با صفر CSS تازه همان
+ساده، یا در فریم‌ورکی که این پروژه برایش بایندینگ اختصاصی ندارد، بگذارد و با صفر CSS تازه همان
 ظاهر را ببیند.

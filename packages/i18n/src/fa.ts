@@ -83,9 +83,9 @@ export const fa: LocalePack = {
     },
     future: {
       day: { one: '{n} روز دیگر', other: '{n} روز دیگر' },
-      week: { one: '{n} هفته بعد', other: '{n} هفته بعد' },
-      month: { one: '{n} ماه بعد', other: '{n} ماه بعد' },
-      year: { one: '{n} سال بعد', other: '{n} سال بعد' },
+      week: { one: '{n} هفته دیگر', other: '{n} هفته دیگر' },
+      month: { one: '{n} ماه دیگر', other: '{n} ماه دیگر' },
+      year: { one: '{n} سال دیگر', other: '{n} سال دیگر' },
     },
   },
 };

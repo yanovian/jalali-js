@@ -1,5 +1,5 @@
 ---
-description: رابط Vue، DatePicker، Calendar بدون ظاهر، و نکته‌های SSR در Nuxt.
+description: بایندینگ Vue، DatePicker، Calendar بدون ظاهر، و نکته‌های SSR در Nuxt.
 ---
 
 # Vue
@@ -28,7 +28,7 @@ const jalali = useCalendar({ system: 'jalali', locale: 'fa' });
 
 امضای کامل: [مرجع API](/api/@jalali-js/vue/).
 
-## `Calendar`: ابتدایی بدون ظاهر
+## `Calendar`: پریمیتیو بدون ظاهر
 
 شبکه ماه با ویژگی‌های `data-jalali-calendar-*` و بدون CSS اجباری.
 
@@ -77,7 +77,7 @@ const stored = ref<StorageValue>();
 در پاپ‌آپ شبکه (و مستقیم در `Calendar`)، شخص می‌تواند ماه یا سال سربرگ را کلیک کند تا مستقیم
 به شبکه ماه یا شبکه سال برود، به‌جای ورق زدن ماه به ماه. این به‌صورت پیش‌فرض روشن است؛ برای
 خاموش کردن `:quick-nav="false"` بدهید. برای بدون انتخاب اولیه `:default-date="null"` بدهید،
-تا انتخابگر خالی باز شود و جایگاه‌نما را نشان دهد تا کسی تاریخ بگزیند.
+تا انتخابگر خالی باز شود و جایگاه‌نما را نشان دهد تا کسی تاریخ انتخاب کند.
 
 ## `useResolvedTimeZone()`
 
@@ -97,7 +97,7 @@ const timeZone = useResolvedTimeZone('auto'); // هنگام SSR برابر 'UTC'
 ## انتخابگر بازه، تقویم رویداد، و تقویم درون‌خطی
 
 `@jalali-js/ui-vue` مقادیر `RangePicker`، `EventCalendar` و `InlineCalendar` را روی همان
-ابتدایی‌ها اضافه می‌کند؛ ببینید
+پریمیتیوها اضافه می‌کند؛ ببینید
 [پیکربندی و قالب ظاهری](/fa/guide/theming#range-picker-event-calendar-and-inline-calendar)
 و [تقویم رویداد](/fa/guide/event-calendar).
 

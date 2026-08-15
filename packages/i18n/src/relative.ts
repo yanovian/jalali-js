@@ -38,7 +38,7 @@ function pickForm(forms: RelativeUnitForms, count: number): string {
  * Format how `from` sits relative to `to` in `locale`.
  *
  * - `from` earlier than `to`: past ("3 days ago", "۳ روز پیش")
- * - `from` later than `to`: future ("in 2 months", "۲ ماه بعد")
+ * - `from` later than `to`: future ("in 2 months", "۲ ماه دیگر")
  * - same day: `locale.relative.today`
  *
  * Unit selection uses `diffDates()` from `jalali-js`. Digits follow `numerals`.

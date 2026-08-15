@@ -51,7 +51,7 @@ describe('formatRelative', () => {
     expect(formatRelative(jalali(addDays(base, -14, 'jalali')), base, en)).toBe('2 weeks ago');
     expect(formatRelative(jalali(addMonths(base, -3, 'jalali')), base, en)).toBe('3 months ago');
     expect(formatRelative(jalali(addYears(base, 1, 'jalali')), base, en)).toBe('in 1 year');
-    expect(formatRelative(jalali(addMonths(base, 2, 'jalali')), base, fa)).toBe('۲ ماه بعد');
+    expect(formatRelative(jalali(addMonths(base, 2, 'jalali')), base, fa)).toBe('۲ ماه دیگر');
     expect(formatRelative(jalali(addYears(base, -2, 'jalali')), base, ps)).toBe('۲ کاله مخکې');
   });
 

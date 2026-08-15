@@ -1,5 +1,5 @@
 ---
-description: رابط React، DatePicker، Calendar بدون ظاهر، و نکته‌های SSR در Next.js.
+description: بایندینگ React، DatePicker، Calendar بدون ظاهر، و نکته‌های SSR در Next.js.
 ---
 
 # React
@@ -12,7 +12,7 @@ npm install @jalali-js/react
 
 هوک سطح پایین: وضعیت `date`، `format()` بسته‌شده به زبان خود هوک، و
 `isLeapYear()` / `daysInMonth()` / `today()` سامانه تقویم. بقیه این بسته روی آن یا روی
-همان ابتدایی‌هایی که می‌پوشاند ساخته شده است.
+همان پریمیتیوهایی که می‌پوشاند ساخته شده است.
 
 ```tsx
 import { useCalendar } from '@jalali-js/react';
@@ -26,7 +26,7 @@ function Summary() {
 ورودی `{ system?, locale?, initialDate? }`، خروجی `{ date, setDate, format, today, isLeapYear,
 daysInMonth, locale }`. امضای کامل: [مرجع API](/api/@jalali-js/react/).
 
-## `Calendar`: ابتدایی بدون ظاهر
+## `Calendar`: پریمیتیو بدون ظاهر
 
 شبکه ماه با ویژگی‌های `data-jalali-calendar-*` و بدون CSS اجباری. `DatePicker` (پایین) همین
 مؤلفه با stylesheet پیش‌فرض و popover دور آن است؛ برای شبکه همیشه دیده‌شده، یا برای ساختن
@@ -67,7 +67,7 @@ import { DatePicker } from '@jalali-js/react';
 در پاپ‌آپ شبکه (و مستقیم در `Calendar`)، شخص می‌تواند ماه یا سال سربرگ را کلیک کند تا مستقیم
 به شبکه ماه یا شبکه سال برود، به‌جای ورق زدن ماه به ماه. این به‌صورت پیش‌فرض روشن است؛ برای
 خاموش کردن `quickNav={false}` بدهید. برای بدون انتخاب اولیه `defaultDate={null}` بدهید، تا
-انتخابگر خالی باز شود و جایگاه‌نما را نشان دهد تا کسی تاریخ بگزیند.
+انتخابگر خالی باز شود و جایگاه‌نما را نشان دهد تا کسی تاریخ انتخاب کند.
 
 فهرست کامل prop: [`DatePickerProps`](/api/@jalali-js/react/interfaces/DatePickerProps).
 
@@ -89,7 +89,7 @@ function Clock() {
 ## انتخابگر بازه، تقویم رویداد، و تقویم درون‌خطی
 
 `@jalali-js/ui-react` مقادیر `RangePicker`، `EventCalendar` و `InlineCalendar` را روی همان
-ابتدایی‌ها اضافه می‌کند؛ ببینید
+پریمیتیوها اضافه می‌کند؛ ببینید
 [پیکربندی و قالب ظاهری](/fa/guide/theming#range-picker-event-calendar-and-inline-calendar)
 و [تقویم رویداد](/fa/guide/event-calendar).
 

@@ -37,7 +37,7 @@ description: تقویم‌های رویداد ماه، هفته، روز و time
   `startTime` / `endTime` استفاده می‌کنند. هم‌پوشانی‌ها خطوط کنارهم می‌گیرند.
 - **Timeline**: فهرست زمانی با ریل، نشانگر، و کارت تأکید.
   تاریخ و زمان از `@jalali-js/i18n` استفاده می‌کنند (`format`، `formatNumber`، رقم‌های زبان،
-  و `displayFormat.numerals`). چیدمان کارت را با `timeline.layout` برگزینید (پایین را ببینید).
+  و `displayFormat.numerals`). چیدمان کارت را با `timeline.layout` انتخاب کنید (پایین را ببینید).
 
 لنگر را با `initialDisplayedMonth` (ماه) یا `initialDate` (هفته و روز) بگذارید.
 Timeline از ناوبری ماه قبل/بعد استفاده نمی‌کند.
