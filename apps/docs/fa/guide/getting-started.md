@@ -6,6 +6,9 @@ description: هسته یا یک بایندینگ فریم‌ورک را نصب �
 
 ## نصب
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install jalali-js
 # React
@@ -15,6 +18,32 @@ npm install @jalali-js/vue
 # بدون فریم‌ورک: Web Components ساده
 npm install @jalali-js/web
 ```
+
+== pnpm
+
+```sh
+pnpm add jalali-js
+# React
+pnpm add @jalali-js/react
+# Vue
+pnpm add @jalali-js/vue
+# بدون فریم‌ورک: Web Components ساده
+pnpm add @jalali-js/web
+```
+
+== yarn
+
+```sh
+yarn add jalali-js
+# React
+yarn add @jalali-js/react
+# Vue
+yarn add @jalali-js/vue
+# بدون فریم‌ورک: Web Components ساده
+yarn add @jalali-js/web
+```
+
+:::
 
 `jalali-js` بسته هسته است: TypeScript خالص، بدون وابستگی به فریم‌ورک، و بدون وابستگی
 زمان اجرا. `@jalali-js/react`، `@jalali-js/vue` و `@jalali-js/web` همه به آن وابسته‌اند.

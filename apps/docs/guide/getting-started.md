@@ -6,6 +6,9 @@ description: Install the core or a framework binding, then convert a date or ren
 
 ## Install
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install jalali-js
 # React
@@ -15,6 +18,32 @@ npm install @jalali-js/vue
 # No framework: plain Web Components
 npm install @jalali-js/web
 ```
+
+== pnpm
+
+```sh
+pnpm add jalali-js
+# React
+pnpm add @jalali-js/react
+# Vue
+pnpm add @jalali-js/vue
+# No framework: plain Web Components
+pnpm add @jalali-js/web
+```
+
+== yarn
+
+```sh
+yarn add jalali-js
+# React
+yarn add @jalali-js/react
+# Vue
+yarn add @jalali-js/vue
+# No framework: plain Web Components
+yarn add @jalali-js/web
+```
+
+:::
 
 `jalali-js` is the core package: pure TypeScript, no framework dependency, no runtime
 dependency of its own. `@jalali-js/react`, `@jalali-js/vue`, and `@jalali-js/web` all depend on

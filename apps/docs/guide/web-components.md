@@ -4,9 +4,26 @@ description: Framework-free Web Components pickers for plain HTML or any host fr
 
 # Vanilla / Web Components
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/web
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/web
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/web
+```
+
+:::
 
 `@jalali-js/web` needs no framework. It ships plain
 [Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_components) (custom
@@ -70,9 +87,26 @@ Full property and event list: [`JalaliDatePickerElement`](/api/@jalali-js/web/cl
 [Configuration and theming](/guide/theming#range-picker-event-calendar-and-inline-calendar) and
 [Event calendar](/guide/event-calendar).
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/ui-web
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/ui-web
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/ui-web
+```
+
+:::
 
 ```html
 <jalali-inline-calendar system="jalali" locale="en"></jalali-inline-calendar>

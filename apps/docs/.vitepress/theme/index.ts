@@ -1,5 +1,6 @@
 import DefaultTheme from 'vitepress/theme';
 import type { EnhanceAppContext, Theme } from 'vitepress';
+import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client';
 import './custom.css';
 
 /**
@@ -42,5 +43,6 @@ export default {
   enhanceApp(ctx) {
     bindPlaygroundLinks(ctx);
     bindApiLocaleFallback();
+    enhanceAppWithTabs(ctx.app);
   },
 } satisfies Theme;

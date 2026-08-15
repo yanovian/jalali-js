@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitepress';
 import llmstxt from 'vitepress-plugin-llms';
+import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs';
 import { localeConfigs, searchLocaleOptions } from './locales/index.js';
 import { playgroundDevProxy, playgroundPublicPlugin } from './playground-dev.js';
 import { selectSitemapItems } from './sitemap.js';
@@ -36,6 +37,11 @@ export default defineConfig({
   // Links in the nav and home page open them in a new tab.
   ignoreDeadLinks: [/^\/playground\//],
   locales: localeConfigs,
+  markdown: {
+    config(md) {
+      md.use(tabsMarkdownPlugin);
+    },
+  },
   // Built into dist/sitemap.xml. Submit that URL in Bing and Google Search Console.
   sitemap: {
     hostname: SITE_URL,

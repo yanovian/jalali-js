@@ -4,9 +4,26 @@ description: React bindings, DatePicker, headless Calendar, and Next.js SSR note
 
 # React
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/react
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/react
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/react
+```
+
+:::
 
 ## `useCalendar()`
 
@@ -93,9 +110,26 @@ function Clock() {
 primitives; see [Configuration and theming](/guide/theming#range-picker-event-calendar-and-inline-calendar)
 and [Event calendar](/guide/event-calendar).
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/ui-react
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/ui-react
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/ui-react
+```
+
+:::
 
 ```tsx
 import { EventCalendar, InlineCalendar, RangePicker } from '@jalali-js/ui-react';

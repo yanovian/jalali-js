@@ -4,9 +4,26 @@ description: بایندینگ Vue، DatePicker، Calendar بدون ظاهر، و
 
 # Vue
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/vue
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/vue
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/vue
+```
+
+:::
 
 ## `useCalendar()`
 
@@ -101,9 +118,26 @@ const timeZone = useResolvedTimeZone('auto'); // هنگام SSR برابر 'UTC'
 [پیکربندی و قالب ظاهری](/fa/guide/theming#range-picker-event-calendar-and-inline-calendar)
 و [تقویم رویداد](/fa/guide/event-calendar).
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/ui-vue
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/ui-vue
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/ui-vue
+```
+
+:::
 
 ```vue
 <script setup lang="ts">

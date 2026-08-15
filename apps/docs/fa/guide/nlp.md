@@ -4,9 +4,26 @@ description: عبارت‌های تاریخ انگلیسی، فارسی و پش�
 
 # پردازش زبان طبیعی
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/nlp
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/nlp
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/nlp
+```
+
+:::
 
 `parse()` یک عبارت کوتاه زبان طبیعی را می‌خواند و یک `CalendarDate` برمی‌گرداند، یا وقتی
 عبارت را نشناسد `null`. سه زبان: `en`، `fa` و `ps` (پشتو). ورودی انگلیسی نام ماه‌های

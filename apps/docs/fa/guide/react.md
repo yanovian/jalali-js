@@ -4,9 +4,26 @@ description: بایندینگ React، DatePicker، Calendar بدون ظاهر، 
 
 # React
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/react
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/react
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/react
+```
+
+:::
 
 ## `useCalendar()`
 
@@ -93,9 +110,26 @@ function Clock() {
 [پیکربندی و قالب ظاهری](/fa/guide/theming#range-picker-event-calendar-and-inline-calendar)
 و [تقویم رویداد](/fa/guide/event-calendar).
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/ui-react
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/ui-react
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/ui-react
+```
+
+:::
 
 ```tsx
 import { EventCalendar, InlineCalendar, RangePicker } from '@jalali-js/ui-react';

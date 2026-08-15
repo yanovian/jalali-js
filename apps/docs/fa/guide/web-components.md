@@ -4,9 +4,26 @@ description: انتخابگرهای Web Components بدون فریم‌ورک ب
 
 # Vanilla / Web Components
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/web
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/web
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/web
+```
+
+:::
 
 `@jalali-js/web` به فریم‌ورک نیاز ندارد.
 [Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_components) ساده
@@ -70,9 +87,26 @@ property، نه attribute)، تا انتخابگر خالی باز شود و ج�
 [پیکربندی و قالب ظاهری](/fa/guide/theming#range-picker-event-calendar-and-inline-calendar) و
 [تقویم رویداد](/fa/guide/event-calendar).
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/ui-web
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/ui-web
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/ui-web
+```
+
+:::
 
 ```html
 <jalali-inline-calendar system="jalali" locale="en"></jalali-inline-calendar>

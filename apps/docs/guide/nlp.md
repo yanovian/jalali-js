@@ -4,9 +4,26 @@ description: Parse English, Farsi, and Pashto date phrases into calendar dates.
 
 # Natural language parsing
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/nlp
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/nlp
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/nlp
+```
+
+:::
 
 `parse()` reads a short natural-language phrase and returns a `CalendarDate`, or `null` when it
 doesn't recognize the phrase. Three locales: `en`, `fa`, and `ps` (Pashto). English input

@@ -4,9 +4,26 @@ description: Vue bindings, DatePicker, headless Calendar, and Nuxt SSR notes.
 
 # Vue
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/vue
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/vue
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/vue
+```
+
+:::
 
 ## `useCalendar()`
 
@@ -101,9 +118,26 @@ const timeZone = useResolvedTimeZone('auto'); // 'UTC' during SSR, the real zone
 primitives; see [Configuration and theming](/guide/theming#range-picker-event-calendar-and-inline-calendar)
 and [Event calendar](/guide/event-calendar).
 
+:::tabs key:pm variant:code
+== npm
+
 ```sh
 npm install @jalali-js/ui-vue
 ```
+
+== pnpm
+
+```sh
+pnpm add @jalali-js/ui-vue
+```
+
+== yarn
+
+```sh
+yarn add @jalali-js/ui-vue
+```
+
+:::
 
 ```vue
 <script setup lang="ts">
