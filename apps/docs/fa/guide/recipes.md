@@ -9,7 +9,7 @@ description: پاسخ‌های کوتاه آماده‌کپی برای کاره�
 
 ## پیش‌فرض امروز
 
-امروز دانه پیش‌فرض است. چیزی ندهید، یا امروز را صریح بدهید.
+مقدار پیش‌فرض همان امروز است. چیزی ندهید، یا امروز را صریح بدهید.
 
 ```tsx
 import '@jalali-js/react/date-picker.css';
@@ -85,7 +85,7 @@ Vue: `v-model` را به مقدار ذخیره ببندید و همان ref را
 
 ### React
 
-`DatePicker` برای انتخاب بدون کنترل است. با `defaultDate` دانه بگذارید. برای خواندن وضعیت
+`DatePicker` برای انتخاب بدون کنترل است. با `defaultDate` مقدار اولیه بدهید. برای خواندن وضعیت
 خودتان را از `onChange` نگه دارید. برای پاک کردن یا بازنشانی با `key` تازه remount کنید.
 
 ```tsx
@@ -122,7 +122,7 @@ function ControlledShell() {
 
 ### Vue
 
-`DatePicker` مقدار ذخیره را از طریق `v-model` می‌نویسد. با `defaultDate` دانه بگذارید. برای
+`DatePicker` مقدار ذخیره را از طریق `v-model` می‌نویسد. با `defaultDate` مقدار اولیه بدهید. برای
 پاک کردن با `:key` remount کنید. `Calendar` از `:value` و `@select` استفاده می‌کند.
 
 ```vue
@@ -147,8 +147,8 @@ function clear() {
 
 ### Web Components
 
-برای خواندن یا نوشتن انتخاب بدون ارسال رویداد، `.value` را تنظیم کنید. قبل از connect برای
-دانه، `.defaultDate` را بگذارید. برای انتخاب کاربر به `change` گوش دهید.
+برای خواندن یا نوشتن انتخاب بدون ارسال رویداد، `.value` را تنظیم کنید. برای مقدار اولیه، قبل
+از connect مقدار `.defaultDate` را بگذارید. برای انتخاب کاربر به `change` گوش دهید.
 
 ```ts
 const el = document.querySelector('jalali-date-picker')!;

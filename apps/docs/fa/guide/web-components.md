@@ -42,7 +42,7 @@ npm install @jalali-js/web
 
   document.getElementById('picker').addEventListener('change', (event) => {
     // event.detail: { value, date }. value: مقدار ذخیره (پیش‌فرض ISO میلادی)؛ ببینید
-    // «مقدار نمایش در برابر مقدار ذخیره». date: CalendarDate خام.
+    // «مقدار نمایشی در برابر مقدار ذخیره‌سازی». date: CalendarDate خام.
   });
 </script>
 ```

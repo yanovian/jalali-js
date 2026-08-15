@@ -50,7 +50,7 @@ import { DatePicker } from '@jalali-js/react';
 <DatePicker
   system="jalali"
   locale="fa"
-  valueFormat="gregorian-iso" // پیش‌فرض؛ «مقدار نمایش در برابر مقدار ذخیره» را ببینید
+  valueFormat="gregorian-iso" // پیش‌فرض؛ «مقدار نمایشی در برابر مقدار ذخیره‌سازی» را ببینید
   onChange={(value, date) => {
     /* value: مقدار ذخیره؛ date: CalendarDate خام */
   }}
@@ -150,15 +150,15 @@ import { EventCalendar, InlineCalendar, RangePicker } from '@jalali-js/ui-react'
 
 ### `TimePicker`
 
-| Prop            | نوع              | پیش‌فرض                  | معنا                |
-| --------------- | ---------------- | ------------------------ | ------------------- |
-| `value`         | `TimeOfDay`      | -                        | زمان کنترل‌شده      |
-| `defaultValue`  | `TimeOfDay`      | `{ hour: 0, minute: 0 }` | دانه بدون کنترل     |
-| `minuteStep`    | `number`         | `1`                      | گام گزینه‌های دقیقه |
-| `disabledHours` | `number[]`       | -                        | ساعت‌های پنهان      |
-| `locale`        | `LocaleCode`     | `'en'`                   | زبان رقم‌ها         |
-| `onChange`      | `(time) => void` | -                        | زمان عوض شد         |
-| `className`     | `string`         | -                        | کلاس ریشه           |
+| Prop            | نوع              | پیش‌فرض                  | معنا                   |
+| --------------- | ---------------- | ------------------------ | ---------------------- |
+| `value`         | `TimeOfDay`      | -                        | زمان کنترل‌شده         |
+| `defaultValue`  | `TimeOfDay`      | `{ hour: 0, minute: 0 }` | مقدار اولیه بدون کنترل |
+| `minuteStep`    | `number`         | `1`                      | گام گزینه‌های دقیقه    |
+| `disabledHours` | `number[]`       | -                        | ساعت‌های پنهان         |
+| `locale`        | `LocaleCode`     | `'en'`                   | زبان رقم‌ها            |
+| `onChange`      | `(time) => void` | -                        | زمان عوض شد            |
+| `className`     | `string`         | -                        | کلاس ریشه              |
 
 ### `RangePicker` (`@jalali-js/ui-react`)
 

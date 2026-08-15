@@ -51,7 +51,7 @@ import { Calendar } from '@jalali-js/vue';
 `v-model` مقدار **ذخیره** را حمل می‌کند (شکل‌گرفته با `valueFormat`)، نه `CalendarDate` خام،
 پس یک کانال نوشتن مؤثر است: انتخاب تاریخ مقدار بسته‌شده را مستقیم به‌روز می‌کند. مقدار را
 دوباره نمی‌خواند (برگرداندن هر `valueFormat` به `CalendarDate` خارج از محدوده است)؛ برای
-دانه انتخاب اولیه به‌جای آن از `defaultDate` استفاده کنید.
+مقدار انتخاب اولیه به‌جای آن از `defaultDate` استفاده کنید.
 
 ```vue
 <script setup lang="ts">
@@ -126,7 +126,7 @@ const storedRange = ref<RangeStorageValue>();
 SFCهای `.vue` در API تولیدشده نیستند. این جدول‌ها با `defineProps` در منبع هم‌خوانی دارند.
 
 نکته اتصال: `DatePicker` و `RangePicker` برای مقدار ذخیره از `v-model` استفاده می‌کنند (کانال
-نوشتن). با `defaultDate` / `defaultRange` دانه بگذارید. `Calendar` از `:value` و `@select`
+نوشتن). با `defaultDate` / `defaultRange` مقدار اولیه بدهید. `Calendar` از `:value` و `@select`
 استفاده می‌کند. `TimePicker` / `TimeRangePicker` رویداد `change` می‌فرستند. `EventCalendar`
 رویدادهای `eventClick` و `dayClick` می‌فرستد.
 
@@ -168,13 +168,13 @@ Emit: `select` با `CalendarDate` انتخاب‌شده.
 
 ### `TimePicker`
 
-| Prop            | نوع          | پیش‌فرض                  | معنا                |
-| --------------- | ------------ | ------------------------ | ------------------- |
-| `value`         | `TimeOfDay`  | -                        | زمان کنترل‌شده      |
-| `defaultValue`  | `TimeOfDay`  | `{ hour: 0, minute: 0 }` | دانه بدون کنترل     |
-| `minuteStep`    | `number`     | `1`                      | گام گزینه‌های دقیقه |
-| `disabledHours` | `number[]`   | -                        | ساعت‌های پنهان      |
-| `locale`        | `LocaleCode` | `'en'`                   | زبان رقم‌ها         |
+| Prop            | نوع          | پیش‌فرض                  | معنا                   |
+| --------------- | ------------ | ------------------------ | ---------------------- |
+| `value`         | `TimeOfDay`  | -                        | زمان کنترل‌شده         |
+| `defaultValue`  | `TimeOfDay`  | `{ hour: 0, minute: 0 }` | مقدار اولیه بدون کنترل |
+| `minuteStep`    | `number`     | `1`                      | گام گزینه‌های دقیقه    |
+| `disabledHours` | `number[]`   | -                        | ساعت‌های پنهان         |
+| `locale`        | `LocaleCode` | `'en'`                   | زبان رقم‌ها            |
 
 Emit: `change` با `TimeOfDay`.
 

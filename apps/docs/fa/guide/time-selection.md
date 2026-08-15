@@ -27,7 +27,7 @@ import { TimePicker } from '@jalali-js/react';
 | Prop            | نوع              | پیش‌فرض                  | معنا                   |
 | --------------- | ---------------- | ------------------------ | ---------------------- |
 | `value`         | `TimeOfDay`      | -                        | زمان کنترل‌شده         |
-| `defaultValue`  | `TimeOfDay`      | `{ hour: 0, minute: 0 }` | دانه بدون کنترل        |
+| `defaultValue`  | `TimeOfDay`      | `{ hour: 0, minute: 0 }` | مقدار اولیه بدون کنترل |
 | `minuteStep`    | `number`         | `1`                      | گام گزینه‌های دقیقه    |
 | `disabledHours` | `number[]`       | -                        | ساعت‌های پنهان ۰ تا ۲۳ |
 | `locale`        | `LocaleCode`     | `'en'`                   | رقم‌ها و جهت           |
