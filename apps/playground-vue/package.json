@@ -15,11 +15,11 @@
     "@jalali-js/vue": "workspace:*",
     "jalali-js": "workspace:*",
     "playground-shared": "workspace:*",
-    "vue": "^3.5.42"
+    "vue": "^3.5.43"
   },
   "devDependencies": {
-    "@types/node": "^26.4.0",
-    "@vitejs/plugin-vue": "^6.0.8",
+    "@types/node": "^26.6.3",
+    "@vitejs/plugin-vue": "^6.0.9",
     "vite": "8.2.0",
     "vue-tsc": "^3.3.11"
   }
