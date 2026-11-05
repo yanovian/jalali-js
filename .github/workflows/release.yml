@@ -13,6 +13,8 @@ on:
 
 permissions:
   contents: write
+  # npm trusted publishing (OIDC) needs this. npm gives a short-lived token, so no NPM_TOKEN secret is necessary.
+  id-token: write
 
 jobs:
   release:
@@ -29,7 +31,6 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: make install-frozen
@@ -54,8 +55,6 @@ jobs:
 
       - name: Publish to npm
         run: make publish-packages
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
